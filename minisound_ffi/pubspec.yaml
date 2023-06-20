@@ -2,6 +2,7 @@ name: minisound_ffi
 description: A new Flutter FFI plugin project.
 version: 1.0.0
 publish_to: none
+homepage: https://github.com/DaniilAlpha/minisound/tree/master/minisound_ffi
 
 #####
 
