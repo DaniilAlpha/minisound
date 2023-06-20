@@ -1,0 +1,67 @@
+name: minisound_ffi
+description: A new Flutter FFI plugin project.
+version: 1.0.0
+publish_to: none
+
+#####
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.3.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  ffi: ^2.0.2
+  minisound_platform_interface:
+    path: ../minisound_platform_interface/
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.1
+  ffigen: ^8.0.2
+
+#####
+
+ffigen:
+  name: MinisoundFfiBindings
+  description: Bindings for minisound.h
+  output: "lib/minisound_ffi_bindings.dart"
+  headers:
+    entry-points:
+      - "src/include/minisound.h"
+      - "src/include/engine.h"
+    include-directives:
+      - "src/include/*.h"
+  preamble: |
+    // ignore_for_file: camel_case_types
+    // ignore_for_file: prefer_double_quotes
+    // ignore_for_file: non_constant_identifier_names
+    // ignore_for_file: constant_identifier_names
+    // ignore_for_file: prefer_expression_function_bodies
+    // ignore_for_file: sort_constructors_first
+  llvm-path:
+    - c:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\Llvm\x64\
+
+##
+
+flutter:
+  plugin:
+    implements: minisound
+    platforms:
+      android:
+        ffiPlugin: true
+        dartPluginClass: MinisoundFfi
+      ios:
+        ffiPlugin: true
+        dartPluginClass: MinisoundFfi
+      linux:
+        ffiPlugin: true
+        dartPluginClass: MinisoundFfi
+      macos:
+        ffiPlugin: true
+        dartPluginClass: MinisoundFfi
+      windows:
+        ffiPlugin: true
+        dartPluginClass: MinisoundFfi

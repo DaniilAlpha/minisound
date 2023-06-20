@@ -1,0 +1,87 @@
+# options: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+---
+AlignAfterOpenBracket: BlockIndent
+AlignArrayOfStructures: Left
+AlignConsecutiveMacros: Consecutive
+AlignEscapedNewlines: Right
+
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: Always
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortEnumsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: All
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLambdasOnASingleLine: All
+AllowShortLoopsOnASingleLine: true
+
+BasedOnStyle: Google
+
+BinPackArguments: false
+BinPackParameters: false
+
+BreakBeforeBraces: Attach
+BreakConstructorInitializers: BeforeColon
+BreakInheritanceList: AfterColon
+BreakStringLiterals: false
+
+ColumnLimit: 80
+
+ConstructorInitializerIndentWidth: 0
+ContinuationIndentWidth: 2
+
+DerivePointerAlignment: false
+
+EmptyLineAfterAccessModifier: Never
+EmptyLineBeforeAccessModifier: Always
+
+FixNamespaceComments: true
+
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: "^<string.h>$"
+    Priority: 1
+  - Regex: "^<assert.h>$"
+    Priority: 1
+  - Regex: "^<time.h>$"
+    Priority: 1
+  - Regex: "^<milo.h>$"
+    Priority: 1000000000
+
+  - Regex: "^<std"
+    Priority: 1
+  - Regex: "^<[^.]*>$"
+    Priority: 1
+
+  - Regex: "^<"
+    Priority: 100
+  - Regex: '^"'
+    Priority: 1000
+
+IndentAccessModifiers: false
+IndentCaseBlocks: false
+IndentCaseLabels: false
+IndentExternBlock: NoIndent
+IndentGotoLabels: false
+IndentPPDirectives: AfterHash
+IndentWidth: 2
+
+InsertNewlineAtEOF: true
+LineEnding: LF
+
+NamespaceIndentation: All
+
+PPIndentWidth: 1
+
+PackConstructorInitializers: NextLine
+
+PointerAlignment: Right
+ReferenceAlignment: Pointer
+
+ReflowComments: true
+
+SeparateDefinitionBlocks: Leave
+
+SortIncludes: CaseInsensitive
+
+UseTab: Never

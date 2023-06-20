@@ -1,0 +1,2 @@
+# Hashes of file build rules.
+a0c85ac09c334ddb5b102b01162b473f CMakeFiles/minisound_web_js

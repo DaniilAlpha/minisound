@@ -1,0 +1,95 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    ### syntax ###
+    # types
+    avoid_types_on_closure_parameters: true
+    omit_local_variable_types: true
+    avoid_double_and_int_checks: true
+    avoid_final_parameters: true
+
+    # strings
+    prefer_double_quotes: true
+    leading_newlines_in_multiline_strings: true
+
+    # functions
+    prefer_expression_function_bodies: true
+    avoid_positional_boolean_parameters: true
+
+    # classes
+    prefer_constructors_over_static_methods: true
+    sort_constructors_first: true
+    sort_unnamed_constructors_first: true
+    unnecessary_null_aware_operator_on_extension_on_nullable: true
+    avoid_returning_this: true
+
+    # imports
+    directives_ordering: true
+    always_use_package_imports: true
+    combinators_ordering: true
+
+    # unnecessary
+    unnecessary_parenthesis: true
+    unnecessary_raw_strings: true
+    unnecessary_await_in_return: true
+    unnecessary_lambdas: true
+    literal_only_boolean_expressions: true
+    unnecessary_statements: true
+    noop_primitive_operations: true
+    use_named_constants: true
+
+    # others
+    no_leading_underscores_for_local_identifiers: true
+    avoid_bool_literals_in_conditional_expressions: true
+    ######
+
+    ### good practicies ###
+    # final
+    prefer_final_in_for_each: true
+    prefer_final_locals: true
+    prefer_final_fields: true
+    parameter_assignments: true
+
+    # types
+    avoid_dynamic_calls: true
+    test_types_in_equals: true
+    always_declare_return_types: true
+    avoid_void_async: true
+    null_check_on_nullable_type_parameter: true
+
+    # classes
+    prefer_mixin: true
+    use_enums: true
+    avoid_setters_without_getters: true
+    implicit_call_tearoffs: true
+    use_to_and_as_if_applicable: true
+
+    # throw/try/catch
+    throw_in_finally: true
+    avoid_catches_without_on_clauses: true
+    avoid_catching_errors: true
+    only_throw_errors: true
+
+    # strings
+    use_string_buffers: true
+    avoid_type_to_string: true
+
+    # async
+    cancel_subscriptions: true
+    close_sinks: true
+    unawaited_futures: true
+
+    # others
+    conditional_uri_does_not_exist: true
+    avoid_js_rounded_ints: true
+    ######
+
+    ### flutter ###
+    use_colored_box: true
+    use_decorated_box: true
+    ######
+
+analyzer:
+  errors:
+    todo: ignore

@@ -1,0 +1,4 @@
+/mnt/d/_projects/_flutter/minisound/minisound_web/lib/js/CMakeFiles/rebuild_cache.dir
+/mnt/d/_projects/_flutter/minisound/minisound_web/lib/js/CMakeFiles/minisound_web_js.dir
+/mnt/d/_projects/_flutter/minisound/minisound_web/lib/js/CMakeFiles/edit_cache.dir
+/mnt/d/_projects/_flutter/minisound/minisound_web/lib/js/CMakeFiles/minisound_web.dir

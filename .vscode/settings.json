@@ -1,0 +1,32 @@
+{
+    "activitusbar.views": [
+        {
+            "name": "task.upgrade",
+            "codicon": "arrow-down",
+            "tooltip": "upgrade"
+        },
+        {
+            "name": "task.clean",
+            "codicon": "trash",
+            "tooltip": "clean"
+        },
+        {
+            "name": "task.example-run-web",
+            "codicon": "browser",
+            "tooltip": "example run web"
+        },
+        {
+            "name": "task.minisound-web-build-lib",
+            "codicon": "library",
+            "tooltip": "minisound_web build lib"
+        },
+        {
+            "name": "task.minisound-web-clean-lib",
+            "codicon": "clear-all",
+            "tooltip": "minisound_web clean lib"
+        },
+    ],
+    "files.associations": {
+        "*.h": "c",
+    }
+}

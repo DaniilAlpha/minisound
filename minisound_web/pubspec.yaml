@@ -1,0 +1,42 @@
+name: minisound_web
+description: A new Flutter package project.
+version: 1.0.0
+publish_to: none
+
+#####
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+  js: ^0.6.7
+  minisound_platform_interface:
+    path: ../minisound_platform_interface/
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.1
+
+#####
+
+flutter:
+  plugin:
+    implements: minisound
+    platforms:
+      web:
+        pluginClass: MinisoundWeb
+        fileName: minisound_web.dart
+
+  assets:
+    - packages/minisound_web/js/minisound_web.loader.js
+    - packages/minisound_web/js/emscripten/minisound_web.wasm
+    - packages/minisound_web/js/emscripten/minisound_web.js
+    - packages/minisound_web/js/emscripten/minisound_web.aw.js
+    - packages/minisound_web/js/emscripten/minisound_web.ww.js
+    - packages/minisound_web/js/emscripten/minisound_web.worker.js
