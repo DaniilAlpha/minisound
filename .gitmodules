@@ -1,0 +1,3 @@
+[submodule "minisound_ffi/src/external/milo"]
+	path = minisound_ffi/src/external/milo
+	url = git@github.com:DaniilAlpha/milo.git
