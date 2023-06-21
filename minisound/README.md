@@ -1,6 +1,6 @@
 # minisound
 
-A high-level real-time audio playback library based on [miniaudio](http://miniaud.io). The library offers basic functionality and quite low latency. Not really suitable for big sounds right now. Supports MP3, WAV and FLAC formats.
+A high-level real-time audio playback library based on [miniaudio](https://miniaud.io). The library offers basic functionality and quite low latency. Not really suitable for big sounds right now. Supports MP3, WAV and FLAC formats.
 
 
 **Platform support**
