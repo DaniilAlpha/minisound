@@ -1,8 +1,8 @@
 import "dart:io";
 
 import "package:flutter/services.dart";
-import "package:minisound_platform_interface/minisound_platform.dart";
-export "package:minisound_platform_interface/minisound_platform.dart"
+import "package:minisound_platform_interface/minisound_platform_interface.dart";
+export "package:minisound_platform_interface/minisound_platform_interface.dart"
     show MinisoundPlatformException, MinisoundPlatformOutOfMemoryException;
 
 /// Controls the loading and unloading of `Sound`s.

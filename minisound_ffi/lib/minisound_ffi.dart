@@ -4,7 +4,7 @@ import "dart:io";
 import "package:ffi/ffi.dart";
 import "package:flutter/services.dart";
 import "package:minisound_ffi/minisound_ffi_bindings.dart" as ffi;
-import "package:minisound_platform_interface/minisound_platform.dart";
+import "package:minisound_platform_interface/minisound_platform_interface.dart";
 
 // dynamic lib
 const String _libName = "minisound_ffi";

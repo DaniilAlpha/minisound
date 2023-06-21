@@ -1,6 +1,6 @@
 import "package:flutter_test/flutter_test.dart";
 import "package:minisound/minisound.dart";
-import "package:minisound_platform_interface/minisound_platform.dart";
+import "package:minisound_platform_interface/minisound_platform_interface.dart";
 
 import "minisound_mock.dart";
 

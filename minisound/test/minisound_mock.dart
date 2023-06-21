@@ -1,6 +1,6 @@
 import "dart:typed_data";
 
-import "package:minisound_platform_interface/minisound_platform.dart";
+import "package:minisound_platform_interface/minisound_platform_interface.dart";
 
 // minisound mock
 

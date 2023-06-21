@@ -1,7 +1,7 @@
 import "dart:typed_data";
 
 import "package:flutter_web_plugins/flutter_web_plugins.dart";
-import "package:minisound_platform_interface/minisound_platform.dart";
+import "package:minisound_platform_interface/minisound_platform_interface.dart";
 import "package:minisound_web/bindings/minisound.dart" as wasm;
 import "package:minisound_web/bindings/wasm/wasm.dart";
 
