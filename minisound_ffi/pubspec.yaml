@@ -13,8 +13,7 @@ dependencies:
   flutter:
     sdk: flutter
   ffi: ^2.0.2
-  minisound_platform_interface:
-    path: ../minisound_platform_interface/
+  minisound_platform_interface: ^1.0.0
 
 dev_dependencies:
   flutter_test:

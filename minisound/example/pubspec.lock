@@ -153,9 +153,10 @@ packages:
   minisound_platform_interface:
     dependency: transitive
     description:
-      path: "../../minisound_platform_interface"
-      relative: true
-    source: path
+      name: minisound_platform_interface
+      sha256: "8bfee89369946dafeb4795bb698c5333fbaf0ba0f9b0bffaa46e0e00918a3c97"
+      url: "https://pub.dev"
+    source: hosted
     version: "1.0.0"
   minisound_web:
     dependency: transitive
