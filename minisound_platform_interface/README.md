@@ -6,7 +6,7 @@ This interface allows platform-specific implementations of the `minisound` plugi
 
 ## Usage
 
-To implement a new platform-specific implementation of `minisound`, extend `MinisoundPlatform`, `EnginePlatform` and `SoundPlatform` with an implementation that performs the platform-specific behavior, and when you register your plugin, set the default `MinisoundPlatform` by calling `MinisoundPlatform.instance = MinisoundYourPlatform()`.
+To implement a new platform-specific implementation of `minisound`, extend `MinisoundPlatform`, `PlatformEngine` and `PlatformSound` with an implementation that performs the platform-specific behavior, and when you register your plugin, set the default `MinisoundPlatform` by calling `MinisoundPlatform.instance = MinisoundYourPlatform()`.
 
 ## Note on breaking changes
 

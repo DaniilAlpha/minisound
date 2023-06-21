@@ -12,7 +12,7 @@ export "package:minisound_platform_interface/minisound_platform.dart"
 final class Engine {
   // TODO add finisher for automatic disposing
 
-  final _engine = EnginePlatform();
+  final _engine = PlatformEngine();
 
   /// Initializes an engine.
   ///
@@ -56,9 +56,9 @@ final class Engine {
 final class Sound {
   // TODO add finisher for automatic unloading
 
-  Sound._(SoundPlatform sound) : _sound = sound;
+  Sound._(PlatformSound sound) : _sound = sound;
 
-  final SoundPlatform _sound;
+  final PlatformSound _sound;
 
   /// a `double` between `0` and `1`
   double get volume => _sound.volume;

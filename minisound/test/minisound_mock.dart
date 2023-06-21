@@ -6,14 +6,14 @@ import "package:minisound_platform_interface/minisound_platform.dart";
 
 class MinisoundMock extends MinisoundPlatform {
   @override
-  EnginePlatform createEngine() => EngineMock();
+  PlatformEngine createEngine() => EngineMock();
 }
 
 // engine mock
 
 enum EngineState { uninit, init, started }
 
-class EngineMock implements EnginePlatform {
+class EngineMock implements PlatformEngine {
   var state = EngineState.uninit;
 
   @override
@@ -28,7 +28,7 @@ class EngineMock implements EnginePlatform {
   }
 
   @override
-  Future<SoundPlatform> loadSound(Uint8List data) async {
+  Future<PlatformSound> loadSound(Uint8List data) async {
     if (state == EngineState.uninit) {
       throw MinisoundPlatformException("cannot load sound");
     }
@@ -44,7 +44,7 @@ class EngineMock implements EnginePlatform {
   }
 
   @override
-  void unloadSound(SoundPlatform sound) {
+  void unloadSound(PlatformSound sound) {
     sound as SoundMock;
   }
 }
@@ -53,7 +53,7 @@ class EngineMock implements EnginePlatform {
 
 enum SoundState { playing, paused, stopped }
 
-class SoundMock implements SoundPlatform {
+class SoundMock implements PlatformSound {
   SoundMock(this.data);
 
   final Uint8List data;

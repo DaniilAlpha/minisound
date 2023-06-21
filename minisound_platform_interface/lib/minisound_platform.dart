@@ -14,22 +14,22 @@ abstract class MinisoundPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  EnginePlatform createEngine();
+  PlatformEngine createEngine();
 }
 
-abstract interface class EnginePlatform {
-  factory EnginePlatform() => MinisoundPlatform.instance.createEngine();
+abstract interface class PlatformEngine {
+  factory PlatformEngine() => MinisoundPlatform.instance.createEngine();
 
   Future<void> init(int periodMs);
   void dispose();
 
   void start();
 
-  Future<SoundPlatform> loadSound(Uint8List data);
-  void unloadSound(SoundPlatform sound);
+  Future<PlatformSound> loadSound(Uint8List data);
+  void unloadSound(PlatformSound sound);
 }
 
-abstract interface class SoundPlatform {
+abstract interface class PlatformSound {
   double get volume;
   set volume(double value);
 

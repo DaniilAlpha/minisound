@@ -26,16 +26,16 @@ class MinisoundFfi extends MinisoundPlatform {
   static void registerWith() => MinisoundPlatform.instance = MinisoundFfi._();
 
   @override
-  EnginePlatform createEngine() {
+  PlatformEngine createEngine() {
     final self = _bindings.engine_alloc();
     if (self == nullptr) throw MinisoundPlatformOutOfMemoryException();
-    return EngineFfi(self);
+    return FfiEngine(self);
   }
 }
 
 // engine ffi
-final class EngineFfi implements EnginePlatform {
-  EngineFfi(Pointer<ffi.Engine> self) : _self = self;
+final class FfiEngine implements PlatformEngine {
+  FfiEngine(Pointer<ffi.Engine> self) : _self = self;
 
   final Pointer<ffi.Engine> _self;
 
@@ -60,7 +60,7 @@ final class EngineFfi implements EnginePlatform {
   }
 
   @override
-  Future<SoundPlatform> loadSound(Uint8List data) async {
+  Future<PlatformSound> loadSound(Uint8List data) async {
     // copy data into the memory
     final dataPtr = malloc.allocate<Uint8>(data.lengthInBytes);
     for (var i = 0; i < data.length; i++) {
@@ -73,12 +73,12 @@ final class EngineFfi implements EnginePlatform {
     if (sound == nullptr) {
       throw MinisoundPlatformException("Failed to load a sound.");
     }
-    return SoundFfi._fromPtrs(sound, dataPtr);
+    return FfiSound._fromPtrs(sound, dataPtr);
   }
 
   @override
-  void unloadSound(SoundPlatform sound) {
-    sound as SoundFfi;
+  void unloadSound(PlatformSound sound) {
+    sound as FfiSound;
 
     _bindings.engine_unload_sound(_self, sound._self);
     malloc.free(sound._data);
@@ -86,8 +86,8 @@ final class EngineFfi implements EnginePlatform {
 }
 
 // sound ffi
-final class SoundFfi implements SoundPlatform {
-  SoundFfi._fromPtrs(Pointer<ffi.Sound> self, Pointer data)
+final class FfiSound implements PlatformSound {
+  FfiSound._fromPtrs(Pointer<ffi.Sound> self, Pointer data)
       : _self = self,
         _data = data,
         _volume = _bindings.sound_get_volume(self),

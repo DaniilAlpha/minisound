@@ -13,16 +13,16 @@ class MinisoundWeb extends MinisoundPlatform {
       MinisoundPlatform.instance = MinisoundWeb._();
 
   @override
-  EnginePlatform createEngine() {
+  PlatformEngine createEngine() {
     final self = wasm.engine_alloc();
     if (self == nullptr) throw MinisoundPlatformOutOfMemoryException();
-    return EngineWeb(self);
+    return WebEngine(self);
   }
 }
 
 // engine web
-final class EngineWeb implements EnginePlatform {
-  EngineWeb(Pointer<wasm.Engine> self) : _self = self;
+final class WebEngine implements PlatformEngine {
+  WebEngine(Pointer<wasm.Engine> self) : _self = self;
 
   final Pointer<wasm.Engine> _self;
 
@@ -47,7 +47,7 @@ final class EngineWeb implements EnginePlatform {
   }
 
   @override
-  Future<SoundPlatform> loadSound(Uint8List data) async {
+  Future<PlatformSound> loadSound(Uint8List data) async {
     // copy data into the memory
     final dataPtr = malloc.allocate(data.lengthInBytes);
     heap.copy(dataPtr, data);
@@ -57,12 +57,12 @@ final class EngineWeb implements EnginePlatform {
     if (sound == nullptr) {
       throw MinisoundPlatformException("Failed to load a sound.");
     }
-    return SoundWeb._fromPtrs(sound, dataPtr);
+    return WebSound._fromPtrs(sound, dataPtr);
   }
 
   @override
-  void unloadSound(SoundPlatform sound) {
-    sound as SoundWeb;
+  void unloadSound(PlatformSound sound) {
+    sound as WebSound;
 
     wasm.engine_unload_sound(_self, sound._self);
     malloc.free(sound._data);
@@ -70,8 +70,8 @@ final class EngineWeb implements EnginePlatform {
 }
 
 // sound web
-final class SoundWeb implements SoundPlatform {
-  SoundWeb._fromPtrs(Pointer<wasm.Sound> self, Pointer data)
+final class WebSound implements PlatformSound {
+  WebSound._fromPtrs(Pointer<wasm.Sound> self, Pointer data)
       : _self = self,
         _data = data,
         _volume = wasm.sound_get_volume(self),
