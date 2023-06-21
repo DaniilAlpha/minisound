@@ -1,8 +1,7 @@
 name: minisound_platform_interface
-description: A new Flutter package project.
+description: A common platform interface for the Minisound package.
 version: 1.0.0
-publish_to: none
-homepage: https://github.com/DaniilAlpha/minisound/tree/master/minisound_platform_interface
+repository: https://github.com/DaniilAlpha/minisound/tree/master/minisound_platform_interface
 
 #####
 

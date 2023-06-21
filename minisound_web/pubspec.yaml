@@ -1,8 +1,7 @@
 name: minisound_web
-description: A new Flutter package project.
+description: Web implementation of the Minisound package.
 version: 1.0.0
-publish_to: none
-homepage: https://github.com/DaniilAlpha/minisound/tree/master/minisound_web
+repository: https://github.com/DaniilAlpha/minisound/tree/master/minisound_web
 
 #####
 

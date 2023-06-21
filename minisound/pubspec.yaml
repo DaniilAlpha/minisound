@@ -1,8 +1,7 @@
 name: minisound
 description: A high-level real-time audio playback library based on Miniaudio.
 version: 1.0.0
-publish_to: none
-homepage: https://github.com/DaniilAlpha/minisound/tree/master/minisound
+repository: https://github.com/DaniilAlpha/minisound/tree/master/minisound
 
 #####
 
