@@ -7,7 +7,7 @@ repository: https://github.com/DaniilAlpha/minisound/tree/master/minisound
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=1.17.0"
+  flutter: ">=1.20.0"
 
 dependencies:
   flutter:

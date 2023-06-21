@@ -162,9 +162,10 @@ packages:
   minisound_web:
     dependency: transitive
     description:
-      path: "../../minisound_web"
-      relative: true
-    source: path
+      name: minisound_web
+      sha256: c61472840d6e5360ed77fdd45bb7ae7ff6c2f365300148beb1863f10b29e793b
+      url: "https://pub.dev"
+    source: hosted
     version: "1.0.0"
   path:
     dependency: transitive
