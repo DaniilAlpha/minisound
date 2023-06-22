@@ -4,14 +4,14 @@ A high-level real-time audio playback library based on [miniaudio](https://minia
 
 
 **Platform support**
-| Platform | Tested                                      | Supposed to work                        | Unsupported                                |
-| -------- | :-----------------------------------------: | :-------------------------------------: | :----------------------------------------: |
-| Android  | SDK 31, 19                                  | SDK 16+                                 | SDK 15-                                    |
-| iOS      | None                                        | Unknown                                 | Unknown                                    |
-| Windows  | 11 <br> 7 (x64)                             | Vista+                                  | XP-                                        |
-| macOS    | None                                        | Unknown                                 | Unknown                                    |
-| Linux    | Debian 11 (WSL)                             | Any                                     | None                                       |
-| Web      | Chrome 93+ <br> Firefox 79+ <br> Safari 16+ | Browsers with an `AudioWorklet` support | Browsers without an `AudioWorklet` support |
+| Platform | Tested                              | Supposed to work                        | Unsupported                                |
+| -------- | :---------------------------------: | :-------------------------------------: | :----------------------------------------: |
+| Android  | SDK 31, 19                          | SDK 16+                                 | SDK 15-                                    |
+| iOS      | None                                | Unknown                                 | Unknown                                    |
+| Windows  | 11, 7 (x64)                         | Vista+                                  | XP-                                        |
+| macOS    | None                                | Unknown                                 | Unknown                                    |
+| Linux    | Debian 11 (WSL)                     | Any                                     | None                                       |
+| Web      | Chrome 93+, Firefox 79+, Safari 16+ | Browsers with an `AudioWorklet` support | Browsers without an `AudioWorklet` support |
 
 ## Getting started on the web
 
