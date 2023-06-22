@@ -3,4 +3,4 @@ A high-level real-time audio playback library based on [miniaudio](https://minia
 
 This is a [pub.dev package](https://pub.dev/packages/minisound).
 
-See the full description in the `minisound` folder.
+See the full description in the [`minisound`](minisound/) folder.
