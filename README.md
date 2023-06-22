@@ -1,1 +1,1 @@
-minisound/README.md
+./minisound/README.md
