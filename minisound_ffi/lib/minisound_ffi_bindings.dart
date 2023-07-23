@@ -101,22 +101,19 @@ class MinisoundFfiBindings {
       ffi.Pointer<Sound> Function(
           ffi.Pointer<Engine>, ffi.Pointer<ffi.Void>, int)>();
 
-  void engine_unload_sound(
-    ffi.Pointer<Engine> self,
-    ffi.Pointer<Sound> sound,
+  void sound_unload(
+    ffi.Pointer<Sound> self,
   ) {
-    return _engine_unload_sound(
+    return _sound_unload(
       self,
-      sound,
     );
   }
 
-  late final _engine_unload_soundPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(
-              ffi.Pointer<Engine>, ffi.Pointer<Sound>)>>('engine_unload_sound');
-  late final _engine_unload_sound = _engine_unload_soundPtr
-      .asFunction<void Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>)>();
+  late final _sound_unloadPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<Sound>)>>(
+          'sound_unload');
+  late final _sound_unload =
+      _sound_unloadPtr.asFunction<void Function(ffi.Pointer<Sound>)>();
 
   int sound_play(
     ffi.Pointer<Sound> self,

@@ -75,14 +75,6 @@ final class FfiEngine implements PlatformEngine {
     }
     return FfiSound._fromPtrs(sound, dataPtr);
   }
-
-  @override
-  void unloadSound(PlatformSound sound) {
-    sound as FfiSound;
-
-    _bindings.engine_unload_sound(_self, sound._self);
-    malloc.free(sound._data);
-  }
 }
 
 // sound ffi
@@ -108,6 +100,12 @@ final class FfiSound implements PlatformSound {
   final double _duration;
   @override
   double get duration => _duration;
+
+  @override
+  void unload() {
+    _bindings.sound_unload(_self);
+    malloc.free(_data);
+  }
 
   @override
   void play() {

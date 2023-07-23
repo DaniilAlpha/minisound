@@ -1,6 +1,6 @@
 name: minisound_platform_interface
 description: A common platform interface for the Minisound package.
-version: 1.0.0
+version: 1.1.0
 repository: https://github.com/DaniilAlpha/minisound/tree/master/minisound_platform_interface
 
 #####

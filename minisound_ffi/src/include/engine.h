@@ -24,9 +24,10 @@ EXPORT Sound *engine_load_sound(
   const void *const data,
   const size_t data_size
 );
-EXPORT void engine_unload_sound(const Engine *const self, Sound *const sound);
 
 // sound functions
+
+EXPORT void sound_unload(Sound *const self);
 
 EXPORT Result sound_play(Sound *const self);
 EXPORT void sound_pause(Sound *const self);

@@ -36,7 +36,7 @@ final class WebEngine implements PlatformEngine {
   @override
   void dispose() {
     wasm.engine_uninit(_self);
-    malloc.free(_self); // TODO free when GC unloads an object
+    malloc.free(_self);
   }
 
   @override
@@ -58,14 +58,6 @@ final class WebEngine implements PlatformEngine {
       throw MinisoundPlatformException("Failed to load a sound.");
     }
     return WebSound._fromPtrs(sound, dataPtr);
-  }
-
-  @override
-  void unloadSound(PlatformSound sound) {
-    sound as WebSound;
-
-    wasm.engine_unload_sound(_self, sound._self);
-    malloc.free(sound._data);
   }
 }
 
@@ -92,6 +84,12 @@ final class WebSound implements PlatformSound {
   final double _duration;
   @override
   double get duration => _duration;
+
+  @override
+  void unload() {
+    wasm.sound_unload(_self);
+    malloc.free(_data);
+  }
 
   @override
   void play() {

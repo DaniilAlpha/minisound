@@ -42,11 +42,6 @@ class EngineMock implements PlatformEngine {
     }
     state = EngineState.started;
   }
-
-  @override
-  void unloadSound(PlatformSound sound) {
-    sound as SoundMock;
-  }
 }
 
 // sound mock
@@ -74,4 +69,7 @@ class SoundMock implements PlatformSound {
 
   @override
   void stop() => state = SoundState.stopped;
+
+  @override
+  void unload() {}
 }

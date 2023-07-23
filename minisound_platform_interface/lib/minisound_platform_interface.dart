@@ -26,7 +26,6 @@ abstract interface class PlatformEngine {
   void start();
 
   Future<PlatformSound> loadSound(Uint8List data);
-  void unloadSound(PlatformSound sound);
 }
 
 abstract interface class PlatformSound {
@@ -34,6 +33,8 @@ abstract interface class PlatformSound {
   set volume(double value);
 
   double get duration;
+
+  void unload();
 
   void play();
   void pause();

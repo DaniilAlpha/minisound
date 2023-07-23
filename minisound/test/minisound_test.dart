@@ -18,8 +18,5 @@ void main() {
     sound.play();
     sound.pause();
     sound.stop();
-
-    await engine.unloadSound(sound);
-    await engine.dispose();
   });
 }

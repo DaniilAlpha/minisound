@@ -10,7 +10,13 @@ export "package:minisound_platform_interface/minisound_platform_interface.dart"
 /// Should be initialized before doind anything.
 /// Should be started to hear any sound.
 final class Engine {
-  // TODO add finisher for automatic disposing
+  Engine() {
+    _finalizer.attach(this, _engine);
+  }
+
+  static final _finalizer =
+      Finalizer<PlatformEngine>((engine) => engine.dispose());
+  static final _soundsFinalizer = Finalizer<Sound>((sound) => sound.unload());
 
   final _engine = PlatformEngine();
 
@@ -19,19 +25,15 @@ final class Engine {
   /// Change an update period (affects the sound latency).
   Future<void> init([int periodMs = 10]) => _engine.init(periodMs);
 
-  /// Uninitializes an engine. Unload all sounds before doing this.
-  ///
-  /// Cannot be reinitialized.
-  Future<void> dispose() async => _engine.dispose();
-
   /// Starts an engine.
-  ///
-  /// There is no `stop` function. Just call `dispose`.
   Future<void> start() async => _engine.start();
 
   /// Copies `data` to the internal memory location and creates a `Sound` from it.
-  Future<Sound> loadSound(Uint8List data) async =>
-      Sound._(await _engine.loadSound(data));
+  Future<Sound> loadSound(Uint8List data) async {
+    final sound = Sound._(await _engine.loadSound(data));
+    _soundsFinalizer.attach(this, sound);
+    return sound;
+  }
 
   /// Copies asset data to the internal memory location and creates a `Sound` from it.
   Future<Sound> loadSoundAsset(String path) async {
@@ -44,18 +46,10 @@ final class Engine {
     final file = await File(path).readAsBytes();
     return loadSound(file);
   }
-
-  /// Unloads a sound.
-  Future<void> unloadSound(Sound sound) async =>
-      _engine.unloadSound(sound._sound);
 }
 
 /// A sound.
-///
-/// Remember to unload sounds that you are not longer using.
 final class Sound {
-  // TODO add finisher for automatic unloading
-
   Sound._(PlatformSound sound) : _sound = sound;
 
   final PlatformSound _sound;
@@ -80,4 +74,6 @@ final class Sound {
 
   /// Resets a sound position.
   void stop() => _sound.stop();
+
+  void unload() => _sound.unload();
 }

@@ -111,16 +111,17 @@ Sound *engine_load_sound(
   return sound;
 
 error:
-  engine_unload_sound(self, sound);
+  sound_unload(sound);
   return NULL;
-}
-void engine_unload_sound(const Engine *const self, Sound *const sound) {
-  ma_sound_uninit(&sound->wave);
-  ma_decoder_uninit(&sound->decoder);
-  free(sound);
 }
 
 // sound functions
+
+void sound_unload(Sound *const self) {
+  ma_sound_uninit(&self->wave);
+  ma_decoder_uninit(&self->decoder);
+  free(self);
+}
 
 Result sound_play(Sound *const self) {
   if (ma_sound_start(&self->wave) != MA_SUCCESS) {

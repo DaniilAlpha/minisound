@@ -34,10 +34,10 @@ Pointer<Sound> engine_load_sound(
   int dataSize,
 ) =>
     Pointer(_engine_load_sound(self.addr, data.addr, dataSize));
-void engine_unload_sound(Pointer<Engine> self, Pointer<Sound> sound) =>
-    _engine_unload_sound(self.addr, sound.addr);
 
 // sound functions
+
+void sound_unload(Pointer<Sound> self) => _sound_unload(self.addr);
 
 int sound_play(Pointer<Sound> self) => _sound_play(self.addr);
 void sound_pause(Pointer<Sound> self) => _sound_pause(self.addr);
@@ -85,10 +85,11 @@ external int _engine_start(int self);
 
 @JS()
 external int _engine_load_sound(int self, int data, int dataSize);
-@JS()
-external void _engine_unload_sound(int self, int sound);
 
 // sound functions
+
+@JS()
+external void _sound_unload(int sound);
 
 @JS()
 external int _sound_play(int self);
