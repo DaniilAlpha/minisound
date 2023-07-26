@@ -1,8 +1,8 @@
 import "dart:ffi";
 import "dart:io";
+import "dart:typed_data";
 
 import "package:ffi/ffi.dart";
-import "package:flutter/services.dart";
 import "package:minisound_ffi/minisound_ffi_bindings.dart" as ffi;
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
 

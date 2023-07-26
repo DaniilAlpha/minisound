@@ -66,7 +66,7 @@ void main() {
   await engine.init(); 
 
   // there is also a 'loadSound' method to load a sound from the Uint8List
-  final sound = await engine.loadSoundAsset("asset/path.mp3");
+  final sound = await engine.loadSoundAsset("asset/path.ext");
   sound.volume = 0.5;
 
   // this may cause a MinisoundPlatformException to be thrown on the web
@@ -80,8 +80,6 @@ void main() {
   sound.pause(); // this method saves sound position
   sound.stop(); // but this does not
 
-  // you should unload any loaded sound before disposing an engine
-  await engine.unloadSound(sound);
-  await engine.dispose();
+  // the engine and all loaded sounds will be automatically disposed
 }
 ```

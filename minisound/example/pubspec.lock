@@ -139,10 +139,10 @@ packages:
     dependency: transitive
     description:
       name: minisound_platform_interface
-      sha256: "686bd78f1ad83629163027d09cf75f38fd31f9a72c1acdf62cd9080245fe5f64"
+      sha256: "54bbd78fd7e11553bf95ba666dc0d8406b9e6f68801131c222112a04756e5c27"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.1"
   minisound_web:
     dependency: transitive
     description:
