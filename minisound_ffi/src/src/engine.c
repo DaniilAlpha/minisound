@@ -1,11 +1,11 @@
-#include "engine.h"
+#include "../include/engine.h"
 
 #include <stdbool.h>
 
-#include <miniaudio.h>
+#include "../external/miniaudio/include/miniaudio.h"
 
 #define MILO_LVL MILO_LVL_INFO
-#include <milo.h>
+#include "../external/milo/include/milo.h"
 
 /*************
  ** private **

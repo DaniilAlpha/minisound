@@ -1,3 +1,7 @@
+## 1.1.4
+
+A problem with iOS and macOS compilation fixed.
+
 ## 1.1.0
 
 Slightly changed sound loading.
