@@ -1,3 +1,7 @@
+## 1.1.5
+
+Some small fixes.
+
 ## 1.1.4
 
 A problem with iOS and macOS compilation fixed.
