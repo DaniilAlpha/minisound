@@ -19,11 +19,17 @@ final class Engine {
   static final _soundsFinalizer = Finalizer<Sound>((sound) => sound.unload());
 
   final _engine = PlatformEngine();
+  var _isInit = false;
 
   /// Initializes an engine.
   ///
   /// Change an update period (affects the sound latency).
-  Future<void> init([int periodMs = 10]) => _engine.init(periodMs);
+  Future<void> init([int periodMs = 10]) async {
+    if (_isInit) throw EngineAlreadyInitError();
+
+    await _engine.init(periodMs);
+    _isInit = true;
+  }
 
   /// Starts an engine.
   Future<void> start() async => _engine.start();
@@ -76,4 +82,14 @@ final class Sound {
   void stop() => _sound.stop();
 
   void unload() => _sound.unload();
+}
+
+class EngineAlreadyInitError extends Error {
+  EngineAlreadyInitError([this.message]);
+
+  final String? message;
+
+  @override
+  String toString() =>
+      message == null ? "Engine already init" : "Engine already init: $message";
 }
