@@ -66,10 +66,10 @@ packages:
     dependency: "direct dev"
     description:
       name: flutter_lints
-      sha256: "2118df84ef0c3ca93f96123a616ae8540879991b8b57af2f81b76a7ada49b2a4"
+      sha256: a25a15ebbdfc33ab1cd26c63a6ee519df92338a9c10f122adda92938253bef04
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.2"
+    version: "2.0.3"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -126,15 +126,15 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.1.5"
+    version: "1.2.0"
   minisound_ffi:
     dependency: transitive
     description:
       name: minisound_ffi
-      sha256: c6f7e6caabce6adf93b8e9397a4496ad73a453af7629572ba2e703da6d77c941
+      sha256: b75c3d7d7c1d2e947ed70d9dce2531ed7a97808c13b41e1d58e51e037e0d6b5a
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.4"
+    version: "1.2.0"
   minisound_platform_interface:
     dependency: transitive
     description:
@@ -147,10 +147,10 @@ packages:
     dependency: transitive
     description:
       name: minisound_web
-      sha256: "7298e4fe7281642c70cc419e61dc748d5438df332cad2a8301e30df85e6c7c16"
+      sha256: "7ee4610e72b45c8b155e0445724398b4610c1d06047938cf4094dc9b921565a6"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.2.0"
   path:
     dependency: transitive
     description:
@@ -163,10 +163,10 @@ packages:
     dependency: transitive
     description:
       name: plugin_platform_interface
-      sha256: "43798d895c929056255600343db8f049921cbec94d31ec87f1dc5c16c01935dd"
+      sha256: da3fdfeccc4d4ff2da8f8c556704c08f912542c5fb3cf2233ed75372384a034d
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.5"
+    version: "2.1.6"
   sky_engine:
     dependency: transitive
     description: flutter

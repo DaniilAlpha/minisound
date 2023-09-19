@@ -11,8 +11,8 @@ stdio.h
 -
 
 /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/milo/src/milo.c
-milo.h
-/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/milo/src/milo.h
+../include/milo.h
+/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/milo/include/milo.h
 string.h
 -
 
@@ -29,8 +29,8 @@ stdarg.h
 -
 
 /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/miniaudio/src/miniaudio.c
-miniaudio.h
-/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/miniaudio/src/miniaudio.h
+../include/miniaudio.h
+/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/miniaudio/include/miniaudio.h
 assert.h
 -
 limits.h
@@ -233,12 +233,12 @@ emscripten.h
 /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/include/result.h
 
 /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/src/engine.c
-engine.h
-/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/src/engine.h
+../include/engine.h
+/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/include/engine.h
 stdbool.h
 -
-miniaudio.h
--
-milo.h
--
+../external/miniaudio/include/miniaudio.h
+/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/miniaudio/include/miniaudio.h
+../external/milo/include/milo.h
+/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/milo/include/milo.h
 

@@ -25,7 +25,7 @@ struct Sound {
 
 // sound functions
 
-Sound *_sound_alloc() {
+static Sound *_sound_alloc() {
   Sound *const sound = malloc(sizeof(Sound));
   if (sound == NULL) error("not enough memory to allocate sound");
   return sound;
@@ -51,7 +51,7 @@ Result engine_init(Engine *const self, const uint32_t period_ms) {
   engine_config.noAutoStart = true;
   if (ma_engine_init(&engine_config, &self->engine) != MA_SUCCESS) {
     error("cannot init audio engine");
-    goto error;
+    return Error;
   }
 
   self->dec_config = ma_decoder_config_init(
@@ -63,10 +63,6 @@ Result engine_init(Engine *const self, const uint32_t period_ms) {
   info("engine initialized successfully!");
 
   return Ok;
-
-error:
-  engine_uninit(self);
-  return Error;
 }
 void engine_uninit(Engine *const self) { ma_engine_uninit(&self->engine); }
 
@@ -75,7 +71,7 @@ Result engine_start(Engine *const self) {
 
   if (ma_engine_start(&self->engine) != MA_SUCCESS) {
     error("cannot start audio device");
-    goto error;
+    return Error;
   }
 
   self->was_engine_started = true;
@@ -83,9 +79,6 @@ Result engine_start(Engine *const self) {
   info("engine started successfully");
 
   return Ok;
-
-error:
-  return Error;
 }
 
 Sound *engine_load_sound(
@@ -98,21 +91,20 @@ Sound *engine_load_sound(
 
   if (ma_decoder_init_memory(data, data_size, &self->dec_config, &sound->decoder) != MA_SUCCESS) {
     error("cannot init decoder from memory");
-    goto error;
+    free(sound);
+    return NULL;
   }
 
   if (ma_sound_init_from_data_source(&self->engine, &sound->decoder, MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION, NULL, &sound->wave) != MA_SUCCESS){
     error("cannot init sound from decoder");
-    goto error;
+    ma_decoder_uninit(&sound->decoder);
+    free(sound);
+    return NULL;
   }
 
   info("sound loaded successfully!");
 
   return sound;
-
-error:
-  sound_unload(sound);
-  return NULL;
 }
 
 // sound functions
@@ -126,15 +118,12 @@ void sound_unload(Sound *const self) {
 Result sound_play(Sound *const self) {
   if (ma_sound_start(&self->wave) != MA_SUCCESS) {
     error("cannot play sound");
-    goto error;
+    return Error;
   }
 
   info("sound played successfully!");
 
   return Ok;
-
-error:
-  return Error;
 }
 void sound_pause(Sound *const self) { ma_sound_stop(&self->wave); }
 void sound_stop(Sound *const self) {

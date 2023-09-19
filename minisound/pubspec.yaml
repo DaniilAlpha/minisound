@@ -1,6 +1,6 @@
 name: minisound
 description: A high-level real-time audio playback library based on Miniaudio.
-version: 1.1.5
+version: 1.2.0
 repository: https://github.com/DaniilAlpha/minisound/tree/master/minisound
 
 #####
@@ -13,8 +13,8 @@ dependencies:
   flutter:
     sdk: flutter
   minisound_platform_interface: ^1.1.0
-  minisound_ffi: ^1.1.4
-  minisound_web: ^1.1.0
+  minisound_ffi: ^1.2.0
+  minisound_web: ^1.2.0
 
 dev_dependencies:
   flutter_test:

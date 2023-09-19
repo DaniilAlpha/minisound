@@ -1,3 +1,7 @@
+## 1.2.0
+
+Changed error handling. It helps to avoid some crashes during runtime.
+
 ## 1.1.4
 
 A problem with iOS and macOS compilation fixed.
