@@ -3,5 +3,6 @@
 #include "../../src/include/minisound.h"
 
 #include "../../src/src/engine.c"
+#include "../../src/src/sound.c"
 #include "../../src/external/milo/src/milo.c"
 #include "../../src/external/miniaudio/src/miniaudio.c"

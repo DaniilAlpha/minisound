@@ -237,6 +237,33 @@ src/engine.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/minisound_web.dir/build.make CMakeFiles/minisound_web.dir/src/engine.c.s
 .PHONY : src/engine.c.s
 
+src/sound.o: src/sound.c.o
+
+.PHONY : src/sound.o
+
+# target to build an object file
+src/sound.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/minisound_web.dir/build.make CMakeFiles/minisound_web.dir/src/sound.c.o
+.PHONY : src/sound.c.o
+
+src/sound.i: src/sound.c.i
+
+.PHONY : src/sound.i
+
+# target to preprocess a source file
+src/sound.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/minisound_web.dir/build.make CMakeFiles/minisound_web.dir/src/sound.c.i
+.PHONY : src/sound.c.i
+
+src/sound.s: src/sound.c.s
+
+.PHONY : src/sound.s
+
+# target to generate assembly for a file
+src/sound.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/minisound_web.dir/build.make CMakeFiles/minisound_web.dir/src/sound.c.s
+.PHONY : src/sound.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -256,6 +283,9 @@ help:
 	@echo "... src/engine.o"
 	@echo "... src/engine.i"
 	@echo "... src/engine.s"
+	@echo "... src/sound.o"
+	@echo "... src/sound.i"
+	@echo "... src/sound.s"
 .PHONY : help
 
 

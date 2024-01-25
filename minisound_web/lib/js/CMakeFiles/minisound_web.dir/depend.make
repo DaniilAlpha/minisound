@@ -9,8 +9,16 @@ CMakeFiles/minisound_web.dir/external/miniaudio/src/miniaudio.c.o: /mnt/d/_proje
 
 CMakeFiles/minisound_web.dir/src/engine.c.o: /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/milo/include/milo.h
 CMakeFiles/minisound_web.dir/src/engine.c.o: /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/miniaudio/include/miniaudio.h
+CMakeFiles/minisound_web.dir/src/engine.c.o: /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/result.h
 CMakeFiles/minisound_web.dir/src/engine.c.o: /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/include/engine.h
 CMakeFiles/minisound_web.dir/src/engine.c.o: /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/include/export.h
-CMakeFiles/minisound_web.dir/src/engine.c.o: /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/include/result.h
+CMakeFiles/minisound_web.dir/src/engine.c.o: /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/include/sound.h
 CMakeFiles/minisound_web.dir/src/engine.c.o: /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/src/engine.c
+
+CMakeFiles/minisound_web.dir/src/sound.c.o: /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/milo/include/milo.h
+CMakeFiles/minisound_web.dir/src/sound.c.o: /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/miniaudio/include/miniaudio.h
+CMakeFiles/minisound_web.dir/src/sound.c.o: /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/result.h
+CMakeFiles/minisound_web.dir/src/sound.c.o: /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/include/export.h
+CMakeFiles/minisound_web.dir/src/sound.c.o: /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/include/sound.h
+CMakeFiles/minisound_web.dir/src/sound.c.o: /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/src/sound.c
 

@@ -1,16 +1,13 @@
-#ifndef _INC_ENGINE
-#define _INC_ENGINE
+#ifndef ENGINE_H
+#define ENGINE_H
 
 #include <stdint.h>
-#include <stdlib.h>
 
+#include "../external/result/result.h"
 #include "export.h"
-#include "result.h"
+#include "sound.h"
 
 typedef struct Engine Engine;
-typedef struct Sound Sound;
-
-// engine functions
 
 EXPORT Engine *engine_alloc();
 
@@ -19,23 +16,11 @@ EXPORT void engine_uninit(Engine *const self);
 
 EXPORT Result engine_start(Engine *const self);
 
-EXPORT Sound *engine_load_sound(
+EXPORT Result engine_load_sound(
   Engine *const self,
+  Sound *const sound,
   const void *const data,
   const size_t data_size
 );
-
-// sound functions
-
-EXPORT void sound_unload(Sound *const self);
-
-EXPORT Result sound_play(Sound *const self);
-EXPORT void sound_pause(Sound *const self);
-EXPORT void sound_stop(Sound *const self);
-
-EXPORT float sound_get_volume(const Sound *const self);
-EXPORT void sound_set_volume(Sound *const self, const float value);
-
-EXPORT float sound_get_duration(Sound *const self);
 
 #endif

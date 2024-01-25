@@ -1,5 +1,5 @@
-#ifndef _INC_MINISOUND
-#define _INC_MINISOUND
+#ifndef MINISOUND_H
+#define MINISOUND_H
 
 #include "engine.h"
 

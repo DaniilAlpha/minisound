@@ -53,8 +53,13 @@ final class WebEngine implements PlatformEngine {
     heap.copy(dataPtr, data);
 
     // create sound
-    final sound = wasm.engine_load_sound(_self, dataPtr, data.lengthInBytes);
+    final sound = wasm.sound_alloc();
     if (sound == nullptr) {
+      throw MinisoundPlatformException("Failed to allocate a sound.");
+    }
+
+    if (wasm.engine_load_sound(_self, sound, dataPtr, data.lengthInBytes) !=
+        wasm.Result.Ok) {
       throw MinisoundPlatformException("Failed to load a sound.");
     }
     return WebSound._fromPtrs(sound, dataPtr);
@@ -65,14 +70,12 @@ final class WebEngine implements PlatformEngine {
 final class WebSound implements PlatformSound {
   WebSound._fromPtrs(Pointer<wasm.Sound> self, Pointer data)
       : _self = self,
-        _data = data,
-        _volume = wasm.sound_get_volume(self),
-        _duration = wasm.sound_get_duration(self);
+        _data = data;
 
   final Pointer<wasm.Sound> _self;
   final Pointer _data;
 
-  double _volume;
+  late double _volume = wasm.sound_get_volume(_self);
   @override
   double get volume => _volume;
   @override
@@ -81,9 +84,17 @@ final class WebSound implements PlatformSound {
     _volume = value;
   }
 
-  final double _duration;
   @override
-  double get duration => _duration;
+  late final double duration = wasm.sound_get_duration(_self);
+
+  bool _isLooped = false;
+  @override
+  bool get isLooped => _isLooped;
+  @override
+  set isLooped(bool value) {
+    if (wasm.sound_set_is_looped(_self, value) != wasm.Result.Ok) return;
+    _isLooped = value;
+  }
 
   @override
   void unload() {

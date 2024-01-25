@@ -17,6 +17,7 @@ endif()
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/src/*.c")
 set(OLD_GLOB
   "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/src/engine.c"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/src/sound.c"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
@@ -30,6 +31,25 @@ set(OLD_GLOB
   "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/milo/src"
   "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/miniaudio/include"
   "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/miniaudio/src"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git/hooks"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git/info"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git/logs"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git/logs/refs"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git/logs/refs/heads"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git/logs/refs/remotes"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git/logs/refs/remotes/origin"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git/objects"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git/objects/3f"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git/objects/4b"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git/objects/d9"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git/objects/info"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git/objects/pack"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git/refs"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git/refs/heads"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git/refs/remotes"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git/refs/remotes/origin"
+  "/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/.git/refs/tags"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")

@@ -62,6 +62,11 @@ class SoundMock implements PlatformSound {
   double get duration => double.infinity;
 
   @override
+  bool get isLooped => false;
+  @override
+  set isLooped(bool value) {}
+
+  @override
   void play() => state = SoundState.playing;
 
   @override

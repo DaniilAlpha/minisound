@@ -15,7 +15,10 @@ final class Sound extends Opaque {}
 
 abstract class Result {
   static const int Ok = 0;
-  static const int Error = 1;
+  static const int UnknownErr = 1;
+  static const int OutOfMemErr = 2;
+  static const int RangeErr = 3;
+  static const int ResultCount = 4;
 }
 
 // engine functions
@@ -28,14 +31,17 @@ Future<int> engine_init(Pointer<Engine> self, int periodMs) =>
 void engine_uninit(Pointer<Engine> self) => _engine_uninit(self.addr);
 int engine_start(Pointer<Engine> self) => _engine_start(self.addr);
 
-Pointer<Sound> engine_load_sound(
+int engine_load_sound(
   Pointer<Engine> self,
+  Pointer<Sound> sound,
   Pointer data,
   int dataSize,
 ) =>
-    Pointer(_engine_load_sound(self.addr, data.addr, dataSize));
+    _engine_load_sound(self.addr, sound.addr, data.addr, dataSize);
 
 // sound functions
+
+Pointer<Sound> sound_alloc() => Pointer(_sound_alloc());
 
 void sound_unload(Pointer<Sound> self) => _sound_unload(self.addr);
 
@@ -49,6 +55,10 @@ void sound_set_volume(Pointer<Sound> self, double value) =>
 
 double sound_get_duration(Pointer<Sound> self) =>
     _sound_get_duration(self.addr);
+
+// ignore: avoid_positional_boolean_parameters
+int sound_set_is_looped(Pointer<Sound> self, bool value) =>
+    _sound_set_is_looped(self.addr, value);
 
 /********
  ** js **
@@ -84,9 +94,12 @@ external void _engine_uninit(int self);
 external int _engine_start(int self);
 
 @JS()
-external int _engine_load_sound(int self, int data, int dataSize);
+external int _engine_load_sound(int self, int sound, int data, int dataSize);
 
 // sound functions
+
+@JS()
+external int _sound_alloc();
 
 @JS()
 external void _sound_unload(int sound);
@@ -105,3 +118,6 @@ external void _sound_set_volume(int self, double value);
 
 @JS()
 external double _sound_get_duration(int self);
+
+@JS()
+external int _sound_set_is_looped(int self, bool value);

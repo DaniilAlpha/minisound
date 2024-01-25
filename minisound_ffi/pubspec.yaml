@@ -1,6 +1,6 @@
 name: minisound_ffi
 description: FFI implementation of the Minisound package.
-version: 1.2.0
+version: 1.3.0
 repository: https://github.com/DaniilAlpha/minisound/tree/master/minisound_ffi
 
 #####
@@ -31,6 +31,7 @@ ffigen:
     entry-points:
       - "src/include/minisound.h"
       - "src/include/engine.h"
+      - "src/include/sound.h"
     include-directives:
       - "src/include/*.h"
   preamble: |

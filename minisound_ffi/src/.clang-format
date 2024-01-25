@@ -45,7 +45,7 @@ IncludeCategories:
     Priority: 1
   - Regex: "^<time.h>$"
     Priority: 1
-  - Regex: "^<milo.h>$"
+  - Regex: '^.*milo.h(>|")$'
     Priority: 1000000000
 
   - Regex: "^<std"

@@ -60,19 +60,15 @@ final class Sound {
 
   final PlatformSound _sound;
 
-  /// a `double` between `0` and `1`
+  /// a `double` greater than `0` (support for values greater than `1` is tested only on windows)
   double get volume => _sound.volume;
-  set volume(double value) {
-    if (value < 0 || value > 1) {
-      throw ArgumentError(
-          "Volume should be between 0 and 1 inclusive, but is now $value.");
-    }
-    _sound.volume = value;
-  }
+  set volume(double value) => _sound.volume = value < 0 ? 0 : value;
 
   late final duration =
       Duration(milliseconds: (_sound.duration * 1000).toInt());
 
+  bool get isLooped => _sound.isLooped;
+  set isLooped(bool value) => _sound.isLooped = value;
   void play() => _sound.play();
 
   /// Does not reset a sound position.

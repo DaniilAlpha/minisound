@@ -216,26 +216,52 @@ stdio.h
 wchar.h
 -
 
+/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/result.h
+assert.h
+-
+
 /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/include/engine.h
 stdint.h
 -
-stdlib.h
--
+../external/result/result.h
+/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/result.h
 export.h
 /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/include/export.h
-result.h
-/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/include/result.h
+sound.h
+/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/include/sound.h
 
 /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/include/export.h
 emscripten.h
 -
 
-/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/include/result.h
+/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/include/sound.h
+stdbool.h
+-
+stddef.h
+-
+../external/result/result.h
+/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/result/result.h
+export.h
+/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/include/export.h
 
 /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/src/engine.c
 ../include/engine.h
 /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/include/engine.h
 stdbool.h
+-
+stdlib.h
+-
+../external/miniaudio/include/miniaudio.h
+/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/miniaudio/include/miniaudio.h
+../external/milo/include/milo.h
+/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/milo/include/milo.h
+
+/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/src/sound.c
+../include/sound.h
+/mnt/d/_projects/_flutter/minisound/minisound_ffi/src/include/sound.h
+stdbool.h
+-
+stdlib.h
 -
 ../external/miniaudio/include/miniaudio.h
 /mnt/d/_projects/_flutter/minisound/minisound_ffi/src/external/miniaudio/include/miniaudio.h

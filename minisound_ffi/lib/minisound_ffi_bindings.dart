@@ -81,13 +81,15 @@ class MinisoundFfiBindings {
   late final _engine_start =
       _engine_startPtr.asFunction<int Function(ffi.Pointer<Engine>)>();
 
-  ffi.Pointer<Sound> engine_load_sound(
+  int engine_load_sound(
     ffi.Pointer<Engine> self,
+    ffi.Pointer<Sound> sound,
     ffi.Pointer<ffi.Void> data,
     int data_size,
   ) {
     return _engine_load_sound(
       self,
+      sound,
       data,
       data_size,
     );
@@ -95,11 +97,48 @@ class MinisoundFfiBindings {
 
   late final _engine_load_soundPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<Sound> Function(ffi.Pointer<Engine>,
+          ffi.Int32 Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>,
               ffi.Pointer<ffi.Void>, ffi.Size)>>('engine_load_sound');
   late final _engine_load_sound = _engine_load_soundPtr.asFunction<
-      ffi.Pointer<Sound> Function(
-          ffi.Pointer<Engine>, ffi.Pointer<ffi.Void>, int)>();
+      int Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>,
+          ffi.Pointer<ffi.Void>, int)>();
+
+  ffi.Pointer<Sound> sound_alloc() {
+    return _sound_alloc();
+  }
+
+  late final _sound_allocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<Sound> Function()>>('sound_alloc');
+  late final _sound_alloc =
+      _sound_allocPtr.asFunction<ffi.Pointer<Sound> Function()>();
+
+  int sound_init(
+    ffi.Pointer<Sound> self,
+    ffi.Pointer<ffi.Void> data,
+    int data_size,
+    ffi.Pointer<ffi.Void> dec_config,
+    ffi.Pointer<ffi.Void> engine,
+  ) {
+    return _sound_init(
+      self,
+      data,
+      data_size,
+      dec_config,
+      engine,
+    );
+  }
+
+  late final _sound_initPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<Sound>,
+              ffi.Pointer<ffi.Void>,
+              ffi.Size,
+              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Void>)>>('sound_init');
+  late final _sound_init = _sound_initPtr.asFunction<
+      int Function(ffi.Pointer<Sound>, ffi.Pointer<ffi.Void>, int,
+          ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>();
 
   void sound_unload(
     ffi.Pointer<Sound> self,
@@ -200,13 +239,46 @@ class MinisoundFfiBindings {
           'sound_get_duration');
   late final _sound_get_duration =
       _sound_get_durationPtr.asFunction<double Function(ffi.Pointer<Sound>)>();
+
+  bool sound_get_is_looped(
+    ffi.Pointer<Sound> self,
+  ) {
+    return _sound_get_is_looped(
+      self,
+    );
+  }
+
+  late final _sound_get_is_loopedPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(ffi.Pointer<Sound>)>>(
+          'sound_get_is_looped');
+  late final _sound_get_is_looped =
+      _sound_get_is_loopedPtr.asFunction<bool Function(ffi.Pointer<Sound>)>();
+
+  int sound_set_is_looped(
+    ffi.Pointer<Sound> self,
+    bool value,
+  ) {
+    return _sound_set_is_looped(
+      self,
+      value,
+    );
+  }
+
+  late final _sound_set_is_loopedPtr = _lookup<
+          ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<Sound>, ffi.Bool)>>(
+      'sound_set_is_looped');
+  late final _sound_set_is_looped = _sound_set_is_loopedPtr
+      .asFunction<int Function(ffi.Pointer<Sound>, bool)>();
 }
 
 final class Engine extends ffi.Opaque {}
 
-final class Sound extends ffi.Opaque {}
-
 abstract class Result {
   static const int Ok = 0;
-  static const int Error = 1;
+  static const int UnknownErr = 1;
+  static const int OutOfMemErr = 2;
+  static const int RangeErr = 3;
+  static const int ResultCount = 4;
 }
+
+final class Sound extends ffi.Opaque {}

@@ -29,21 +29,56 @@ class _ExamplePageState extends State<ExamplePage> {
   Widget build(BuildContext context) => Scaffold(
         body: Center(
           child: FutureBuilder(
-            future: soundFuture,
-            builder: (context, snapshot) =>
-                snapshot.connectionState == ConnectionState.done &&
-                        snapshot.hasData
-                    ? ElevatedButton(
-                        child: const Text("LASER SHOOT"),
-                        onPressed: () async {
-                          await engine.start();
+              future: soundFuture,
+              builder: (_, snapshot) => switch (snapshot) {
+                    AsyncSnapshot(
+                      connectionState: ConnectionState.done,
+                      hasData: true,
+                      data: final sound!
+                    ) =>
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            child: const Text("PLAY"),
+                            onPressed: () async {
+                              await engine.start();
 
-                          final sound = snapshot.data!;
-                          sound.play();
-                        },
-                      )
-                    : const CircularProgressIndicator(),
-          ),
+                              sound.play();
+                            },
+                          ),
+                          SizedBox(
+                            width: 200,
+                            child: Slider(
+                              value: sound.volume,
+                              min: 0,
+                              max: 10,
+                              divisions: 20,
+                              label: sound.volume.toString(),
+                              onChanged: (value) => setState(() {
+                                sound.volume = value;
+                              }),
+                            ),
+                          ),
+                          Row(mainAxisSize: MainAxisSize.min, children: [
+                            Checkbox(
+                              value: sound.isLooped,
+                              onChanged: (value) => setState(() {
+                                sound.isLooped = value!;
+                              }),
+                            ),
+                            const Text("Is looped?"),
+                          ]),
+                        ],
+                      ),
+                    AsyncSnapshot(
+                      connectionState: ConnectionState.done,
+                      hasData: false,
+                      :final error
+                    ) =>
+                      Text("error: $error"),
+                    _ => const CircularProgressIndicator(),
+                  }),
         ),
       );
 }

@@ -68,11 +68,21 @@ final class FfiEngine implements PlatformEngine {
     }
 
     // create sound
-    final sound =
-        _bindings.engine_load_sound(_self, dataPtr.cast(), data.lengthInBytes);
+    final sound = _bindings.sound_alloc();
     if (sound == nullptr) {
+      throw MinisoundPlatformException("Failed to allocate a sound.");
+    }
+
+    if (_bindings.engine_load_sound(
+          _self,
+          sound,
+          dataPtr.cast(),
+          data.lengthInBytes,
+        ) !=
+        ffi.Result.Ok) {
       throw MinisoundPlatformException("Failed to load a sound.");
     }
+
     return FfiSound._fromPtrs(sound, dataPtr);
   }
 }
@@ -100,6 +110,15 @@ final class FfiSound implements PlatformSound {
   final double _duration;
   @override
   double get duration => _duration;
+
+  bool _isLooped = false;
+  @override
+  bool get isLooped => _isLooped;
+  @override
+  set isLooped(bool value) {
+    if (_bindings.sound_set_is_looped(_self, value) != ffi.Result.Ok) return;
+    _isLooped = value;
+  }
 
   @override
   void unload() {

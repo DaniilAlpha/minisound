@@ -127,7 +127,7 @@
     {
       "label": "minisound-ffi-ffigen",
       "type": "shell",
-      "command": "flutter pub run ffigen",
+      "command": "dart run ffigen",
       "options": {
         "cwd": "minisound_ffi/"
       }
