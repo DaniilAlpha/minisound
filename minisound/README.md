@@ -80,6 +80,13 @@ void main() {
   sound.pause(); // this method saves sound position
   sound.stop(); // but this does not
 
+  sound.isLooped = true; // sound will now be looped
+  sound.play();
+
+  await Future.delayed(sound.duration*5);
+
+  sound.stop();
+
   // the engine and all loaded sounds will be automatically disposed
 }
 ```

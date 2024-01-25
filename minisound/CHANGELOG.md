@@ -1,3 +1,7 @@
+## 1.3.1
+
+Fixed readme.
+
 ## 1.3.0
 
 Slightly changed error messages. 
