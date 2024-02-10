@@ -1,3 +1,7 @@
+## 1.3.5
+
+Changed dependency for the newest `js`. 
+
 ## 1.3.4
 
 Changed dependency for the newest `minisound_platform_intergace`. 
