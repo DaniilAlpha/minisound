@@ -1,3 +1,11 @@
+## 1.1.3
+
+Added interface for sound looping.
+
+## 1.1.2
+
+-
+
 ## 1.1.1
 
 Unnecessary `flutter' dependency removed.

@@ -34,6 +34,9 @@ abstract interface class PlatformSound {
 
   double get duration;
 
+  bool get isLooped;
+  set isLooped(bool value);
+
   void unload();
 
   void play();

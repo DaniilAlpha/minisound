@@ -1,3 +1,12 @@
+## 1.3.4
+
+Changed dependencies for newer `minisound_platform_intergace`, `minisound_ffi`, `minisound_web`. 
+Fixed readme.
+
+## 1.3.2
+
+Changed dependencies for newer `minisound_platform_intergace`, `minisound_ffi`, `minisound_web`. 
+
 ## 1.3.1
 
 Fixed readme.

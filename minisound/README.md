@@ -87,6 +87,10 @@ void main() {
 
   sound.stop();
 
-  // the engine and all loaded sounds will be automatically disposed
+  // it is recommended to unload sounds manually to prevent memory leaks
+  sound.unload(); 
+
+  // the engine and all loaded sounds will be automatically disposed when 
+  // engine gets garbage-collected
 }
 ```

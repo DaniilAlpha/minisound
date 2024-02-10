@@ -1,3 +1,11 @@
+## 1.3.4
+
+Changed dependency for the newest `minisound_platform_intergace`. 
+
+## 1.3.3
+
+Changed dependency newer `minisound_platform_intergace`. 
+
 ## 1.3.0
 
 Slightly changed error messages. 
