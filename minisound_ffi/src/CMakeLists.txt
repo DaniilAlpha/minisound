@@ -41,7 +41,7 @@ target_include_directories(${MAIN_LIB} PUBLIC ${MAIN_INCLUDES})
 target_compile_definitions(${MAIN_LIB} PUBLIC DART_SHARED_LIB)
 
 # milo definitions
-target_compile_definitions(${MAIN_LIB} PUBLIC MILO_DEFAULT_LVL=MILO_LVL_INFO)
+target_compile_definitions(${MAIN_LIB} PUBLIC MILO_DEFAULT_LVL=MILO_LVL_WARN)
 
 # miniaudio definitions
 target_compile_definitions(${MAIN_LIB} PUBLIC

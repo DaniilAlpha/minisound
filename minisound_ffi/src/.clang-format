@@ -1,10 +1,11 @@
 # options: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 ---
 AlignAfterOpenBracket: BlockIndent
-AlignArrayOfStructures: Left
+AlignArrayOfStructures: None
 AlignConsecutiveMacros: Consecutive
 AlignEscapedNewlines: Right
 
+AlignOperands: AlignAfterOperator
 AllowAllArgumentsOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
 AllowShortBlocksOnASingleLine: Always
@@ -20,6 +21,7 @@ BasedOnStyle: Google
 BinPackArguments: false
 BinPackParameters: false
 
+BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Attach
 BreakConstructorInitializers: BeforeColon
 BreakInheritanceList: AfterColon
@@ -41,11 +43,11 @@ IncludeBlocks: Regroup
 IncludeCategories:
   - Regex: "^<string.h>$"
     Priority: 1
-  - Regex: "^<assert.h>$"
+  - Regex: "^<math.h>$"
     Priority: 1
   - Regex: "^<time.h>$"
     Priority: 1
-  - Regex: '^.*milo.h(>|")$'
+  - Regex: "^<milo.h>$"
     Priority: 1000000000
 
   - Regex: "^<std"
@@ -67,6 +69,7 @@ IndentPPDirectives: AfterHash
 IndentWidth: 2
 
 InsertNewlineAtEOF: true
+InsertTrailingCommas: Wrapped
 LineEnding: LF
 
 NamespaceIndentation: All
@@ -85,3 +88,8 @@ SeparateDefinitionBlocks: Leave
 SortIncludes: CaseInsensitive
 
 UseTab: Never
+
+QualifierOrder: ["static", "inline", "type", "const", "volatile", "restrict"]
+QualifierAlignment: Custom
+
+ForEachMacros: [foreach]
