@@ -10,7 +10,7 @@ A high-level real-time audio playback library based on [miniaudio](https://minia
 | iOS      | None                                | Unknown                                 | Unknown                                    |
 | Windows  | 11, 7 (x64)                         | Vista+                                  | XP-                                        |
 | macOS    | None                                | Unknown                                 | Unknown                                    |
-| Linux    | Debian 11 (WSL)                     | Any                                     | None                                       |
+| Linux    | Fedora 39                           | Any                                     | None                                       |
 | Web      | Chrome 93+, Firefox 79+, Safari 16+ | Browsers with an `AudioWorklet` support | Browsers without an `AudioWorklet` support |
 
 ## Getting started on the web
