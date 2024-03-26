@@ -1,3 +1,7 @@
+## 1.1.4
+
+-
+
 ## 1.1.3
 
 Added interface for sound looping.
