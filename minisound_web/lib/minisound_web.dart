@@ -1,6 +1,5 @@
 import "dart:typed_data";
 
-import "package:flutter_web_plugins/flutter_web_plugins.dart";
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
 import "package:minisound_web/bindings/minisound.dart" as wasm;
 import "package:minisound_web/bindings/wasm/wasm.dart";
@@ -9,7 +8,7 @@ import "package:minisound_web/bindings/wasm/wasm.dart";
 class MinisoundWeb extends MinisoundPlatform {
   MinisoundWeb._();
 
-  static void registerWith(Registrar _) =>
+  static void registerWith(Never _) =>
       MinisoundPlatform.instance = MinisoundWeb._();
 
   @override

@@ -1,3 +1,7 @@
+## 1.3.6
+
+Unnecessary `flutter` dependency removed. 
+
 ## 1.3.5
 
 Changed dependency for the newest `js`. 
