@@ -1,5 +1,5 @@
 ### setup ##############
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.5)
 project(minisound_ffi VERSION 1.0.0 LANGUAGES C)
 
 # lib name

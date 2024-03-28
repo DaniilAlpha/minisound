@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "../external/milo/include/milo.h"
+#include "../external/milo/milo.h"
 #include "../external/miniaudio/include/miniaudio.h"
 
 /*************

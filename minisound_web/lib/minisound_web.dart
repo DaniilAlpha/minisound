@@ -8,7 +8,7 @@ import "package:minisound_web/bindings/wasm/wasm.dart";
 class MinisoundWeb extends MinisoundPlatform {
   MinisoundWeb._();
 
-  static void registerWith(Never _) =>
+  static void registerWith(dynamic _) =>
       MinisoundPlatform.instance = MinisoundWeb._();
 
   @override

@@ -1,3 +1,7 @@
+## 1.3.7
+
+Added needed dependency for `flutter_web_plugins`.
+
 ## 1.3.6
 
 Changed dependencies for newer `minisound_platform_intergace`, `minisound_ffi`, `minisound_web`.

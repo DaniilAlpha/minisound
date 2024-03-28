@@ -1,3 +1,7 @@
+## 1.3.7
+
+Fixed bug with include path of `milo.h`.
+
 ## 1.3.6
 
 -
