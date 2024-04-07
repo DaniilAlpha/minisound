@@ -64,7 +64,7 @@ final class FfiEngine implements PlatformEngine {
     // copy data into the memory
     final dataPtr = malloc.allocate<Uint8>(data.lengthInBytes);
     for (var i = 0; i < data.length; i++) {
-      (dataPtr + i).value = data[i];
+      dataPtr.elementAt(i).value = data[i];
     }
 
     // create sound
