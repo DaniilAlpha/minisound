@@ -1,3 +1,7 @@
+## 1.3.8
+
+-
+
 ## 1.3.7
 
 Added needed dependency for `flutter_web_plugins`.
