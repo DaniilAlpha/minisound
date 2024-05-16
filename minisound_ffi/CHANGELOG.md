@@ -1,3 +1,7 @@
+## 1.3.9
+
+Fixed iOS and MacOS compilation error.
+
 ## 1.3.8
 
 -
