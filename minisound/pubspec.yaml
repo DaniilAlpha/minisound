@@ -15,12 +15,18 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
+<<<<<<< Updated upstream
   minisound_platform_interface:
     path: ../minisound_platform_interface
   minisound_ffi:
     path: ../minisound_ffi
   minisound_web:
     path: ../minisound_web
+=======
+  minisound_platform_interface: ^1.1.4
+  minisound_ffi: ^1.3.10
+  minisound_web: ^1.3.8
+>>>>>>> Stashed changes
 
 dev_dependencies:
   flutter_test:

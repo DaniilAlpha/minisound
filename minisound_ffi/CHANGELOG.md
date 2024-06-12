@@ -1,3 +1,7 @@
+## 1.3.10
+
+Disabled logging by default as not needed anymore.
+
 ## 1.3.9
 
 Fixed iOS and MacOS compilation error.
