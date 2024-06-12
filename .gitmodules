@@ -2,5 +2,5 @@
 	path = minisound_ffi/src/external/milo
 	url = git@github.com:DaniilAlpha/milo.git
 [submodule "result"]
-	path = result
+	path = minisound_ffi/src/external/result
 	url = git@github.com:DaniilAlpha/result
