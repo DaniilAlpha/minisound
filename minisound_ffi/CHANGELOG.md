@@ -1,3 +1,7 @@
+## 1.3.11
+
+Fix annoying error.
+
 ## 1.3.10
 
 Disabled logging by default as not needed anymore.

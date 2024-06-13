@@ -1,0 +1,56 @@
+{
+    "tasks": {
+        "get": {
+            "icon": "󰇚",
+            "desc": "get flutter packages",
+            "cmd": [
+                "flutter pub get -C ./minisound_platform_interface/",
+                "flutter pub upgrade -C ./minisound_platform_interface/",
+                "flutter pub get -C ./minisound_ffi/",
+                "flutter pub upgrade -C ./minisound_ffi/",
+                "flutter pub get -C ./minisound_web/",
+                "flutter pub upgrade -C ./minisound_web/",
+                "flutter pub get -C ./minisound/",
+                "flutter pub upgrade -C ./minisound/",
+                "flutter pub get -C ./minisound/example/",
+                "flutter pub upgrade -C ./minisound/example/"
+            ],
+            "noninteractive": true
+        },
+        "clean": {
+            "icon": "󰃢",
+            "cmd": [
+                "flutter pub clean -C ./minisound_platform_interface/",
+                "flutter pub clean -C ./minisound_ffi/",
+                "flutter pub clean -C ./minisound_web/",
+                "flutter pub clean -C ./minisound/",
+                "flutter pub clean -C ./minisound/example/"
+            ],
+            "noninteractive": true
+        },
+        "ffigen": {
+            "desc": "generate dart ffi bindings",
+            "cmd": "dart run ffigen -C ./minisound_ffi/"
+        },
+        "build web lib": {
+            "desc": "build ffi lib to web via emscripten",
+            "cmd": [
+                "cd ./minisound_web/lib/js/",
+                "emcmake cmake ../../../minisound_ffi/src/",
+                "make",
+                "sed -i 's|audioWorklet.addModule(\"minisound_web.aw.js\")|audioWorklet.addModule(locateFile(\"minisound_web.aw.js\"))|g' ./emscripten/minisound_web.js"
+            ]
+        },
+        "clean web lib": {
+            "cmd": "rm -r ./minisound_web/lib/js/*",
+            "noninteractive": true
+        },
+        "run web": {
+            "icon": "󰐊",
+            "cmd": [
+                "cd ./minisound/example/",
+                "flutter run -d chrome --web-browser-flag '--enable-features=SharedArrayBuffer'"
+            ]
+        }
+    }
+}
