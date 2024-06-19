@@ -20,6 +20,8 @@ class ExamplePage extends StatefulWidget {
 class _ExamplePageState extends State<ExamplePage> {
   final engine = Engine();
 
+  var loopDelay = 0.0;
+
   late final Future<Sound> soundFuture = () async {
     await engine.init();
     return engine.loadSoundAsset("assets/laser_shoot.wav");
@@ -47,27 +49,61 @@ class _ExamplePageState extends State<ExamplePage> {
                               sound.play();
                             },
                           ),
-                          SizedBox(
-                            width: 200,
-                            child: Slider(
-                              value: sound.volume,
-                              min: 0,
-                              max: 10,
-                              divisions: 20,
-                              label: sound.volume.toString(),
-                              onChanged: (value) => setState(() {
-                                sound.volume = value;
-                              }),
-                            ),
+                          ElevatedButton(
+                            child: const Text("PAUSE"),
+                            onPressed: () async {
+                              sound.pause();
+                            },
+                          ),
+                          ElevatedButton(
+                            child: const Text("STOP"),
+                            onPressed: () async {
+                              sound.stop();
+                            },
                           ),
                           Row(mainAxisSize: MainAxisSize.min, children: [
-                            Checkbox(
-                              value: sound.isLooped,
-                              onChanged: (value) => setState(() {
-                                sound.isLooped = value!;
-                              }),
+                            const Text("Volume: "),
+                            SizedBox(
+                              width: 200,
+                              child: Slider(
+                                value: sound.volume,
+                                min: 0,
+                                max: 10,
+                                divisions: 20,
+                                label: sound.volume.toString(),
+                                onChanged: (value) => setState(() {
+                                  sound.volume = value;
+                                }),
+                              ),
                             ),
-                            const Text("Is looped?"),
+                          ]),
+                          ElevatedButton(
+                            child: const Text("PLAY LOOPED"),
+                            onPressed: () async {
+                              await engine.start();
+
+                              sound.playLooped(
+                                  delay: Duration(
+                                      milliseconds:
+                                          (loopDelay * 1000).toInt()));
+                            },
+                          ),
+                          Row(mainAxisSize: MainAxisSize.min, children: [
+                            const Text(
+                                "Loop duration (changes occure when stopped and played again)"),
+                            SizedBox(
+                              width: 200,
+                              child: Slider(
+                                value: loopDelay,
+                                min: 0,
+                                max: 3,
+                                divisions: 300,
+                                label: loopDelay.toString(),
+                                onChanged: (value) => setState(() {
+                                  loopDelay = value;
+                                }),
+                              ),
+                            ),
                           ]),
                         ],
                       ),

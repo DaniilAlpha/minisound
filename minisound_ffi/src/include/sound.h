@@ -11,7 +11,7 @@ typedef struct Sound Sound;
 
 EXPORT Sound *sound_alloc();
 
-EXPORT Result sound_init(
+Result sound_init(
     Sound *const self,
     void const *const data,
     size_t const data_size,
@@ -21,6 +21,7 @@ EXPORT Result sound_init(
 EXPORT void sound_unload(Sound *const self);
 
 EXPORT Result sound_play(Sound *const self);
+EXPORT Result sound_replay(Sound *const self);
 EXPORT void sound_pause(Sound *const self);
 EXPORT void sound_stop(Sound *const self);
 
@@ -30,6 +31,7 @@ EXPORT void sound_set_volume(Sound *const self, float const value);
 EXPORT float sound_get_duration(Sound *const self);
 
 EXPORT bool sound_get_is_looped(Sound const *const self);
-EXPORT Result sound_set_is_looped(Sound *const self, bool value);
+EXPORT void
+sound_set_looped(Sound *const self, bool const value, size_t const delay_ms);
 
 #endif

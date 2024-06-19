@@ -3,9 +3,10 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "../external/miniaudio/include/miniaudio.h"
+
 #define MILO_IMPL
 #include "../external/milo/milo.h"
-#include "../external/miniaudio/include/miniaudio.h"
 
 /*************
  ** private **

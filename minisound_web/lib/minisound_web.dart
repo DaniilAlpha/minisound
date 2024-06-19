@@ -74,7 +74,7 @@ final class WebSound implements PlatformSound {
   final Pointer<wasm.Sound> _self;
   final Pointer _data;
 
-  late double _volume = wasm.sound_get_volume(_self);
+  late var _volume = wasm.sound_get_volume(_self);
   @override
   double get volume => _volume;
   @override
@@ -84,15 +84,15 @@ final class WebSound implements PlatformSound {
   }
 
   @override
-  late final double duration = wasm.sound_get_duration(_self);
+  late double duration = wasm.sound_get_duration(_self);
 
-  bool _isLooped = false;
+  var _looping = (false, 0);
   @override
-  bool get isLooped => _isLooped;
+  PlatformSoundLooping get looping => _looping;
   @override
-  set isLooped(bool value) {
-    if (wasm.sound_set_is_looped(_self, value) != wasm.Result.Ok) return;
-    _isLooped = value;
+  set looping(PlatformSoundLooping value) {
+    wasm.sound_set_looped(_self, value.$1, value.$2);
+    _looping = value;
   }
 
   @override
@@ -104,6 +104,13 @@ final class WebSound implements PlatformSound {
   @override
   void play() {
     if (wasm.sound_play(_self) != wasm.Result.Ok) {
+      throw MinisoundPlatformException("Failed to play the sound.");
+    }
+  }
+
+  @override
+  void replay() {
+    if (wasm.sound_replay(_self) != wasm.Result.Ok) {
       throw MinisoundPlatformException("Failed to play the sound.");
     }
   }

@@ -1,9 +1,9 @@
-set(CMAKE_HOST_SYSTEM "Linux-5.15.133.1-microsoft-standard-WSL2")
+set(CMAKE_HOST_SYSTEM "Linux-6.9.4-200.fc40.x86_64")
 set(CMAKE_HOST_SYSTEM_NAME "Linux")
-set(CMAKE_HOST_SYSTEM_VERSION "5.15.133.1-microsoft-standard-WSL2")
+set(CMAKE_HOST_SYSTEM_VERSION "6.9.4-200.fc40.x86_64")
 set(CMAKE_HOST_SYSTEM_PROCESSOR "x86_64")
 
-include("/home/daniil/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
+include("/home/Daniil/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
 
 set(CMAKE_SYSTEM "Emscripten-1")
 set(CMAKE_SYSTEM_NAME "Emscripten")

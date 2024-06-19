@@ -1,5 +1,6 @@
 import "dart:io";
 
+import "package:flutter/foundation.dart";
 import "package:flutter/services.dart";
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
 export "package:minisound_platform_interface/minisound_platform_interface.dart"
@@ -24,7 +25,7 @@ final class Engine {
   /// Initializes an engine.
   ///
   /// Change an update period (affects the sound latency).
-  Future<void> init([int periodMs = 10]) async {
+  Future<void> init([int periodMs = kIsWeb ? 33 : 10]) async {
     if (_isInit) throw EngineAlreadyInitError();
 
     await _engine.init(periodMs);
@@ -64,18 +65,44 @@ final class Sound {
   double get volume => _sound.volume;
   set volume(double value) => _sound.volume = value < 0 ? 0 : value;
 
-  late final duration =
+  Duration get duration =>
       Duration(milliseconds: (_sound.duration * 1000).toInt());
 
-  bool get isLooped => _sound.isLooped;
-  set isLooped(bool value) => _sound.isLooped = value;
-  void play() => _sound.play();
+  bool get isLooped => _sound.looping.$1;
+  Duration get loopDelay => Duration(milliseconds: _sound.looping.$2);
+
+  void play() {
+    if (_sound.looping.$1) _sound.looping = (false, 0);
+
+    _sound.replay();
+  }
+
+  void playLooped({Duration delay = Duration.zero}) {
+    final delayMs = delay.inMilliseconds;
+    if (!_sound.looping.$1 || _sound.looping.$2 != delayMs) {
+      _sound.looping = (true, delayMs);
+    }
+
+    _sound.play();
+  }
 
   /// Does not reset a sound position.
-  void pause() => _sound.pause();
+  ///
+  /// If sound is looped, when played again will wait `loopDelay` and play. If you do not want this, use `stop()`.
+  void pause() {
+    if (_sound.looping.$1) _sound.looping = (false, 0);
+
+    _sound.pause();
+  }
 
   /// Resets a sound position.
-  void stop() => _sound.stop();
+  ///
+  /// If sound is looped, when played again will NOT wait `loopDelay` and play. If you do not want this, use `pause()`.
+  void stop() {
+    if (_sound.looping.$1) _sound.looping = (false, 0);
+
+    _sound.stop();
+  }
 
   void unload() => _sound.unload();
 }

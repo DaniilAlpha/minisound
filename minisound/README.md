@@ -80,10 +80,10 @@ void main() {
   sound.pause(); // this method saves sound position
   sound.stop(); // but this does not
 
-  sound.isLooped = true; // sound will now be looped
-  sound.play();
+  final loopDelay=Duratoin(seconds: 1);
+  sound.playLooped(delay: loopDelay); // sound will be looped with one second period
 
-  await Future.delayed(sound.duration*5);
+  await Future.delayed((sound.duration + loopDelay) * 5); // sound duration does not account loop delay
 
   sound.stop();
 
@@ -94,3 +94,8 @@ void main() {
   // engine gets garbage-collected
 }
 ```
+
+## TODO
+
+- It is possible that due to emscripten threads and memory growth flutter app is less performant, need additional info
+- Fix non-intuitiveness of pausing and stopping, then playing again looped sounds
