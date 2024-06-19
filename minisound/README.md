@@ -99,3 +99,4 @@ void main() {
 
 - It is possible that due to emscripten threads and memory growth flutter app is less performant, need additional info
 - Fix non-intuitiveness of pausing and stopping, then playing again looped sounds
+- Exclude emscripten build cache from git.
