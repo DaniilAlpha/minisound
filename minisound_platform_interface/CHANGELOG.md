@@ -1,4 +1,4 @@
-## 1.4.0
+## 1.2.0
 
 Added an ability to add delay between loops.
 Changed behavoiur when playing sound while already playing: stops and starts again instead of doing nothing.
