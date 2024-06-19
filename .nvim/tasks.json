@@ -1,0 +1,68 @@
+{
+    "tasks": {
+        "get": {
+            "icon": "󰇚",
+            "desc": "get flutter packages",
+            "cmd": [
+                "flutter pub get -C ./minisound_platform_interface/",
+                "flutter pub upgrade -C ./minisound_platform_interface/",
+                "flutter pub get -C ./minisound_ffi/",
+                "flutter pub upgrade -C ./minisound_ffi/",
+                "flutter pub get -C ./minisound_web/",
+                "flutter pub upgrade -C ./minisound_web/",
+                "flutter pub get -C ./minisound/",
+                "flutter pub upgrade -C ./minisound/",
+                "flutter pub get -C ./minisound/example/",
+                "flutter pub upgrade -C ./minisound/example/"
+            ],
+            "noninteractive": true
+        },
+        "clean": {
+            "icon": "󰃢",
+            "cmd": [
+                "cd ./minisound_platform_interface/; flutter clean; cd ../",
+                "cd ./minisound_ffi/; flutter clean; cd ../",
+                "cd ./minisound_web/; flutter clean; cd ../",
+                "cd ./minisound/; flutter clean; cd ../",
+                "cd ./minisound/example/; flutter clean; cd ../"
+            ],
+            "noninteractive": true
+        },
+        "run": {
+            "icon": "󰐊",
+            "cmd": [
+                "cd ./minisound/example/",
+                "flutter run -d linux"
+            ]
+        },
+        "ffigen": {
+            "desc": "generate dart ffi bindings",
+            "cmd": [
+                "cd ./minisound_ffi",
+                "dart run ffigen"
+            ]
+        },
+        "build web lib": {
+            "desc": "build ffi lib to web via emscripten",
+            "cmd": [
+                "export EMSDK_QUIET=1; . ~/emsdk/emsdk_env.sh",
+                "export SRC=./minisound_ffi/src/",
+                "export BUILD=./minisound_web/lib/js/",
+                "emcmake cmake -S $SRC -B $BUILD",
+                "cmake --build $BUILD",
+                "sed -i 's|audioWorklet.addModule(\"minisound_web.aw.js\")|audioWorklet.addModule(locateFile(\"minisound_web.aw.js\"))|g' $BUILD/emscripten/minisound_web.js"
+            ]
+        },
+        "clean web lib": {
+            "cmd": "rm -r ./minisound_web/lib/js/*",
+            "noninteractive": true
+        },
+        "run web": {
+            "icon": "󰐊",
+            "cmd": [
+                "cd ./minisound/example/",
+                "flutter run -d chrome --web-browser-flag '--enable-features=SharedArrayBuffer'"
+            ]
+        }
+    }
+}

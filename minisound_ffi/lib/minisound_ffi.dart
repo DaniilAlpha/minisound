@@ -64,7 +64,7 @@ final class FfiEngine implements PlatformEngine {
     // copy data into the memory
     final dataPtr = malloc.allocate<Uint8>(data.lengthInBytes);
     for (var i = 0; i < data.length; i++) {
-      dataPtr.elementAt(i).value = data[i];
+      (dataPtr + i).value = data[i];
     }
 
     // create sound
@@ -111,13 +111,13 @@ final class FfiSound implements PlatformSound {
   @override
   double get duration => _duration;
 
-  bool _isLooped = false;
+  PlatformSoundLooping _looping = (false, 0);
   @override
-  bool get isLooped => _isLooped;
+  PlatformSoundLooping get looping => _looping;
   @override
-  set isLooped(bool value) {
-    if (_bindings.sound_set_is_looped(_self, value) != ffi.Result.Ok) return;
-    _isLooped = value;
+  set looping(PlatformSoundLooping value) {
+    _bindings.sound_set_looped(_self, value.$1, value.$2);
+    _looping = value;
   }
 
   @override
@@ -130,6 +130,13 @@ final class FfiSound implements PlatformSound {
   void play() {
     if (_bindings.sound_play(_self) != ffi.Result.Ok) {
       throw MinisoundPlatformException("Failed to play the sound.");
+    }
+  }
+
+  @override
+  void replay() {
+    if (_bindings.sound_replay(_self) != ffi.Result.Ok) {
+      throw MinisoundPlatformException("Failed to replay the sound.");
     }
   }
 

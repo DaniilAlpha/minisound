@@ -1,4 +1,4 @@
-// ignore_for_file: camel_case_types, slash_for_doc_comments
+// ignore_for_file: cam, slash_for_doc_comments
 // ignore_for_file: non_constant_identifier_names
 // ignore_for_file: constant_identifier_names
 
@@ -46,6 +46,7 @@ Pointer<Sound> sound_alloc() => Pointer(_sound_alloc());
 void sound_unload(Pointer<Sound> self) => _sound_unload(self.addr);
 
 int sound_play(Pointer<Sound> self) => _sound_play(self.addr);
+int sound_replay(Pointer<Sound> self) => _sound_replay(self.addr);
 void sound_pause(Pointer<Sound> self) => _sound_pause(self.addr);
 void sound_stop(Pointer<Sound> self) => _sound_stop(self.addr);
 
@@ -57,8 +58,8 @@ double sound_get_duration(Pointer<Sound> self) =>
     _sound_get_duration(self.addr);
 
 // ignore: avoid_positional_boolean_parameters
-int sound_set_is_looped(Pointer<Sound> self, bool value) =>
-    _sound_set_is_looped(self.addr, value);
+void sound_set_looped(Pointer<Sound> self, bool value, int delay_ms) =>
+    _sound_set_looped(self.addr, value, delay_ms);
 
 /********
  ** js **
@@ -94,7 +95,7 @@ external void _engine_uninit(int self);
 external int _engine_start(int self);
 
 @JS()
-external int _engine_load_sound(int self, int sound, int data, int dataSize);
+external int _engine_load_sound(int self, int sound, int data, int data_size);
 
 // sound functions
 
@@ -106,6 +107,8 @@ external void _sound_unload(int sound);
 
 @JS()
 external int _sound_play(int self);
+@JS()
+external int _sound_replay(int self);
 @JS()
 external void _sound_pause(int self);
 @JS()
@@ -120,4 +123,4 @@ external void _sound_set_volume(int self, double value);
 external double _sound_get_duration(int self);
 
 @JS()
-external int _sound_set_is_looped(int self, bool value);
+external int _sound_set_looped(int self, bool value, int delay_ms);

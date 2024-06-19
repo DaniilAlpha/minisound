@@ -5,6 +5,7 @@
 
 #include "../external/milo/milo.h"
 #include "../external/miniaudio/include/miniaudio.h"
+#include "../include/silence_data_source.h"
 
 /*************
  ** private **
@@ -13,6 +14,8 @@
 struct Sound {
     ma_sound wave;
     ma_decoder decoder;
+
+    SilenceDataSource loop_delay_ds;
 };
 
 /************
@@ -62,9 +65,14 @@ Result sound_play(Sound *const self) {
     info("sound played");
     return Ok;
 }
+Result sound_replay(Sound *const self) {
+    sound_stop(self);
+    return sound_play(self);
+}
 void sound_pause(Sound *const self) { ma_sound_stop(&self->wave); }
 void sound_stop(Sound *const self) {
     ma_sound_stop(&self->wave);
+    ma_data_source_set_current(&self->decoder, &self->decoder);
     ma_sound_seek_to_pcm_frame(&self->wave, 0);
 }
 
@@ -81,9 +89,31 @@ float sound_get_duration(Sound *const self) {
     return duration;
 }
 
-Result sound_set_is_looped(Sound *const self, bool value) {
-    if (ma_data_source_set_looping(&self->decoder, value) != MA_SUCCESS)
-        return error("miniaudio setting looping error!"), UnknownErr;
+void sound_set_looped(
+    Sound *const self,
+    bool const value,
+    size_t const delay_ms
+) {
+    if (value) {
+        if (delay_ms <= 0) {
+            ma_data_source_set_looping(&self->decoder, true);
+        } else {
+            SilenceDataSourceConfig const config = silence_data_source_config(
+                self->decoder.outputFormat,
+                self->decoder.outputChannels,
+                self->decoder.outputSampleRate,
+                (delay_ms * self->decoder.outputSampleRate) / 1000
+            );
+            silence_data_source_init(&self->loop_delay_ds, &config);
 
-    return Ok;
+            ma_data_source_set_next(&self->decoder, &self->loop_delay_ds);
+            ma_data_source_set_next(&self->loop_delay_ds, &self->decoder);
+        }
+    } else {
+        // TODO? maybe refactor this
+
+        ma_data_source_set_current(&self->decoder, &self->decoder);
+        ma_data_source_set_looping(&self->decoder, false);
+        ma_data_source_set_next(&self->decoder, NULL);
+    }
 }

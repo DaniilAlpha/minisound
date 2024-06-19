@@ -45,6 +45,13 @@ linter:
     ######
 
     ### good practicies ###
+    # const
+    prefer_const_declarations: true
+    avoid_field_initializers_in_const_classes: true
+    prefer_const_constructors: true
+    prefer_const_constructors_in_immutables: true
+    prefer_const_literals_to_create_immutables: true
+
     # final
     prefer_final_in_for_each: true
     prefer_final_locals: true
@@ -61,6 +68,7 @@ linter:
     # classes
     prefer_mixin: true
     use_enums: true
+    exhaustive_cases: true
     avoid_setters_without_getters: true
     implicit_call_tearoffs: true
     use_to_and_as_if_applicable: true
@@ -93,3 +101,4 @@ linter:
 analyzer:
   errors:
     todo: ignore
+

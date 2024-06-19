@@ -28,18 +28,21 @@ abstract interface class PlatformEngine {
   Future<PlatformSound> loadSound(Uint8List data);
 }
 
+typedef PlatformSoundLooping = (bool isLooped, int delayMs);
+
 abstract interface class PlatformSound {
   double get volume;
   set volume(double value);
 
   double get duration;
 
-  bool get isLooped;
-  set isLooped(bool value);
+  PlatformSoundLooping get looping;
+  set looping(PlatformSoundLooping value);
 
   void unload();
 
   void play();
+  void replay();
   void pause();
   void stop();
 }
