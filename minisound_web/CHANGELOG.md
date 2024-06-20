@@ -1,3 +1,7 @@
+## 1.4.1
+
+Got rid of unnecessary pthreads in emscripten build, should decrease library size and possiby increase performance.
+
 ## 1.4.0
 
 Added an ability to add delay between loops.

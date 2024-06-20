@@ -1,3 +1,7 @@
+## 1.4.1
+
+Added limit on negative loop delay.
+
 ## 1.4.0
 
 Added an ability to add delay between loops.
