@@ -84,7 +84,7 @@ final class WebSound implements PlatformSound {
   }
 
   @override
-  late double duration = wasm.sound_get_duration(_self);
+  late final double duration = wasm.sound_get_duration(_self);
 
   var _looping = (false, 0);
   @override

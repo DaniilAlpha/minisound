@@ -85,20 +85,18 @@ else()
     set_target_properties(${MAIN_LIB} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${MAIN_OUT_PATH}/emscripten/)
     target_compile_options(${MAIN_LIB} PUBLIC
-        -pthread
-        -g -O3
+        # -pthread
+        -O3
         -flto -fno-rtti -fno-exceptions
-        -sNO_DEFAULT_TO_CXX
         -sWASM_WORKERS
     )
     set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
-        -pthread \
-        -g -O3 \
+        -O3 \
         -flto \
         -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall \
-        -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=256mb \
+        -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb \
         -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB \
-        -sAUDIO_WORKLET -sWASM_WORKERS -sASYNCIFY -sASYNCIFY_STACK_SIZE=16384 \
+        -sAUDIO_WORKLET -sWASM_WORKERS -sASYNCIFY -ASYNCIFY_ONLYsASYNCIFY_STACK_SIZE=16384 \
         -sSTACK_OVERFLOW_CHECK \
     ")
 endif()

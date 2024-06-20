@@ -61,7 +61,7 @@ final class Sound {
 
   final PlatformSound _sound;
 
-  /// a `double` greater than `0` (support for values greater than `1` is tested only on windows)
+  /// a `double` greater than `0` (values greater than `1` may behave differently from platform to platform)
   double get volume => _sound.volume;
   set volume(double value) => _sound.volume = value < 0 ? 0 : value;
 
@@ -71,14 +71,18 @@ final class Sound {
   bool get isLooped => _sound.looping.$1;
   Duration get loopDelay => Duration(milliseconds: _sound.looping.$2);
 
+  /// Starts a sound. Stopped and played again if it is already started.
   void play() {
     if (_sound.looping.$1) _sound.looping = (false, 0);
 
     _sound.replay();
   }
 
+  /// Starts sound looping.
+  ///
+  /// `delay` is clamped positive
   void playLooped({Duration delay = Duration.zero}) {
-    final delayMs = delay.inMilliseconds;
+    final delayMs = delay < Duration.zero ? 0 : delay.inMilliseconds;
     if (!_sound.looping.$1 || _sound.looping.$2 != delayMs) {
       _sound.looping = (true, delayMs);
     }

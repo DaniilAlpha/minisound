@@ -6,5 +6,5 @@ C_DEFINES = -DDART_SHARED_LIB -DMA_AUDIO_WORKLETS_THREAD_STACK_SIZE=131072 -DMA_
 
 C_INCLUDES = @CMakeFiles/minisound_web.dir/includes_C.rsp
 
-C_FLAGS = -pthread -g -O3 -flto -fno-rtti -fno-exceptions -sNO_DEFAULT_TO_CXX -sWASM_WORKERS
+C_FLAGS = -O3 -flto -fno-rtti -fno-exceptions -sWASM_WORKERS
 

@@ -65,11 +65,6 @@ void sound_set_looped(Pointer<Sound> self, bool value, int delay_ms) =>
  ** js **
  ********/
 
-// engine functions
-
-@JS()
-external int _engine_alloc();
-
 @JS("ccall")
 external dynamic _ccall(
   String name,
@@ -78,6 +73,11 @@ external dynamic _ccall(
   List args,
   Map opts,
 );
+
+// engine functions
+
+@JS()
+external int _engine_alloc();
 
 Future<int> _engine_init(int self, int periodMs) async =>
     promiseToFuture(_ccall(
