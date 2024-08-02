@@ -47,6 +47,31 @@ abstract interface class PlatformSound {
   void stop();
 }
 
+abstract interface class PlatformRecorder {
+  factory PlatformRecorder() => MinisoundPlatform.instance.createRecorder();
+
+  Future<void> initFile(String filename);
+  Future<void> initStream();
+  void start();
+  void stop();
+  bool get isRecording;
+  Float32List getBuffer(int framesToRead);
+  void dispose();
+}
+
+abstract interface class PlatformWave {
+  factory PlatformWave() => MinisoundPlatform.instance.createWave();
+
+  Future<void> init(
+      int type, double frequency, double amplitude, int sampleRate);
+  void setType(int type);
+  void setFrequency(double frequency);
+  void setAmplitude(double amplitude);
+  void setSampleRate(int sampleRate);
+  Float32List read(int framesToRead);
+  void dispose();
+}
+
 base class MinisoundPlatformException implements Exception {
   MinisoundPlatformException([this.message]);
 

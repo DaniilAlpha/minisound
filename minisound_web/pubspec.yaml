@@ -28,8 +28,8 @@ flutter:
 
   assets:
     - packages/minisound_web/js/minisound_web.loader.js
-    - packages/minisound_web/js/emscripten/minisound_web.wasm
-    - packages/minisound_web/js/emscripten/minisound_web.js
-    - packages/minisound_web/js/emscripten/minisound_web.aw.js
-    - packages/minisound_web/js/emscripten/minisound_web.ww.js
+    - packages/minisound_web/js/minisound_web.wasm
+    - packages/minisound_web/js/minisound_web.js
+    - packages/minisound_web/js/minisound_web.aw.js
+    - packages/minisound_web/js/minisound_web.ww.js
     # - packages/minisound_web/js/emscripten/minisound_web.worker.js

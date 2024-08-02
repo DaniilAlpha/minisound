@@ -145,3 +145,135 @@ final class FfiSound implements PlatformSound {
   @override
   void stop() => _bindings.sound_stop(_self);
 }
+
+// recorder ffi
+class FfiRecorder implements PlatformRecorder {
+  FfiRecorder(Pointer<ffi.Recorder> self) : _self = self;
+
+  final Pointer<ffi.Recorder> _self;
+
+  @override
+  Future<void> initFile(String filename) async {
+    final filenamePtr = filename.toNativeUtf8();
+    try {
+      if (_bindings.recorder_init_file(_self, filenamePtr.cast()) !=
+          ffi.RecorderResult.RECORDER_OK) {
+        throw MinisoundPlatformException(
+            "Failed to initialize recorder with file.");
+      }
+    } finally {
+      malloc.free(filenamePtr);
+    }
+  }
+
+  @override
+  Future<void> initStream() async {
+    if (_bindings.recorder_init_stream(_self) !=
+        ffi.RecorderResult.RECORDER_OK) {
+      throw MinisoundPlatformException("Failed to initialize recorder stream.");
+    }
+  }
+
+  @override
+  void start() {
+    if (_bindings.recorder_start(_self) != ffi.RecorderResult.RECORDER_OK) {
+      throw MinisoundPlatformException("Failed to start recording.");
+    }
+  }
+
+  @override
+  void stop() {
+    if (_bindings.recorder_stop(_self) != ffi.RecorderResult.RECORDER_OK) {
+      throw MinisoundPlatformException("Failed to stop recording.");
+    }
+  }
+
+  @override
+  bool get isRecording => _bindings.recorder_is_recording(_self);
+
+  @override
+  Float32List getBuffer(int framesToRead) {
+    final output = malloc<Float>(framesToRead);
+    try {
+      final framesRead =
+          _bindings.recorder_get_buffer(_self, output, framesToRead);
+      if (framesRead < 0) {
+        throw MinisoundPlatformException("Failed to get recorder buffer.");
+      }
+      return output.asTypedList(framesRead);
+    } finally {
+      malloc.free(output);
+    }
+  }
+
+  @override
+  void dispose() {
+    _bindings.recorder_destroy(_self);
+  }
+}
+
+// wave ffi
+class FfiWave implements PlatformWave {
+  FfiWave(Pointer<ffi.Wave> self) : _self = self;
+
+  final Pointer<ffi.Wave> _self;
+
+  @override
+  Future<void> init(
+      int type, double frequency, double amplitude, int sampleRate) async {
+    if (_bindings.wave_init(_self, type, frequency, amplitude, sampleRate) !=
+        ffi.WaveResult.WAVE_OK) {
+      throw MinisoundPlatformException("Failed to initialize wave.");
+    }
+  }
+
+  @override
+  void setType(int type) {
+    if (_bindings.wave_set_type(_self, type) != ffi.WaveResult.WAVE_OK) {
+      throw MinisoundPlatformException("Failed to set wave type.");
+    }
+  }
+
+  @override
+  void setFrequency(double frequency) {
+    if (_bindings.wave_set_frequency(_self, frequency) !=
+        ffi.WaveResult.WAVE_OK) {
+      throw MinisoundPlatformException("Failed to set wave frequency.");
+    }
+  }
+
+  @override
+  void setAmplitude(double amplitude) {
+    if (_bindings.wave_set_amplitude(_self, amplitude) !=
+        ffi.WaveResult.WAVE_OK) {
+      throw MinisoundPlatformException("Failed to set wave amplitude.");
+    }
+  }
+
+  @override
+  void setSampleRate(int sampleRate) {
+    if (_bindings.wave_set_sample_rate(_self, sampleRate) !=
+        ffi.WaveResult.WAVE_OK) {
+      throw MinisoundPlatformException("Failed to set wave sample rate.");
+    }
+  }
+
+  @override
+  Float32List read(int framesToRead) {
+    final output = malloc<Float>(framesToRead);
+    try {
+      final framesRead = _bindings.wave_read(_self, output, framesToRead);
+      if (framesRead < 0) {
+        throw MinisoundPlatformException("Failed to read wave data.");
+      }
+      return output.asTypedList(framesRead);
+    } finally {
+      malloc.free(output);
+    }
+  }
+
+  @override
+  void dispose() {
+    _bindings.wave_destroy(_self);
+  }
+}

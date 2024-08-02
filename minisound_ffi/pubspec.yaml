@@ -28,6 +28,8 @@ ffigen:
       - "src/include/minisound.h"
       - "src/include/engine.h"
       - "src/include/sound.h"
+      - "src/include/record.h"
+      - "src/include/wave.h"
     include-directives:
       - "src/include/*.h"
       - "/usr/lib/clang/18/include/stdbool.h"
