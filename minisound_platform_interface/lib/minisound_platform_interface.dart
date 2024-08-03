@@ -15,6 +15,8 @@ abstract class MinisoundPlatform extends PlatformInterface {
   }
 
   PlatformEngine createEngine();
+  PlatformRecorder createRecorder();
+  PlatformWave createWave();
 }
 
 abstract interface class PlatformEngine {

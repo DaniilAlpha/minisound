@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "../external/milo/milo.h"
-#include "../external/miniaudio/include/miniaudio.h"
+#include "../include/miniaudio.h"
 #include "../include/silence_data_source.h"
 
 /*************

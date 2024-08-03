@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "../external/miniaudio/include/miniaudio.h"
+#include "../include/miniaudio.h"
 
 #define MILO_IMPL
 #include "../external/milo/milo.h"

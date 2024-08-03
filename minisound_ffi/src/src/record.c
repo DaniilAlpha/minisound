@@ -1,5 +1,5 @@
 #include "record.h"
-#include "../external/miniaudio/include/miniaudio.h"
+#include "../include/miniaudio.h"
 
 #include <stdlib.h>
 #include <string.h>

@@ -1,5 +1,5 @@
 #include "wave.h"
-#include "../external/miniaudio/include/miniaudio.h"
+#include "../include/miniaudio.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -72,7 +72,7 @@ WaveResult wave_set_amplitude(Wave* wave, double amplitude) {
     if (wave == NULL) {
         return WAVE_ERROR;
     }
-    ma_waveform_set_amplitude(&wave->waveform, amplitude);
+    wave_set_amplitude(&wave->waveform, amplitude);
     return WAVE_OK;
 }
 
@@ -89,6 +89,6 @@ int32_t wave_read(Wave* wave, float* output, int32_t frames_to_read) {
         return 0;
     }
 
-    ma_waveform_read_pcm_frames(&wave->waveform, output, (ma_uint64)frames_to_read, NULL);
+    ma_decoder_read_pcm_frames(&wave->waveform, output, (ma_uint64)frames_to_read, NULL);
     return frames_to_read;
 }

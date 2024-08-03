@@ -1,4 +1,5 @@
 import "dart:io";
+import "dart:typed_data";
 
 import "package:flutter/foundation.dart";
 import "package:flutter/services.dart";
@@ -8,7 +9,7 @@ export "package:minisound_platform_interface/minisound_platform_interface.dart"
 
 /// Controls the loading and unloading of `Sound`s.
 ///
-/// Should be initialized before doind anything.
+/// Should be initialized before doing anything.
 /// Should be started to hear any sound.
 final class Engine {
   Engine() {
@@ -18,6 +19,9 @@ final class Engine {
   static final _finalizer =
       Finalizer<PlatformEngine>((engine) => engine.dispose());
   static final _soundsFinalizer = Finalizer<Sound>((sound) => sound.unload());
+  static final _recorderFinalizer =
+      Finalizer<Recorder>((recorder) => recorder.dispose());
+  static final _waveFinalizer = Finalizer<Wave>((wave) => wave.dispose());
 
   final _engine = PlatformEngine();
   var _isInit = false;
@@ -52,6 +56,20 @@ final class Engine {
   Future<Sound> loadSoundFile(String path) async {
     final file = await File(path).readAsBytes();
     return loadSound(file);
+  }
+
+  /// Creates a new Recorder instance.
+  Recorder createRecorder() {
+    final recorder = Recorder._();
+    _recorderFinalizer.attach(this, recorder);
+    return recorder;
+  }
+
+  /// Creates a new Wave instance.
+  Wave createWave() {
+    final wave = Wave._();
+    _waveFinalizer.attach(this, wave);
+    return wave;
   }
 }
 
@@ -109,6 +127,64 @@ final class Sound {
   }
 
   void unload() => _sound.unload();
+}
+
+/// A recorder for audio input.
+final class Recorder {
+  Recorder._() : _recorder = PlatformRecorder();
+
+  final PlatformRecorder _recorder;
+
+  /// Initializes the recorder to save to a file.
+  Future<void> initFile(String filename) async => _recorder.initFile(filename);
+
+  /// Initializes the recorder for streaming.
+  Future<void> initStream() async => _recorder.initStream();
+
+  /// Starts recording.
+  void start() => _recorder.start();
+
+  /// Stops recording.
+  void stop() => _recorder.stop();
+
+  /// Checks if the recorder is currently recording.
+  bool get isRecording => _recorder.isRecording;
+
+  /// Gets the recorded buffer.
+  Float32List getBuffer(int framesToRead) => _recorder.getBuffer(framesToRead);
+
+  /// Disposes of the recorder resources.
+  void dispose() => _recorder.dispose();
+}
+
+/// A wave generator.
+final class Wave {
+  Wave._() : _wave = PlatformWave();
+
+  final PlatformWave _wave;
+
+  /// Initializes the wave generator.
+  Future<void> init(
+          int type, double frequency, double amplitude, int sampleRate) async =>
+      _wave.init(type, frequency, amplitude, sampleRate);
+
+  /// Sets the wave type.
+  void setType(int type) => _wave.setType(type);
+
+  /// Sets the wave frequency.
+  void setFrequency(double frequency) => _wave.setFrequency(frequency);
+
+  /// Sets the wave amplitude.
+  void setAmplitude(double amplitude) => _wave.setAmplitude(amplitude);
+
+  /// Sets the wave sample rate.
+  void setSampleRate(int sampleRate) => _wave.setSampleRate(sampleRate);
+
+  /// Reads wave data.
+  Float32List read(int framesToRead) => _wave.read(framesToRead);
+
+  /// Disposes of the wave generator resources.
+  void dispose() => _wave.dispose();
 }
 
 class EngineAlreadyInitError extends Error {

@@ -32,7 +32,7 @@ endif()
 # Set paths
 set(MAIN_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 set(MAIN_OUT_PATH ${CMAKE_CURRENT_BINARY_DIR})
-set(WEB_OUTPUT_DIR ${TARGET_FILE_PATH}/minisound_web/lib/js)
+set(WEB_OUTPUT_DIR ${TARGET_FILE_PATH}/minisound_web/lib/build)
 
 # Main lib
 if(NOT EMSCRIPTEN)
@@ -100,7 +100,7 @@ else()
     target_compile_options(${MAIN_LIB} PUBLIC
         -O3
         -flto -fno-rtti -fno-exceptions
-        -sWASM_WORKERS
+        -sWASM_WORKERS=1
     )
     set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
         -O3 \
@@ -108,7 +108,7 @@ else()
         -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall \
         -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb \
         -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB \
-        -sAUDIO_WORKLET -sWASM_WORKERS -sASYNCIFY -ASYNCIFY_ONLYsASYNCIFY_STACK_SIZE=16384 \
+        -sAUDIO_WORKLET=1 -sWASM_WORKERS=1 -sASYNCIFY -ASYNCIFY_ONLY \
         -sSTACK_OVERFLOW_CHECK \
     ")
 endif()
@@ -128,12 +128,27 @@ if(EMSCRIPTEN)
             COMMENT "Copying ${JS_FILENAME} to web output directory"
         )
     endforeach()
-
     add_custom_target(${MAIN_JS} ALL
         DEPENDS ${JS_OUTPUTS}
         COMMENT "Copying JS sources to web output directory"
     )
     add_dependencies(${MAIN_LIB} ${MAIN_JS})
+
+    # Configure the modify_js.cmake script
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/modify_js.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/modify_js.cmake
+        @ONLY
+    )
+
+    # Add custom command to modify the output JS file
+    add_custom_command(
+        TARGET ${MAIN_LIB} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "Modifying ${MAIN_LIB}.js to use locateFile"
+        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/modify_js.cmake
+        WORKING_DIRECTORY ${WEB_OUTPUT_DIR}
+        COMMENT "Post-processing ${MAIN_LIB}.js"
+    )
 endif()
 
 # Additional libs
