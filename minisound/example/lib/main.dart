@@ -122,10 +122,13 @@ class _ExamplePageState extends State<ExamplePage> {
                               onPressed: () async {
                                 if (isRecording) {
                                   final buff = recorder.getBuffer(44100);
-                                  print(
-                                      buff.lengthInBytes); // 1 second of audio
-                                  await engine
-                                      .loadSound(buff.buffer.asUint8List());
+                                  try {
+                                    await engine
+                                        .loadSound(buff.buffer.asUint8List());
+                                  } catch (e) {
+                                    print(e);
+                                  }
+
                                   recorder.stop();
                                 } else {
                                   await recorder.initStream();

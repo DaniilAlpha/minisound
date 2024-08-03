@@ -41,7 +41,8 @@ final class Engine {
 
   /// Copies `data` to the internal memory location and creates a `Sound` from it.
   Future<Sound> loadSound(Uint8List data) async {
-    final sound = Sound._(await _engine.loadSound(data));
+    final engineSound = await _engine.loadSound(data);
+    final sound = Sound._(engineSound);
     _soundsFinalizer.attach(this, sound);
     return sound;
   }
