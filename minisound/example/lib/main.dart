@@ -1,3 +1,6 @@
+import "dart:async";
+import "dart:typed_data";
+
 import "package:flutter/material.dart";
 import "package:minisound/minisound.dart";
 
@@ -20,17 +23,20 @@ class ExamplePage extends StatefulWidget {
 class _ExamplePageState extends State<ExamplePage> {
   final engine = Engine();
   var loopDelay = 0.0;
-  late Recorder recorder;
-  late Wave wave;
+  Recorder recorder = Recorder();
+  Wave wave = Wave();
   bool isRecording = false;
+  List<Uint8List> recordingBuffer = [];
+  int totalRecordedFrames = 0;
   int waveType = 0;
   double waveFrequency = 440.0;
   double waveAmplitude = 1.0;
 
   late final Future<Sound> soundFuture = () async {
-    await engine.init();
-    recorder = engine.createRecorder();
-    wave = engine.createWave();
+    if (!engine.isInit) {
+      await engine.init();
+    }
+    await engine.start();
     //await wave.init(0, waveFrequency, waveAmplitude, 44100);
     return engine.loadSoundAsset("assets/laser_shoot.wav");
   }();
@@ -121,18 +127,33 @@ class _ExamplePageState extends State<ExamplePage> {
                                   : "START RECORDING"),
                               onPressed: () async {
                                 if (isRecording) {
-                                  final buff = recorder.getBuffer(44100);
                                   try {
-                                    await engine
-                                        .loadSound(buff.buffer.asUint8List());
+                                    final sound =
+                                        await createSoundFromRecorder(recorder);
+                                    sound.play();
                                   } catch (e) {
                                     print(e);
+                                  } finally {
+                                    recorder.stop();
+                                    // Clear the buffer after creating the sound
+                                    recordingBuffer.clear();
+                                    totalRecordedFrames = 0;
                                   }
-
-                                  recorder.stop();
                                 } else {
-                                  await recorder.initStream();
+                                  if (recorder.isRecording) {
+                                    recorder.stop();
+                                  }
+                                  await recorder.initStream(
+                                      sampleRate: 48000,
+                                      channels: 1,
+                                      format: 1);
                                   recorder.start();
+                                  Timer.periodic(
+                                      const Duration(milliseconds: 100),
+                                      (_) => accumulateFrames());
+                                  // Clear the buffer before starting a new recording
+                                  recordingBuffer.clear();
+                                  totalRecordedFrames = 0;
                                 }
 
                                 setState(() {
@@ -169,8 +190,8 @@ class _ExamplePageState extends State<ExamplePage> {
                                 child: Slider(
                                   value: waveFrequency,
                                   min: 20,
-                                  max: 20000,
-                                  divisions: 1000,
+                                  max: 2000,
+                                  divisions: 150,
                                   label: waveFrequency.toStringAsFixed(2),
                                   onChanged: (value) => setState(() {
                                     waveFrequency = value;
@@ -199,8 +220,12 @@ class _ExamplePageState extends State<ExamplePage> {
                             ElevatedButton(
                               child: const Text("PLAY WAVE"),
                               onPressed: () async {
-                                final waveBuffer = wave.read(44100);
-                                print(waveBuffer); // 1 second of audio
+                                final waveBuffer = wave.read(1024);
+                                final audioData = AudioData(waveBuffer.buffer,
+                                    AudioFormat.uint8, 48000, 1);
+                                await engine.start();
+                                final sound = await engine.loadSound(audioData);
+                                sound.play();
                               },
                             ),
                           ],
@@ -216,6 +241,38 @@ class _ExamplePageState extends State<ExamplePage> {
                   }),
         ),
       );
+
+  void accumulateFrames() async {
+    if (isRecording) {
+      Uint8List buffer = recorder.getBuffer(1028);
+      if (buffer.isNotEmpty) {
+        recordingBuffer.add(buffer);
+        totalRecordedFrames += buffer.length ~/ recorder.channels;
+      }
+    }
+  }
+
+  Future<Sound> createSoundFromRecorder(Recorder recorder) async {
+    // Combine all chunks into a single Uint8List
+    final Uint8List combinedBuffer =
+        Uint8List(totalRecordedFrames * recorder.channels);
+    int offset = 0;
+    for (var chunk in recordingBuffer) {
+      combinedBuffer.setAll(offset, chunk);
+      offset += chunk.length;
+    }
+
+    print("Total recorded frames: $totalRecordedFrames");
+
+    // Create AudioData object
+    final audioData = AudioData(
+        combinedBuffer.buffer, AudioFormat.uint8, recorder.sampleRate, 1);
+
+    await recorder.engine.start();
+
+    // Load the sound
+    return recorder.engine.loadSound(audioData);
+  }
 }
 
 Widget returnError(error) {

@@ -31,6 +31,20 @@ class MinisoundFfi extends MinisoundPlatform {
     if (self == nullptr) throw MinisoundPlatformOutOfMemoryException();
     return FfiEngine(self);
   }
+
+  @override
+  PlatformRecorder createRecorder() {
+    final self = _bindings.recorder_create();
+    if (self == nullptr) throw MinisoundPlatformOutOfMemoryException();
+    return FfiRecorder(self);
+  }
+
+  @override
+  PlatformWave createWave() {
+    final self = _bindings.wave_create();
+    if (self == nullptr) throw MinisoundPlatformOutOfMemoryException();
+    return FfiWave(self);
+  }
 }
 
 // engine ffi
@@ -60,30 +74,121 @@ final class FfiEngine implements PlatformEngine {
   }
 
   @override
-  Future<PlatformSound> loadSound(Uint8List data) async {
-    // copy data into the memory
-    final dataPtr = malloc.allocate<Uint8>(data.lengthInBytes);
-    for (var i = 0; i < data.length; i++) {
-      (dataPtr + i).value = data[i];
-    }
+  Future<PlatformSound> loadSound(AudioData audioData) async {
+    final dataPtr =
+        _allocateForFormat(audioData.format, audioData.buffer.lengthInBytes);
 
-    // create sound
+    _copyAudioData(dataPtr, audioData.buffer, audioData.format);
+
     final sound = _bindings.sound_alloc();
     if (sound == nullptr) {
+      malloc.free(dataPtr);
       throw MinisoundPlatformException("Failed to allocate a sound.");
     }
 
-    if (_bindings.engine_load_sound(
+    final maFormat = convertToMaFormat(audioData.format);
+
+    if (_bindings.engine_load_sound_ex(
           _self,
           sound,
           dataPtr.cast(),
-          data.lengthInBytes,
+          audioData.buffer.lengthInBytes,
+          maFormat,
+          audioData.sampleRate,
+          audioData.channels,
         ) !=
         ffi.Result.Ok) {
+      malloc.free(dataPtr);
+      _bindings.sound_unload(sound);
       throw MinisoundPlatformException("Failed to load a sound.");
     }
 
     return FfiSound._fromPtrs(sound, dataPtr);
+  }
+
+  // ma_format_unknown = 0,     /* Mainly used for indicating an error, but also used as the default for the output format for decoders. */
+  // ma_format_u8      = 1,
+  // ma_format_s16     = 2,     /* Seems to be the most widely supported format. */
+  // ma_format_s24     = 3,     /* Tightly packed. 3 bytes per sample. */
+  // ma_format_s32     = 4,
+  // ma_format_f32     = 5,
+
+  void _copyAudioData(
+      Pointer<NativeType> ptr, dynamic data, AudioFormat format) {
+    var thisData;
+    if (data is ByteBuffer) {
+      thisData = _getTypedDataViewFromByteBuffer(data, format);
+    }
+
+    if (thisData is! TypedData) {
+      throw ArgumentError('Data must be either ByteBuffer or TypedData');
+    }
+
+    switch (format) {
+      case AudioFormat.uint8:
+        final list =
+            (ptr as Pointer<Uint8>).asTypedList(thisData.lengthInBytes);
+        list.setAll(0, data as Uint8List);
+        break;
+      case AudioFormat.int16:
+        final list =
+            (ptr as Pointer<Int16>).asTypedList(thisData.lengthInBytes ~/ 2);
+        list.setAll(0, data as Int16List);
+        break;
+      case AudioFormat.int32:
+        final list =
+            (ptr as Pointer<Int32>).asTypedList(thisData.lengthInBytes ~/ 4);
+        list.setAll(0, data as Int32List);
+        break;
+      case AudioFormat.float32:
+        final list =
+            (ptr as Pointer<Float>).asTypedList(thisData.lengthInBytes ~/ 4);
+        list.setAll(0, data as Float32List);
+        break;
+      case AudioFormat.float64:
+        final list =
+            (ptr as Pointer<Double>).asTypedList(thisData.lengthInBytes ~/ 8);
+        list.setAll(0, data as Float64List);
+        break;
+      default:
+        throw ArgumentError('Unsupported audio format: $format');
+    }
+  }
+
+  Pointer<NativeType> _allocateForFormat(
+      AudioFormat format, int lengthInBytes) {
+    switch (format) {
+      case AudioFormat.uint8:
+        return malloc.allocate<Uint8>(lengthInBytes);
+      case AudioFormat.int16:
+        return malloc.allocate<Int16>(lengthInBytes ~/ 2);
+      case AudioFormat.int32:
+        return malloc.allocate<Int32>(lengthInBytes ~/ 4);
+      case AudioFormat.float32:
+        return malloc.allocate<Float>(lengthInBytes ~/ 4);
+      case AudioFormat.float64:
+        return malloc.allocate<Double>(lengthInBytes ~/ 8);
+      default:
+        throw ArgumentError('Unsupported audio format: $format');
+    }
+  }
+
+  TypedData _getTypedDataViewFromByteBuffer(
+      ByteBuffer buffer, AudioFormat format) {
+    switch (format) {
+      case AudioFormat.uint8:
+        return buffer.asUint8List();
+      case AudioFormat.int16:
+        return buffer.asInt16List();
+      case AudioFormat.int32:
+        return buffer.asInt32List();
+      case AudioFormat.float32:
+        return buffer.asFloat32List();
+      case AudioFormat.float64:
+        return buffer.asFloat64List();
+      default:
+        throw ArgumentError('Unsupported audio format: $format');
+    }
   }
 }
 
@@ -153,10 +258,14 @@ class FfiRecorder implements PlatformRecorder {
   final Pointer<ffi.Recorder> _self;
 
   @override
-  Future<void> initFile(String filename) async {
+  Future<void> initFile(String filename,
+      {int sampleRate = 44800,
+      int channels = 1,
+      int format = MaFormat.ma_format_f32}) async {
     final filenamePtr = filename.toNativeUtf8();
     try {
-      if (_bindings.recorder_init_file(_self, filenamePtr.cast()) !=
+      if (_bindings.recorder_init_file(
+              _self, filenamePtr.cast(), sampleRate, channels, format) !=
           ffi.RecorderResult.RECORDER_OK) {
         throw MinisoundPlatformException(
             "Failed to initialize recorder with file.");
@@ -167,8 +276,13 @@ class FfiRecorder implements PlatformRecorder {
   }
 
   @override
-  Future<void> initStream() async {
-    if (_bindings.recorder_init_stream(_self) !=
+  Future<void> initStream(
+      {int sampleRate = 44800,
+      int channels = 1,
+      int format = MaFormat.ma_format_f32,
+      double bufferDurationSeconds = 5}) async {
+    if (_bindings.recorder_init_stream(
+            _self, sampleRate, channels, format, bufferDurationSeconds) !=
         ffi.RecorderResult.RECORDER_OK) {
       throw MinisoundPlatformException("Failed to initialize recorder stream.");
     }
@@ -192,7 +306,7 @@ class FfiRecorder implements PlatformRecorder {
   bool get isRecording => _bindings.recorder_is_recording(_self);
 
   @override
-  Float32List getBuffer(int framesToRead) {
+  Uint8List getBuffer(int framesToRead) {
     final output = malloc<Float>(framesToRead);
     try {
       final framesRead =

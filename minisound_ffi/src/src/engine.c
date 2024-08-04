@@ -12,7 +12,8 @@
  ** private **
  *************/
 
-struct Engine {
+struct Engine
+{
     bool is_started;
 
     ma_engine engine;
@@ -23,13 +24,16 @@ struct Engine {
  ** public **
  ************/
 
-Engine *engine_alloc() {
+Engine *engine_alloc()
+{
     Engine *const engine = malloc(sizeof(Engine));
-    if (engine == NULL) error("%s", explain(OutOfMemErr));
+    if (engine == NULL)
+        error("%s", explain(OutOfMemErr));
     return engine;
 }
 
-Result engine_init(Engine *const self, uint32_t const period_ms) {
+Result engine_init(Engine *const self, uint32_t const period_ms)
+{
     self->is_started = false;
 
     ma_engine_config engine_config = ma_engine_config_init();
@@ -41,8 +45,7 @@ Result engine_init(Engine *const self, uint32_t const period_ms) {
     self->dec_config = ma_decoder_config_init(
         self->engine.pDevice->playback.format,
         self->engine.pDevice->playback.channels,
-        self->engine.sampleRate
-    );
+        self->engine.sampleRate);
 
     info("engine initialized");
 
@@ -50,8 +53,10 @@ Result engine_init(Engine *const self, uint32_t const period_ms) {
 }
 void engine_uninit(Engine *const self) { ma_engine_uninit(&self->engine); }
 
-Result engine_start(Engine *const self) {
-    if (self->is_started) return Ok;
+Result engine_start(Engine *const self)
+{
+    if (self->is_started)
+        return Ok;
 
     if (ma_engine_start(&self->engine) != MA_SUCCESS)
         return error("miniaudio engine starting error!"), UnknownErr;
@@ -63,11 +68,16 @@ Result engine_start(Engine *const self) {
     return Ok;
 }
 
-Result engine_load_sound(
+Result engine_load_sound_ex(
     Engine *const self,
     Sound *const sound,
     void const *const data,
-    size_t const data_size
-) {
-    return sound_init(sound, data, data_size, &self->dec_config, &self->engine);
+    size_t const data_size,
+    ma_format format,
+    ma_uint32 sample_rate,
+    ma_uint32 channels)
+{
+    ma_decoder_config dec_config = ma_decoder_config_init(format, channels, sample_rate);
+
+    return sound_init(sound, data, data_size, format, channels, sample_rate, &self->engine);
 }

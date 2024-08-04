@@ -7,6 +7,7 @@ library minisound;
 
 import "package:js/js.dart";
 import "package:js/js_util.dart";
+import "package:minisound_platform_interface/minisound_platform_interface.dart";
 import "package:minisound_web/bindings/wasm/wasm.dart";
 
 final class Engine extends Opaque {}
@@ -55,13 +56,24 @@ Future<int> engine_init(Pointer<Engine> self, int periodMs) =>
 void engine_uninit(Pointer<Engine> self) => _engine_uninit(self.addr);
 int engine_start(Pointer<Engine> self) => _engine_start(self.addr);
 
-int engine_load_sound(
+int engine_load_sound_ex(
   Pointer<Engine> self,
   Pointer<Sound> sound,
   Pointer data,
   int dataSize,
+  int format,
+  int sampleRate,
+  int channels,
 ) =>
-    _engine_load_sound(self.addr, sound.addr, data.addr, dataSize);
+    _engine_load_sound_ex(
+      self.addr,
+      sound.addr,
+      data.addr,
+      dataSize,
+      format,
+      sampleRate,
+      channels,
+    );
 
 // sound functions
 Pointer<Sound> sound_alloc() => Pointer(_sound_alloc());
@@ -81,10 +93,22 @@ void sound_set_looped(Pointer<Sound> self, bool value, int delay_ms) =>
 
 // recorder functions
 Pointer<Recorder> recorder_create() => Pointer(_recorder_create());
-Future<int> recorder_init_file(Pointer<Recorder> self, String filename) =>
-    _recorder_init_file(self.addr, filename);
-Future<int> recorder_init_stream(Pointer<Recorder> self) =>
-    _recorder_init_stream(self.addr);
+Future<int> recorder_init_file(Pointer<Recorder> self, String filename,
+        {int sampleRate = 44800,
+        int channels = 1,
+        int format = MaFormat.ma_format_f32}) =>
+    _recorder_init_file(self.addr, filename,
+        sampleRate: sampleRate, channels: channels, format: format);
+Future<int> recorder_init_stream(Pointer<Recorder> self,
+        {int sampleRate = 44800,
+        int channels = 1,
+        int format = MaFormat.ma_format_f32,
+        double bufferDurationSeconds = 5}) =>
+    _recorder_init_stream(self.addr,
+        sampleRate: sampleRate,
+        channels: channels,
+        format: format,
+        bufferDurationSeconds: bufferDurationSeconds);
 int recorder_start(Pointer<Recorder> self) => _recorder_start(self.addr);
 int recorder_stop(Pointer<Recorder> self) => _recorder_stop(self.addr);
 bool recorder_is_recording(Pointer<Recorder> self) =>
@@ -139,8 +163,17 @@ Future<int> _engine_init(int self, int periodMs) async =>
 external void _engine_uninit(int self);
 @JS()
 external int _engine_start(int self);
-@JS()
-external int _engine_load_sound(int self, int sound, int data, int data_size);
+
+@JS("_engine_load_sound_ex")
+external int _engine_load_sound_ex(
+  int self,
+  int sound,
+  int data,
+  int dataSize,
+  int format,
+  int sampleRate,
+  int channels,
+);
 
 // sound functions
 @JS()
@@ -167,19 +200,28 @@ external int _sound_set_looped(int self, bool value, int delay_ms);
 // recorder functions
 @JS()
 external int _recorder_create();
-Future<int> _recorder_init_file(int self, String filename) async =>
+
+Future<int> _recorder_init_file(int self, String filename,
+        {int sampleRate = 44800,
+        int channels = 1,
+        int format = MaFormat.ma_format_f32}) async =>
     promiseToFuture(_ccall(
       "recorder_init_file",
       "number",
-      ["number", "string"],
-      [self, filename],
+      ["number", "string", "number", "number", "number"],
+      [self, filename, sampleRate, channels, format],
       {"async": true},
     ));
-Future<int> _recorder_init_stream(int self) async => promiseToFuture(_ccall(
+Future<int> _recorder_init_stream(int self,
+        {int sampleRate = 44800,
+        int channels = 1,
+        int format = MaFormat.ma_format_f32,
+        double bufferDurationSeconds = 5}) async =>
+    promiseToFuture(_ccall(
       "recorder_init_stream",
       "number",
-      ["number"],
-      [self],
+      ["number", "number", "number", "number", "number"],
+      [self, sampleRate, channels, format, bufferDurationSeconds],
       {"async": true},
     ));
 @JS()
@@ -189,7 +231,7 @@ external int _recorder_stop(int self);
 @JS()
 external bool _recorder_is_recording(int self);
 @JS()
-external int _recorder_get_buffer(int self, int output, int frames_to_read);
+external int _recorder_get_buffer(int self, void output, int frames_to_read);
 @JS()
 external void _recorder_destroy(int self);
 

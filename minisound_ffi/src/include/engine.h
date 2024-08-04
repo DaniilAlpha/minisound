@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+#include "../external/miniaudio/include/miniaudio.h"
 #include "../external/result/result.h"
 #include "export.h"
 #include "sound.h"
@@ -16,11 +17,14 @@ EXPORT void engine_uninit(Engine *const self);
 
 EXPORT Result engine_start(Engine *const self);
 
-EXPORT Result engine_load_sound(
+EXPORT Result engine_load_sound_ex(
     Engine *const self,
     Sound *const sound,
     void const *const data,
-    size_t const data_size
+    size_t const data_size,
+    ma_format format,
+    ma_uint32 sample_rate,
+    ma_uint32 channels
 );
 
 #endif

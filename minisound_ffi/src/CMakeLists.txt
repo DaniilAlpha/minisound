@@ -73,7 +73,6 @@ elseif(EMSCRIPTEN)
     target_compile_definitions(${MAIN_LIB} PUBLIC
         MA_ENABLE_WEBAUDIO
         MA_ENABLE_AUDIO_WORKLETS
-        MA_AUDIO_WORKLETS_THREAD_STACK_SIZE=131072
     )
 elseif(APPLE)
     target_compile_definitions(${MAIN_LIB} PUBLIC MA_ENABLE_COREAUDIO)

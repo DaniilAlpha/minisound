@@ -59,18 +59,26 @@ final class WebEngine implements PlatformEngine {
   }
 
   @override
-  Future<PlatformSound> loadSound(Uint8List data) async {
-    // copy data into the memory
-    final dataPtr = malloc.allocate(data.lengthInBytes);
-    heap.copy(dataPtr, data);
+  Future<PlatformSound> loadSound(AudioData audioData) async {
+    final dataPtr = malloc.allocate(audioData.buffer.lengthInBytes);
 
-    // create sound
+    heap.copyAudioData(dataPtr, audioData.buffer, audioData.format);
+
     final sound = wasm.sound_alloc();
     if (sound == nullptr) {
       throw MinisoundPlatformException("Failed to allocate a sound.");
     }
-    final result =
-        wasm.engine_load_sound(_self, sound, dataPtr, data.lengthInBytes);
+
+    final maFormat = convertToMaFormat(audioData.format);
+
+    final result = wasm.engine_load_sound_ex(
+        _self,
+        sound,
+        dataPtr,
+        audioData.buffer.lengthInBytes,
+        maFormat,
+        audioData.sampleRate,
+        audioData.channels);
     if (result != wasm.Result.Ok) {
       print(result);
       throw MinisoundPlatformException("Failed to load a sound.");
@@ -143,8 +151,12 @@ final class WebRecorder implements PlatformRecorder {
   final Pointer<wasm.Recorder> _self;
 
   @override
-  Future<void> initFile(String filename) async {
-    final result = await wasm.recorder_init_file(_self, filename);
+  Future<void> initFile(String filename,
+      {int sampleRate = 44800,
+      int channels = 1,
+      int format = MaFormat.ma_format_f32}) async {
+    final result = await wasm.recorder_init_file(_self, filename,
+        sampleRate: sampleRate, channels: channels, format: format);
     if (result != wasm.RecorderResult.RECORDER_OK) {
       throw MinisoundPlatformException(
           "Failed to initialize recorder with file.");
@@ -152,8 +164,16 @@ final class WebRecorder implements PlatformRecorder {
   }
 
   @override
-  Future<void> initStream() async {
-    final result = await wasm.recorder_init_stream(_self);
+  Future<void> initStream(
+      {int sampleRate = 44800,
+      int channels = 1,
+      int format = MaFormat.ma_format_f32,
+      double bufferDurationSeconds = 5}) async {
+    final result = await wasm.recorder_init_stream(_self,
+        sampleRate: sampleRate,
+        channels: channels,
+        format: format,
+        bufferDurationSeconds: bufferDurationSeconds);
     if (result != wasm.RecorderResult.RECORDER_OK) {
       throw MinisoundPlatformException("Failed to initialize recorder stream.");
     }
@@ -177,15 +197,15 @@ final class WebRecorder implements PlatformRecorder {
   bool get isRecording => wasm.recorder_is_recording(_self);
 
   @override
-  Float32List getBuffer(int framesToRead) {
-    final bufferPtr = malloc.allocate<double>(framesToRead);
+  Uint8List getBuffer(int framesToRead, {int channels = 2}) {
+    final bufferPtr = malloc.allocate<Float32List>(framesToRead * channels);
     final framesRead = wasm.recorder_get_buffer(_self, bufferPtr, framesToRead);
     if (framesRead < 0) {
       malloc.free(bufferPtr);
       throw MinisoundPlatformException("Failed to get recorder buffer.");
     }
-    final result = Float32List.fromList(List.generate(
-        framesRead, (i) => bufferPtr.elementAt(i).value.toDouble()));
+    final result = Uint8List.fromList(List.generate(
+        framesRead * channels, (i) => bufferPtr.elementAt(i).value));
     malloc.free(bufferPtr);
     return result;
   }

@@ -98,7 +98,7 @@ enum RecorderState { uninit, ready, recording }
 class RecorderMock implements PlatformRecorder {
   var state = RecorderState.uninit;
   String? filename;
-  final List<Float32List> recordedBuffers = [];
+  final List<Uint8List> recordedBuffers = [];
 
   @override
   Future<void> initFile(String filename) async {
@@ -131,11 +131,11 @@ class RecorderMock implements PlatformRecorder {
   bool get isRecording => state == RecorderState.recording;
 
   @override
-  Float32List getBuffer(int framesToRead) {
+  Uint8List getBuffer(int framesToRead) {
     if (state == RecorderState.uninit) {
       throw MinisoundPlatformException("Recorder not initialized");
     }
-    final buffer = Float32List(framesToRead);
+    final buffer = Uint8List(framesToRead);
     for (var i = 0; i < framesToRead; i++) {
       buffer[i] = i.toDouble() / framesToRead;
     }
