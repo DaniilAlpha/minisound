@@ -422,7 +422,7 @@ class MinisoundFfiBindings {
 
   int recorder_get_buffer(
     ffi.Pointer<Recorder> recorder,
-    ffi.Pointer<ffi.Uint8> output,
+    ffi.Pointer<ffi.Float> output,
     int frames_to_read,
   ) {
     return _recorder_get_buffer(

@@ -1,9 +1,9 @@
 import 'dart:typed_data';
+import 'package:js/js.dart';
 import 'package:minisound_platform_interface/minisound_platform_interface.dart';
 import 'package:minisound_web/bindings/minisound.dart' as wasm;
 import 'package:minisound_web/bindings/wasm/wasm.dart';
 
-// minisound web
 class MinisoundWeb extends MinisoundPlatform {
   MinisoundWeb._();
 
@@ -32,9 +32,8 @@ class MinisoundWeb extends MinisoundPlatform {
   }
 }
 
-// engine web
 final class WebEngine implements PlatformEngine {
-  WebEngine(Pointer<wasm.Engine> self) : _self = self;
+  WebEngine(this._self);
 
   final Pointer<wasm.Engine> _self;
 
@@ -61,16 +60,15 @@ final class WebEngine implements PlatformEngine {
   @override
   Future<PlatformSound> loadSound(AudioData audioData) async {
     final dataPtr = malloc.allocate(audioData.buffer.lengthInBytes);
-
     heap.copyAudioData(dataPtr, audioData.buffer, audioData.format);
 
     final sound = wasm.sound_alloc();
     if (sound == nullptr) {
+      malloc.free(dataPtr);
       throw MinisoundPlatformException("Failed to allocate a sound.");
     }
 
     final maFormat = convertToMaFormat(audioData.format);
-
     final result = wasm.engine_load_sound_ex(
         _self,
         sound,
@@ -79,8 +77,10 @@ final class WebEngine implements PlatformEngine {
         maFormat,
         audioData.sampleRate,
         audioData.channels);
+
     if (result != wasm.Result.Ok) {
-      print(result);
+      malloc.free(dataPtr);
+      wasm.sound_unload(sound);
       throw MinisoundPlatformException("Failed to load a sound.");
     }
 
@@ -88,11 +88,8 @@ final class WebEngine implements PlatformEngine {
   }
 }
 
-// sound web
 final class WebSound implements PlatformSound {
-  WebSound._fromPtrs(Pointer<wasm.Sound> self, Pointer data)
-      : _self = self,
-        _data = data;
+  WebSound._fromPtrs(this._self, this._data);
 
   final Pointer<wasm.Sound> _self;
   final Pointer _data;
@@ -112,6 +109,7 @@ final class WebSound implements PlatformSound {
   var _looping = (false, 0);
   @override
   PlatformSoundLooping get looping => _looping;
+
   @override
   set looping(PlatformSoundLooping value) {
     wasm.sound_set_looped(_self, value.$1, value.$2);
@@ -144,7 +142,6 @@ final class WebSound implements PlatformSound {
   void stop() => wasm.sound_stop(_self);
 }
 
-// recorder web
 final class WebRecorder implements PlatformRecorder {
   WebRecorder(this._self);
 
@@ -159,7 +156,7 @@ final class WebRecorder implements PlatformRecorder {
         sampleRate: sampleRate, channels: channels, format: format);
     if (result != wasm.RecorderResult.RECORDER_OK) {
       throw MinisoundPlatformException(
-          "Failed to initialize recorder with file.");
+          "Failed to initialize recorder with file. Error code: $result");
     }
   }
 
@@ -175,7 +172,8 @@ final class WebRecorder implements PlatformRecorder {
         format: format,
         bufferDurationSeconds: bufferDurationSeconds);
     if (result != wasm.RecorderResult.RECORDER_OK) {
-      throw MinisoundPlatformException("Failed to initialize recorder stream.");
+      throw MinisoundPlatformException(
+          "Failed to initialize recorder stream. Error code: $result");
     }
   }
 
@@ -194,21 +192,50 @@ final class WebRecorder implements PlatformRecorder {
   }
 
   @override
-  bool get isRecording => wasm.recorder_is_recording(_self);
+  void startStreaming(void Function(Float32List) callback) {
+    final nativeCallback =
+        allowInterop((Pointer<dynamic> frames, int frameCount) {
+      final framesArray = frames.cast<Float>().asTypedList(frameCount);
+      callback(
+          Float32List.fromList(framesArray.map((e) => e.toDouble()).toList()));
+    });
+    final result =
+        wasm.recorder_start_streaming(_self, nativeCallback, nullptr);
+    if (result != wasm.RecorderResult.RECORDER_OK) {
+      throw MinisoundPlatformException(
+          "Failed to start streaming. Error code: $result");
+    }
+  }
 
   @override
-  Uint8List getBuffer(int framesToRead, {int channels = 2}) {
-    final bufferPtr = malloc.allocate<Float32List>(framesToRead * channels);
-    final framesRead = wasm.recorder_get_buffer(_self, bufferPtr, framesToRead);
-    if (framesRead < 0) {
-      malloc.free(bufferPtr);
-      throw MinisoundPlatformException("Failed to get recorder buffer.");
+  void stopStreaming() {
+    final result = wasm.recorder_stop_streaming(_self);
+    if (result != wasm.RecorderResult.RECORDER_OK) {
+      throw MinisoundPlatformException(
+          "Failed to stop streaming. Error code: $result");
     }
-    final result = Uint8List.fromList(List.generate(
-        framesRead * channels, (i) => bufferPtr.elementAt(i).value));
-    malloc.free(bufferPtr);
-    return result;
   }
+
+  @override
+  int getAvailableFrames() => wasm.recorder_get_available_frames(_self);
+
+  @override
+  Float32List getBuffer(int framesToRead, {int channels = 2}) {
+    int floatsToRead = framesToRead;
+    final bufferPtr = malloc.allocate<Float>(floatsToRead);
+    try {
+      final floatsRead =
+          wasm.recorder_get_buffer(_self, bufferPtr, floatsToRead);
+      if (floatsRead < 0) {
+        throw MinisoundPlatformException(
+            "Failed to get recorder buffer. Error code: $floatsRead");
+      }
+      return Float32List.fromList(bufferPtr.asTypedList(floatsRead));
+    } finally {}
+  }
+
+  @override
+  bool get isRecording => wasm.recorder_is_recording(_self);
 
   @override
   void dispose() {
@@ -217,7 +244,6 @@ final class WebRecorder implements PlatformRecorder {
   }
 }
 
-// wave web
 final class WebWave implements PlatformWave {
   WebWave(this._self);
 
@@ -229,7 +255,8 @@ final class WebWave implements PlatformWave {
     final result =
         await wasm.wave_init(_self, type, frequency, amplitude, sampleRate);
     if (result != wasm.WaveResult.WAVE_OK) {
-      throw MinisoundPlatformException("Failed to initialize wave.");
+      throw MinisoundPlatformException(
+          "Failed to initialize wave. Error code: $result");
     }
   }
 
@@ -262,19 +289,19 @@ final class WebWave implements PlatformWave {
     }
   }
 
-// In WebWave class
   @override
   Float32List read(int framesToRead) {
-    final bufferPtr = malloc.allocate<double>(framesToRead);
-    final framesRead = wasm.wave_read(_self, bufferPtr, framesToRead);
-    if (framesRead < 0) {
+    final bufferPtr = malloc.allocate<Float>(framesToRead);
+    try {
+      final framesRead = wasm.wave_read(_self, bufferPtr, framesToRead);
+      if (framesRead < 0) {
+        throw MinisoundPlatformException(
+            "Failed to read wave data. Error code: $framesRead");
+      }
+      return Float32List.fromList(bufferPtr.asTypedList(framesRead));
+    } finally {
       malloc.free(bufferPtr);
-      throw MinisoundPlatformException("Failed to read wave data.");
     }
-    final result = Float32List.fromList(List.generate(
-        framesRead, (i) => bufferPtr.elementAt(i).value.toDouble()));
-    malloc.free(bufferPtr);
-    return result;
   }
 
   @override

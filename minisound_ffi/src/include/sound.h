@@ -27,7 +27,7 @@ EXPORT Result sound_replay(Sound *const self);
 EXPORT void sound_pause(Sound *const self);
 EXPORT void sound_stop(Sound *const self);
 
-EXPORT int sound_get_volume(Sound const *const self);
+EXPORT float sound_get_volume(Sound const *const self);
 EXPORT void sound_set_volume(Sound *const self, float const value);
 
 EXPORT float sound_get_duration(Sound *const self);

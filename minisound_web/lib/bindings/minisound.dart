@@ -18,6 +18,16 @@ final class Recorder extends Opaque {}
 
 final class Wave extends Opaque {}
 
+typedef OnFramesAvailableCallback = void Function(
+    Pointer<dynamic> frames, int frameCount);
+
+@JS()
+@anonymous
+class FrameData {
+  external Pointer<Float> get frames;
+  external int get frame_count;
+}
+
 abstract class Result {
   static const int Ok = 0;
   static const int UnknownErr = 1;
@@ -47,35 +57,18 @@ abstract class WaveType {
   static const int WAVE_TYPE_SAWTOOTH = 3;
 }
 
-// engine functions
+// Engine functions
 Pointer<Engine> engine_alloc() => Pointer(_engine_alloc());
-
 Future<int> engine_init(Pointer<Engine> self, int periodMs) =>
     _engine_init(self.addr, periodMs);
-
 void engine_uninit(Pointer<Engine> self) => _engine_uninit(self.addr);
 int engine_start(Pointer<Engine> self) => _engine_start(self.addr);
+int engine_load_sound_ex(Pointer<Engine> self, Pointer<Sound> sound,
+        Pointer data, int dataSize, int format, int sampleRate, int channels) =>
+    _engine_load_sound_ex(self.addr, sound.addr, data.addr, dataSize, format,
+        sampleRate, channels);
 
-int engine_load_sound_ex(
-  Pointer<Engine> self,
-  Pointer<Sound> sound,
-  Pointer data,
-  int dataSize,
-  int format,
-  int sampleRate,
-  int channels,
-) =>
-    _engine_load_sound_ex(
-      self.addr,
-      sound.addr,
-      data.addr,
-      dataSize,
-      format,
-      sampleRate,
-      channels,
-    );
-
-// sound functions
+// Sound functions
 Pointer<Sound> sound_alloc() => Pointer(_sound_alloc());
 void sound_unload(Pointer<Sound> self) => _sound_unload(self.addr);
 int sound_play(Pointer<Sound> self) => _sound_play(self.addr);
@@ -87,11 +80,10 @@ void sound_set_volume(Pointer<Sound> self, double value) =>
     _sound_set_volume(self.addr, value);
 double sound_get_duration(Pointer<Sound> self) =>
     _sound_get_duration(self.addr);
-// ignore: avoid_positional_boolean_parameters
 void sound_set_looped(Pointer<Sound> self, bool value, int delay_ms) =>
     _sound_set_looped(self.addr, value, delay_ms);
 
-// recorder functions
+// Recorder functions
 Pointer<Recorder> recorder_create() => Pointer(_recorder_create());
 Future<int> recorder_init_file(Pointer<Recorder> self, String filename,
         {int sampleRate = 44800,
@@ -111,14 +103,63 @@ Future<int> recorder_init_stream(Pointer<Recorder> self,
         bufferDurationSeconds: bufferDurationSeconds);
 int recorder_start(Pointer<Recorder> self) => _recorder_start(self.addr);
 int recorder_stop(Pointer<Recorder> self) => _recorder_stop(self.addr);
+int recorder_start_streaming(Pointer<Recorder> self,
+        OnFramesAvailableCallback callback, Pointer<dynamic> userData) =>
+    _recorder_start_streaming(self.addr, allowInterop(callback), userData.addr);
+int recorder_stop_streaming(Pointer<Recorder> self) =>
+    _recorder_stop_streaming(self.addr);
+int recorder_get_available_frames(Pointer<Recorder> self) =>
+    _recorder_get_available_frames(self.addr);
 bool recorder_is_recording(Pointer<Recorder> self) =>
     _recorder_is_recording(self.addr);
 int recorder_get_buffer(
-        Pointer<Recorder> self, Pointer output, int frames_to_read) =>
+        Pointer<Recorder> self, Pointer<Float> output, int frames_to_read) =>
     _recorder_get_buffer(self.addr, output.addr, frames_to_read);
 void recorder_destroy(Pointer<Recorder> self) => _recorder_destroy(self.addr);
 
-// wave functions
+// Recorder JS bindings
+@JS()
+external int _recorder_create();
+Future<int> _recorder_init_file(int self, String filename,
+        {int sampleRate = 44800,
+        int channels = 1,
+        int format = MaFormat.ma_format_f32}) async =>
+    promiseToFuture(_ccall(
+        "recorder_init_file",
+        "number",
+        ["number", "string", "number", "number", "number"],
+        [self, filename, sampleRate, channels, format],
+        {"async": true}));
+Future<int> _recorder_init_stream(int self,
+        {int sampleRate = 44800,
+        int channels = 1,
+        int format = MaFormat.ma_format_f32,
+        double bufferDurationSeconds = 5}) async =>
+    promiseToFuture(_ccall(
+        "recorder_init_stream",
+        "number",
+        ["number", "number", "number", "number", "number"],
+        [self, sampleRate, channels, format, bufferDurationSeconds],
+        {"async": true}));
+@JS()
+external int _recorder_start(int self);
+@JS()
+external int _recorder_stop(int self);
+@JS()
+external int _recorder_start_streaming(
+    int self, Function callback, int userData);
+@JS()
+external int _recorder_stop_streaming(int self);
+@JS()
+external int _recorder_get_available_frames(int self);
+@JS()
+external bool _recorder_is_recording(int self);
+@JS()
+external int _recorder_get_buffer(int self, int output, int frames_to_read);
+@JS()
+external void _recorder_destroy(int self);
+
+// Wave functions
 Pointer<Wave> wave_create() => Pointer(_wave_create());
 Future<int> wave_init(Pointer<Wave> self, int type, double frequency,
         double amplitude, int sample_rate) =>
@@ -131,51 +172,30 @@ int wave_set_amplitude(Pointer<Wave> self, double amplitude) =>
     _wave_set_amplitude(self.addr, amplitude);
 int wave_set_sample_rate(Pointer<Wave> self, int sample_rate) =>
     _wave_set_sample_rate(self.addr, sample_rate);
-int wave_read(Pointer<Wave> self, Pointer output, int frames_to_read) =>
+int wave_read(Pointer<Wave> self, Pointer<Float> output, int frames_to_read) =>
     _wave_read(self.addr, output.addr, frames_to_read);
 void wave_destroy(Pointer<Wave> self) => _wave_destroy(self.addr);
 
-/********
- ** js **
- ********/
-
+// JS interop
 @JS("ccall")
 external dynamic _ccall(
-  String name,
-  String returnType,
-  List<String> argTypes,
-  List args,
-  Map opts,
-);
+    String name, String returnType, List<String> argTypes, List args, Map opts);
 
-// engine functions
+// Engine JS bindings
 @JS()
 external int _engine_alloc();
 Future<int> _engine_init(int self, int periodMs) async =>
-    promiseToFuture(_ccall(
-      "engine_init",
-      "number",
-      ["number", "number"],
-      [self, periodMs],
-      {"async": true},
-    ));
+    promiseToFuture(_ccall("engine_init", "number", ["number", "number"],
+        [self, periodMs], {"async": true}));
 @JS()
 external void _engine_uninit(int self);
 @JS()
 external int _engine_start(int self);
-
 @JS("_engine_load_sound_ex")
-external int _engine_load_sound_ex(
-  int self,
-  int sound,
-  int data,
-  int dataSize,
-  int format,
-  int sampleRate,
-  int channels,
-);
+external int _engine_load_sound_ex(int self, int sound, int data, int dataSize,
+    int format, int sampleRate, int channels);
 
-// sound functions
+// Sound JS bindings
 @JS()
 external int _sound_alloc();
 @JS()
@@ -197,56 +217,17 @@ external double _sound_get_duration(int self);
 @JS()
 external int _sound_set_looped(int self, bool value, int delay_ms);
 
-// recorder functions
-@JS()
-external int _recorder_create();
-
-Future<int> _recorder_init_file(int self, String filename,
-        {int sampleRate = 44800,
-        int channels = 1,
-        int format = MaFormat.ma_format_f32}) async =>
-    promiseToFuture(_ccall(
-      "recorder_init_file",
-      "number",
-      ["number", "string", "number", "number", "number"],
-      [self, filename, sampleRate, channels, format],
-      {"async": true},
-    ));
-Future<int> _recorder_init_stream(int self,
-        {int sampleRate = 44800,
-        int channels = 1,
-        int format = MaFormat.ma_format_f32,
-        double bufferDurationSeconds = 5}) async =>
-    promiseToFuture(_ccall(
-      "recorder_init_stream",
-      "number",
-      ["number", "number", "number", "number", "number"],
-      [self, sampleRate, channels, format, bufferDurationSeconds],
-      {"async": true},
-    ));
-@JS()
-external int _recorder_start(int self);
-@JS()
-external int _recorder_stop(int self);
-@JS()
-external bool _recorder_is_recording(int self);
-@JS()
-external int _recorder_get_buffer(int self, void output, int frames_to_read);
-@JS()
-external void _recorder_destroy(int self);
-
-// wave functions
+// Wave JS bindings
 @JS()
 external int _wave_create();
 Future<int> _wave_init(int self, int type, double frequency, double amplitude,
         int sample_rate) async =>
     promiseToFuture(_ccall(
-      "wave_init",
-      "number",
-      ["number", "number", "number", "number", "number"],
-      [self, type, frequency, amplitude, sample_rate],
-      {"async": true},
-    ));
+        "wave_init",
+        "number",
+        ["number", "number", "number", "number", "number"],
+        [self, type, frequency, amplitude, sample_rate],
+        {"async": true}));
 @JS()
 external int _wave_set_type(int self, int type);
 @JS()

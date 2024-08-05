@@ -51,96 +51,23 @@ final class Engine {
   /// Loads a sound asset and creates a `Sound` from it.
   Future<Sound> loadSoundAsset(String assetPath) async {
     final asset = await rootBundle.load(assetPath);
-    return _loadSoundFromBuffer(asset.buffer, assetPath);
+    return _loadSoundFromBuffer(asset.buffer.asFloat32List(), assetPath);
   }
 
   /// Loads a sound file and creates a `Sound` from it.
   Future<Sound> loadSoundFile(String filePath) async {
     final file = File(filePath);
     final bytes = await file.readAsBytes();
-    return _loadSoundFromBuffer(bytes.buffer, filePath);
+    return _loadSoundFromBuffer(bytes.buffer.asFloat32List(), filePath);
   }
 
-  Future<Sound> _loadSoundFromBuffer(ByteBuffer buffer, String path) async {
-    final extension = path.split('.').last.toLowerCase();
-
-    switch (extension) {
-      case 'wav':
-        return _loadWavSound(buffer);
-      case 'mp3':
-      case 'ogg':
-      case 'flac':
-        // For these formats, we'll let miniaudio handle the decoding
-        return loadSound(AudioData(
-            buffer,
-            AudioFormat.uint8, // We pass the raw data and let miniaudio decode
-            0, // Sample rate will be detected by miniaudio
-            0 // Channels will be detected by miniaudio
-            ));
-      default:
-        throw UnsupportedError('Unsupported audio format: $extension');
-    }
-  }
-
-  Future<Sound> _loadWavSound(ByteBuffer buffer) async {
-    final data = buffer.asByteData();
-
-    // Basic WAV header parsing
-    if (String.fromCharCodes(data.buffer.asUint8List(0, 4)) != 'RIFF' ||
-        String.fromCharCodes(data.buffer.asUint8List(8, 4)) != 'WAVE') {
-      throw FormatException('Not a valid WAV file');
-    }
-
-    final audioFormat = data.getUint16(20, Endian.little);
-    final numChannels = data.getUint16(22, Endian.little);
-    final sampleRate = data.getUint32(24, Endian.little);
-    final bitsPerSample = data.getUint16(34, Endian.little);
-
-    AudioFormat format;
-    switch (audioFormat) {
-      case 1: // PCM
-        switch (bitsPerSample) {
-          case 8:
-            format = AudioFormat.uint8;
-            break;
-          case 16:
-            format = AudioFormat.int16;
-            break;
-          case 32:
-            format = AudioFormat.int32;
-            break;
-          default:
-            throw UnsupportedError(
-                'Unsupported bits per sample: $bitsPerSample');
-        }
-        break;
-      case 3: // IEEE float
-        format = AudioFormat.float32;
-        break;
-      default:
-        throw UnsupportedError('Unsupported WAV audio format: $audioFormat');
-    }
-
-    // Find the 'data' chunk
-    int offset = 12; // Start after the 'WAVE' identifier
-    while (offset < data.lengthInBytes - 8) {
-      final chunkId = String.fromCharCodes(data.buffer.asUint8List(offset, 4));
-      final chunkSize = data.getUint32(offset + 4, Endian.little);
-      if (chunkId == 'data') {
-        offset += 8; // Move past the 'data' identifier and size
-        break;
-      }
-      offset += 8 + chunkSize;
-    }
-
-    if (offset >= data.lengthInBytes - 8) {
-      throw FormatException('Could not find audio data in WAV file');
-    }
-
-    final audioData = buffer.asUint8List(offset);
-
-    return loadSound(
-        AudioData(audioData.buffer, format, sampleRate, numChannels));
+  Future<Sound> _loadSoundFromBuffer(Float32List buffer, String path) async {
+    return loadSound(AudioData(
+        buffer,
+        AudioFormat.float32, // We pass the raw data and let miniaudio decode
+        0, // Sample rate will be detected by miniaudio
+        0 // Channels will be detected by miniaudio
+        ));
   }
 }
 
@@ -200,15 +127,10 @@ final class Sound {
   void unload() => _sound.unload();
 }
 
-/// A recorder for audio input.
 final class Recorder {
-  Recorder() : _recorder = PlatformRecorder() {
+  Recorder() : _recorder = MinisoundPlatform.instance.createRecorder() {
     engine = Engine();
-    //_finalizer.attach(this, _engine);
   }
-
-  //static final _finalizer =
-  //    Finalizer<PlatformEngine>((engine) => engine.dispose());
 
   final PlatformRecorder _recorder;
   late Engine engine;
@@ -231,7 +153,7 @@ final class Recorder {
     if (sampleRate <= 0 || channels <= 0) {
       throw ArgumentError("Invalid recorder parameters");
     }
-    if (engine.isInit == false) {
+    if (!engine.isInit) {
       await initEngine();
     }
     this.sampleRate = sampleRate;
@@ -247,7 +169,7 @@ final class Recorder {
       int channels = 1,
       int format = MaFormat.ma_format_f32,
       double bufferDurationSeconds = 5}) async {
-    if (engine.isInit == false) {
+    if (!engine.isInit) {
       print("init engine");
       await initEngine();
     }
@@ -274,16 +196,25 @@ final class Recorder {
   /// Stops recording.
   void stop() => _recorder.stop();
 
+  /// Starts streaming audio data.
+  void startStreaming(void Function(Float32List) callback) =>
+      _recorder.startStreaming(callback);
+
+  /// Stops streaming audio data.
+  void stopStreaming() => _recorder.stopStreaming();
+
   /// Checks if the recorder is currently recording.
   bool get isRecording => _recorder.isRecording;
 
   /// Gets the recorded buffer.
-  Uint8List getBuffer(int framesToRead) => _recorder.getBuffer(framesToRead);
+  Float32List getBuffer(int framesToRead) => _recorder.getBuffer(framesToRead);
+
+  /// Gets available frames from the recorder.
+  int getAvailableFrames() => _recorder.getAvailableFrames();
 
   /// Disposes of the recorder resources.
   void dispose() {
     _recorder.dispose();
-    //_engine.dispose();
   }
 }
 

@@ -1,16 +1,16 @@
 #include "record.h"
-#include "../include/miniaudio.h"
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 #include "../external/milo/milo.h"
 
 typedef struct
 {
-    uint8_t *buffer;
-    size_t buffer_size;
+    float *buffer;
+    size_t capacity;
     size_t write_pos;
     size_t read_pos;
-    ma_spinlock lock;
+    pthread_mutex_t mutex;
 } CircularBuffer;
 
 struct Recorder
@@ -32,48 +32,113 @@ struct Recorder
     uint8_t *encode_buffer;
     size_t encode_buffer_size;
     size_t encode_buffer_used;
+
+    void (*on_frames_available)(Recorder *recorder, float *frames, int frame_count);
+    void *user_data;
 };
 
-static void circular_buffer_init(CircularBuffer *cb, size_t size)
+static void circular_buffer_init(CircularBuffer *cb, size_t size_in_bytes)
 {
-    cb->buffer = malloc(size);
-    cb->buffer_size = size;
+    cb->buffer = (float *)malloc(size_in_bytes);
+    cb->capacity = size_in_bytes / sizeof(float);
     cb->write_pos = 0;
     cb->read_pos = 0;
-    cb->lock = 0;
+    pthread_mutex_init(&cb->mutex, NULL);
 }
 
 static void circular_buffer_uninit(CircularBuffer *cb)
 {
     free(cb->buffer);
+    cb->buffer = NULL;
+    pthread_mutex_destroy(&cb->mutex);
 }
 
-static void circular_buffer_write(CircularBuffer *cb, const void *data, size_t size)
+static void circular_buffer_write(CircularBuffer *cb, const float *data, size_t size_in_floats)
 {
-    ma_spinlock_lock(&cb->lock);
-    for (size_t i = 0; i < size; i++)
+    size_t to_write = size_in_floats;
+    size_t write_pos = cb->write_pos;
+
+    while (to_write > 0)
     {
-        cb->buffer[cb->write_pos] = ((const uint8_t *)data)[i];
-        cb->write_pos = (cb->write_pos + 1) % cb->buffer_size;
-        if (cb->write_pos == cb->read_pos)
+        size_t available_space;
+        pthread_mutex_lock(&cb->mutex);
+        available_space = cb->capacity - ((write_pos - cb->read_pos + cb->capacity) % cb->capacity);
+        if (available_space == 0)
         {
-            cb->read_pos = (cb->read_pos + 1) % cb->buffer_size;
+            // Buffer is full, move read_pos
+            cb->read_pos = (cb->read_pos + 1) % cb->capacity;
         }
+        pthread_mutex_unlock(&cb->mutex);
+
+        size_t chunk = (to_write < available_space) ? to_write : available_space;
+        for (size_t i = 0; i < chunk; i++)
+        {
+            cb->buffer[write_pos] = data[size_in_floats - to_write + i];
+            write_pos = (write_pos + 1) % cb->capacity;
+        }
+        to_write -= chunk;
     }
-    ma_spinlock_unlock(&cb->lock);
+
+    pthread_mutex_lock(&cb->mutex);
+    cb->write_pos = write_pos;
+    pthread_mutex_unlock(&cb->mutex);
 }
 
-static size_t circular_buffer_read(CircularBuffer *cb, void *data, size_t size)
+static size_t circular_buffer_read(CircularBuffer *cb, float *data, size_t size_in_floats)
 {
-    ma_spinlock_lock(&cb->lock);
-    size_t available = (cb->write_pos - cb->read_pos + cb->buffer_size) % cb->buffer_size;
-    size_t to_read = (size < available) ? size : available;
+    pthread_mutex_lock(&cb->mutex);
+    size_t available = (cb->write_pos - cb->read_pos + cb->capacity) % cb->capacity;
+    size_t to_read = (size_in_floats < available) ? size_in_floats : available;
+    pthread_mutex_unlock(&cb->mutex);
+
     for (size_t i = 0; i < to_read; i++)
     {
-        ((uint8_t *)data)[i] = cb->buffer[cb->read_pos];
-        cb->read_pos = (cb->read_pos + 1) % cb->buffer_size;
+        size_t read_pos;
+        pthread_mutex_lock(&cb->mutex);
+        read_pos = cb->read_pos;
+        cb->read_pos = (cb->read_pos + 1) % cb->capacity;
+        pthread_mutex_unlock(&cb->mutex);
+
+        data[i] = cb->buffer[read_pos];
     }
-    ma_spinlock_unlock(&cb->lock);
+
+    return to_read;
+}
+
+static size_t circular_buffer_get_available_floats(CircularBuffer *cb)
+{
+    pthread_mutex_lock(&cb->mutex);
+    size_t available = (cb->write_pos - cb->read_pos + cb->capacity) % cb->capacity;
+    pthread_mutex_unlock(&cb->mutex);
+    return available;
+}
+
+static size_t circular_buffer_read_available(CircularBuffer *cb, float *data, size_t max_size_in_floats)
+{
+    size_t read_pos, write_pos, available, to_read;
+
+    pthread_mutex_lock(&cb->mutex);
+    
+    read_pos = cb->read_pos;
+    write_pos = cb->write_pos;
+    
+    if (write_pos >= read_pos) {
+        available = write_pos - read_pos;
+    } else {
+        available = cb->capacity - read_pos + write_pos;
+    }
+    
+    to_read = (max_size_in_floats < available) ? max_size_in_floats : available;
+
+    for (size_t i = 0; i < to_read; i++) {
+        data[i] = cb->buffer[read_pos];
+        read_pos = (read_pos + 1) % cb->capacity;
+    }
+
+    cb->read_pos = read_pos;
+    
+    pthread_mutex_unlock(&cb->mutex);
+
     return to_read;
 }
 
@@ -81,14 +146,19 @@ static void data_callback(ma_device *pDevice, void *pOutput, const void *pInput,
 {
     Recorder *recorder = (Recorder *)pDevice->pUserData;
 
-    size_t bytesToWrite = frameCount * recorder->channels * ma_get_bytes_per_sample(recorder->format);
-    
+    size_t floatsToWrite = frameCount * recorder->channels;
+
     // Write raw PCM data directly to the circular buffer
-    circular_buffer_write(&recorder->circular_buffer, pInput, bytesToWrite);
+    circular_buffer_write(&recorder->circular_buffer, (const float *)pInput, floatsToWrite);
 
     if (recorder->is_file_recording)
     {
         ma_encoder_write_pcm_frames(&recorder->encoder, pInput, frameCount, NULL);
+    }
+
+    if (recorder->on_frames_available != NULL)
+    {
+        recorder->on_frames_available(recorder, (float *)pInput, frameCount);
     }
 
     (void)pOutput;
@@ -158,6 +228,8 @@ static RecorderResult recorder_init_common(Recorder *recorder, const char *filen
     }
 
     recorder->is_recording = false;
+    recorder->on_frames_available = NULL;
+    recorder->user_data = NULL;
 
     return RECORDER_OK;
 }
@@ -171,7 +243,7 @@ RecorderResult recorder_init_file(Recorder *recorder, const char *filename, ma_u
     return recorder_init_common(recorder, filename, sample_rate, channels, format, 5.0f); // 5 seconds buffer
 }
 
-RecorderResult recorder_init_stream(Recorder *recorder, ma_uint32 sample_rate, ma_uint32 channels, ma_format format, float buffer_duration_seconds)
+RecorderResult recorder_init_stream(Recorder *recorder, ma_uint32 sample_rate, ma_uint32 channels, ma_format format, int buffer_duration_seconds)
 {
     return recorder_init_common(recorder, NULL, sample_rate, channels, format, buffer_duration_seconds);
 }
@@ -216,16 +288,54 @@ bool recorder_is_recording(const Recorder *recorder)
     return recorder != NULL && recorder->is_recording;
 }
 
-int recorder_get_buffer(Recorder *recorder, void *output, int32_t bytes_to_read)
+int recorder_get_buffer(Recorder *recorder, float *output, int32_t floats_to_read)
 {
-    if (recorder == NULL || output == NULL || bytes_to_read <= 0)
+    if (recorder == NULL || output == NULL || floats_to_read <= 0)
     {
         return 0;
     }
 
-    size_t bytes_read = circular_buffer_read(&recorder->circular_buffer, output, bytes_to_read);
+    size_t available_floats = circular_buffer_get_available_floats(&recorder->circular_buffer);
+    size_t to_read = (floats_to_read < available_floats) ? floats_to_read : available_floats;
 
-    return (int)bytes_read;
+    return (int)circular_buffer_read_available(&recorder->circular_buffer, output, to_read);
+}
+
+int recorder_get_available_frames(Recorder *recorder)
+{
+    if (recorder == NULL)
+    {
+        return RECORDER_ERROR_INVALID_ARGUMENT;
+    }
+
+    size_t available_floats = circular_buffer_get_available_floats(&recorder->circular_buffer);
+    return (int)(available_floats / recorder->channels);
+}
+
+RecorderResult recorder_start_streaming(Recorder *recorder, void (*on_frames_available)(Recorder *recorder, float *frames, int frame_count), void *user_data)
+{
+    if (recorder == NULL)
+    {
+        return RECORDER_ERROR_INVALID_ARGUMENT;
+    }
+
+    recorder->on_frames_available = on_frames_available;
+    recorder->user_data = user_data;
+
+    return recorder_start(recorder);
+}
+
+RecorderResult recorder_stop_streaming(Recorder *recorder)
+{
+    if (recorder == NULL)
+    {
+        return RECORDER_ERROR_INVALID_ARGUMENT;
+    }
+
+    recorder->on_frames_available = NULL;
+    recorder->user_data = NULL;
+
+    return recorder_stop(recorder);
 }
 
 void recorder_destroy(Recorder *recorder)

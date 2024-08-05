@@ -306,7 +306,7 @@ class FfiRecorder implements PlatformRecorder {
   bool get isRecording => _bindings.recorder_is_recording(_self);
 
   @override
-  Uint8List getBuffer(int framesToRead) {
+  Float32List getBuffer(int framesToRead) {
     final output = malloc<Float>(framesToRead);
     try {
       final framesRead =

@@ -63,8 +63,11 @@ abstract interface class PlatformRecorder {
       double bufferDurationSeconds = 5});
   void start();
   void stop();
+  void startStreaming(void Function(Float32List) callback);
+  void stopStreaming();
+  int getAvailableFrames();
   bool get isRecording;
-  Uint8List getBuffer(int framesToRead);
+  Float32List getBuffer(int framesToRead);
   void dispose();
 }
 
@@ -101,7 +104,7 @@ final class MinisoundPlatformOutOfMemoryException
 class AudioData {
   AudioData(this.buffer, this.format, this.sampleRate, this.channels);
 
-  final ByteBuffer buffer;
+  final Float32List buffer;
   final AudioFormat format;
   final int sampleRate;
   final int channels;

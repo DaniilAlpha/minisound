@@ -23,23 +23,33 @@ class ExamplePage extends StatefulWidget {
 class _ExamplePageState extends State<ExamplePage> {
   final engine = Engine();
   var loopDelay = 0.0;
-  Recorder recorder = Recorder();
-  Wave wave = Wave();
+  late Recorder recorder;
+  late Wave wave;
   bool isRecording = false;
-  List<Uint8List> recordingBuffer = [];
+  List<Float32List> recordingBuffer = [];
   int totalRecordedFrames = 0;
   int waveType = 0;
   double waveFrequency = 440.0;
   double waveAmplitude = 1.0;
 
-  late final Future<Sound> soundFuture = () async {
+  late final Future<Sound> soundFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    recorder = Recorder();
+    wave = Wave();
+    soundFuture = _initializeSound();
+  }
+
+  Future<Sound> _initializeSound() async {
     if (!engine.isInit) {
       await engine.init();
     }
     await engine.start();
     //await wave.init(0, waveFrequency, waveAmplitude, 44100);
     return engine.loadSoundAsset("assets/laser_shoot.wav");
-  }();
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -130,6 +140,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                   try {
                                     final sound =
                                         await createSoundFromRecorder(recorder);
+                                    await recorder.engine.start();
                                     sound.play();
                                   } catch (e) {
                                     print(e);
@@ -143,14 +154,19 @@ class _ExamplePageState extends State<ExamplePage> {
                                   if (recorder.isRecording) {
                                     recorder.stop();
                                   }
-                                  await recorder.initStream(
-                                      sampleRate: 48000,
-                                      channels: 1,
-                                      format: 1);
+                                  if (!recorder.isCreated) {
+                                    await recorder.initStream(
+                                        sampleRate: 48000,
+                                        channels: 1,
+                                        format: 5);
+                                    recorder.isCreated = true;
+                                  }
+
                                   recorder.start();
                                   Timer.periodic(
                                       const Duration(milliseconds: 100),
                                       (_) => accumulateFrames());
+
                                   // Clear the buffer before starting a new recording
                                   recordingBuffer.clear();
                                   totalRecordedFrames = 0;
@@ -221,8 +237,11 @@ class _ExamplePageState extends State<ExamplePage> {
                               child: const Text("PLAY WAVE"),
                               onPressed: () async {
                                 final waveBuffer = wave.read(1024);
-                                final audioData = AudioData(waveBuffer.buffer,
-                                    AudioFormat.uint8, 48000, 1);
+                                final audioData = AudioData(
+                                    waveBuffer.buffer.asFloat32List(),
+                                    AudioFormat.int32,
+                                    48000,
+                                    1);
                                 await engine.start();
                                 final sound = await engine.loadSound(audioData);
                                 sound.play();
@@ -242,36 +261,46 @@ class _ExamplePageState extends State<ExamplePage> {
         ),
       );
 
-  void accumulateFrames() async {
+  void accumulateFrames() {
     if (isRecording) {
-      Uint8List buffer = recorder.getBuffer(1028);
+      final frames = recorder.getAvailableFrames();
+      final buffer = recorder.getBuffer(frames);
       if (buffer.isNotEmpty) {
         recordingBuffer.add(buffer);
-        totalRecordedFrames += buffer.length ~/ recorder.channels;
+        totalRecordedFrames += frames;
       }
     }
   }
 
+  late Float32List combinedBuffer;
+
   Future<Sound> createSoundFromRecorder(Recorder recorder) async {
-    // Combine all chunks into a single Uint8List
-    final Uint8List combinedBuffer =
-        Uint8List(totalRecordedFrames * recorder.channels);
+    // Combine all chunks into a single Float32List
+    combinedBuffer = Float32List(totalRecordedFrames);
     int offset = 0;
     for (var chunk in recordingBuffer) {
       combinedBuffer.setAll(offset, chunk);
       offset += chunk.length;
     }
 
+    print("Combined buffer length: ${combinedBuffer.length}");
+
     print("Total recorded frames: $totalRecordedFrames");
 
     // Create AudioData object
-    final audioData = AudioData(
-        combinedBuffer.buffer, AudioFormat.uint8, recorder.sampleRate, 1);
+    final audioData = AudioData(combinedBuffer.buffer.asFloat32List(),
+        AudioFormat.float32, recorder.sampleRate, recorder.channels);
 
-    await recorder.engine.start();
-
+    recordingBuffer.clear();
     // Load the sound
     return recorder.engine.loadSound(audioData);
+  }
+
+  @override
+  void dispose() {
+    recorder.dispose();
+    wave.dispose();
+    super.dispose();
   }
 }
 

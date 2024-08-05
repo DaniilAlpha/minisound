@@ -27,19 +27,26 @@ EXPORT Recorder *recorder_create(void);
 EXPORT RecorderResult recorder_init_file(Recorder *recorder, const char *filename, ma_uint32 sample_rate, ma_uint32 channels, ma_format format);
 
 // Initialize the recorder for streaming (no file output)
-EXPORT RecorderResult recorder_init_stream(Recorder *recorder, ma_uint32 sample_rate, ma_uint32 channels, ma_format format, float buffer_duration_seconds);
+EXPORT RecorderResult recorder_init_stream(Recorder *recorder, ma_uint32 sample_rate, ma_uint32 channels, ma_format format, int buffer_duration_seconds);
 
 // Start recording
 EXPORT RecorderResult recorder_start(Recorder *recorder);
 
+EXPORT RecorderResult recorder_start_streaming(Recorder *recorder, void (*on_frames_available)(Recorder *recorder, float *frames, int frame_count), void *user_data);
+
+EXPORT int recorder_get_available_frames(Recorder *recorder);
+
 // Stop recording
 EXPORT RecorderResult recorder_stop(Recorder *recorder);
+
+EXPORT RecorderResult recorder_stop_streaming(Recorder *recorder);
 
 // Check if the recorder is currently recording
 EXPORT bool recorder_is_recording(const Recorder *recorder);
 
 // Get recorded audio data from the buffer
-EXPORT float recorder_get_buffer(Recorder *recorder, void *output, int32_t frames_to_read);
+EXPORT int recorder_get_buffer(Recorder *recorder, float *output, int32_t floats_to_read);
+
 
 // Destroy the recorder and free all associated resources
 EXPORT void recorder_destroy(Recorder *recorder);
