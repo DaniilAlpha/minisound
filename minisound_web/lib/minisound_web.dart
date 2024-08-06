@@ -195,7 +195,8 @@ final class WebRecorder implements PlatformRecorder {
   void startStreaming(void Function(Float32List) callback) {
     final nativeCallback =
         allowInterop((Pointer<dynamic> frames, int frameCount) {
-      final framesArray = frames.cast<Float>().asTypedList(frameCount);
+      final framesArray =
+          frames.cast<Float>().asTypedList(frameCount) as List<double>;
       callback(
           Float32List.fromList(framesArray.map((e) => e.toDouble()).toList()));
     });
@@ -218,19 +219,29 @@ final class WebRecorder implements PlatformRecorder {
 
   @override
   int getAvailableFrames() => wasm.recorder_get_available_frames(_self);
+  Pointer<Float> bufferPtr = malloc.allocate<Float>(0);
 
   @override
   Float32List getBuffer(int framesToRead, {int channels = 2}) {
-    int floatsToRead = framesToRead;
-    final bufferPtr = malloc.allocate<Float>(floatsToRead);
     try {
+      int floatsToRead =
+          framesToRead * 20; // Calculate the actual number of floats to read
+      if (bufferPtr.value <= 0) malloc.free(bufferPtr);
+
+      bufferPtr = malloc.allocate<Float>(
+          floatsToRead); // Allocate memory for the float buffer
       final floatsRead =
           wasm.recorder_get_buffer(_self, bufferPtr, floatsToRead);
+
+      // Error handling for negative return values
       if (floatsRead < 0) {
         throw MinisoundPlatformException(
             "Failed to get recorder buffer. Error code: $floatsRead");
       }
-      return Float32List.fromList(bufferPtr.asTypedList(floatsRead));
+
+      // Convert the data in the allocated memory to a Dart Float32List
+      return Float32List.fromList(
+          bufferPtr.asTypedList(floatsRead) as List<double>);
     } finally {}
   }
 
@@ -298,7 +309,8 @@ final class WebWave implements PlatformWave {
         throw MinisoundPlatformException(
             "Failed to read wave data. Error code: $framesRead");
       }
-      return Float32List.fromList(bufferPtr.asTypedList(framesRead));
+      return Float32List.fromList(
+          bufferPtr.asTypedList(framesRead) as List<double>);
     } finally {
       malloc.free(bufferPtr);
     }

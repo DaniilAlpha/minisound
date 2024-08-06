@@ -45,7 +45,7 @@ EXPORT RecorderResult recorder_stop_streaming(Recorder *recorder);
 EXPORT bool recorder_is_recording(const Recorder *recorder);
 
 // Get recorded audio data from the buffer
-EXPORT int recorder_get_buffer(Recorder *recorder, float *output, int32_t floats_to_read);
+EXPORT int recorder_get_buffer(Recorder *recorder, float *output, ma_uint32 floats_to_read);
 
 
 // Destroy the recorder and free all associated resources

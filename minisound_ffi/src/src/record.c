@@ -288,7 +288,7 @@ bool recorder_is_recording(const Recorder *recorder)
     return recorder != NULL && recorder->is_recording;
 }
 
-int recorder_get_buffer(Recorder *recorder, float *output, int32_t floats_to_read)
+int recorder_get_buffer(Recorder *recorder, float *output, ma_uint32 floats_to_read)
 {
     if (recorder == NULL || output == NULL || floats_to_read <= 0)
     {
@@ -298,7 +298,7 @@ int recorder_get_buffer(Recorder *recorder, float *output, int32_t floats_to_rea
     size_t available_floats = circular_buffer_get_available_floats(&recorder->circular_buffer);
     size_t to_read = (floats_to_read < available_floats) ? floats_to_read : available_floats;
 
-    return (int)circular_buffer_read_available(&recorder->circular_buffer, output, to_read);
+    return (int)circular_buffer_read(&recorder->circular_buffer, output, to_read);
 }
 
 int recorder_get_available_frames(Recorder *recorder)

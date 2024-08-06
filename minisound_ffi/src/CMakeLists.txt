@@ -99,15 +99,15 @@ else()
     target_compile_options(${MAIN_LIB} PUBLIC
         -O3
         -flto -fno-rtti -fno-exceptions
-        -sWASM_WORKERS=1
+        -sWASM_WORKERS=1 -sUSE_PTHREADS
     )
     set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
         -O3 \
         -flto \
         -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall \
-        -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb \
+        -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=15MB -sMAXIMUM_MEMORY=1gb -sUSE_PTHREADS \
         -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB \
-        -sAUDIO_WORKLET=1 -sWASM_WORKERS=1 -sASYNCIFY -ASYNCIFY_ONLY \
+        -sAUDIO_WORKLET=1 -sWASM_WORKERS=1 -sASYNCIFY \
         -sSTACK_OVERFLOW_CHECK \
     ")
 endif()

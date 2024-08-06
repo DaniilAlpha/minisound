@@ -31,6 +31,7 @@ class _ExamplePageState extends State<ExamplePage> {
   int waveType = 0;
   double waveFrequency = 440.0;
   double waveAmplitude = 1.0;
+  List<Sound> sounds = [];
 
   late final Future<Sound> soundFuture;
 
@@ -46,7 +47,7 @@ class _ExamplePageState extends State<ExamplePage> {
     if (!engine.isInit) {
       await engine.init();
     }
-    await engine.start();
+    //await engine.start();
     //await wave.init(0, waveFrequency, waveAmplitude, 44100);
     return engine.loadSoundAsset("assets/laser_shoot.wav");
   }
@@ -138,10 +139,10 @@ class _ExamplePageState extends State<ExamplePage> {
                               onPressed: () async {
                                 if (isRecording) {
                                   try {
-                                    final sound =
+                                    final testSound =
                                         await createSoundFromRecorder(recorder);
                                     await recorder.engine.start();
-                                    sound.play();
+                                    testSound.play();
                                   } catch (e) {
                                     print(e);
                                   } finally {
@@ -164,11 +165,9 @@ class _ExamplePageState extends State<ExamplePage> {
 
                                   recorder.start();
                                   Timer.periodic(
-                                      const Duration(milliseconds: 100),
+                                      const Duration(milliseconds: 50),
                                       (_) => accumulateFrames());
 
-                                  // Clear the buffer before starting a new recording
-                                  recordingBuffer.clear();
                                   totalRecordedFrames = 0;
                                 }
 
@@ -272,11 +271,20 @@ class _ExamplePageState extends State<ExamplePage> {
     }
   }
 
-  late Float32List combinedBuffer;
-
   Future<Sound> createSoundFromRecorder(Recorder recorder) async {
-    // Combine all chunks into a single Float32List
-    combinedBuffer = Float32List(totalRecordedFrames);
+    Float32List combinedBuffer = Float32List(0);
+    if (sounds.isNotEmpty) {
+      sounds.last.stop();
+      sounds.last.unload();
+    }
+
+    // Calculate the total number of frames in the recordingBuffer
+    int totalFrames =
+        recordingBuffer.fold(0, (sum, chunk) => sum + chunk.length);
+
+    // Resize the combinedBuffer to match the total number of frames
+    combinedBuffer = Float32List(totalFrames);
+
     int offset = 0;
     for (var chunk in recordingBuffer) {
       combinedBuffer.setAll(offset, chunk);
@@ -284,16 +292,16 @@ class _ExamplePageState extends State<ExamplePage> {
     }
 
     print("Combined buffer length: ${combinedBuffer.length}");
-
-    print("Total recorded frames: $totalRecordedFrames");
+    print("Total recorded frames: $totalFrames");
 
     // Create AudioData object
     final audioData = AudioData(combinedBuffer.buffer.asFloat32List(),
         AudioFormat.float32, recorder.sampleRate, recorder.channels);
 
     recordingBuffer.clear();
-    // Load the sound
-    return recorder.engine.loadSound(audioData);
+    sounds.add(await recorder.engine.loadSound(audioData));
+    combinedBuffer = Float32List(0);
+    return sounds.last;
   }
 
   @override
