@@ -14,11 +14,11 @@ EXPORT Sound *sound_alloc();
 
 Result sound_init(
     Sound *const self,
-    void const *const data,
+    float *data,
     size_t const data_size,
     const ma_format format,
-    const ma_uint32 channels,
-    const ma_uint32 sample_rate,
+    const int channels,
+    const int sample_rate,
     ma_engine *const engine);
 EXPORT void sound_unload(Sound *const self);
 

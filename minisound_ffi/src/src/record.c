@@ -16,8 +16,8 @@ struct Recorder
 
     CircularBuffer circular_buffer;
 
-    ma_uint32 sample_rate;
-    ma_uint32 channels;
+    int sample_rate;
+    int channels;
     ma_format format;
 
     uint8_t *encode_buffer;
@@ -62,7 +62,7 @@ Recorder *recorder_create(void)
     return recorder;
 }
 
-static RecorderResult recorder_init_common(Recorder *recorder, const char *filename, ma_uint32 sample_rate, ma_uint32 channels, ma_format format, float buffer_duration_seconds)
+static RecorderResult recorder_init_common(Recorder *recorder, const char *filename, int sample_rate, int channels, ma_format format, int buffer_duration_seconds)
 {
     if (recorder == NULL)
     {
@@ -121,7 +121,7 @@ static RecorderResult recorder_init_common(Recorder *recorder, const char *filen
     return RECORDER_OK;
 }
 
-RecorderResult recorder_init_file(Recorder *recorder, const char *filename, ma_uint32 sample_rate, ma_uint32 channels, ma_format format)
+RecorderResult recorder_init_file(Recorder *recorder, const char *filename, int sample_rate, int channels, ma_format format)
 {
     if (filename == NULL)
     {
@@ -130,7 +130,7 @@ RecorderResult recorder_init_file(Recorder *recorder, const char *filename, ma_u
     return recorder_init_common(recorder, filename, sample_rate, channels, format, 5.0f); // 5 seconds buffer
 }
 
-RecorderResult recorder_init_stream(Recorder *recorder, ma_uint32 sample_rate, ma_uint32 channels, ma_format format, int buffer_duration_seconds)
+RecorderResult recorder_init_stream(Recorder *recorder, int sample_rate, int channels, ma_format format, int buffer_duration_seconds)
 {
     return recorder_init_common(recorder, NULL, sample_rate, channels, format, buffer_duration_seconds);
 }
@@ -175,7 +175,7 @@ bool recorder_is_recording(const Recorder *recorder)
     return recorder != NULL && recorder->is_recording;
 }
 
-int recorder_get_buffer(Recorder *recorder, float *output, ma_uint32 floats_to_read)
+int recorder_get_buffer(Recorder *recorder, float *output, int floats_to_read)
 {
     if (recorder == NULL || output == NULL || floats_to_read <= 0)
     {

@@ -2,6 +2,7 @@ import "dart:async";
 import "dart:typed_data";
 
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 import "package:minisound/minisound.dart";
 
 void main() async {
@@ -23,8 +24,8 @@ class ExamplePage extends StatefulWidget {
 class _ExamplePageState extends State<ExamplePage> {
   final engine = Engine();
   var loopDelay = 0.0;
-  late Recorder recorder;
-  late Generator generator;
+  Recorder recorder = Recorder();
+  Generator generator = Generator();
   WaveformType waveformType = WaveformType.sine;
   NoiseType noiseType = NoiseType.white;
   bool isGenerating = false;
@@ -41,8 +42,6 @@ class _ExamplePageState extends State<ExamplePage> {
   @override
   void initState() {
     super.initState();
-    recorder = Recorder();
-    generator = Generator();
     soundFuture = _initializeSound();
   }
 
@@ -52,7 +51,8 @@ class _ExamplePageState extends State<ExamplePage> {
     }
     //await engine.start();
     //await wave.init(0, waveFrequency, waveAmplitude, 44100);
-    return engine.loadSoundAsset("assets/laser_shoot.wav");
+    final data = await rootBundle.load("assets/laser_shoot.wav");
+    return engine.loadSoundAsset(data, "assets/laser_shoot.wav");
   }
 
   @override
@@ -159,6 +159,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                     recorder.stop();
                                   }
                                   if (!recorder.isCreated) {
+                                    print("Creating recorder");
                                     await recorder.initStream(
                                         sampleRate: 48000,
                                         channels: 1,
@@ -228,37 +229,27 @@ class _ExamplePageState extends State<ExamplePage> {
                                   });
                                 } else {
                                   await generator.init(
-                                      MaFormat.ma_format_f32, 1, 44100, 5);
+                                      MaFormat.ma_format_f32, 1, 48000, 5);
 
                                   if (waveformType != WaveformType.sine) {
-                                    generator.setWaveform(
-                                        waveformType, 440.0, 0.5);
-                                  } else {
-                                    generator.setNoise(
-                                        noiseType,
-                                        DateTime.now().millisecondsSinceEpoch,
-                                        0.5);
-                                  }
+                                    //generator.setWaveform(
+                                    //   waveformType, 440.0, 0.5);
+                                  } else {}
 
                                   setState(() {
                                     isGenerating = true;
-                                    generator.start();
+                                    //generator.start();
                                   });
 
                                   while (isGenerating) {
-                                    final available =
-                                        generator.getAvailableFrames();
-                                    print("Available frames: $available");
-                                    final frames =
-                                        generator.getBuffer(available);
+                                    //final available =
+                                    // generator.getAvailableFrames();
+                                    // print("Available frames: $available");
+                                    // final frames =
+                                    //    generator.getBuffer(available);
                                     // Process the generated data as needed
-                                    print("Generated ${frames.length} frames");
-
-                                    await Future.delayed(
-                                        Duration(milliseconds: 100));
+                                    //print("Generated ${frames.length} frames");
                                   }
-
-                                  generator.dispose();
                                 }
                               },
                             ),

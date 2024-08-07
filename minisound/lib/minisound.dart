@@ -1,8 +1,6 @@
 import "dart:io";
 import "dart:typed_data";
 
-import "package:flutter/foundation.dart";
-import "package:flutter/services.dart";
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
 export "package:minisound_platform_interface/minisound_platform_interface.dart"
     show
@@ -33,7 +31,7 @@ final class Engine {
   /// Initializes an engine.
   ///
   /// Change an update period (affects the sound latency).
-  Future<void> init([int periodMs = kIsWeb ? 33 : 10]) async {
+  Future<void> init([int periodMs = 33]) async {
     if (isInit) throw EngineAlreadyInitError();
 
     await _engine.init(periodMs);
@@ -52,10 +50,8 @@ final class Engine {
   }
 
   /// Loads a sound asset and creates a `Sound` from it.
-  Future<Sound> loadSoundAsset(String assetPath) async {
-    final asset = await rootBundle.load(assetPath);
-    return _loadSoundFromBuffer(asset.buffer.asFloat32List(), assetPath);
-  }
+  Future<Sound> loadSoundAsset(ByteData data, assetPath) async =>
+      _loadSoundFromBuffer(data.buffer.asFloat32List(), assetPath);
 
   /// Loads a sound file and creates a `Sound` from it.
   Future<Sound> loadSoundFile(String filePath) async {
@@ -144,7 +140,7 @@ final class Recorder {
   bool isCreated = false;
 
   /// Initializes the recorder's engine.
-  Future<void> initEngine([int periodMs = kIsWeb ? 33 : 10]) async {
+  Future<void> initEngine([int periodMs = 33]) async {
     await engine.init(periodMs);
   }
 
@@ -184,6 +180,8 @@ final class Recorder {
       this.channels = channels;
       this.format = format;
       this.bufferDurationSeconds = bufferDurationSeconds;
+      print(
+          "creating record with $sampleRate, $channels, $format, $bufferDurationSeconds");
       await _recorder.initStream(
           sampleRate: sampleRate,
           channels: channels,
@@ -225,7 +223,7 @@ final class Generator {
   bool isCreated = false;
 
   /// Initializes the generator's engine.
-  Future initEngine([int periodMs = kIsWeb ? 33 : 10]) async {
+  Future initEngine([int periodMs = 33]) async {
     await engine.init(periodMs);
   }
 

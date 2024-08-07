@@ -85,7 +85,7 @@ class MinisoundFfiBindings {
   int engine_load_sound(
     ffi.Pointer<Engine> self,
     ffi.Pointer<Sound> sound,
-    ffi.Pointer<ffi.Void> data,
+    ffi.Pointer<ffi.Float> data,
     int data_size,
     int format,
     int sample_rate,
@@ -107,14 +107,14 @@ class MinisoundFfiBindings {
           ffi.Int32 Function(
               ffi.Pointer<Engine>,
               ffi.Pointer<Sound>,
-              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Float>,
               ffi.Size,
               ffi.Int32,
-              ma_uint32,
-              ma_uint32)>>('engine_load_sound');
+              ffi.Int,
+              ffi.Int)>>('engine_load_sound');
   late final _engine_load_sound = _engine_load_soundPtr.asFunction<
       int Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>,
-          ffi.Pointer<ffi.Void>, int, int, int, int)>();
+          ffi.Pointer<ffi.Float>, int, int, int, int)>();
 
   ffi.Pointer<Sound> sound_alloc() {
     return _sound_alloc();
@@ -127,7 +127,7 @@ class MinisoundFfiBindings {
 
   int sound_init(
     ffi.Pointer<Sound> self,
-    ffi.Pointer<ffi.Void> data,
+    ffi.Pointer<ffi.Float> data,
     int data_size,
     int format,
     int channels,
@@ -149,14 +149,14 @@ class MinisoundFfiBindings {
       ffi.NativeFunction<
           ffi.Int32 Function(
               ffi.Pointer<Sound>,
-              ffi.Pointer<ffi.Void>,
+              ffi.Pointer<ffi.Float>,
               ffi.Size,
               ffi.Int32,
-              ma_uint32,
-              ma_uint32,
+              ffi.Int,
+              ffi.Int,
               ffi.Pointer<ma_engine>)>>('sound_init');
   late final _sound_init = _sound_initPtr.asFunction<
-      int Function(ffi.Pointer<Sound>, ffi.Pointer<ffi.Void>, int, int, int,
+      int Function(ffi.Pointer<Sound>, ffi.Pointer<ffi.Float>, int, int, int,
           int, ffi.Pointer<ma_engine>)>();
 
   void sound_unload(
@@ -335,7 +335,7 @@ class MinisoundFfiBindings {
   late final _recorder_init_filePtr = _lookup<
       ffi.NativeFunction<
           ffi.Int32 Function(ffi.Pointer<Recorder>, ffi.Pointer<ffi.Char>,
-              ma_uint32, ma_uint32, ffi.Int32)>>('recorder_init_file');
+              ffi.Int, ffi.Int, ffi.Int32)>>('recorder_init_file');
   late final _recorder_init_file = _recorder_init_filePtr.asFunction<
       int Function(
           ffi.Pointer<Recorder>, ffi.Pointer<ffi.Char>, int, int, int)>();
@@ -358,8 +358,8 @@ class MinisoundFfiBindings {
 
   late final _recorder_init_streamPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Recorder>, ma_uint32, ma_uint32,
-              ffi.Int32, ffi.Int)>>('recorder_init_stream');
+          ffi.Int32 Function(ffi.Pointer<Recorder>, ffi.Int, ffi.Int, ffi.Int32,
+              ffi.Int)>>('recorder_init_stream');
   late final _recorder_init_stream = _recorder_init_streamPtr
       .asFunction<int Function(ffi.Pointer<Recorder>, int, int, int, int)>();
 
@@ -420,7 +420,7 @@ class MinisoundFfiBindings {
   late final _recorder_get_bufferPtr = _lookup<
       ffi.NativeFunction<
           ffi.Int Function(ffi.Pointer<Recorder>, ffi.Pointer<ffi.Float>,
-              ma_uint32)>>('recorder_get_buffer');
+              ffi.Int)>>('recorder_get_buffer');
   late final _recorder_get_buffer = _recorder_get_bufferPtr.asFunction<
       int Function(ffi.Pointer<Recorder>, ffi.Pointer<ffi.Float>, int)>();
 
@@ -624,7 +624,7 @@ class MinisoundFfiBindings {
       _generator_get_available_framesPtr
           .asFunction<int Function(ffi.Pointer<Generator>)>();
 
-  void circular_buffer_init(
+  int circular_buffer_init(
     ffi.Pointer<CircularBuffer> cb,
     int size_in_bytes,
   ) {
@@ -636,10 +636,10 @@ class MinisoundFfiBindings {
 
   late final _circular_buffer_initPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Void Function(
+          ffi.Int Function(
               ffi.Pointer<CircularBuffer>, ffi.Size)>>('circular_buffer_init');
   late final _circular_buffer_init = _circular_buffer_initPtr
-      .asFunction<void Function(ffi.Pointer<CircularBuffer>, int)>();
+      .asFunction<int Function(ffi.Pointer<CircularBuffer>, int)>();
 
   void circular_buffer_uninit(
     ffi.Pointer<CircularBuffer> cb,
@@ -759,8 +759,6 @@ abstract class ma_format {
   static const int ma_format_f32 = 5;
   static const int ma_format_count = 6;
 }
-
-typedef ma_uint32 = ffi.UnsignedInt;
 
 final class ma_engine extends ffi.Struct {
   external ma_node_graph nodeGraph;
@@ -901,6 +899,7 @@ final class ma_node_vtable extends ffi.Struct {
 }
 
 typedef ma_node = ffi.Void;
+typedef ma_uint32 = ffi.UnsignedInt;
 
 abstract class ma_result {
   static const int MA_SUCCESS = 0;
@@ -4144,9 +4143,7 @@ abstract class GeneratorType {
   static const int GENERATOR_TYPE_NOISE = 2;
 }
 
-typedef Generator = UnnamedStruct55;
-
-final class UnnamedStruct55 extends ffi.Struct {
+final class Generator extends ffi.Struct {
   external ma_waveform waveform;
 
   external ma_pulsewave pulsewave;
@@ -4281,12 +4278,12 @@ final class ma_lcg extends ffi.Struct {
 }
 
 final class UnnamedUnion20 extends ffi.Union {
-  external UnnamedStruct56 pink;
+  external UnnamedStruct55 pink;
 
-  external UnnamedStruct57 brownian;
+  external UnnamedStruct56 brownian;
 }
 
-final class UnnamedStruct56 extends ffi.Struct {
+final class UnnamedStruct55 extends ffi.Struct {
   external ffi.Pointer<ffi.Pointer<ffi.Double>> bin;
 
   external ffi.Pointer<ffi.Double> accumulation;
@@ -4294,13 +4291,11 @@ final class UnnamedStruct56 extends ffi.Struct {
   external ffi.Pointer<ma_uint32> counter;
 }
 
-final class UnnamedStruct57 extends ffi.Struct {
+final class UnnamedStruct56 extends ffi.Struct {
   external ffi.Pointer<ffi.Double> accumulation;
 }
 
-typedef CircularBuffer = UnnamedStruct58;
-
-final class UnnamedStruct58 extends ffi.Struct {
+final class CircularBuffer extends ffi.Struct {
   external ffi.Pointer<ffi.Float> buffer;
 
   @ffi.Size()
@@ -4311,7 +4306,4 @@ final class UnnamedStruct58 extends ffi.Struct {
 
   @ffi.Size()
   external int read_pos;
-
-  @ffi.Int()
-  external int mutex;
 }

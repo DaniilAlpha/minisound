@@ -75,37 +75,42 @@ final class FfiEngine implements PlatformEngine {
 
   @override
   Future<PlatformSound> loadSound(AudioData audioData) async {
-    final dataPtr =
-        _allocateForFormat(audioData.format, audioData.buffer.lengthInBytes);
+    final int dataSize = audioData.buffer.lengthInBytes;
+    final Pointer<Float> dataPtr =
+        malloc.allocate<Float>(audioData.buffer.length * sizeOf<Float>());
 
-    _copyAudioData(dataPtr, audioData.buffer, audioData.format);
+    try {
+      final Float32List floatList =
+          dataPtr.asTypedList(audioData.buffer.length);
+      floatList.setAll(0, audioData.buffer);
 
-    final sound = _bindings.sound_alloc();
-    if (sound == nullptr) {
+      final Pointer<ffi.Sound> sound = _bindings.sound_alloc();
+      if (sound == nullptr) {
+        throw MinisoundPlatformException("Failed to allocate a sound.");
+      }
+
+      final int maFormat = convertToMaFormat(audioData.format);
+      final int result = _bindings.engine_load_sound(
+        _self,
+        sound,
+        dataPtr,
+        dataSize,
+        maFormat,
+        audioData.sampleRate,
+        audioData.channels,
+      );
+
+      if (result != ffi.Result.Ok) {
+        _bindings.sound_unload(sound);
+        throw MinisoundPlatformException("Failed to load a sound.");
+      }
+
+      return FfiSound._fromPtrs(sound, dataPtr);
+    } catch (e) {
       malloc.free(dataPtr);
-      throw MinisoundPlatformException("Failed to allocate a sound.");
+      rethrow;
     }
-
-    final maFormat = convertToMaFormat(audioData.format);
-
-    if (_bindings.engine_load_sound(
-          _self,
-          sound,
-          dataPtr.cast(),
-          audioData.buffer.lengthInBytes,
-          maFormat,
-          audioData.sampleRate,
-          audioData.channels,
-        ) !=
-        ffi.Result.Ok) {
-      malloc.free(dataPtr);
-      _bindings.sound_unload(sound);
-      throw MinisoundPlatformException("Failed to load a sound.");
-    }
-
-    return FfiSound._fromPtrs(sound, dataPtr);
   }
-
   // ma_format_unknown = 0,     /* Mainly used for indicating an error, but also used as the default for the output format for decoders. */
   // ma_format_u8      = 1,
   // ma_format_s16     = 2,     /* Seems to be the most widely supported format. */
@@ -113,81 +118,15 @@ final class FfiEngine implements PlatformEngine {
   // ma_format_s32     = 4,
   // ma_format_f32     = 5,
 
-  void _copyAudioData(
-      Pointer<NativeType> ptr, dynamic data, AudioFormat format) {
-    var thisData;
+  void _copyAudioData(Pointer<Float> ptr, dynamic data, AudioFormat format) {
     if (data is ByteBuffer) {
-      thisData = _getTypedDataViewFromByteBuffer(data, format);
-    }
-
-    if (thisData is! TypedData) {
-      throw ArgumentError('Data must be either ByteBuffer or TypedData');
-    }
-
-    switch (format) {
-      case AudioFormat.uint8:
-        final list =
-            (ptr as Pointer<Uint8>).asTypedList(thisData.lengthInBytes);
-        list.setAll(0, data as Uint8List);
-        break;
-      case AudioFormat.int16:
-        final list =
-            (ptr as Pointer<Int16>).asTypedList(thisData.lengthInBytes ~/ 2);
-        list.setAll(0, data as Int16List);
-        break;
-      case AudioFormat.int32:
-        final list =
-            (ptr as Pointer<Int32>).asTypedList(thisData.lengthInBytes ~/ 4);
-        list.setAll(0, data as Int32List);
-        break;
-      case AudioFormat.float32:
-        final list =
-            (ptr as Pointer<Float>).asTypedList(thisData.lengthInBytes ~/ 4);
-        list.setAll(0, data as Float32List);
-        break;
-      case AudioFormat.float64:
-        final list =
-            (ptr as Pointer<Double>).asTypedList(thisData.lengthInBytes ~/ 8);
-        list.setAll(0, data as Float64List);
-        break;
-      default:
-        throw ArgumentError('Unsupported audio format: $format');
-    }
-  }
-
-  Pointer<NativeType> _allocateForFormat(
-      AudioFormat format, int lengthInBytes) {
-    switch (format) {
-      case AudioFormat.uint8:
-        return malloc.allocate<Uint8>(lengthInBytes);
-      case AudioFormat.int16:
-        return malloc.allocate<Int16>(lengthInBytes ~/ 2);
-      case AudioFormat.int32:
-        return malloc.allocate<Int32>(lengthInBytes ~/ 4);
-      case AudioFormat.float32:
-        return malloc.allocate<Float>(lengthInBytes ~/ 4);
-      case AudioFormat.float64:
-        return malloc.allocate<Double>(lengthInBytes ~/ 8);
-      default:
-        throw ArgumentError('Unsupported audio format: $format');
-    }
-  }
-
-  TypedData _getTypedDataViewFromByteBuffer(
-      ByteBuffer buffer, AudioFormat format) {
-    switch (format) {
-      case AudioFormat.uint8:
-        return buffer.asUint8List();
-      case AudioFormat.int16:
-        return buffer.asInt16List();
-      case AudioFormat.int32:
-        return buffer.asInt32List();
-      case AudioFormat.float32:
-        return buffer.asFloat32List();
-      case AudioFormat.float64:
-        return buffer.asFloat64List();
-      default:
-        throw ArgumentError('Unsupported audio format: $format');
+      final byteData = data.asFloat32List();
+      ptr.asTypedList(byteData.length * sizeOf<Float>()).setAll(0, byteData);
+    } else if (data is TypedData) {
+      final byteData = data.buffer.asFloat32List();
+      ptr.asTypedList(byteData.length * sizeOf<Float>()).setAll(0, byteData);
+    } else {
+      throw ArgumentError('Unsupported data type: ${data.runtimeType}');
     }
   }
 }
@@ -281,6 +220,7 @@ class FfiRecorder implements PlatformRecorder {
       int channels = 1,
       int format = MaFormat.ma_format_f32,
       int bufferDurationSeconds = 5}) async {
+    print(channels);
     if (_bindings.recorder_init_stream(
             _self, sampleRate, channels, format, bufferDurationSeconds) !=
         ffi.RecorderResult.RECORDER_OK) {
@@ -305,25 +245,32 @@ class FfiRecorder implements PlatformRecorder {
   @override
   bool get isRecording => _bindings.recorder_is_recording(_self);
 
+  Pointer<Float> bufferPtr = malloc.allocate<Float>(0);
+
   @override
   Float32List getBuffer(int framesToRead) {
-    final output = malloc<Float>(framesToRead);
     try {
-      final framesRead =
-          _bindings.recorder_get_buffer(_self, output, framesToRead);
-      if (framesRead < 0) {
-        throw MinisoundPlatformException("Failed to get recorder buffer.");
+      final floatsToRead = framesToRead *
+          sizeOf<Float>(); // Calculate the actual number of floats to read
+
+      bufferPtr = malloc.allocate<Float>(
+          floatsToRead); // Allocate memory for the float buffer
+      final floatsRead =
+          _bindings.recorder_get_buffer(_self, bufferPtr, floatsToRead);
+
+      // Error handling for negative return values
+      if (floatsRead < 0) {
+        throw MinisoundPlatformException(
+            "Failed to get recorder buffer. Error code: $floatsRead");
       }
-      return output.asTypedList(framesRead);
-    } finally {
-      malloc.free(output);
-    }
+
+      // Convert the data in the allocated memory to a Dart Float32List
+      return Float32List.fromList(bufferPtr.asTypedList(floatsRead));
+    } finally {}
   }
 
   @override
-  int getAvailableFrames() {
-    return _bindings.recorder_get_available_frames(_self);
-  }
+  int getAvailableFrames() => _bindings.recorder_get_available_frames(_self);
 
   @override
   void dispose() {

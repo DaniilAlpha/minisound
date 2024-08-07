@@ -2,7 +2,6 @@
 #define CIRCULAR_BUFFER_H
 
 #include <stddef.h>
-#include <pthread.h>
 
 #include "export.h"
 
@@ -12,10 +11,9 @@ typedef struct
     size_t capacity;
     size_t write_pos;
     size_t read_pos;
-    pthread_mutex_t mutex;
 } CircularBuffer;
 
-void circular_buffer_init(CircularBuffer *cb, size_t size_in_bytes);
+int circular_buffer_init(CircularBuffer *cb, size_t size_in_bytes);
 void circular_buffer_uninit(CircularBuffer *cb);
 void circular_buffer_write(CircularBuffer *cb, const float *data, size_t size_in_floats);
 size_t circular_buffer_read(CircularBuffer *cb, float *data, size_t size_in_floats);

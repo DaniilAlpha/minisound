@@ -21,8 +21,8 @@ EXPORT typedef struct {
     ma_waveform waveform;
     ma_pulsewave pulsewave;
     ma_noise noise;
-    ma_device *device;
-    ma_device_config *device_config;
+    ma_device device;
+    ma_device_config device_config;
     CircularBuffer circular_buffer;
     ma_uint32 sample_rate;
     ma_uint32 channels;

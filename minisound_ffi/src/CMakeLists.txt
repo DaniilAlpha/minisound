@@ -10,7 +10,7 @@ get_filename_component(PROJECT_ROOT ${PROJECT_ROOT} DIRECTORY)
 
 # Construct potential paths
 set(FILEPATH_CURRENT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
-set(FILEPATH_PROJECT_ROOT "${PROJECT_ROOT}/${FILENAME}")
+set(FILEPATH_PROJECT_ROOT "${PROJECT_ROOT}/${FILENAME}/../../")
 
 # Check if the file exists in the current directory
 if(EXISTS ${FILEPATH_CURRENT_DIR})

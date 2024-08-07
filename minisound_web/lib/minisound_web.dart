@@ -198,7 +198,7 @@ final class WebRecorder implements PlatformRecorder {
   Float32List getBuffer(int framesToRead, {int channels = 2}) {
     try {
       int floatsToRead =
-          framesToRead * 20; // Calculate the actual number of floats to read
+          framesToRead * 8; // Calculate the actual number of floats to read
       if (bufferPtr.value <= 0) malloc.free(bufferPtr);
 
       bufferPtr = malloc.allocate<Float>(
