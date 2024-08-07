@@ -82,7 +82,7 @@ class MinisoundFfiBindings {
   late final _engine_start =
       _engine_startPtr.asFunction<int Function(ffi.Pointer<Engine>)>();
 
-  int engine_load_sound_ex(
+  int engine_load_sound(
     ffi.Pointer<Engine> self,
     ffi.Pointer<Sound> sound,
     ffi.Pointer<ffi.Void> data,
@@ -91,7 +91,7 @@ class MinisoundFfiBindings {
     int sample_rate,
     int channels,
   ) {
-    return _engine_load_sound_ex(
+    return _engine_load_sound(
       self,
       sound,
       data,
@@ -102,7 +102,7 @@ class MinisoundFfiBindings {
     );
   }
 
-  late final _engine_load_sound_exPtr = _lookup<
+  late final _engine_load_soundPtr = _lookup<
       ffi.NativeFunction<
           ffi.Int32 Function(
               ffi.Pointer<Engine>,
@@ -110,9 +110,9 @@ class MinisoundFfiBindings {
               ffi.Pointer<ffi.Void>,
               ffi.Size,
               ffi.Int32,
-              ffi.Uint32,
-              ffi.Uint32)>>('engine_load_sound_ex');
-  late final _engine_load_sound_ex = _engine_load_sound_exPtr.asFunction<
+              ma_uint32,
+              ma_uint32)>>('engine_load_sound');
+  late final _engine_load_sound = _engine_load_soundPtr.asFunction<
       int Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>,
           ffi.Pointer<ffi.Void>, int, int, int, int)>();
 
@@ -129,14 +129,18 @@ class MinisoundFfiBindings {
     ffi.Pointer<Sound> self,
     ffi.Pointer<ffi.Void> data,
     int data_size,
-    ffi.Pointer<ffi.Void> dec_config,
-    ffi.Pointer<ffi.Void> engine,
+    int format,
+    int channels,
+    int sample_rate,
+    ffi.Pointer<ma_engine> engine,
   ) {
     return _sound_init(
       self,
       data,
       data_size,
-      dec_config,
+      format,
+      channels,
+      sample_rate,
       engine,
     );
   }
@@ -147,11 +151,13 @@ class MinisoundFfiBindings {
               ffi.Pointer<Sound>,
               ffi.Pointer<ffi.Void>,
               ffi.Size,
-              ffi.Pointer<ffi.Void>,
-              ffi.Pointer<ffi.Void>)>>('sound_init');
+              ffi.Int32,
+              ma_uint32,
+              ma_uint32,
+              ffi.Pointer<ma_engine>)>>('sound_init');
   late final _sound_init = _sound_initPtr.asFunction<
-      int Function(ffi.Pointer<Sound>, ffi.Pointer<ffi.Void>, int,
-          ffi.Pointer<ffi.Void>, ffi.Pointer<ffi.Void>)>();
+      int Function(ffi.Pointer<Sound>, ffi.Pointer<ffi.Void>, int, int, int,
+          int, ffi.Pointer<ma_engine>)>();
 
   void sound_unload(
     ffi.Pointer<Sound> self,
@@ -313,14 +319,14 @@ class MinisoundFfiBindings {
   int recorder_init_file(
     ffi.Pointer<Recorder> recorder,
     ffi.Pointer<ffi.Char> filename,
-    int sampleRate,
+    int sample_rate,
     int channels,
     int format,
   ) {
     return _recorder_init_file(
       recorder,
       filename,
-      sampleRate,
+      sample_rate,
       channels,
       format,
     );
@@ -328,55 +334,34 @@ class MinisoundFfiBindings {
 
   late final _recorder_init_filePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(
-            ffi.Pointer<Recorder>,
-            ffi.Pointer<ffi.Char>,
-            ffi.Uint32,
-            ffi.Uint32,
-            ffi.Int32,
-          )>>('recorder_init_file');
+          ffi.Int32 Function(ffi.Pointer<Recorder>, ffi.Pointer<ffi.Char>,
+              ma_uint32, ma_uint32, ffi.Int32)>>('recorder_init_file');
   late final _recorder_init_file = _recorder_init_filePtr.asFunction<
       int Function(
-        ffi.Pointer<Recorder>,
-        ffi.Pointer<ffi.Char>,
-        int,
-        int,
-        int,
-      )>();
+          ffi.Pointer<Recorder>, ffi.Pointer<ffi.Char>, int, int, int)>();
 
   int recorder_init_stream(
     ffi.Pointer<Recorder> recorder,
-    int sampleRate,
+    int sample_rate,
     int channels,
     int format,
-    double bufferDurationSeconds,
+    int buffer_duration_seconds,
   ) {
     return _recorder_init_stream(
       recorder,
-      sampleRate,
+      sample_rate,
       channels,
       format,
-      bufferDurationSeconds,
+      buffer_duration_seconds,
     );
   }
 
   late final _recorder_init_streamPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(
-            ffi.Pointer<Recorder>,
-            ffi.Uint32,
-            ffi.Uint32,
-            ffi.Int32,
-            ffi.Float,
-          )>>('recorder_init_stream');
-  late final _recorder_init_stream = _recorder_init_streamPtr.asFunction<
-      int Function(
-        ffi.Pointer<Recorder>,
-        int,
-        int,
-        int,
-        double,
-      )>();
+          ffi.Int32 Function(ffi.Pointer<Recorder>, ma_uint32, ma_uint32,
+              ffi.Int32, ffi.Int)>>('recorder_init_stream');
+  late final _recorder_init_stream = _recorder_init_streamPtr
+      .asFunction<int Function(ffi.Pointer<Recorder>, int, int, int, int)>();
 
   int recorder_start(
     ffi.Pointer<Recorder> recorder,
@@ -406,6 +391,39 @@ class MinisoundFfiBindings {
   late final _recorder_stop =
       _recorder_stopPtr.asFunction<int Function(ffi.Pointer<Recorder>)>();
 
+  int recorder_get_available_frames(
+    ffi.Pointer<Recorder> recorder,
+  ) {
+    return _recorder_get_available_frames(
+      recorder,
+    );
+  }
+
+  late final _recorder_get_available_framesPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Pointer<Recorder>)>>(
+          'recorder_get_available_frames');
+  late final _recorder_get_available_frames = _recorder_get_available_framesPtr
+      .asFunction<int Function(ffi.Pointer<Recorder>)>();
+
+  int recorder_get_buffer(
+    ffi.Pointer<Recorder> recorder,
+    ffi.Pointer<ffi.Float> output,
+    int floats_to_read,
+  ) {
+    return _recorder_get_buffer(
+      recorder,
+      output,
+      floats_to_read,
+    );
+  }
+
+  late final _recorder_get_bufferPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int Function(ffi.Pointer<Recorder>, ffi.Pointer<ffi.Float>,
+              ma_uint32)>>('recorder_get_buffer');
+  late final _recorder_get_buffer = _recorder_get_bufferPtr.asFunction<
+      int Function(ffi.Pointer<Recorder>, ffi.Pointer<ffi.Float>, int)>();
+
   bool recorder_is_recording(
     ffi.Pointer<Recorder> recorder,
   ) {
@@ -419,25 +437,6 @@ class MinisoundFfiBindings {
           'recorder_is_recording');
   late final _recorder_is_recording = _recorder_is_recordingPtr
       .asFunction<bool Function(ffi.Pointer<Recorder>)>();
-
-  int recorder_get_buffer(
-    ffi.Pointer<Recorder> recorder,
-    ffi.Pointer<ffi.Float> output,
-    int frames_to_read,
-  ) {
-    return _recorder_get_buffer(
-      recorder,
-      output,
-      frames_to_read,
-    );
-  }
-
-  late final _recorder_get_bufferPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Recorder>, ffi.Pointer<ffi.Uint8>,
-              ffi.Int32)>>('recorder_get_buffer');
-  late final _recorder_get_buffer = _recorder_get_bufferPtr.asFunction<
-      int Function(ffi.Pointer<Recorder>, ffi.Pointer<ffi.Uint8>, int)>();
 
   void recorder_destroy(
     ffi.Pointer<Recorder> recorder,
@@ -453,137 +452,255 @@ class MinisoundFfiBindings {
   late final _recorder_destroy =
       _recorder_destroyPtr.asFunction<void Function(ffi.Pointer<Recorder>)>();
 
-  ffi.Pointer<Wave> wave_create() {
-    return _wave_create();
+  ffi.Pointer<Generator> generator_create() {
+    return _generator_create();
   }
 
-  late final _wave_createPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<Wave> Function()>>('wave_create');
-  late final _wave_create =
-      _wave_createPtr.asFunction<ffi.Pointer<Wave> Function()>();
+  late final _generator_createPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<Generator> Function()>>(
+          'generator_create');
+  late final _generator_create =
+      _generator_createPtr.asFunction<ffi.Pointer<Generator> Function()>();
 
-  void wave_destroy(
-    ffi.Pointer<Wave> wave,
+  void generator_destroy(
+    ffi.Pointer<Generator> generator,
   ) {
-    return _wave_destroy(
-      wave,
+    return _generator_destroy(
+      generator,
     );
   }
 
-  late final _wave_destroyPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<Wave>)>>(
-          'wave_destroy');
-  late final _wave_destroy =
-      _wave_destroyPtr.asFunction<void Function(ffi.Pointer<Wave>)>();
+  late final _generator_destroyPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<Generator>)>>(
+          'generator_destroy');
+  late final _generator_destroy =
+      _generator_destroyPtr.asFunction<void Function(ffi.Pointer<Generator>)>();
 
-  int wave_init(
-    ffi.Pointer<Wave> wave,
-    int type,
-    double frequency,
-    double amplitude,
+  int generator_init(
+    ffi.Pointer<Generator> generator,
+    int format,
+    int channels,
     int sample_rate,
+    double buffer_duration_seconds,
   ) {
-    return _wave_init(
-      wave,
-      type,
-      frequency,
-      amplitude,
+    return _generator_init(
+      generator,
+      format,
+      channels,
       sample_rate,
+      buffer_duration_seconds,
     );
   }
 
-  late final _wave_initPtr = _lookup<
+  late final _generator_initPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Wave>, ffi.Int32, ffi.Double,
-              ffi.Double, ffi.Uint32)>>('wave_init');
-  late final _wave_init = _wave_initPtr
-      .asFunction<int Function(ffi.Pointer<Wave>, int, double, double, int)>();
+          ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Int32, ma_uint32,
+              ma_uint32, ffi.Float)>>('generator_init');
+  late final _generator_init = _generator_initPtr.asFunction<
+      int Function(ffi.Pointer<Generator>, int, int, int, double)>();
 
-  int wave_set_type(
-    ffi.Pointer<Wave> wave,
+  int generator_set_waveform(
+    ffi.Pointer<Generator> generator,
     int type,
-  ) {
-    return _wave_set_type(
-      wave,
-      type,
-    );
-  }
-
-  late final _wave_set_typePtr = _lookup<
-          ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<Wave>, ffi.Int32)>>(
-      'wave_set_type');
-  late final _wave_set_type =
-      _wave_set_typePtr.asFunction<int Function(ffi.Pointer<Wave>, int)>();
-
-  int wave_set_frequency(
-    ffi.Pointer<Wave> wave,
     double frequency,
-  ) {
-    return _wave_set_frequency(
-      wave,
-      frequency,
-    );
-  }
-
-  late final _wave_set_frequencyPtr = _lookup<
-          ffi
-          .NativeFunction<ffi.Int32 Function(ffi.Pointer<Wave>, ffi.Double)>>(
-      'wave_set_frequency');
-  late final _wave_set_frequency = _wave_set_frequencyPtr
-      .asFunction<int Function(ffi.Pointer<Wave>, double)>();
-
-  int wave_set_amplitude(
-    ffi.Pointer<Wave> wave,
     double amplitude,
   ) {
-    return _wave_set_amplitude(
-      wave,
+    return _generator_set_waveform(
+      generator,
+      type,
+      frequency,
       amplitude,
     );
   }
 
-  late final _wave_set_amplitudePtr = _lookup<
-          ffi
-          .NativeFunction<ffi.Int32 Function(ffi.Pointer<Wave>, ffi.Double)>>(
-      'wave_set_amplitude');
-  late final _wave_set_amplitude = _wave_set_amplitudePtr
-      .asFunction<int Function(ffi.Pointer<Wave>, double)>();
+  late final _generator_set_waveformPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Int32, ffi.Double,
+              ffi.Double)>>('generator_set_waveform');
+  late final _generator_set_waveform = _generator_set_waveformPtr
+      .asFunction<int Function(ffi.Pointer<Generator>, int, double, double)>();
 
-  int wave_set_sample_rate(
-    ffi.Pointer<Wave> wave,
-    int sample_rate,
+  int generator_set_pulsewave(
+    ffi.Pointer<Generator> generator,
+    double frequency,
+    double amplitude,
+    double dutyCycle,
   ) {
-    return _wave_set_sample_rate(
-      wave,
-      sample_rate,
+    return _generator_set_pulsewave(
+      generator,
+      frequency,
+      amplitude,
+      dutyCycle,
     );
   }
 
-  late final _wave_set_sample_ratePtr = _lookup<
-          ffi
-          .NativeFunction<ffi.Int32 Function(ffi.Pointer<Wave>, ffi.Uint32)>>(
-      'wave_set_sample_rate');
-  late final _wave_set_sample_rate = _wave_set_sample_ratePtr
-      .asFunction<int Function(ffi.Pointer<Wave>, int)>();
+  late final _generator_set_pulsewavePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Double, ffi.Double,
+              ffi.Double)>>('generator_set_pulsewave');
+  late final _generator_set_pulsewave = _generator_set_pulsewavePtr.asFunction<
+      int Function(ffi.Pointer<Generator>, double, double, double)>();
 
-  int wave_read(
-    ffi.Pointer<Wave> wave,
+  int generator_set_noise(
+    ffi.Pointer<Generator> generator,
+    int type,
+    int seed,
+    double amplitude,
+  ) {
+    return _generator_set_noise(
+      generator,
+      type,
+      seed,
+      amplitude,
+    );
+  }
+
+  late final _generator_set_noisePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Int32, ma_int32,
+              ffi.Double)>>('generator_set_noise');
+  late final _generator_set_noise = _generator_set_noisePtr
+      .asFunction<int Function(ffi.Pointer<Generator>, int, int, double)>();
+
+  int generator_read(
+    ffi.Pointer<Generator> generator,
     ffi.Pointer<ffi.Float> output,
     int frames_to_read,
   ) {
-    return _wave_read(
-      wave,
+    return _generator_read(
+      generator,
       output,
       frames_to_read,
     );
   }
 
-  late final _wave_readPtr = _lookup<
+  late final _generator_readPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Wave>, ffi.Pointer<ffi.Float>,
-              ffi.Int32)>>('wave_read');
-  late final _wave_read = _wave_readPtr.asFunction<
-      int Function(ffi.Pointer<Wave>, ffi.Pointer<ffi.Float>, int)>();
+          ma_uint32 Function(ffi.Pointer<Generator>, ffi.Pointer<ffi.Float>,
+              ma_uint32)>>('generator_read');
+  late final _generator_read = _generator_readPtr.asFunction<
+      int Function(ffi.Pointer<Generator>, ffi.Pointer<ffi.Float>, int)>();
+
+  int generator_get_available_frames(
+    ffi.Pointer<Generator> generator,
+  ) {
+    return _generator_get_available_frames(
+      generator,
+    );
+  }
+
+  late final _generator_get_available_framesPtr =
+      _lookup<ffi.NativeFunction<ma_uint32 Function(ffi.Pointer<Generator>)>>(
+          'generator_get_available_frames');
+  late final _generator_get_available_frames =
+      _generator_get_available_framesPtr
+          .asFunction<int Function(ffi.Pointer<Generator>)>();
+
+  void circular_buffer_init(
+    ffi.Pointer<CircularBuffer> cb,
+    int size_in_bytes,
+  ) {
+    return _circular_buffer_init(
+      cb,
+      size_in_bytes,
+    );
+  }
+
+  late final _circular_buffer_initPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Pointer<CircularBuffer>, ffi.Size)>>('circular_buffer_init');
+  late final _circular_buffer_init = _circular_buffer_initPtr
+      .asFunction<void Function(ffi.Pointer<CircularBuffer>, int)>();
+
+  void circular_buffer_uninit(
+    ffi.Pointer<CircularBuffer> cb,
+  ) {
+    return _circular_buffer_uninit(
+      cb,
+    );
+  }
+
+  late final _circular_buffer_uninitPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(ffi.Pointer<CircularBuffer>)>>(
+      'circular_buffer_uninit');
+  late final _circular_buffer_uninit = _circular_buffer_uninitPtr
+      .asFunction<void Function(ffi.Pointer<CircularBuffer>)>();
+
+  void circular_buffer_write(
+    ffi.Pointer<CircularBuffer> cb,
+    ffi.Pointer<ffi.Float> data,
+    int size_in_floats,
+  ) {
+    return _circular_buffer_write(
+      cb,
+      data,
+      size_in_floats,
+    );
+  }
+
+  late final _circular_buffer_writePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<CircularBuffer>, ffi.Pointer<ffi.Float>,
+              ffi.Size)>>('circular_buffer_write');
+  late final _circular_buffer_write = _circular_buffer_writePtr.asFunction<
+      void Function(
+          ffi.Pointer<CircularBuffer>, ffi.Pointer<ffi.Float>, int)>();
+
+  int circular_buffer_read(
+    ffi.Pointer<CircularBuffer> cb,
+    ffi.Pointer<ffi.Float> data,
+    int size_in_floats,
+  ) {
+    return _circular_buffer_read(
+      cb,
+      data,
+      size_in_floats,
+    );
+  }
+
+  late final _circular_buffer_readPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Size Function(ffi.Pointer<CircularBuffer>, ffi.Pointer<ffi.Float>,
+              ffi.Size)>>('circular_buffer_read');
+  late final _circular_buffer_read = _circular_buffer_readPtr.asFunction<
+      int Function(ffi.Pointer<CircularBuffer>, ffi.Pointer<ffi.Float>, int)>();
+
+  int circular_buffer_get_available_floats(
+    ffi.Pointer<CircularBuffer> cb,
+  ) {
+    return _circular_buffer_get_available_floats(
+      cb,
+    );
+  }
+
+  late final _circular_buffer_get_available_floatsPtr = _lookup<
+          ffi.NativeFunction<ffi.Size Function(ffi.Pointer<CircularBuffer>)>>(
+      'circular_buffer_get_available_floats');
+  late final _circular_buffer_get_available_floats =
+      _circular_buffer_get_available_floatsPtr
+          .asFunction<int Function(ffi.Pointer<CircularBuffer>)>();
+
+  int circular_buffer_read_available(
+    ffi.Pointer<CircularBuffer> cb,
+    ffi.Pointer<ffi.Float> data,
+    int max_size_in_floats,
+  ) {
+    return _circular_buffer_read_available(
+      cb,
+      data,
+      max_size_in_floats,
+    );
+  }
+
+  late final _circular_buffer_read_availablePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Size Function(ffi.Pointer<CircularBuffer>, ffi.Pointer<ffi.Float>,
+              ffi.Size)>>('circular_buffer_read_available');
+  late final _circular_buffer_read_available =
+      _circular_buffer_read_availablePtr.asFunction<
+          int Function(
+              ffi.Pointer<CircularBuffer>, ffi.Pointer<ffi.Float>, int)>();
 }
 
 final class Engine extends ffi.Opaque {}
@@ -605,6 +722,3377 @@ abstract class Result {
 
 final class Sound extends ffi.Opaque {}
 
+abstract class ma_format {
+  static const int ma_format_unknown = 0;
+  static const int ma_format_u8 = 1;
+  static const int ma_format_s16 = 2;
+  static const int ma_format_s24 = 3;
+  static const int ma_format_s32 = 4;
+  static const int ma_format_f32 = 5;
+  static const int ma_format_count = 6;
+}
+
+typedef ma_uint32 = ffi.UnsignedInt;
+
+final class ma_engine extends ffi.Struct {
+  external ma_node_graph nodeGraph;
+
+  external ffi.Pointer<ma_resource_manager> pResourceManager;
+
+  external ffi.Pointer<ma_device> pDevice;
+
+  external ffi.Pointer<ma_log> pLog;
+
+  @ma_uint32()
+  external int sampleRate;
+
+  @ma_uint32()
+  external int listenerCount;
+
+  @ffi.Array.multi([4])
+  external ffi.Array<ma_spatializer_listener> listeners;
+
+  external ma_allocation_callbacks allocationCallbacks;
+
+  @ma_bool8()
+  external int ownsResourceManager;
+
+  @ma_bool8()
+  external int ownsDevice;
+
+  @ma_spinlock()
+  external int inlinedSoundLock;
+
+  external ffi.Pointer<ma_sound_inlined> pInlinedSoundHead;
+
+  @ma_uint32()
+  external int inlinedSoundCount;
+
+  @ma_uint32()
+  external int gainSmoothTimeInFrames;
+
+  @ma_uint32()
+  external int defaultVolumeSmoothTimeInPCMFrames;
+
+  @ffi.Int32()
+  external int monoExpansionMode;
+
+  external ma_engine_process_proc onProcess;
+
+  external ffi.Pointer<ffi.Void> pProcessUserData;
+}
+
+final class ma_node_graph extends ffi.Struct {
+  external ma_node_base base;
+
+  external ma_node_base endpoint;
+
+  @ma_uint16()
+  external int nodeCacheCapInFrames;
+
+  @ma_bool32()
+  external int isReading;
+}
+
+final class ma_node_base extends ffi.Struct {
+  external ffi.Pointer<ma_node_graph> pNodeGraph;
+
+  external ffi.Pointer<ma_node_vtable> vtable;
+
+  external ffi.Pointer<ffi.Float> pCachedData;
+
+  @ma_uint16()
+  external int cachedDataCapInFramesPerBus;
+
+  @ma_uint16()
+  external int cachedFrameCountOut;
+
+  @ma_uint16()
+  external int cachedFrameCountIn;
+
+  @ma_uint16()
+  external int consumedFrameCountIn;
+
+  @ffi.Int32()
+  external int state;
+
+  @ffi.Array.multi([2])
+  external ffi.Array<ma_uint64> stateTimes;
+
+  @ma_uint64()
+  external int localTime;
+
+  @ma_uint32()
+  external int inputBusCount;
+
+  @ma_uint32()
+  external int outputBusCount;
+
+  external ffi.Pointer<ma_node_input_bus> pInputBuses;
+
+  external ffi.Pointer<ma_node_output_bus> pOutputBuses;
+
+  @ffi.Array.multi([2])
+  external ffi.Array<ma_node_input_bus> _inputBuses;
+
+  @ffi.Array.multi([2])
+  external ffi.Array<ma_node_output_bus> _outputBuses;
+
+  external ffi.Pointer<ffi.Void> _pHeap;
+
+  @ma_bool32()
+  external int _ownsHeap;
+}
+
+final class ma_node_vtable extends ffi.Struct {
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Pointer<ma_node> pNode,
+              ffi.Pointer<ffi.Pointer<ffi.Float>> ppFramesIn,
+              ffi.Pointer<ma_uint32> pFrameCountIn,
+              ffi.Pointer<ffi.Pointer<ffi.Float>> ppFramesOut,
+              ffi.Pointer<ma_uint32> pFrameCountOut)>> onProcess;
+
+  external ffi.Pointer<
+          ffi.NativeFunction<
+              ffi.Int32 Function(
+                  ffi.Pointer<ma_node> pNode,
+                  ma_uint32 outputFrameCount,
+                  ffi.Pointer<ma_uint32> pInputFrameCount)>>
+      onGetRequiredInputFrameCount;
+
+  @ma_uint8()
+  external int inputBusCount;
+
+  @ma_uint8()
+  external int outputBusCount;
+
+  @ma_uint32()
+  external int flags;
+}
+
+typedef ma_node = ffi.Void;
+
+abstract class ma_result {
+  static const int MA_SUCCESS = 0;
+  static const int MA_ERROR = -1;
+  static const int MA_INVALID_ARGS = -2;
+  static const int MA_INVALID_OPERATION = -3;
+  static const int MA_OUT_OF_MEMORY = -4;
+  static const int MA_OUT_OF_RANGE = -5;
+  static const int MA_ACCESS_DENIED = -6;
+  static const int MA_DOES_NOT_EXIST = -7;
+  static const int MA_ALREADY_EXISTS = -8;
+  static const int MA_TOO_MANY_OPEN_FILES = -9;
+  static const int MA_INVALID_FILE = -10;
+  static const int MA_TOO_BIG = -11;
+  static const int MA_PATH_TOO_LONG = -12;
+  static const int MA_NAME_TOO_LONG = -13;
+  static const int MA_NOT_DIRECTORY = -14;
+  static const int MA_IS_DIRECTORY = -15;
+  static const int MA_DIRECTORY_NOT_EMPTY = -16;
+  static const int MA_AT_END = -17;
+  static const int MA_NO_SPACE = -18;
+  static const int MA_BUSY = -19;
+  static const int MA_IO_ERROR = -20;
+  static const int MA_INTERRUPT = -21;
+  static const int MA_UNAVAILABLE = -22;
+  static const int MA_ALREADY_IN_USE = -23;
+  static const int MA_BAD_ADDRESS = -24;
+  static const int MA_BAD_SEEK = -25;
+  static const int MA_BAD_PIPE = -26;
+  static const int MA_DEADLOCK = -27;
+  static const int MA_TOO_MANY_LINKS = -28;
+  static const int MA_NOT_IMPLEMENTED = -29;
+  static const int MA_NO_MESSAGE = -30;
+  static const int MA_BAD_MESSAGE = -31;
+  static const int MA_NO_DATA_AVAILABLE = -32;
+  static const int MA_INVALID_DATA = -33;
+  static const int MA_TIMEOUT = -34;
+  static const int MA_NO_NETWORK = -35;
+  static const int MA_NOT_UNIQUE = -36;
+  static const int MA_NOT_SOCKET = -37;
+  static const int MA_NO_ADDRESS = -38;
+  static const int MA_BAD_PROTOCOL = -39;
+  static const int MA_PROTOCOL_UNAVAILABLE = -40;
+  static const int MA_PROTOCOL_NOT_SUPPORTED = -41;
+  static const int MA_PROTOCOL_FAMILY_NOT_SUPPORTED = -42;
+  static const int MA_ADDRESS_FAMILY_NOT_SUPPORTED = -43;
+  static const int MA_SOCKET_NOT_SUPPORTED = -44;
+  static const int MA_CONNECTION_RESET = -45;
+  static const int MA_ALREADY_CONNECTED = -46;
+  static const int MA_NOT_CONNECTED = -47;
+  static const int MA_CONNECTION_REFUSED = -48;
+  static const int MA_NO_HOST = -49;
+  static const int MA_IN_PROGRESS = -50;
+  static const int MA_CANCELLED = -51;
+  static const int MA_MEMORY_ALREADY_MAPPED = -52;
+  static const int MA_CRC_MISMATCH = -100;
+  static const int MA_FORMAT_NOT_SUPPORTED = -200;
+  static const int MA_DEVICE_TYPE_NOT_SUPPORTED = -201;
+  static const int MA_SHARE_MODE_NOT_SUPPORTED = -202;
+  static const int MA_NO_BACKEND = -203;
+  static const int MA_NO_DEVICE = -204;
+  static const int MA_API_NOT_FOUND = -205;
+  static const int MA_INVALID_DEVICE_CONFIG = -206;
+  static const int MA_LOOP = -207;
+  static const int MA_BACKEND_NOT_ENABLED = -208;
+  static const int MA_DEVICE_NOT_INITIALIZED = -300;
+  static const int MA_DEVICE_ALREADY_INITIALIZED = -301;
+  static const int MA_DEVICE_NOT_STARTED = -302;
+  static const int MA_DEVICE_NOT_STOPPED = -303;
+  static const int MA_FAILED_TO_INIT_BACKEND = -400;
+  static const int MA_FAILED_TO_OPEN_BACKEND_DEVICE = -401;
+  static const int MA_FAILED_TO_START_BACKEND_DEVICE = -402;
+  static const int MA_FAILED_TO_STOP_BACKEND_DEVICE = -403;
+}
+
+typedef ma_uint8 = ffi.UnsignedChar;
+typedef ma_uint16 = ffi.UnsignedShort;
+
+abstract class ma_node_state {
+  static const int ma_node_state_started = 0;
+  static const int ma_node_state_stopped = 1;
+}
+
+typedef ma_uint64 = ffi.UnsignedLongLong;
+
+final class ma_node_input_bus extends ffi.Struct {
+  external ma_node_output_bus head;
+
+  @ma_uint32()
+  external int nextCounter;
+
+  @ma_spinlock()
+  external int lock;
+
+  @ma_uint8()
+  external int channels;
+}
+
+final class ma_node_output_bus extends ffi.Struct {
+  external ffi.Pointer<ma_node> pNode;
+
+  @ma_uint8()
+  external int outputBusIndex;
+
+  @ma_uint8()
+  external int channels;
+
+  @ma_uint8()
+  external int inputNodeInputBusIndex;
+
+  @ma_uint32()
+  external int flags;
+
+  @ma_uint32()
+  external int refCount;
+
+  @ma_bool32()
+  external int isAttached;
+
+  @ma_spinlock()
+  external int lock;
+
+  @ffi.Float()
+  external double volume;
+
+  external ffi.Pointer<ma_node_output_bus> pNext;
+
+  external ffi.Pointer<ma_node_output_bus> pPrev;
+
+  external ffi.Pointer<ma_node> pInputNode;
+}
+
+typedef ma_bool32 = ma_uint32;
+typedef ma_spinlock = ma_uint32;
+
+final class ma_resource_manager extends ffi.Struct {
+  external ma_resource_manager_config config;
+
+  external ffi.Pointer<ma_resource_manager_data_buffer_node>
+      pRootDataBufferNode;
+
+  external ma_mutex dataBufferBSTLock;
+
+  @ffi.Array.multi([64])
+  external ffi.Array<ma_thread> jobThreads;
+
+  external ma_job_queue jobQueue;
+
+  external ma_default_vfs defaultVFS;
+
+  external ma_log log;
+}
+
+final class ma_resource_manager_config extends ffi.Struct {
+  external ma_allocation_callbacks allocationCallbacks;
+
+  external ffi.Pointer<ma_log> pLog;
+
+  @ffi.Int32()
+  external int decodedFormat;
+
+  @ma_uint32()
+  external int decodedChannels;
+
+  @ma_uint32()
+  external int decodedSampleRate;
+
+  @ma_uint32()
+  external int jobThreadCount;
+
+  @ffi.Size()
+  external int jobThreadStackSize;
+
+  @ma_uint32()
+  external int jobQueueCapacity;
+
+  @ma_uint32()
+  external int flags;
+
+  external ffi.Pointer<ma_vfs> pVFS;
+
+  external ffi.Pointer<ffi.Pointer<ma_decoding_backend_vtable>>
+      ppCustomDecodingBackendVTables;
+
+  @ma_uint32()
+  external int customDecodingBackendCount;
+
+  external ffi.Pointer<ffi.Void> pCustomDecodingBackendUserData;
+}
+
+final class ma_allocation_callbacks extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> pUserData;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Void> Function(
+              ffi.Size sz, ffi.Pointer<ffi.Void> pUserData)>> onMalloc;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void> p, ffi.Size sz,
+              ffi.Pointer<ffi.Void> pUserData)>> onRealloc;
+
+  external ffi.Pointer<
+          ffi.NativeFunction<
+              ffi.Void Function(
+                  ffi.Pointer<ffi.Void> p, ffi.Pointer<ffi.Void> pUserData)>>
+      onFree;
+}
+
+final class ma_log extends ffi.Struct {
+  @ffi.Array.multi([4])
+  external ffi.Array<ma_log_callback> callbacks;
+
+  @ma_uint32()
+  external int callbackCount;
+
+  external ma_allocation_callbacks allocationCallbacks;
+
+  external ma_mutex lock;
+}
+
+final class ma_log_callback extends ffi.Struct {
+  external ma_log_callback_proc onLog;
+
+  external ffi.Pointer<ffi.Void> pUserData;
+}
+
+typedef ma_log_callback_proc = ffi.Pointer<
+    ffi.NativeFunction<
+        ffi.Void Function(ffi.Pointer<ffi.Void> pUserData, ma_uint32 level,
+            ffi.Pointer<ffi.Char> pMessage)>>;
+typedef ma_mutex = ma_handle;
+typedef ma_handle = ffi.Pointer<ffi.Void>;
+
+/// VFS
+/// ===
+///
+/// The VFS object (virtual file system) is what's used to customize file access. This is useful in cases where stdio FILE* based APIs may not be entirely
+/// appropriate for a given situation.
+typedef ma_vfs = ffi.Void;
+
+final class ma_decoding_backend_vtable extends ffi.Struct {
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<ffi.Void> pUserData,
+              ma_read_proc onRead,
+              ma_seek_proc onSeek,
+              ma_tell_proc onTell,
+              ffi.Pointer<ffi.Void> pReadSeekTellUserData,
+              ffi.Pointer<ma_decoding_backend_config> pConfig,
+              ffi.Pointer<ma_allocation_callbacks> pAllocationCallbacks,
+              ffi.Pointer<ffi.Pointer<ma_data_source>> ppBackend)>> onInit;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<ffi.Void> pUserData,
+              ffi.Pointer<ffi.Char> pFilePath,
+              ffi.Pointer<ma_decoding_backend_config> pConfig,
+              ffi.Pointer<ma_allocation_callbacks> pAllocationCallbacks,
+              ffi.Pointer<ffi.Pointer<ma_data_source>> ppBackend)>> onInitFile;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<ffi.Void> pUserData,
+              ffi.Pointer<ffi.WChar> pFilePath,
+              ffi.Pointer<ma_decoding_backend_config> pConfig,
+              ffi.Pointer<ma_allocation_callbacks> pAllocationCallbacks,
+              ffi.Pointer<ffi.Pointer<ma_data_source>> ppBackend)>> onInitFileW;
+
+  external ffi.Pointer<
+          ffi.NativeFunction<
+              ffi.Int32 Function(
+                  ffi.Pointer<ffi.Void> pUserData,
+                  ffi.Pointer<ffi.Void> pData,
+                  ffi.Size dataSize,
+                  ffi.Pointer<ma_decoding_backend_config> pConfig,
+                  ffi.Pointer<ma_allocation_callbacks> pAllocationCallbacks,
+                  ffi.Pointer<ffi.Pointer<ma_data_source>> ppBackend)>>
+      onInitMemory;
+
+  external ffi.Pointer<
+          ffi.NativeFunction<
+              ffi.Void Function(
+                  ffi.Pointer<ffi.Void> pUserData,
+                  ffi.Pointer<ma_data_source> pBackend,
+                  ffi.Pointer<ma_allocation_callbacks> pAllocationCallbacks)>>
+      onUninit;
+}
+
+typedef ma_read_proc = ffi.Pointer<
+    ffi.NativeFunction<
+        ffi.Int32 Function(
+            ffi.Pointer<ffi.Void> pUserData,
+            ffi.Pointer<ffi.Void> pBufferOut,
+            ffi.Size bytesToRead,
+            ffi.Pointer<ffi.Size> pBytesRead)>>;
+typedef ma_seek_proc = ffi.Pointer<
+    ffi.NativeFunction<
+        ffi.Int32 Function(ffi.Pointer<ffi.Void> pUserData, ma_int64 offset,
+            ffi.Int32 origin)>>;
+typedef ma_int64 = ffi.LongLong;
+
+abstract class ma_seek_origin {
+  static const int ma_seek_origin_start = 0;
+  static const int ma_seek_origin_current = 1;
+  static const int ma_seek_origin_end = 2;
+}
+
+typedef ma_tell_proc = ffi.Pointer<
+    ffi.NativeFunction<
+        ffi.Int32 Function(
+            ffi.Pointer<ffi.Void> pUserData, ffi.Pointer<ma_int64> pCursor)>>;
+
+final class ma_decoding_backend_config extends ffi.Struct {
+  @ffi.Int32()
+  external int preferredFormat;
+
+  @ma_uint32()
+  external int seekPointCount;
+}
+
+/// Data Source
+typedef ma_data_source = ffi.Void;
+
+final class ma_resource_manager_data_buffer_node extends ffi.Struct {
+  @ma_uint32()
+  external int hashedName32;
+
+  @ma_uint32()
+  external int refCount;
+
+  @ffi.Int32()
+  external int result;
+
+  @ma_uint32()
+  external int executionCounter;
+
+  @ma_uint32()
+  external int executionPointer;
+
+  @ma_bool32()
+  external int isDataOwnedByResourceManager;
+
+  external ma_resource_manager_data_supply data;
+
+  external ffi.Pointer<ma_resource_manager_data_buffer_node> pParent;
+
+  external ffi.Pointer<ma_resource_manager_data_buffer_node> pChildLo;
+
+  external ffi.Pointer<ma_resource_manager_data_buffer_node> pChildHi;
+}
+
+final class ma_resource_manager_data_supply extends ffi.Struct {
+  @ffi.Int32()
+  external int type;
+
+  external UnnamedUnion1 backend;
+}
+
+abstract class ma_resource_manager_data_supply_type {
+  static const int ma_resource_manager_data_supply_type_unknown = 0;
+  static const int ma_resource_manager_data_supply_type_encoded = 1;
+  static const int ma_resource_manager_data_supply_type_decoded = 2;
+  static const int ma_resource_manager_data_supply_type_decoded_paged = 3;
+}
+
+final class UnnamedUnion1 extends ffi.Union {
+  external UnnamedStruct1 encoded;
+
+  external UnnamedStruct2 decoded;
+
+  external UnnamedStruct3 decodedPaged;
+}
+
+final class UnnamedStruct1 extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> pData;
+
+  @ffi.Size()
+  external int sizeInBytes;
+}
+
+final class UnnamedStruct2 extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> pData;
+
+  @ma_uint64()
+  external int totalFrameCount;
+
+  @ma_uint64()
+  external int decodedFrameCount;
+
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  @ma_uint32()
+  external int sampleRate;
+}
+
+final class UnnamedStruct3 extends ffi.Struct {
+  external ma_paged_audio_buffer_data data;
+
+  @ma_uint64()
+  external int decodedFrameCount;
+
+  @ma_uint32()
+  external int sampleRate;
+}
+
+final class ma_paged_audio_buffer_data extends ffi.Struct {
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  external ma_paged_audio_buffer_page head;
+
+  external ffi.Pointer<ma_paged_audio_buffer_page> pTail;
+}
+
+final class ma_paged_audio_buffer_page extends ffi.Struct {
+  external ffi.Pointer<ma_paged_audio_buffer_page> pNext;
+
+  @ma_uint64()
+  external int sizeInFrames;
+
+  @ffi.Array.multi([1])
+  external ffi.Array<ma_uint8> pAudioData;
+}
+
+typedef ma_thread = ma_handle;
+
+final class ma_job_queue extends ffi.Struct {
+  @ma_uint32()
+  external int flags;
+
+  @ma_uint32()
+  external int capacity;
+
+  @ma_uint64()
+  external int head;
+
+  @ma_uint64()
+  external int tail;
+
+  external ma_semaphore sem;
+
+  external ma_slot_allocator allocator;
+
+  external ffi.Pointer<ma_job> pJobs;
+
+  @ma_spinlock()
+  external int lock;
+
+  external ffi.Pointer<ffi.Void> _pHeap;
+
+  @ma_bool32()
+  external int _ownsHeap;
+}
+
+typedef ma_semaphore = ma_handle;
+
+final class ma_slot_allocator extends ffi.Struct {
+  external ffi.Pointer<ma_slot_allocator_group> pGroups;
+
+  external ffi.Pointer<ma_uint32> pSlots;
+
+  @ma_uint32()
+  external int count;
+
+  @ma_uint32()
+  external int capacity;
+
+  @ma_bool32()
+  external int _ownsHeap;
+
+  external ffi.Pointer<ffi.Void> _pHeap;
+}
+
+final class ma_slot_allocator_group extends ffi.Struct {
+  @ma_uint32()
+  external int bitfield;
+}
+
+final class ma_job extends ffi.Struct {
+  external UnnamedUnion2 toc;
+
+  @ma_uint64()
+  external int next;
+
+  @ma_uint32()
+  external int order;
+
+  external UnnamedUnion3 data;
+}
+
+final class UnnamedUnion2 extends ffi.Union {
+  external UnnamedStruct4 breakup;
+
+  @ma_uint64()
+  external int allocation;
+}
+
+final class UnnamedStruct4 extends ffi.Struct {
+  @ma_uint16()
+  external int code;
+
+  @ma_uint16()
+  external int slot;
+
+  @ma_uint32()
+  external int refcount;
+}
+
+final class UnnamedUnion3 extends ffi.Union {
+  external UnnamedStruct5 custom;
+
+  external UnnamedUnion4 resourceManager;
+
+  external UnnamedUnion5 device;
+}
+
+final class UnnamedStruct5 extends ffi.Struct {
+  external ma_job_proc proc;
+
+  @ma_uintptr()
+  external int data0;
+
+  @ma_uintptr()
+  external int data1;
+}
+
+typedef ma_job_proc = ffi
+    .Pointer<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<ma_job> pJob)>>;
+typedef ma_uintptr = ma_uint64;
+
+final class UnnamedUnion4 extends ffi.Union {
+  external UnnamedStruct6 loadDataBufferNode;
+
+  external UnnamedStruct7 freeDataBufferNode;
+
+  external UnnamedStruct8 pageDataBufferNode;
+
+  external UnnamedStruct9 loadDataBuffer;
+
+  external UnnamedStruct10 freeDataBuffer;
+
+  external UnnamedStruct11 loadDataStream;
+
+  external UnnamedStruct12 freeDataStream;
+
+  external UnnamedStruct13 pageDataStream;
+
+  external UnnamedStruct14 seekDataStream;
+}
+
+final class UnnamedStruct6 extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> pResourceManager;
+
+  external ffi.Pointer<ffi.Void> pDataBufferNode;
+
+  external ffi.Pointer<ffi.Char> pFilePath;
+
+  external ffi.Pointer<ffi.WChar> pFilePathW;
+
+  @ma_uint32()
+  external int flags;
+
+  external ffi.Pointer<ma_async_notification> pInitNotification;
+
+  external ffi.Pointer<ma_async_notification> pDoneNotification;
+
+  external ffi.Pointer<ma_fence> pInitFence;
+
+  external ffi.Pointer<ma_fence> pDoneFence;
+}
+
+typedef ma_async_notification = ffi.Void;
+
+final class ma_fence extends ffi.Struct {
+  external ma_event e;
+
+  @ma_uint32()
+  external int counter;
+}
+
+typedef ma_event = ma_handle;
+
+final class UnnamedStruct7 extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> pResourceManager;
+
+  external ffi.Pointer<ffi.Void> pDataBufferNode;
+
+  external ffi.Pointer<ma_async_notification> pDoneNotification;
+
+  external ffi.Pointer<ma_fence> pDoneFence;
+}
+
+final class UnnamedStruct8 extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> pResourceManager;
+
+  external ffi.Pointer<ffi.Void> pDataBufferNode;
+
+  external ffi.Pointer<ffi.Void> pDecoder;
+
+  external ffi.Pointer<ma_async_notification> pDoneNotification;
+
+  external ffi.Pointer<ma_fence> pDoneFence;
+}
+
+final class UnnamedStruct9 extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> pDataBuffer;
+
+  external ffi.Pointer<ma_async_notification> pInitNotification;
+
+  external ffi.Pointer<ma_async_notification> pDoneNotification;
+
+  external ffi.Pointer<ma_fence> pInitFence;
+
+  external ffi.Pointer<ma_fence> pDoneFence;
+
+  @ma_uint64()
+  external int rangeBegInPCMFrames;
+
+  @ma_uint64()
+  external int rangeEndInPCMFrames;
+
+  @ma_uint64()
+  external int loopPointBegInPCMFrames;
+
+  @ma_uint64()
+  external int loopPointEndInPCMFrames;
+
+  @ma_uint32()
+  external int isLooping;
+}
+
+final class UnnamedStruct10 extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> pDataBuffer;
+
+  external ffi.Pointer<ma_async_notification> pDoneNotification;
+
+  external ffi.Pointer<ma_fence> pDoneFence;
+}
+
+final class UnnamedStruct11 extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> pDataStream;
+
+  external ffi.Pointer<ffi.Char> pFilePath;
+
+  external ffi.Pointer<ffi.WChar> pFilePathW;
+
+  @ma_uint64()
+  external int initialSeekPoint;
+
+  external ffi.Pointer<ma_async_notification> pInitNotification;
+
+  external ffi.Pointer<ma_fence> pInitFence;
+}
+
+final class UnnamedStruct12 extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> pDataStream;
+
+  external ffi.Pointer<ma_async_notification> pDoneNotification;
+
+  external ffi.Pointer<ma_fence> pDoneFence;
+}
+
+final class UnnamedStruct13 extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> pDataStream;
+
+  @ma_uint32()
+  external int pageIndex;
+}
+
+final class UnnamedStruct14 extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> pDataStream;
+
+  @ma_uint64()
+  external int frameIndex;
+}
+
+final class UnnamedUnion5 extends ffi.Union {
+  external UnnamedUnion6 aaudio;
+}
+
+final class UnnamedUnion6 extends ffi.Union {
+  external UnnamedStruct15 reroute;
+}
+
+final class UnnamedStruct15 extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> pDevice;
+
+  @ma_uint32()
+  external int deviceType;
+}
+
+final class ma_default_vfs extends ffi.Struct {
+  external ma_vfs_callbacks cb;
+
+  external ma_allocation_callbacks allocationCallbacks;
+}
+
+final class ma_vfs_callbacks extends ffi.Struct {
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<ma_vfs> pVFS,
+              ffi.Pointer<ffi.Char> pFilePath,
+              ma_uint32 openMode,
+              ffi.Pointer<ma_vfs_file> pFile)>> onOpen;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<ma_vfs> pVFS,
+              ffi.Pointer<ffi.WChar> pFilePath,
+              ma_uint32 openMode,
+              ffi.Pointer<ma_vfs_file> pFile)>> onOpenW;
+
+  external ffi.Pointer<
+          ffi.NativeFunction<
+              ffi.Int32 Function(ffi.Pointer<ma_vfs> pVFS, ma_vfs_file file)>>
+      onClose;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<ma_vfs> pVFS,
+              ma_vfs_file file,
+              ffi.Pointer<ffi.Void> pDst,
+              ffi.Size sizeInBytes,
+              ffi.Pointer<ffi.Size> pBytesRead)>> onRead;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<ma_vfs> pVFS,
+              ma_vfs_file file,
+              ffi.Pointer<ffi.Void> pSrc,
+              ffi.Size sizeInBytes,
+              ffi.Pointer<ffi.Size> pBytesWritten)>> onWrite;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<ma_vfs> pVFS, ma_vfs_file file,
+              ma_int64 offset, ffi.Int32 origin)>> onSeek;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<ma_vfs> pVFS, ma_vfs_file file,
+              ffi.Pointer<ma_int64> pCursor)>> onTell;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<ma_vfs> pVFS, ma_vfs_file file,
+              ffi.Pointer<ma_file_info> pInfo)>> onInfo;
+}
+
+typedef ma_vfs_file = ma_handle;
+
+final class ma_file_info extends ffi.Struct {
+  @ma_uint64()
+  external int sizeInBytes;
+}
+
+final class ma_device extends ffi.Struct {
+  external ffi.Pointer<ma_context> pContext;
+
+  @ffi.Int32()
+  external int type;
+
+  @ma_uint32()
+  external int sampleRate;
+
+  external ma_atomic_device_state state;
+
+  external ma_device_data_proc onData;
+
+  external ma_device_notification_proc onNotification;
+
+  external ma_stop_proc onStop;
+
+  external ffi.Pointer<ffi.Void> pUserData;
+
+  external ma_mutex startStopLock;
+
+  external ma_event wakeupEvent;
+
+  external ma_event startEvent;
+
+  external ma_event stopEvent;
+
+  external ma_thread thread;
+
+  @ffi.Int32()
+  external int workResult;
+
+  @ma_bool8()
+  external int isOwnerOfContext;
+
+  @ma_bool8()
+  external int noPreSilencedOutputBuffer;
+
+  @ma_bool8()
+  external int noClip;
+
+  @ma_bool8()
+  external int noDisableDenormals;
+
+  @ma_bool8()
+  external int noFixedSizedCallback;
+
+  external ma_atomic_float masterVolumeFactor;
+
+  external ma_duplex_rb duplexRB;
+
+  external UnnamedStruct43 resampling;
+
+  external UnnamedStruct45 playback;
+
+  external UnnamedStruct46 capture;
+
+  external UnnamedUnion16 unnamed;
+}
+
+final class ma_context extends ffi.Struct {
+  external ma_backend_callbacks callbacks;
+
+  @ffi.Int32()
+  external int backend;
+
+  external ffi.Pointer<ma_log> pLog;
+
+  external ma_log log;
+
+  @ffi.Int32()
+  external int threadPriority;
+
+  @ffi.Size()
+  external int threadStackSize;
+
+  external ffi.Pointer<ffi.Void> pUserData;
+
+  external ma_allocation_callbacks allocationCallbacks;
+
+  external ma_mutex deviceEnumLock;
+
+  external ma_mutex deviceInfoLock;
+
+  @ma_uint32()
+  external int deviceInfoCapacity;
+
+  @ma_uint32()
+  external int playbackDeviceInfoCount;
+
+  @ma_uint32()
+  external int captureDeviceInfoCount;
+
+  external ffi.Pointer<ma_device_info> pDeviceInfos;
+
+  external UnnamedUnion9 unnamed;
+
+  external UnnamedUnion11 unnamed1;
+}
+
+final class ma_backend_callbacks extends ffi.Struct {
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<ma_context> pContext,
+              ffi.Pointer<ma_context_config> pConfig,
+              ffi.Pointer<ma_backend_callbacks> pCallbacks)>> onContextInit;
+
+  external ffi.Pointer<
+          ffi
+          .NativeFunction<ffi.Int32 Function(ffi.Pointer<ma_context> pContext)>>
+      onContextUninit;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<ma_context> pContext,
+              ma_enum_devices_callback_proc callback,
+              ffi.Pointer<ffi.Void> pUserData)>> onContextEnumerateDevices;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<ma_context> pContext,
+              ffi.Int32 deviceType,
+              ffi.Pointer<ma_device_id> pDeviceID,
+              ffi.Pointer<ma_device_info> pDeviceInfo)>> onContextGetDeviceInfo;
+
+  external ffi.Pointer<
+          ffi.NativeFunction<
+              ffi.Int32 Function(
+                  ffi.Pointer<ma_device> pDevice,
+                  ffi.Pointer<ma_device_config> pConfig,
+                  ffi.Pointer<ma_device_descriptor> pDescriptorPlayback,
+                  ffi.Pointer<ma_device_descriptor> pDescriptorCapture)>>
+      onDeviceInit;
+
+  external ffi.Pointer<
+          ffi
+          .NativeFunction<ffi.Int32 Function(ffi.Pointer<ma_device> pDevice)>>
+      onDeviceUninit;
+
+  external ffi.Pointer<
+          ffi
+          .NativeFunction<ffi.Int32 Function(ffi.Pointer<ma_device> pDevice)>>
+      onDeviceStart;
+
+  external ffi.Pointer<
+          ffi
+          .NativeFunction<ffi.Int32 Function(ffi.Pointer<ma_device> pDevice)>>
+      onDeviceStop;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<ma_device> pDevice,
+              ffi.Pointer<ffi.Void> pFrames,
+              ma_uint32 frameCount,
+              ffi.Pointer<ma_uint32> pFramesRead)>> onDeviceRead;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<ma_device> pDevice,
+              ffi.Pointer<ffi.Void> pFrames,
+              ma_uint32 frameCount,
+              ffi.Pointer<ma_uint32> pFramesWritten)>> onDeviceWrite;
+
+  external ffi.Pointer<
+          ffi
+          .NativeFunction<ffi.Int32 Function(ffi.Pointer<ma_device> pDevice)>>
+      onDeviceDataLoop;
+
+  external ffi.Pointer<
+          ffi
+          .NativeFunction<ffi.Int32 Function(ffi.Pointer<ma_device> pDevice)>>
+      onDeviceDataLoopWakeup;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<ma_device> pDevice, ffi.Int32 type,
+              ffi.Pointer<ma_device_info> pDeviceInfo)>> onDeviceGetInfo;
+}
+
+final class ma_context_config extends ffi.Struct {
+  external ffi.Pointer<ma_log> pLog;
+
+  @ffi.Int32()
+  external int threadPriority;
+
+  @ffi.Size()
+  external int threadStackSize;
+
+  external ffi.Pointer<ffi.Void> pUserData;
+
+  external ma_allocation_callbacks allocationCallbacks;
+
+  external UnnamedStruct16 alsa;
+
+  external UnnamedStruct17 pulse;
+
+  external UnnamedStruct18 coreaudio;
+
+  external UnnamedStruct19 jack;
+
+  external ma_backend_callbacks custom;
+}
+
+abstract class ma_thread_priority {
+  static const int ma_thread_priority_idle = -5;
+  static const int ma_thread_priority_lowest = -4;
+  static const int ma_thread_priority_low = -3;
+  static const int ma_thread_priority_normal = -2;
+  static const int ma_thread_priority_high = -1;
+  static const int ma_thread_priority_highest = 0;
+  static const int ma_thread_priority_realtime = 1;
+  static const int ma_thread_priority_default = 0;
+}
+
+final class UnnamedStruct16 extends ffi.Struct {
+  @ma_bool32()
+  external int useVerboseDeviceEnumeration;
+}
+
+final class UnnamedStruct17 extends ffi.Struct {
+  external ffi.Pointer<ffi.Char> pApplicationName;
+
+  external ffi.Pointer<ffi.Char> pServerName;
+
+  @ma_bool32()
+  external int tryAutoSpawn;
+}
+
+final class UnnamedStruct18 extends ffi.Struct {
+  @ffi.Int32()
+  external int sessionCategory;
+
+  @ma_uint32()
+  external int sessionCategoryOptions;
+
+  @ma_bool32()
+  external int noAudioSessionActivate;
+
+  @ma_bool32()
+  external int noAudioSessionDeactivate;
+}
+
+abstract class ma_ios_session_category {
+  static const int ma_ios_session_category_default = 0;
+  static const int ma_ios_session_category_none = 1;
+  static const int ma_ios_session_category_ambient = 2;
+  static const int ma_ios_session_category_solo_ambient = 3;
+  static const int ma_ios_session_category_playback = 4;
+  static const int ma_ios_session_category_record = 5;
+  static const int ma_ios_session_category_play_and_record = 6;
+  static const int ma_ios_session_category_multi_route = 7;
+}
+
+final class UnnamedStruct19 extends ffi.Struct {
+  external ffi.Pointer<ffi.Char> pClientName;
+
+  @ma_bool32()
+  external int tryStartServer;
+}
+
+typedef ma_enum_devices_callback_proc = ffi.Pointer<
+    ffi.NativeFunction<
+        ma_bool32 Function(
+            ffi.Pointer<ma_context> pContext,
+            ffi.Int32 deviceType,
+            ffi.Pointer<ma_device_info> pInfo,
+            ffi.Pointer<ffi.Void> pUserData)>>;
+
+abstract class ma_device_type {
+  static const int ma_device_type_playback = 1;
+  static const int ma_device_type_capture = 2;
+  static const int ma_device_type_duplex = 3;
+  static const int ma_device_type_loopback = 4;
+}
+
+final class ma_device_info extends ffi.Struct {
+  external ma_device_id id;
+
+  @ffi.Array.multi([256])
+  external ffi.Array<ffi.Char> name;
+
+  @ma_bool32()
+  external int isDefault;
+
+  @ma_uint32()
+  external int nativeDataFormatCount;
+
+  @ffi.Array.multi([64])
+  external ffi.Array<UnnamedStruct20> nativeDataFormats;
+}
+
+final class ma_device_id extends ffi.Union {
+  @ffi.Array.multi([64])
+  external ffi.Array<ma_wchar_win32> wasapi;
+
+  @ffi.Array.multi([16])
+  external ffi.Array<ma_uint8> dsound;
+
+  @ma_uint32()
+  external int winmm;
+
+  @ffi.Array.multi([256])
+  external ffi.Array<ffi.Char> alsa;
+
+  @ffi.Array.multi([256])
+  external ffi.Array<ffi.Char> pulse;
+
+  @ffi.Int()
+  external int jack;
+
+  @ffi.Array.multi([256])
+  external ffi.Array<ffi.Char> coreaudio;
+
+  @ffi.Array.multi([256])
+  external ffi.Array<ffi.Char> sndio;
+
+  @ffi.Array.multi([256])
+  external ffi.Array<ffi.Char> audio4;
+
+  @ffi.Array.multi([64])
+  external ffi.Array<ffi.Char> oss;
+
+  @ma_int32()
+  external int aaudio;
+
+  @ma_uint32()
+  external int opensl;
+
+  @ffi.Array.multi([32])
+  external ffi.Array<ffi.Char> webaudio;
+
+  external UnnamedUnion7 custom;
+
+  @ffi.Int()
+  external int nullbackend;
+}
+
+typedef ma_wchar_win32 = ffi.WChar;
+typedef ma_int32 = ffi.Int;
+
+final class UnnamedUnion7 extends ffi.Union {
+  @ffi.Int()
+  external int i;
+
+  @ffi.Array.multi([256])
+  external ffi.Array<ffi.Char> s;
+
+  external ffi.Pointer<ffi.Void> p;
+}
+
+final class UnnamedStruct20 extends ffi.Struct {
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  @ma_uint32()
+  external int sampleRate;
+
+  @ma_uint32()
+  external int flags;
+}
+
+final class ma_device_config extends ffi.Struct {
+  @ffi.Int32()
+  external int deviceType;
+
+  @ma_uint32()
+  external int sampleRate;
+
+  @ma_uint32()
+  external int periodSizeInFrames;
+
+  @ma_uint32()
+  external int periodSizeInMilliseconds;
+
+  @ma_uint32()
+  external int periods;
+
+  @ffi.Int32()
+  external int performanceProfile;
+
+  @ma_bool8()
+  external int noPreSilencedOutputBuffer;
+
+  @ma_bool8()
+  external int noClip;
+
+  @ma_bool8()
+  external int noDisableDenormals;
+
+  @ma_bool8()
+  external int noFixedSizedCallback;
+
+  external ma_device_data_proc dataCallback;
+
+  external ma_device_notification_proc notificationCallback;
+
+  external ma_stop_proc stopCallback;
+
+  external ffi.Pointer<ffi.Void> pUserData;
+
+  external ma_resampler_config resampling;
+
+  external UnnamedStruct26 playback;
+
+  external UnnamedStruct27 capture;
+
+  external UnnamedStruct28 wasapi;
+
+  external UnnamedStruct29 alsa;
+
+  external UnnamedStruct30 pulse;
+
+  external UnnamedStruct31 coreaudio;
+
+  external UnnamedStruct32 opensl;
+
+  external UnnamedStruct33 aaudio;
+}
+
+abstract class ma_performance_profile {
+  static const int ma_performance_profile_low_latency = 0;
+  static const int ma_performance_profile_conservative = 1;
+}
+
+typedef ma_bool8 = ma_uint8;
+typedef ma_device_data_proc = ffi.Pointer<
+    ffi.NativeFunction<
+        ffi.Void Function(
+            ffi.Pointer<ma_device> pDevice,
+            ffi.Pointer<ffi.Void> pOutput,
+            ffi.Pointer<ffi.Void> pInput,
+            ma_uint32 frameCount)>>;
+typedef ma_device_notification_proc = ffi.Pointer<
+    ffi.NativeFunction<
+        ffi.Void Function(ffi.Pointer<ma_device_notification> pNotification)>>;
+
+final class ma_device_notification extends ffi.Struct {
+  external ffi.Pointer<ma_device> pDevice;
+
+  @ffi.Int32()
+  external int type;
+
+  external UnnamedUnion8 data;
+}
+
+abstract class ma_device_notification_type {
+  static const int ma_device_notification_type_started = 0;
+  static const int ma_device_notification_type_stopped = 1;
+  static const int ma_device_notification_type_rerouted = 2;
+  static const int ma_device_notification_type_interruption_began = 3;
+  static const int ma_device_notification_type_interruption_ended = 4;
+  static const int ma_device_notification_type_unlocked = 5;
+}
+
+final class UnnamedUnion8 extends ffi.Union {
+  external UnnamedStruct21 started;
+
+  external UnnamedStruct22 stopped;
+
+  external UnnamedStruct23 rerouted;
+
+  external UnnamedStruct24 interruption;
+}
+
+final class UnnamedStruct21 extends ffi.Struct {
+  @ffi.Int()
+  external int _unused;
+}
+
+final class UnnamedStruct22 extends ffi.Struct {
+  @ffi.Int()
+  external int _unused;
+}
+
+final class UnnamedStruct23 extends ffi.Struct {
+  @ffi.Int()
+  external int _unused;
+}
+
+final class UnnamedStruct24 extends ffi.Struct {
+  @ffi.Int()
+  external int _unused;
+}
+
+typedef ma_stop_proc = ffi.Pointer<
+    ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ma_device> pDevice)>>;
+
+final class ma_resampler_config extends ffi.Struct {
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  @ma_uint32()
+  external int sampleRateIn;
+
+  @ma_uint32()
+  external int sampleRateOut;
+
+  @ffi.Int32()
+  external int algorithm;
+
+  external ffi.Pointer<ma_resampling_backend_vtable> pBackendVTable;
+
+  external ffi.Pointer<ffi.Void> pBackendUserData;
+
+  external UnnamedStruct25 linear;
+}
+
+abstract class ma_resample_algorithm {
+  static const int ma_resample_algorithm_linear = 0;
+  static const int ma_resample_algorithm_custom = 1;
+}
+
+final class ma_resampling_backend_vtable extends ffi.Struct {
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<ffi.Void> pUserData,
+              ffi.Pointer<ma_resampler_config> pConfig,
+              ffi.Pointer<ffi.Size> pHeapSizeInBytes)>> onGetHeapSize;
+
+  external ffi.Pointer<
+          ffi.NativeFunction<
+              ffi.Int32 Function(
+                  ffi.Pointer<ffi.Void> pUserData,
+                  ffi.Pointer<ma_resampler_config> pConfig,
+                  ffi.Pointer<ffi.Void> pHeap,
+                  ffi.Pointer<ffi.Pointer<ma_resampling_backend>> ppBackend)>>
+      onInit;
+
+  external ffi.Pointer<
+          ffi.NativeFunction<
+              ffi.Void Function(
+                  ffi.Pointer<ffi.Void> pUserData,
+                  ffi.Pointer<ma_resampling_backend> pBackend,
+                  ffi.Pointer<ma_allocation_callbacks> pAllocationCallbacks)>>
+      onUninit;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<ffi.Void> pUserData,
+              ffi.Pointer<ma_resampling_backend> pBackend,
+              ffi.Pointer<ffi.Void> pFramesIn,
+              ffi.Pointer<ma_uint64> pFrameCountIn,
+              ffi.Pointer<ffi.Void> pFramesOut,
+              ffi.Pointer<ma_uint64> pFrameCountOut)>> onProcess;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<ffi.Void> pUserData,
+              ffi.Pointer<ma_resampling_backend> pBackend,
+              ma_uint32 sampleRateIn,
+              ma_uint32 sampleRateOut)>> onSetRate;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ma_uint64 Function(ffi.Pointer<ffi.Void> pUserData,
+              ffi.Pointer<ma_resampling_backend> pBackend)>> onGetInputLatency;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ma_uint64 Function(ffi.Pointer<ffi.Void> pUserData,
+              ffi.Pointer<ma_resampling_backend> pBackend)>> onGetOutputLatency;
+
+  external ffi.Pointer<
+          ffi.NativeFunction<
+              ffi.Int32 Function(
+                  ffi.Pointer<ffi.Void> pUserData,
+                  ffi.Pointer<ma_resampling_backend> pBackend,
+                  ma_uint64 outputFrameCount,
+                  ffi.Pointer<ma_uint64> pInputFrameCount)>>
+      onGetRequiredInputFrameCount;
+
+  external ffi.Pointer<
+          ffi.NativeFunction<
+              ffi.Int32 Function(
+                  ffi.Pointer<ffi.Void> pUserData,
+                  ffi.Pointer<ma_resampling_backend> pBackend,
+                  ma_uint64 inputFrameCount,
+                  ffi.Pointer<ma_uint64> pOutputFrameCount)>>
+      onGetExpectedOutputFrameCount;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<ffi.Void> pUserData,
+              ffi.Pointer<ma_resampling_backend> pBackend)>> onReset;
+}
+
+typedef ma_resampling_backend = ffi.Void;
+
+final class UnnamedStruct25 extends ffi.Struct {
+  @ma_uint32()
+  external int lpfOrder;
+}
+
+final class UnnamedStruct26 extends ffi.Struct {
+  external ffi.Pointer<ma_device_id> pDeviceID;
+
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  external ffi.Pointer<ma_channel> pChannelMap;
+
+  @ffi.Int32()
+  external int channelMixMode;
+
+  @ma_bool32()
+  external int calculateLFEFromSpatialChannels;
+
+  @ffi.Int32()
+  external int shareMode;
+}
+
+typedef ma_channel = ma_uint8;
+
+abstract class ma_channel_mix_mode {
+  static const int ma_channel_mix_mode_rectangular = 0;
+  static const int ma_channel_mix_mode_simple = 1;
+  static const int ma_channel_mix_mode_custom_weights = 2;
+  static const int ma_channel_mix_mode_default = 0;
+}
+
+abstract class ma_share_mode {
+  static const int ma_share_mode_shared = 0;
+  static const int ma_share_mode_exclusive = 1;
+}
+
+final class UnnamedStruct27 extends ffi.Struct {
+  external ffi.Pointer<ma_device_id> pDeviceID;
+
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  external ffi.Pointer<ma_channel> pChannelMap;
+
+  @ffi.Int32()
+  external int channelMixMode;
+
+  @ma_bool32()
+  external int calculateLFEFromSpatialChannels;
+
+  @ffi.Int32()
+  external int shareMode;
+}
+
+final class UnnamedStruct28 extends ffi.Struct {
+  @ffi.Int32()
+  external int usage;
+
+  @ma_bool8()
+  external int noAutoConvertSRC;
+
+  @ma_bool8()
+  external int noDefaultQualitySRC;
+
+  @ma_bool8()
+  external int noAutoStreamRouting;
+
+  @ma_bool8()
+  external int noHardwareOffloading;
+
+  @ma_uint32()
+  external int loopbackProcessID;
+
+  @ma_bool8()
+  external int loopbackProcessExclude;
+}
+
+abstract class ma_wasapi_usage {
+  static const int ma_wasapi_usage_default = 0;
+  static const int ma_wasapi_usage_games = 1;
+  static const int ma_wasapi_usage_pro_audio = 2;
+}
+
+final class UnnamedStruct29 extends ffi.Struct {
+  @ma_bool32()
+  external int noMMap;
+
+  @ma_bool32()
+  external int noAutoFormat;
+
+  @ma_bool32()
+  external int noAutoChannels;
+
+  @ma_bool32()
+  external int noAutoResample;
+}
+
+final class UnnamedStruct30 extends ffi.Struct {
+  external ffi.Pointer<ffi.Char> pStreamNamePlayback;
+
+  external ffi.Pointer<ffi.Char> pStreamNameCapture;
+}
+
+final class UnnamedStruct31 extends ffi.Struct {
+  @ma_bool32()
+  external int allowNominalSampleRateChange;
+}
+
+final class UnnamedStruct32 extends ffi.Struct {
+  @ffi.Int32()
+  external int streamType;
+
+  @ffi.Int32()
+  external int recordingPreset;
+
+  @ma_bool32()
+  external int enableCompatibilityWorkarounds;
+}
+
+abstract class ma_opensl_stream_type {
+  static const int ma_opensl_stream_type_default = 0;
+  static const int ma_opensl_stream_type_voice = 1;
+  static const int ma_opensl_stream_type_system = 2;
+  static const int ma_opensl_stream_type_ring = 3;
+  static const int ma_opensl_stream_type_media = 4;
+  static const int ma_opensl_stream_type_alarm = 5;
+  static const int ma_opensl_stream_type_notification = 6;
+}
+
+abstract class ma_opensl_recording_preset {
+  static const int ma_opensl_recording_preset_default = 0;
+  static const int ma_opensl_recording_preset_generic = 1;
+  static const int ma_opensl_recording_preset_camcorder = 2;
+  static const int ma_opensl_recording_preset_voice_recognition = 3;
+  static const int ma_opensl_recording_preset_voice_communication = 4;
+  static const int ma_opensl_recording_preset_voice_unprocessed = 5;
+}
+
+final class UnnamedStruct33 extends ffi.Struct {
+  @ffi.Int32()
+  external int usage;
+
+  @ffi.Int32()
+  external int contentType;
+
+  @ffi.Int32()
+  external int inputPreset;
+
+  @ffi.Int32()
+  external int allowedCapturePolicy;
+
+  @ma_bool32()
+  external int noAutoStartAfterReroute;
+
+  @ma_bool32()
+  external int enableCompatibilityWorkarounds;
+}
+
+abstract class ma_aaudio_usage {
+  static const int ma_aaudio_usage_default = 0;
+  static const int ma_aaudio_usage_media = 1;
+  static const int ma_aaudio_usage_voice_communication = 2;
+  static const int ma_aaudio_usage_voice_communication_signalling = 3;
+  static const int ma_aaudio_usage_alarm = 4;
+  static const int ma_aaudio_usage_notification = 5;
+  static const int ma_aaudio_usage_notification_ringtone = 6;
+  static const int ma_aaudio_usage_notification_event = 7;
+  static const int ma_aaudio_usage_assistance_accessibility = 8;
+  static const int ma_aaudio_usage_assistance_navigation_guidance = 9;
+  static const int ma_aaudio_usage_assistance_sonification = 10;
+  static const int ma_aaudio_usage_game = 11;
+  static const int ma_aaudio_usage_assitant = 12;
+  static const int ma_aaudio_usage_emergency = 13;
+  static const int ma_aaudio_usage_safety = 14;
+  static const int ma_aaudio_usage_vehicle_status = 15;
+  static const int ma_aaudio_usage_announcement = 16;
+}
+
+abstract class ma_aaudio_content_type {
+  static const int ma_aaudio_content_type_default = 0;
+  static const int ma_aaudio_content_type_speech = 1;
+  static const int ma_aaudio_content_type_music = 2;
+  static const int ma_aaudio_content_type_movie = 3;
+  static const int ma_aaudio_content_type_sonification = 4;
+}
+
+abstract class ma_aaudio_input_preset {
+  static const int ma_aaudio_input_preset_default = 0;
+  static const int ma_aaudio_input_preset_generic = 1;
+  static const int ma_aaudio_input_preset_camcorder = 2;
+  static const int ma_aaudio_input_preset_voice_recognition = 3;
+  static const int ma_aaudio_input_preset_voice_communication = 4;
+  static const int ma_aaudio_input_preset_unprocessed = 5;
+  static const int ma_aaudio_input_preset_voice_performance = 6;
+}
+
+abstract class ma_aaudio_allowed_capture_policy {
+  static const int ma_aaudio_allow_capture_default = 0;
+  static const int ma_aaudio_allow_capture_by_all = 1;
+  static const int ma_aaudio_allow_capture_by_system = 2;
+  static const int ma_aaudio_allow_capture_by_none = 3;
+}
+
+final class ma_device_descriptor extends ffi.Struct {
+  external ffi.Pointer<ma_device_id> pDeviceID;
+
+  @ffi.Int32()
+  external int shareMode;
+
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  @ma_uint32()
+  external int sampleRate;
+
+  @ffi.Array.multi([254])
+  external ffi.Array<ma_channel> channelMap;
+
+  @ma_uint32()
+  external int periodSizeInFrames;
+
+  @ma_uint32()
+  external int periodSizeInMilliseconds;
+
+  @ma_uint32()
+  external int periodCount;
+}
+
+abstract class ma_backend {
+  static const int ma_backend_wasapi = 0;
+  static const int ma_backend_dsound = 1;
+  static const int ma_backend_winmm = 2;
+  static const int ma_backend_coreaudio = 3;
+  static const int ma_backend_sndio = 4;
+  static const int ma_backend_audio4 = 5;
+  static const int ma_backend_oss = 6;
+  static const int ma_backend_pulseaudio = 7;
+  static const int ma_backend_alsa = 8;
+  static const int ma_backend_jack = 9;
+  static const int ma_backend_aaudio = 10;
+  static const int ma_backend_opensl = 11;
+  static const int ma_backend_webaudio = 12;
+  static const int ma_backend_custom = 13;
+  static const int ma_backend_null = 14;
+}
+
+final class UnnamedUnion9 extends ffi.Union {
+  external UnnamedStruct34 wasapi;
+
+  external UnnamedStruct38 dsound;
+
+  external UnnamedStruct39 winmm;
+
+  external UnnamedStruct40 jack;
+
+  external UnnamedStruct41 null_backend;
+}
+
+final class UnnamedStruct34 extends ffi.Struct {
+  external ma_thread commandThread;
+
+  external ma_mutex commandLock;
+
+  external ma_semaphore commandSem;
+
+  @ma_uint32()
+  external int commandIndex;
+
+  @ma_uint32()
+  external int commandCount;
+
+  @ffi.Array.multi([4])
+  external ffi.Array<ma_context_command__wasapi> commands;
+
+  external ma_handle hAvrt;
+
+  external ma_proc AvSetMmThreadCharacteristicsA;
+
+  external ma_proc AvRevertMmThreadcharacteristics;
+
+  external ma_handle hMMDevapi;
+
+  external ma_proc ActivateAudioInterfaceAsync;
+}
+
+final class ma_context_command__wasapi extends ffi.Struct {
+  @ffi.Int()
+  external int code;
+
+  external ffi.Pointer<ma_event> pEvent;
+
+  external UnnamedUnion10 data;
+}
+
+final class UnnamedUnion10 extends ffi.Union {
+  external UnnamedStruct35 quit;
+
+  external UnnamedStruct36 createAudioClient;
+
+  external UnnamedStruct37 releaseAudioClient;
+}
+
+final class UnnamedStruct35 extends ffi.Struct {
+  @ffi.Int()
+  external int _unused;
+}
+
+final class UnnamedStruct36 extends ffi.Struct {
+  @ffi.Int32()
+  external int deviceType;
+
+  external ffi.Pointer<ffi.Void> pAudioClient;
+
+  external ffi.Pointer<ffi.Pointer<ffi.Void>> ppAudioClientService;
+
+  external ffi.Pointer<ffi.Int32> pResult;
+}
+
+final class UnnamedStruct37 extends ffi.Struct {
+  external ffi.Pointer<ma_device> pDevice;
+
+  @ffi.Int32()
+  external int deviceType;
+}
+
+typedef ma_proc = ffi.Pointer<ffi.Void>;
+
+final class UnnamedStruct38 extends ffi.Struct {
+  external ma_handle hDSoundDLL;
+
+  external ma_proc DirectSoundCreate;
+
+  external ma_proc DirectSoundEnumerateA;
+
+  external ma_proc DirectSoundCaptureCreate;
+
+  external ma_proc DirectSoundCaptureEnumerateA;
+}
+
+final class UnnamedStruct39 extends ffi.Struct {
+  external ma_handle hWinMM;
+
+  external ma_proc waveOutGetNumDevs;
+
+  external ma_proc waveOutGetDevCapsA;
+
+  external ma_proc waveOutOpen;
+
+  external ma_proc waveOutClose;
+
+  external ma_proc waveOutPrepareHeader;
+
+  external ma_proc waveOutUnprepareHeader;
+
+  external ma_proc waveOutWrite;
+
+  external ma_proc waveOutReset;
+
+  external ma_proc waveInGetNumDevs;
+
+  external ma_proc waveInGetDevCapsA;
+
+  external ma_proc waveInOpen;
+
+  external ma_proc waveInClose;
+
+  external ma_proc waveInPrepareHeader;
+
+  external ma_proc waveInUnprepareHeader;
+
+  external ma_proc waveInAddBuffer;
+
+  external ma_proc waveInStart;
+
+  external ma_proc waveInReset;
+}
+
+final class UnnamedStruct40 extends ffi.Struct {
+  external ma_handle jackSO;
+
+  external ma_proc jack_client_open;
+
+  external ma_proc jack_client_close;
+
+  external ma_proc jack_client_name_size;
+
+  external ma_proc jack_set_process_callback;
+
+  external ma_proc jack_set_buffer_size_callback;
+
+  external ma_proc jack_on_shutdown;
+
+  external ma_proc jack_get_sample_rate;
+
+  external ma_proc jack_get_buffer_size;
+
+  external ma_proc jack_get_ports;
+
+  external ma_proc jack_activate;
+
+  external ma_proc jack_deactivate;
+
+  external ma_proc jack_connect;
+
+  external ma_proc jack_port_register;
+
+  external ma_proc jack_port_name;
+
+  external ma_proc jack_port_get_buffer;
+
+  external ma_proc jack_free;
+
+  external ffi.Pointer<ffi.Char> pClientName;
+
+  @ma_bool32()
+  external int tryStartServer;
+}
+
+final class UnnamedStruct41 extends ffi.Struct {
+  @ffi.Int()
+  external int _unused;
+}
+
+final class UnnamedUnion11 extends ffi.Union {
+  external UnnamedStruct42 win32;
+
+  @ffi.Int()
+  external int _unused;
+}
+
+final class UnnamedStruct42 extends ffi.Struct {
+  external ma_handle hOle32DLL;
+
+  external ma_proc CoInitialize;
+
+  external ma_proc CoInitializeEx;
+
+  external ma_proc CoUninitialize;
+
+  external ma_proc CoCreateInstance;
+
+  external ma_proc CoTaskMemFree;
+
+  external ma_proc PropVariantClear;
+
+  external ma_proc StringFromGUID2;
+
+  external ma_handle hUser32DLL;
+
+  external ma_proc GetForegroundWindow;
+
+  external ma_proc GetDesktopWindow;
+
+  external ma_handle hAdvapi32DLL;
+
+  external ma_proc RegOpenKeyExA;
+
+  external ma_proc RegCloseKey;
+
+  external ma_proc RegQueryValueExA;
+
+  @ffi.Long()
+  external int CoInitializeResult;
+}
+
+final class ma_atomic_device_state extends ffi.Struct {
+  @ffi.Int32()
+  external int value;
+}
+
+abstract class ma_device_state {
+  static const int ma_device_state_uninitialized = 0;
+  static const int ma_device_state_stopped = 1;
+  static const int ma_device_state_started = 2;
+  static const int ma_device_state_starting = 3;
+  static const int ma_device_state_stopping = 4;
+}
+
+final class ma_atomic_float extends ffi.Struct {
+  @ma_float()
+  external double value;
+}
+
+typedef ma_float = ffi.Float;
+
+final class ma_duplex_rb extends ffi.Struct {
+  external ma_pcm_rb rb;
+}
+
+final class ma_pcm_rb extends ffi.Struct {
+  external ma_data_source_base ds;
+
+  external ma_rb rb;
+
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  @ma_uint32()
+  external int sampleRate;
+}
+
+final class ma_data_source_base extends ffi.Struct {
+  external ffi.Pointer<ma_data_source_vtable> vtable;
+
+  @ma_uint64()
+  external int rangeBegInFrames;
+
+  @ma_uint64()
+  external int rangeEndInFrames;
+
+  @ma_uint64()
+  external int loopBegInFrames;
+
+  @ma_uint64()
+  external int loopEndInFrames;
+
+  external ffi.Pointer<ma_data_source> pCurrent;
+
+  external ffi.Pointer<ma_data_source> pNext;
+
+  external ma_data_source_get_next_proc onGetNext;
+
+  @ma_bool32()
+  external int isLooping;
+}
+
+final class ma_data_source_vtable extends ffi.Struct {
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<ma_data_source> pDataSource,
+              ffi.Pointer<ffi.Void> pFramesOut,
+              ma_uint64 frameCount,
+              ffi.Pointer<ma_uint64> pFramesRead)>> onRead;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<ma_data_source> pDataSource,
+              ma_uint64 frameIndex)>> onSeek;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<ma_data_source> pDataSource,
+              ffi.Pointer<ffi.Int32> pFormat,
+              ffi.Pointer<ma_uint32> pChannels,
+              ffi.Pointer<ma_uint32> pSampleRate,
+              ffi.Pointer<ma_channel> pChannelMap,
+              ffi.Size channelMapCap)>> onGetDataFormat;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<ma_data_source> pDataSource,
+              ffi.Pointer<ma_uint64> pCursor)>> onGetCursor;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<ma_data_source> pDataSource,
+              ffi.Pointer<ma_uint64> pLength)>> onGetLength;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<ma_data_source> pDataSource,
+              ma_bool32 isLooping)>> onSetLooping;
+
+  @ma_uint32()
+  external int flags;
+}
+
+typedef ma_data_source_get_next_proc = ffi.Pointer<
+    ffi.NativeFunction<
+        ffi.Pointer<ma_data_source> Function(
+            ffi.Pointer<ma_data_source> pDataSource)>>;
+
+/// Ring Buffer
+final class ma_rb extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> pBuffer;
+
+  @ma_uint32()
+  external int subbufferSizeInBytes;
+
+  @ma_uint32()
+  external int subbufferCount;
+
+  @ma_uint32()
+  external int subbufferStrideInBytes;
+
+  @ma_uint32()
+  external int encodedReadOffset;
+
+  @ma_uint32()
+  external int encodedWriteOffset;
+
+  @ma_bool8()
+  external int ownsBuffer;
+
+  @ma_bool8()
+  external int clearOnWriteAcquire;
+
+  external ma_allocation_callbacks allocationCallbacks;
+}
+
+final class UnnamedStruct43 extends ffi.Struct {
+  @ffi.Int32()
+  external int algorithm;
+
+  external ffi.Pointer<ma_resampling_backend_vtable> pBackendVTable;
+
+  external ffi.Pointer<ffi.Void> pBackendUserData;
+
+  external UnnamedStruct44 linear;
+}
+
+final class UnnamedStruct44 extends ffi.Struct {
+  @ma_uint32()
+  external int lpfOrder;
+}
+
+final class UnnamedStruct45 extends ffi.Struct {
+  external ffi.Pointer<ma_device_id> pID;
+
+  external ma_device_id id;
+
+  @ffi.Array.multi([256])
+  external ffi.Array<ffi.Char> name;
+
+  @ffi.Int32()
+  external int shareMode;
+
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  @ffi.Array.multi([254])
+  external ffi.Array<ma_channel> channelMap;
+
+  @ffi.Int32()
+  external int internalFormat;
+
+  @ma_uint32()
+  external int internalChannels;
+
+  @ma_uint32()
+  external int internalSampleRate;
+
+  @ffi.Array.multi([254])
+  external ffi.Array<ma_channel> internalChannelMap;
+
+  @ma_uint32()
+  external int internalPeriodSizeInFrames;
+
+  @ma_uint32()
+  external int internalPeriods;
+
+  @ffi.Int32()
+  external int channelMixMode;
+
+  @ma_bool32()
+  external int calculateLFEFromSpatialChannels;
+
+  external ma_data_converter converter;
+
+  external ffi.Pointer<ffi.Void> pIntermediaryBuffer;
+
+  @ma_uint32()
+  external int intermediaryBufferCap;
+
+  @ma_uint32()
+  external int intermediaryBufferLen;
+
+  external ffi.Pointer<ffi.Void> pInputCache;
+
+  @ma_uint64()
+  external int inputCacheCap;
+
+  @ma_uint64()
+  external int inputCacheConsumed;
+
+  @ma_uint64()
+  external int inputCacheRemaining;
+}
+
+final class ma_data_converter extends ffi.Struct {
+  @ffi.Int32()
+  external int formatIn;
+
+  @ffi.Int32()
+  external int formatOut;
+
+  @ma_uint32()
+  external int channelsIn;
+
+  @ma_uint32()
+  external int channelsOut;
+
+  @ma_uint32()
+  external int sampleRateIn;
+
+  @ma_uint32()
+  external int sampleRateOut;
+
+  @ffi.Int32()
+  external int ditherMode;
+
+  @ffi.Int32()
+  external int executionPath;
+
+  external ma_channel_converter channelConverter;
+
+  external ma_resampler resampler;
+
+  @ma_bool8()
+  external int hasPreFormatConversion;
+
+  @ma_bool8()
+  external int hasPostFormatConversion;
+
+  @ma_bool8()
+  external int hasChannelConverter;
+
+  @ma_bool8()
+  external int hasResampler;
+
+  @ma_bool8()
+  external int isPassthrough;
+
+  @ma_bool8()
+  external int _ownsHeap;
+
+  external ffi.Pointer<ffi.Void> _pHeap;
+}
+
+abstract class ma_dither_mode {
+  static const int ma_dither_mode_none = 0;
+  static const int ma_dither_mode_rectangle = 1;
+  static const int ma_dither_mode_triangle = 2;
+}
+
+abstract class ma_data_converter_execution_path {
+  static const int ma_data_converter_execution_path_passthrough = 0;
+  static const int ma_data_converter_execution_path_format_only = 1;
+  static const int ma_data_converter_execution_path_channels_only = 2;
+  static const int ma_data_converter_execution_path_resample_only = 3;
+  static const int ma_data_converter_execution_path_resample_first = 4;
+  static const int ma_data_converter_execution_path_channels_first = 5;
+}
+
+final class ma_channel_converter extends ffi.Struct {
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channelsIn;
+
+  @ma_uint32()
+  external int channelsOut;
+
+  @ffi.Int32()
+  external int mixingMode;
+
+  @ffi.Int32()
+  external int conversionPath;
+
+  external ffi.Pointer<ma_channel> pChannelMapIn;
+
+  external ffi.Pointer<ma_channel> pChannelMapOut;
+
+  external ffi.Pointer<ma_uint8> pShuffleTable;
+
+  external UnnamedUnion12 weights;
+
+  external ffi.Pointer<ffi.Void> _pHeap;
+
+  @ma_bool32()
+  external int _ownsHeap;
+}
+
+/// Channel Conversion
+abstract class ma_channel_conversion_path {
+  static const int ma_channel_conversion_path_unknown = 0;
+  static const int ma_channel_conversion_path_passthrough = 1;
+  static const int ma_channel_conversion_path_mono_out = 2;
+  static const int ma_channel_conversion_path_mono_in = 3;
+  static const int ma_channel_conversion_path_shuffle = 4;
+  static const int ma_channel_conversion_path_weights = 5;
+}
+
+final class UnnamedUnion12 extends ffi.Union {
+  external ffi.Pointer<ffi.Pointer<ffi.Float>> f32;
+
+  external ffi.Pointer<ffi.Pointer<ma_int32>> s16;
+}
+
+final class ma_resampler extends ffi.Struct {
+  external ffi.Pointer<ma_resampling_backend> pBackend;
+
+  external ffi.Pointer<ma_resampling_backend_vtable> pBackendVTable;
+
+  external ffi.Pointer<ffi.Void> pBackendUserData;
+
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  @ma_uint32()
+  external int sampleRateIn;
+
+  @ma_uint32()
+  external int sampleRateOut;
+
+  external UnnamedUnion13 state;
+
+  external ffi.Pointer<ffi.Void> _pHeap;
+
+  @ma_bool32()
+  external int _ownsHeap;
+}
+
+final class UnnamedUnion13 extends ffi.Union {
+  external ma_linear_resampler linear;
+}
+
+final class ma_linear_resampler extends ffi.Struct {
+  external ma_linear_resampler_config config;
+
+  @ma_uint32()
+  external int inAdvanceInt;
+
+  @ma_uint32()
+  external int inAdvanceFrac;
+
+  @ma_uint32()
+  external int inTimeInt;
+
+  @ma_uint32()
+  external int inTimeFrac;
+
+  external UnnamedUnion14 x0;
+
+  external UnnamedUnion15 x1;
+
+  external ma_lpf lpf;
+
+  external ffi.Pointer<ffi.Void> _pHeap;
+
+  @ma_bool32()
+  external int _ownsHeap;
+}
+
+/// Resampling
+final class ma_linear_resampler_config extends ffi.Struct {
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  @ma_uint32()
+  external int sampleRateIn;
+
+  @ma_uint32()
+  external int sampleRateOut;
+
+  @ma_uint32()
+  external int lpfOrder;
+
+  @ffi.Double()
+  external double lpfNyquistFactor;
+}
+
+final class UnnamedUnion14 extends ffi.Union {
+  external ffi.Pointer<ffi.Float> f32;
+
+  external ffi.Pointer<ma_int16> s16;
+}
+
+typedef ma_int16 = ffi.Short;
+
+final class UnnamedUnion15 extends ffi.Union {
+  external ffi.Pointer<ffi.Float> f32;
+
+  external ffi.Pointer<ma_int16> s16;
+}
+
+final class ma_lpf extends ffi.Struct {
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  @ma_uint32()
+  external int sampleRate;
+
+  @ma_uint32()
+  external int lpf1Count;
+
+  @ma_uint32()
+  external int lpf2Count;
+
+  external ffi.Pointer<ma_lpf1> pLPF1;
+
+  external ffi.Pointer<ma_lpf2> pLPF2;
+
+  external ffi.Pointer<ffi.Void> _pHeap;
+
+  @ma_bool32()
+  external int _ownsHeap;
+}
+
+final class ma_lpf1 extends ffi.Struct {
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  external ma_biquad_coefficient a;
+
+  external ffi.Pointer<ma_biquad_coefficient> pR1;
+
+  external ffi.Pointer<ffi.Void> _pHeap;
+
+  @ma_bool32()
+  external int _ownsHeap;
+}
+
+/// Biquad Filtering
+final class ma_biquad_coefficient extends ffi.Union {
+  @ffi.Float()
+  external double f32;
+
+  @ma_int32()
+  external int s32;
+}
+
+final class ma_lpf2 extends ffi.Struct {
+  external ma_biquad bq;
+}
+
+final class ma_biquad extends ffi.Struct {
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  external ma_biquad_coefficient b0;
+
+  external ma_biquad_coefficient b1;
+
+  external ma_biquad_coefficient b2;
+
+  external ma_biquad_coefficient a1;
+
+  external ma_biquad_coefficient a2;
+
+  external ffi.Pointer<ma_biquad_coefficient> pR1;
+
+  external ffi.Pointer<ma_biquad_coefficient> pR2;
+
+  external ffi.Pointer<ffi.Void> _pHeap;
+
+  @ma_bool32()
+  external int _ownsHeap;
+}
+
+final class UnnamedStruct46 extends ffi.Struct {
+  external ffi.Pointer<ma_device_id> pID;
+
+  external ma_device_id id;
+
+  @ffi.Array.multi([256])
+  external ffi.Array<ffi.Char> name;
+
+  @ffi.Int32()
+  external int shareMode;
+
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  @ffi.Array.multi([254])
+  external ffi.Array<ma_channel> channelMap;
+
+  @ffi.Int32()
+  external int internalFormat;
+
+  @ma_uint32()
+  external int internalChannels;
+
+  @ma_uint32()
+  external int internalSampleRate;
+
+  @ffi.Array.multi([254])
+  external ffi.Array<ma_channel> internalChannelMap;
+
+  @ma_uint32()
+  external int internalPeriodSizeInFrames;
+
+  @ma_uint32()
+  external int internalPeriods;
+
+  @ffi.Int32()
+  external int channelMixMode;
+
+  @ma_bool32()
+  external int calculateLFEFromSpatialChannels;
+
+  external ma_data_converter converter;
+
+  external ffi.Pointer<ffi.Void> pIntermediaryBuffer;
+
+  @ma_uint32()
+  external int intermediaryBufferCap;
+
+  @ma_uint32()
+  external int intermediaryBufferLen;
+}
+
+final class UnnamedUnion16 extends ffi.Union {
+  external UnnamedStruct47 wasapi;
+
+  external UnnamedStruct48 dsound;
+
+  external UnnamedStruct49 winmm;
+
+  external UnnamedStruct50 jack;
+
+  external UnnamedStruct51 null_device;
+}
+
+final class UnnamedStruct47 extends ffi.Struct {
+  external ma_ptr pAudioClientPlayback;
+
+  external ma_ptr pAudioClientCapture;
+
+  external ma_ptr pRenderClient;
+
+  external ma_ptr pCaptureClient;
+
+  external ma_ptr pDeviceEnumerator;
+
+  external ma_IMMNotificationClient notificationClient;
+
+  external ma_handle hEventPlayback;
+
+  external ma_handle hEventCapture;
+
+  @ma_uint32()
+  external int actualBufferSizeInFramesPlayback;
+
+  @ma_uint32()
+  external int actualBufferSizeInFramesCapture;
+
+  @ma_uint32()
+  external int originalPeriodSizeInFrames;
+
+  @ma_uint32()
+  external int originalPeriodSizeInMilliseconds;
+
+  @ma_uint32()
+  external int originalPeriods;
+
+  @ffi.Int32()
+  external int originalPerformanceProfile;
+
+  @ma_uint32()
+  external int periodSizeInFramesPlayback;
+
+  @ma_uint32()
+  external int periodSizeInFramesCapture;
+
+  external ffi.Pointer<ffi.Void> pMappedBufferCapture;
+
+  @ma_uint32()
+  external int mappedBufferCaptureCap;
+
+  @ma_uint32()
+  external int mappedBufferCaptureLen;
+
+  external ffi.Pointer<ffi.Void> pMappedBufferPlayback;
+
+  @ma_uint32()
+  external int mappedBufferPlaybackCap;
+
+  @ma_uint32()
+  external int mappedBufferPlaybackLen;
+
+  external ma_atomic_bool32 isStartedCapture;
+
+  external ma_atomic_bool32 isStartedPlayback;
+
+  @ma_uint32()
+  external int loopbackProcessID;
+
+  @ma_bool8()
+  external int loopbackProcessExclude;
+
+  @ma_bool8()
+  external int noAutoConvertSRC;
+
+  @ma_bool8()
+  external int noDefaultQualitySRC;
+
+  @ma_bool8()
+  external int noHardwareOffloading;
+
+  @ma_bool8()
+  external int allowCaptureAutoStreamRouting;
+
+  @ma_bool8()
+  external int allowPlaybackAutoStreamRouting;
+
+  @ma_bool8()
+  external int isDetachedPlayback;
+
+  @ma_bool8()
+  external int isDetachedCapture;
+
+  @ffi.Int32()
+  external int usage;
+
+  external ffi.Pointer<ffi.Void> hAvrtHandle;
+
+  external ma_mutex rerouteLock;
+}
+
+typedef ma_ptr = ffi.Pointer<ffi.Void>;
+
+final class ma_IMMNotificationClient extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> lpVtbl;
+
+  @ma_uint32()
+  external int counter;
+
+  external ffi.Pointer<ma_device> pDevice;
+}
+
+final class ma_atomic_bool32 extends ffi.Struct {
+  @ma_bool32()
+  external int value;
+}
+
+final class UnnamedStruct48 extends ffi.Struct {
+  external ma_ptr pPlayback;
+
+  external ma_ptr pPlaybackPrimaryBuffer;
+
+  external ma_ptr pPlaybackBuffer;
+
+  external ma_ptr pCapture;
+
+  external ma_ptr pCaptureBuffer;
+}
+
+final class UnnamedStruct49 extends ffi.Struct {
+  external ma_handle hDevicePlayback;
+
+  external ma_handle hDeviceCapture;
+
+  external ma_handle hEventPlayback;
+
+  external ma_handle hEventCapture;
+
+  @ma_uint32()
+  external int fragmentSizeInFrames;
+
+  @ma_uint32()
+  external int iNextHeaderPlayback;
+
+  @ma_uint32()
+  external int iNextHeaderCapture;
+
+  @ma_uint32()
+  external int headerFramesConsumedPlayback;
+
+  @ma_uint32()
+  external int headerFramesConsumedCapture;
+
+  external ffi.Pointer<ma_uint8> pWAVEHDRPlayback;
+
+  external ffi.Pointer<ma_uint8> pWAVEHDRCapture;
+
+  external ffi.Pointer<ma_uint8> pIntermediaryBufferPlayback;
+
+  external ffi.Pointer<ma_uint8> pIntermediaryBufferCapture;
+
+  external ffi.Pointer<ma_uint8> _pHeapData;
+}
+
+final class UnnamedStruct50 extends ffi.Struct {
+  external ma_ptr pClient;
+
+  external ffi.Pointer<ma_ptr> ppPortsPlayback;
+
+  external ffi.Pointer<ma_ptr> ppPortsCapture;
+
+  external ffi.Pointer<ffi.Float> pIntermediaryBufferPlayback;
+
+  external ffi.Pointer<ffi.Float> pIntermediaryBufferCapture;
+}
+
+final class UnnamedStruct51 extends ffi.Struct {
+  external ma_thread deviceThread;
+
+  external ma_event operationEvent;
+
+  external ma_event operationCompletionEvent;
+
+  external ma_semaphore operationSemaphore;
+
+  @ma_uint32()
+  external int operation;
+
+  @ffi.Int32()
+  external int operationResult;
+
+  external ma_timer timer;
+
+  @ffi.Double()
+  external double priorRunTime;
+
+  @ma_uint32()
+  external int currentPeriodFramesRemainingPlayback;
+
+  @ma_uint32()
+  external int currentPeriodFramesRemainingCapture;
+
+  @ma_uint64()
+  external int lastProcessedFramePlayback;
+
+  @ma_uint64()
+  external int lastProcessedFrameCapture;
+
+  external ma_atomic_bool32 isStarted;
+}
+
+final class ma_timer extends ffi.Union {
+  @ma_int64()
+  external int counter;
+
+  @ffi.Double()
+  external double counterD;
+}
+
+final class ma_spatializer_listener extends ffi.Struct {
+  external ma_spatializer_listener_config config;
+
+  external ma_atomic_vec3f position;
+
+  external ma_atomic_vec3f direction;
+
+  external ma_atomic_vec3f velocity;
+
+  @ma_bool32()
+  external int isEnabled;
+
+  @ma_bool32()
+  external int _ownsHeap;
+
+  external ffi.Pointer<ffi.Void> _pHeap;
+}
+
+final class ma_spatializer_listener_config extends ffi.Struct {
+  @ma_uint32()
+  external int channelsOut;
+
+  external ffi.Pointer<ma_channel> pChannelMapOut;
+
+  @ffi.Int32()
+  external int handedness;
+
+  @ffi.Float()
+  external double coneInnerAngleInRadians;
+
+  @ffi.Float()
+  external double coneOuterAngleInRadians;
+
+  @ffi.Float()
+  external double coneOuterGain;
+
+  @ffi.Float()
+  external double speedOfSound;
+
+  external ma_vec3f worldUp;
+}
+
+abstract class ma_handedness {
+  static const int ma_handedness_right = 0;
+  static const int ma_handedness_left = 1;
+}
+
+final class ma_vec3f extends ffi.Struct {
+  @ffi.Float()
+  external double x;
+
+  @ffi.Float()
+  external double y;
+
+  @ffi.Float()
+  external double z;
+}
+
+final class ma_atomic_vec3f extends ffi.Struct {
+  external ma_vec3f v;
+
+  @ma_spinlock()
+  external int lock;
+}
+
+final class ma_sound_inlined extends ffi.Struct {
+  external ma_sound sound;
+
+  external ffi.Pointer<ma_sound_inlined> pNext;
+
+  external ffi.Pointer<ma_sound_inlined> pPrev;
+}
+
+final class ma_sound extends ffi.Struct {
+  external ma_engine_node engineNode;
+
+  external ffi.Pointer<ma_data_source> pDataSource;
+
+  @ma_uint64()
+  external int seekTarget;
+
+  @ma_bool32()
+  external int atEnd;
+
+  external ma_sound_end_proc endCallback;
+
+  external ffi.Pointer<ffi.Void> pEndCallbackUserData;
+
+  @ma_bool8()
+  external int ownsDataSource;
+
+  external ffi.Pointer<ma_resource_manager_data_source>
+      pResourceManagerDataSource;
+}
+
+final class ma_engine_node extends ffi.Struct {
+  external ma_node_base baseNode;
+
+  external ffi.Pointer<ma_engine> pEngine;
+
+  @ma_uint32()
+  external int sampleRate;
+
+  @ma_uint32()
+  external int volumeSmoothTimeInPCMFrames;
+
+  @ffi.Int32()
+  external int monoExpansionMode;
+
+  external ma_fader fader;
+
+  external ma_linear_resampler resampler;
+
+  external ma_spatializer spatializer;
+
+  external ma_panner panner;
+
+  external ma_gainer volumeGainer;
+
+  external ma_atomic_float volume;
+
+  @ffi.Float()
+  external double pitch;
+
+  @ffi.Float()
+  external double oldPitch;
+
+  @ffi.Float()
+  external double oldDopplerPitch;
+
+  @ma_bool32()
+  external int isPitchDisabled;
+
+  @ma_bool32()
+  external int isSpatializationDisabled;
+
+  @ma_uint32()
+  external int pinnedListenerIndex;
+
+  external UnnamedStruct52 fadeSettings;
+
+  @ma_bool8()
+  external int _ownsHeap;
+
+  external ffi.Pointer<ffi.Void> _pHeap;
+}
+
+abstract class ma_mono_expansion_mode {
+  static const int ma_mono_expansion_mode_duplicate = 0;
+  static const int ma_mono_expansion_mode_average = 1;
+  static const int ma_mono_expansion_mode_stereo_only = 2;
+  static const int ma_mono_expansion_mode_default = 0;
+}
+
+final class ma_fader extends ffi.Struct {
+  external ma_fader_config config;
+
+  @ffi.Float()
+  external double volumeBeg;
+
+  @ffi.Float()
+  external double volumeEnd;
+
+  @ma_uint64()
+  external int lengthInFrames;
+
+  @ma_int64()
+  external int cursorInFrames;
+}
+
+final class ma_fader_config extends ffi.Struct {
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  @ma_uint32()
+  external int sampleRate;
+}
+
+final class ma_spatializer extends ffi.Struct {
+  @ma_uint32()
+  external int channelsIn;
+
+  @ma_uint32()
+  external int channelsOut;
+
+  external ffi.Pointer<ma_channel> pChannelMapIn;
+
+  @ffi.Int32()
+  external int attenuationModel;
+
+  @ffi.Int32()
+  external int positioning;
+
+  @ffi.Int32()
+  external int handedness;
+
+  @ffi.Float()
+  external double minGain;
+
+  @ffi.Float()
+  external double maxGain;
+
+  @ffi.Float()
+  external double minDistance;
+
+  @ffi.Float()
+  external double maxDistance;
+
+  @ffi.Float()
+  external double rolloff;
+
+  @ffi.Float()
+  external double coneInnerAngleInRadians;
+
+  @ffi.Float()
+  external double coneOuterAngleInRadians;
+
+  @ffi.Float()
+  external double coneOuterGain;
+
+  @ffi.Float()
+  external double dopplerFactor;
+
+  @ffi.Float()
+  external double directionalAttenuationFactor;
+
+  @ma_uint32()
+  external int gainSmoothTimeInFrames;
+
+  external ma_atomic_vec3f position;
+
+  external ma_atomic_vec3f direction;
+
+  external ma_atomic_vec3f velocity;
+
+  @ffi.Float()
+  external double dopplerPitch;
+
+  @ffi.Float()
+  external double minSpatializationChannelGain;
+
+  external ma_gainer gainer;
+
+  external ffi.Pointer<ffi.Float> pNewChannelGainsOut;
+
+  external ffi.Pointer<ffi.Void> _pHeap;
+
+  @ma_bool32()
+  external int _ownsHeap;
+}
+
+abstract class ma_attenuation_model {
+  static const int ma_attenuation_model_none = 0;
+  static const int ma_attenuation_model_inverse = 1;
+  static const int ma_attenuation_model_linear = 2;
+  static const int ma_attenuation_model_exponential = 3;
+}
+
+abstract class ma_positioning {
+  static const int ma_positioning_absolute = 0;
+  static const int ma_positioning_relative = 1;
+}
+
+final class ma_gainer extends ffi.Struct {
+  external ma_gainer_config config;
+
+  @ma_uint32()
+  external int t;
+
+  @ffi.Float()
+  external double masterVolume;
+
+  external ffi.Pointer<ffi.Float> pOldGains;
+
+  external ffi.Pointer<ffi.Float> pNewGains;
+
+  external ffi.Pointer<ffi.Void> _pHeap;
+
+  @ma_bool32()
+  external int _ownsHeap;
+}
+
+final class ma_gainer_config extends ffi.Struct {
+  @ma_uint32()
+  external int channels;
+
+  @ma_uint32()
+  external int smoothTimeInFrames;
+}
+
+final class ma_panner extends ffi.Struct {
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  @ffi.Int32()
+  external int mode;
+
+  @ffi.Float()
+  external double pan;
+}
+
+abstract class ma_pan_mode {
+  static const int ma_pan_mode_balance = 0;
+  static const int ma_pan_mode_pan = 1;
+}
+
+final class UnnamedStruct52 extends ffi.Struct {
+  external ma_atomic_float volumeBeg;
+
+  external ma_atomic_float volumeEnd;
+
+  external ma_atomic_uint64 fadeLengthInFrames;
+
+  external ma_atomic_uint64 absoluteGlobalTimeInFrames;
+}
+
+final class ma_atomic_uint64 extends ffi.Struct {
+  @ma_uint64()
+  external int value;
+}
+
+typedef ma_sound_end_proc = ffi.Pointer<
+    ffi.NativeFunction<
+        ffi.Void Function(
+            ffi.Pointer<ffi.Void> pUserData, ffi.Pointer<ma_sound> pSound)>>;
+
+final class ma_resource_manager_data_source extends ffi.Struct {
+  external UnnamedUnion17 backend;
+
+  @ma_uint32()
+  external int flags;
+
+  @ma_uint32()
+  external int executionCounter;
+
+  @ma_uint32()
+  external int executionPointer;
+}
+
+final class UnnamedUnion17 extends ffi.Union {
+  external ma_resource_manager_data_buffer buffer;
+
+  external ma_resource_manager_data_stream stream;
+}
+
+final class ma_resource_manager_data_buffer extends ffi.Struct {
+  external ma_data_source_base ds;
+
+  external ffi.Pointer<ma_resource_manager> pResourceManager;
+
+  external ffi.Pointer<ma_resource_manager_data_buffer_node> pNode;
+
+  @ma_uint32()
+  external int flags;
+
+  @ma_uint32()
+  external int executionCounter;
+
+  @ma_uint32()
+  external int executionPointer;
+
+  @ma_uint64()
+  external int seekTargetInPCMFrames;
+
+  @ma_bool32()
+  external int seekToCursorOnNextRead;
+
+  @ffi.Int32()
+  external int result;
+
+  @ma_bool32()
+  external int isLooping;
+
+  external ma_atomic_bool32 isConnectorInitialized;
+
+  external UnnamedUnion18 connector;
+}
+
+final class UnnamedUnion18 extends ffi.Union {
+  external ma_decoder decoder;
+
+  external ma_audio_buffer buffer;
+
+  external ma_paged_audio_buffer pagedBuffer;
+}
+
+final class ma_decoder extends ffi.Struct {
+  external ma_data_source_base ds;
+
+  external ffi.Pointer<ma_data_source> pBackend;
+
+  external ffi.Pointer<ma_decoding_backend_vtable> pBackendVTable;
+
+  external ffi.Pointer<ffi.Void> pBackendUserData;
+
+  external ma_decoder_read_proc onRead;
+
+  external ma_decoder_seek_proc onSeek;
+
+  external ma_decoder_tell_proc onTell;
+
+  external ffi.Pointer<ffi.Void> pUserData;
+
+  @ma_uint64()
+  external int readPointerInPCMFrames;
+
+  @ffi.Int32()
+  external int outputFormat;
+
+  @ma_uint32()
+  external int outputChannels;
+
+  @ma_uint32()
+  external int outputSampleRate;
+
+  external ma_data_converter converter;
+
+  external ffi.Pointer<ffi.Void> pInputCache;
+
+  @ma_uint64()
+  external int inputCacheCap;
+
+  @ma_uint64()
+  external int inputCacheConsumed;
+
+  @ma_uint64()
+  external int inputCacheRemaining;
+
+  external ma_allocation_callbacks allocationCallbacks;
+
+  external UnnamedUnion19 data;
+}
+
+typedef ma_decoder_read_proc = ffi.Pointer<
+    ffi.NativeFunction<
+        ffi.Int32 Function(
+            ffi.Pointer<ma_decoder> pDecoder,
+            ffi.Pointer<ffi.Void> pBufferOut,
+            ffi.Size bytesToRead,
+            ffi.Pointer<ffi.Size> pBytesRead)>>;
+typedef ma_decoder_seek_proc = ffi.Pointer<
+    ffi.NativeFunction<
+        ffi.Int32 Function(ffi.Pointer<ma_decoder> pDecoder,
+            ma_int64 byteOffset, ffi.Int32 origin)>>;
+typedef ma_decoder_tell_proc = ffi.Pointer<
+    ffi.NativeFunction<
+        ffi.Int32 Function(
+            ffi.Pointer<ma_decoder> pDecoder, ffi.Pointer<ma_int64> pCursor)>>;
+
+final class UnnamedUnion19 extends ffi.Union {
+  external UnnamedStruct53 vfs;
+
+  external UnnamedStruct54 memory;
+}
+
+final class UnnamedStruct53 extends ffi.Struct {
+  external ffi.Pointer<ma_vfs> pVFS;
+
+  external ma_vfs_file file;
+}
+
+final class UnnamedStruct54 extends ffi.Struct {
+  external ffi.Pointer<ma_uint8> pData;
+
+  @ffi.Size()
+  external int dataSize;
+
+  @ffi.Size()
+  external int currentReadPos;
+}
+
+final class ma_audio_buffer extends ffi.Struct {
+  external ma_audio_buffer_ref ref;
+
+  external ma_allocation_callbacks allocationCallbacks;
+
+  @ma_bool32()
+  external int ownsData;
+
+  @ffi.Array.multi([1])
+  external ffi.Array<ma_uint8> _pExtraData;
+}
+
+final class ma_audio_buffer_ref extends ffi.Struct {
+  external ma_data_source_base ds;
+
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  @ma_uint32()
+  external int sampleRate;
+
+  @ma_uint64()
+  external int cursor;
+
+  @ma_uint64()
+  external int sizeInFrames;
+
+  external ffi.Pointer<ffi.Void> pData;
+}
+
+final class ma_paged_audio_buffer extends ffi.Struct {
+  external ma_data_source_base ds;
+
+  external ffi.Pointer<ma_paged_audio_buffer_data> pData;
+
+  external ffi.Pointer<ma_paged_audio_buffer_page> pCurrent;
+
+  @ma_uint64()
+  external int relativeCursor;
+
+  @ma_uint64()
+  external int absoluteCursor;
+}
+
+final class ma_resource_manager_data_stream extends ffi.Struct {
+  external ma_data_source_base ds;
+
+  external ffi.Pointer<ma_resource_manager> pResourceManager;
+
+  @ma_uint32()
+  external int flags;
+
+  external ma_decoder decoder;
+
+  @ma_bool32()
+  external int isDecoderInitialized;
+
+  @ma_uint64()
+  external int totalLengthInPCMFrames;
+
+  @ma_uint32()
+  external int relativeCursor;
+
+  @ma_uint64()
+  external int absoluteCursor;
+
+  @ma_uint32()
+  external int currentPageIndex;
+
+  @ma_uint32()
+  external int executionCounter;
+
+  @ma_uint32()
+  external int executionPointer;
+
+  @ma_bool32()
+  external int isLooping;
+
+  external ffi.Pointer<ffi.Void> pPageData;
+
+  @ffi.Array.multi([2])
+  external ffi.Array<ma_uint32> pageFrameCount;
+
+  @ffi.Int32()
+  external int result;
+
+  @ma_bool32()
+  external int isDecoderAtEnd;
+
+  @ffi.Array.multi([2])
+  external ffi.Array<ma_bool32> isPageValid;
+
+  @ma_bool32()
+  external int seekCounter;
+}
+
+typedef ma_engine_process_proc = ffi.Pointer<
+    ffi.NativeFunction<
+        ffi.Void Function(ffi.Pointer<ffi.Void> pUserData,
+            ffi.Pointer<ffi.Float> pFramesOut, ma_uint64 frameCount)>>;
+
 final class Recorder extends ffi.Opaque {}
 
 abstract class RecorderResult {
@@ -614,18 +4102,175 @@ abstract class RecorderResult {
   static const int RECORDER_ERROR_INVALID_ARGUMENT = 3;
   static const int RECORDER_ERROR_ALREADY_RECORDING = 4;
   static const int RECORDER_ERROR_NOT_RECORDING = 5;
+  static const int RECORDER_ERROR_INVALID_FORMAT = 6;
 }
 
-final class Wave extends ffi.Opaque {}
-
-abstract class WaveResult {
-  static const int WAVE_OK = 0;
-  static const int WAVE_ERROR = 1;
+abstract class GeneratorResult {
+  static const int GENERATOR_OK = 0;
+  static const int GENERATOR_ERROR = 1;
 }
 
-abstract class WaveType {
-  static const int WAVE_TYPE_SINE = 0;
-  static const int WAVE_TYPE_SQUARE = 1;
-  static const int WAVE_TYPE_TRIANGLE = 2;
-  static const int WAVE_TYPE_SAWTOOTH = 3;
+typedef Generator = UnnamedStruct55;
+
+final class UnnamedStruct55 extends ffi.Struct {
+  external ma_waveform waveform;
+
+  external ma_pulsewave pulsewave;
+
+  external ma_noise noise;
+
+  external CircularBuffer circular_buffer;
+
+  @ma_uint32()
+  external int sample_rate;
+
+  @ma_uint32()
+  external int channels;
+}
+
+final class ma_waveform extends ffi.Struct {
+  external ma_data_source_base ds;
+
+  external ma_waveform_config config;
+
+  @ffi.Double()
+  external double advance;
+
+  @ffi.Double()
+  external double time;
+}
+
+final class ma_waveform_config extends ffi.Struct {
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  @ma_uint32()
+  external int sampleRate;
+
+  @ffi.Int32()
+  external int type;
+
+  @ffi.Double()
+  external double amplitude;
+
+  @ffi.Double()
+  external double frequency;
+}
+
+abstract class ma_waveform_type {
+  static const int ma_waveform_type_sine = 0;
+  static const int ma_waveform_type_square = 1;
+  static const int ma_waveform_type_triangle = 2;
+  static const int ma_waveform_type_sawtooth = 3;
+}
+
+final class ma_pulsewave extends ffi.Struct {
+  external ma_waveform waveform;
+
+  external ma_pulsewave_config config;
+}
+
+final class ma_pulsewave_config extends ffi.Struct {
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  @ma_uint32()
+  external int sampleRate;
+
+  @ffi.Double()
+  external double dutyCycle;
+
+  @ffi.Double()
+  external double amplitude;
+
+  @ffi.Double()
+  external double frequency;
+}
+
+final class ma_noise extends ffi.Struct {
+  external ma_data_source_base ds;
+
+  external ma_noise_config config;
+
+  external ma_lcg lcg;
+
+  external UnnamedUnion20 state;
+
+  external ffi.Pointer<ffi.Void> _pHeap;
+
+  @ma_bool32()
+  external int _ownsHeap;
+}
+
+final class ma_noise_config extends ffi.Struct {
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  @ffi.Int32()
+  external int type;
+
+  @ma_int32()
+  external int seed;
+
+  @ffi.Double()
+  external double amplitude;
+
+  @ma_bool32()
+  external int duplicateChannels;
+}
+
+abstract class ma_noise_type {
+  static const int ma_noise_type_white = 0;
+  static const int ma_noise_type_pink = 1;
+  static const int ma_noise_type_brownian = 2;
+}
+
+final class ma_lcg extends ffi.Struct {
+  @ma_int32()
+  external int state;
+}
+
+final class UnnamedUnion20 extends ffi.Union {
+  external UnnamedStruct56 pink;
+
+  external UnnamedStruct57 brownian;
+}
+
+final class UnnamedStruct56 extends ffi.Struct {
+  external ffi.Pointer<ffi.Pointer<ffi.Double>> bin;
+
+  external ffi.Pointer<ffi.Double> accumulation;
+
+  external ffi.Pointer<ma_uint32> counter;
+}
+
+final class UnnamedStruct57 extends ffi.Struct {
+  external ffi.Pointer<ffi.Double> accumulation;
+}
+
+typedef CircularBuffer = UnnamedStruct58;
+
+final class UnnamedStruct58 extends ffi.Struct {
+  external ffi.Pointer<ffi.Float> buffer;
+
+  @ffi.Size()
+  external int capacity;
+
+  @ffi.Size()
+  external int write_pos;
+
+  @ffi.Size()
+  external int read_pos;
+
+  @ffi.Int()
+  external int mutex;
 }

@@ -8,8 +8,11 @@ export "package:minisound_platform_interface/minisound_platform_interface.dart"
     show
         AudioData,
         AudioFormat,
+        MaFormat,
         MinisoundPlatformException,
-        MinisoundPlatformOutOfMemoryException;
+        MinisoundPlatformOutOfMemoryException,
+        NoiseType,
+        WaveformType;
 
 /// Controls the loading and unloading of `Sound`s.
 ///
@@ -137,7 +140,7 @@ final class Recorder {
   late int sampleRate;
   late int channels;
   late int format;
-  late double bufferDurationSeconds;
+  late int bufferDurationSeconds;
   bool isCreated = false;
 
   /// Initializes the recorder's engine.
@@ -168,7 +171,7 @@ final class Recorder {
       {int sampleRate = 44800,
       int channels = 1,
       int format = MaFormat.ma_format_f32,
-      double bufferDurationSeconds = 5}) async {
+      int bufferDurationSeconds = 5}) async {
     if (!engine.isInit) {
       print("init engine");
       await initEngine();
@@ -211,51 +214,49 @@ final class Recorder {
   }
 }
 
-/// A wave generator.
-final class Wave {
-  Wave() : _wave = PlatformWave() {
+/// A generator for waveforms and noise.
+final class Generator {
+  Generator() : _generator = MinisoundPlatform.instance.createGenerator() {
     _engine = Engine();
-    //_finalizer.attach(this, _engine);
   }
 
-  //static final _finalizer =
-  //  Finalizer<Engine>((engine) => engine.());
-
-  final PlatformWave _wave;
+  final PlatformGenerator _generator;
   late Engine _engine;
   bool isCreated = false;
 
-  /// Initializes the wave generator's engine.
+  /// Initializes the generator's engine.
   Future initEngine([int periodMs = kIsWeb ? 33 : 10]) async {
     await _engine.init(periodMs);
     await _engine.start();
   }
 
-  /// Initializes the wave generator.
-  Future<void> init(
-      int type, double frequency, double amplitude, int sampleRate) async {
-    await _wave.init(type, frequency, amplitude, sampleRate);
+  /// Initializes the generator.
+  Future<void> init(int format, int channels, int sampleRate,
+      int bufferDurationSeconds) async {
+    await _generator.init(format, channels, sampleRate, bufferDurationSeconds);
   }
 
-  /// Sets the wave type.
-  void setType(int type) => _wave.setType(type);
+  /// Sets the waveform type, frequency, and amplitude.
+  void setWaveform(WaveformType type, double frequency, double amplitude) =>
+      _generator.setWaveform(type, frequency, amplitude);
 
-  /// Sets the wave frequency.
-  void setFrequency(double frequency) => _wave.setFrequency(frequency);
+  /// Sets the pulse wave frequency, amplitude, and duty cycle.
+  void setPulsewave(double frequency, double amplitude, double dutyCycle) =>
+      _generator.setPulsewave(frequency, amplitude, dutyCycle);
 
-  /// Sets the wave amplitude.
-  void setAmplitude(double amplitude) => _wave.setAmplitude(amplitude);
+  /// Sets the noise type, seed, and amplitude.
+  void setNoise(NoiseType type, int seed, double amplitude) =>
+      _generator.setNoise(type, seed, amplitude);
 
-  /// Sets the wave sample rate.
-  void setSampleRate(int sampleRate) => _wave.setSampleRate(sampleRate);
+  /// Reads generated data.
+  Float32List getBuffer(int framesToRead) => _generator.getBuffer(framesToRead);
 
-  /// Reads wave data.
-  Float32List read(int framesToRead) => _wave.read(framesToRead);
+  /// Gets the number of available frames in the generator's buffer.
+  int getAvailableFrames() => _generator.getAvailableFrames();
 
-  /// Disposes of the wave generator resources.
+  /// Disposes of the generator resources.
   void dispose() {
-    _wave.dispose();
-    //_engine.dispose();
+    _generator.dispose();
   }
 }
 

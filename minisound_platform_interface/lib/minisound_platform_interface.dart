@@ -16,7 +16,7 @@ abstract class MinisoundPlatform extends PlatformInterface {
 
   PlatformEngine createEngine();
   PlatformRecorder createRecorder();
-  PlatformWave createWave();
+  PlatformGenerator createGenerator();
 }
 
 abstract interface class PlatformEngine {
@@ -60,7 +60,7 @@ abstract interface class PlatformRecorder {
       {int sampleRate = 44800,
       int channels = 1,
       int format = MaFormat.ma_format_f32,
-      double bufferDurationSeconds = 5});
+      int bufferDurationSeconds = 5});
   void start();
   void stop();
   int getAvailableFrames();
@@ -69,16 +69,28 @@ abstract interface class PlatformRecorder {
   void dispose();
 }
 
-abstract interface class PlatformWave {
-  factory PlatformWave() => MinisoundPlatform.instance.createWave();
+enum WaveformType {
+  sine,
+  square,
+  triangle,
+  sawtooth,
+}
 
+enum NoiseType {
+  white,
+  pink,
+  brownian,
+}
+
+abstract interface class PlatformGenerator {
+  factory PlatformGenerator() => MinisoundPlatform.instance.createGenerator();
   Future<void> init(
-      int type, double frequency, double amplitude, int sampleRate);
-  void setType(int type);
-  void setFrequency(double frequency);
-  void setAmplitude(double amplitude);
-  void setSampleRate(int sampleRate);
-  Float32List read(int framesToRead);
+      int format, int channels, int sampleRate, int bufferDurationSeconds);
+  void setWaveform(WaveformType type, double frequency, double amplitude);
+  void setPulsewave(double frequency, double amplitude, double dutyCycle);
+  void setNoise(NoiseType type, int seed, double amplitude);
+  Float32List getBuffer(int framesToRead);
+  int getAvailableFrames();
   void dispose();
 }
 
@@ -141,4 +153,38 @@ int convertToMaFormat(AudioFormat format) {
     default:
       return MaFormat.ma_format_unknown;
   }
+}
+
+abstract class Result {
+  static const int Ok = 0;
+  static const int UnknownErr = 1;
+  static const int OutOfMemErr = 2;
+  static const int RangeErr = 3;
+  static const int HashCollisionErr = 4;
+  static const int FileUnavailableErr = 5;
+  static const int FileReadingErr = 6;
+  static const int FileWritingErr = 7;
+  static const int FormatErr = 8;
+  static const int ArgErr = 9;
+  static const int StateErr = 10;
+  static const int RESULT_COUNT = 11;
+}
+
+abstract class RecorderResult {
+  static const int RECORDER_OK = 0;
+  static const int RECORDER_ERROR_UNKNOWN = 1;
+  static const int RECORDER_ERROR_OUT_OF_MEMORY = 2;
+  static const int RECORDER_ERROR_INVALID_ARGUMENT = 3;
+  static const int RECORDER_ERROR_ALREADY_RECORDING = 4;
+  static const int RECORDER_ERROR_NOT_RECORDING = 5;
+}
+
+abstract class WaveResult {
+  static const int WAVE_OK = 0;
+  static const int WAVE_ERROR = 1;
+}
+
+abstract class GeneratorResult {
+  static const int GENERATOR_OK = 0;
+  static const int GENERATOR_ERROR = 1;
 }

@@ -16,46 +16,7 @@ final class Sound extends Opaque {}
 
 final class Recorder extends Opaque {}
 
-final class Wave extends Opaque {}
-
-typedef OnFramesAvailableCallback = void Function(
-    Pointer<dynamic> frames, int frameCount);
-
-@JS()
-@anonymous
-class FrameData {
-  external Pointer<Float> get frames;
-  external int get frame_count;
-}
-
-abstract class Result {
-  static const int Ok = 0;
-  static const int UnknownErr = 1;
-  static const int OutOfMemErr = 2;
-  static const int RangeErr = 3;
-  static const int ResultCount = 4;
-}
-
-abstract class RecorderResult {
-  static const int RECORDER_OK = 0;
-  static const int RECORDER_ERROR_UNKNOWN = 1;
-  static const int RECORDER_ERROR_OUT_OF_MEMORY = 2;
-  static const int RECORDER_ERROR_INVALID_ARGUMENT = 3;
-  static const int RECORDER_ERROR_ALREADY_RECORDING = 4;
-  static const int RECORDER_ERROR_NOT_RECORDING = 5;
-}
-
-abstract class WaveResult {
-  static const int WAVE_OK = 0;
-  static const int WAVE_ERROR = 1;
-}
-
-abstract class WaveType {
-  static const int WAVE_TYPE_SINE = 0;
-  static const int WAVE_TYPE_SQUARE = 1;
-  static const int WAVE_TYPE_TRIANGLE = 2;
-  static const int WAVE_TYPE_SAWTOOTH = 3;
-}
+final class Generator extends Opaque {}
 
 // JS interop
 @JS("ccall")
@@ -137,7 +98,7 @@ Future<int> recorder_init_stream(Pointer<Recorder> self,
         {int sampleRate = 44800,
         int channels = 1,
         int format = MaFormat.ma_format_f32,
-        double bufferDurationSeconds = 5}) =>
+        int bufferDurationSeconds = 5}) =>
     _recorder_init_stream(self.addr,
         sampleRate: sampleRate,
         channels: channels,
@@ -171,7 +132,7 @@ Future<int> _recorder_init_stream(int self,
         {int sampleRate = 44800,
         int channels = 1,
         int format = MaFormat.ma_format_f32,
-        double bufferDurationSeconds = 5}) async =>
+        int bufferDurationSeconds = 5}) async =>
     promiseToFuture(_ccall(
         "recorder_init_stream",
         "number",
@@ -198,43 +159,49 @@ external int _recorder_get_buffer(int self, int output, int frames_to_read);
 @JS()
 external void _recorder_destroy(int self);
 
-// Wave functions
-Pointer<Wave> wave_create() => Pointer(_wave_create(), 1, safe: true);
-Future<int> wave_init(Pointer<Wave> self, int type, double frequency,
-        double amplitude, int sample_rate) =>
-    _wave_init(self.addr, type, frequency, amplitude, sample_rate);
-int wave_set_type(Pointer<Wave> self, int type) =>
-    _wave_set_type(self.addr, type);
-int wave_set_frequency(Pointer<Wave> self, double frequency) =>
-    _wave_set_frequency(self.addr, frequency);
-int wave_set_amplitude(Pointer<Wave> self, double amplitude) =>
-    _wave_set_amplitude(self.addr, amplitude);
-int wave_set_sample_rate(Pointer<Wave> self, int sample_rate) =>
-    _wave_set_sample_rate(self.addr, sample_rate);
-int wave_read(Pointer<Wave> self, Pointer<Float> output, int frames_to_read) =>
-    _wave_read(self.addr, output.addr, frames_to_read);
-void wave_destroy(Pointer<Wave> self) => _wave_destroy(self.addr);
+// Generator functions
+Pointer<Generator> generator_create() =>
+    Pointer(_generator_create(), 1, safe: true);
+int generator_init(Pointer<Generator> self, int format, int channels,
+        int sample_rate, int buffer_duration_seconds) =>
+    _generator_init(
+        self.addr, format, channels, sample_rate, buffer_duration_seconds);
+int generator_set_waveform(Pointer<Generator> self, int type, double frequency,
+        double amplitude) =>
+    _generator_set_waveform(self.addr, type, frequency, amplitude);
+int generator_set_pulsewave(Pointer<Generator> self, double frequency,
+        double amplitude, double dutyCycle) =>
+    _generator_set_pulsewave(self.addr, frequency, amplitude, dutyCycle);
+int generator_set_noise(
+        Pointer<Generator> self, int type, int seed, double amplitude) =>
+    _generator_set_noise(self.addr, type, seed, amplitude);
+int generator_get_buffer(
+        Pointer<Generator> self, Pointer<Float> output, int frames_to_read) =>
+    _generator_get_buffer(self.addr, output.addr, frames_to_read);
+int generator_get_available_frames(Pointer<Generator> self) =>
+    _generator_get_available_frames(self.addr);
+void generator_destroy(Pointer<Generator> self) =>
+    _generator_destroy(self.addr);
 
-// Wave JS bindings
+// Generator JS bindings
 @JS()
-external int _wave_create();
-Future<int> _wave_init(int self, int type, double frequency, double amplitude,
-        int sample_rate) async =>
-    promiseToFuture(_ccall(
-        "wave_init",
-        "number",
-        ["number", "number", "number", "number", "number"],
-        [self, type, frequency, amplitude, sample_rate],
-        {"async": true}));
+external int _generator_create();
+
 @JS()
-external int _wave_set_type(int self, int type);
+external int _generator_init(int self, int format, int channels,
+    int sample_rate, int buffer_duration_seconds);
 @JS()
-external int _wave_set_frequency(int self, double frequency);
+external int _generator_set_waveform(
+    int self, int type, double frequency, double amplitude);
 @JS()
-external int _wave_set_amplitude(int self, double amplitude);
+external int _generator_set_pulsewave(
+    int self, double frequency, double amplitude, double dutyCycle);
 @JS()
-external int _wave_set_sample_rate(int self, int sample_rate);
+external int _generator_set_noise(
+    int self, int type, int seed, double amplitude);
 @JS()
-external int _wave_read(int self, int output, int frames_to_read);
+external int _generator_get_buffer(int self, int output, int frames_to_read);
 @JS()
-external void _wave_destroy(int self);
+external int _generator_get_available_frames(int self);
+@JS()
+external void _generator_destroy(int self);

@@ -1,7 +1,7 @@
-import 'dart:typed_data';
-import 'package:minisound_platform_interface/minisound_platform_interface.dart';
-import 'package:minisound_web/bindings/minisound.dart' as wasm;
-import 'package:minisound_web/bindings/wasm/wasm.dart';
+import "dart:typed_data";
+import "package:minisound_platform_interface/minisound_platform_interface.dart";
+import "package:minisound_web/bindings/minisound.dart" as wasm;
+import "package:minisound_web/bindings/wasm/wasm.dart";
 
 class MinisoundWeb extends MinisoundPlatform {
   MinisoundWeb._();
@@ -24,10 +24,10 @@ class MinisoundWeb extends MinisoundPlatform {
   }
 
   @override
-  PlatformWave createWave() {
-    final self = wasm.wave_create();
+  PlatformGenerator createGenerator() {
+    final self = wasm.generator_create();
     if (self == nullptr) throw MinisoundPlatformOutOfMemoryException();
-    return WebWave(self);
+    return WebGenerator(self);
   }
 }
 
@@ -38,7 +38,7 @@ final class WebEngine implements PlatformEngine {
 
   @override
   Future<void> init(int periodMs) async {
-    if (await wasm.engine_init(_self, periodMs) != wasm.Result.Ok) {
+    if (await wasm.engine_init(_self, periodMs) != Result.Ok) {
       throw MinisoundPlatformException("Failed to init the engine.");
     }
   }
@@ -51,7 +51,7 @@ final class WebEngine implements PlatformEngine {
 
   @override
   void start() {
-    if (wasm.engine_start(_self) != wasm.Result.Ok) {
+    if (wasm.engine_start(_self) != Result.Ok) {
       throw MinisoundPlatformException("Failed to start the engine.");
     }
   }
@@ -77,7 +77,7 @@ final class WebEngine implements PlatformEngine {
         audioData.sampleRate,
         audioData.channels);
 
-    if (result != wasm.Result.Ok) {
+    if (result != Result.Ok) {
       malloc.free(dataPtr);
       wasm.sound_unload(sound);
       throw MinisoundPlatformException("Failed to load a sound.");
@@ -123,14 +123,14 @@ final class WebSound implements PlatformSound {
 
   @override
   void play() {
-    if (wasm.sound_play(_self) != wasm.Result.Ok) {
+    if (wasm.sound_play(_self) != Result.Ok) {
       throw MinisoundPlatformException("Failed to play the sound.");
     }
   }
 
   @override
   void replay() {
-    if (wasm.sound_replay(_self) != wasm.Result.Ok) {
+    if (wasm.sound_replay(_self) != Result.Ok) {
       throw MinisoundPlatformException("Failed to replay the sound.");
     }
   }
@@ -153,7 +153,7 @@ final class WebRecorder implements PlatformRecorder {
       int format = MaFormat.ma_format_f32}) async {
     final result = await wasm.recorder_init_file(_self, filename,
         sampleRate: sampleRate, channels: channels, format: format);
-    if (result != wasm.RecorderResult.RECORDER_OK) {
+    if (result != RecorderResult.RECORDER_OK) {
       throw MinisoundPlatformException(
           "Failed to initialize recorder with file. Error code: $result");
     }
@@ -164,13 +164,13 @@ final class WebRecorder implements PlatformRecorder {
       {int sampleRate = 44800,
       int channels = 1,
       int format = MaFormat.ma_format_f32,
-      double bufferDurationSeconds = 5}) async {
+      int bufferDurationSeconds = 5}) async {
     final result = await wasm.recorder_init_stream(_self,
         sampleRate: sampleRate,
         channels: channels,
         format: format,
         bufferDurationSeconds: bufferDurationSeconds);
-    if (result != wasm.RecorderResult.RECORDER_OK) {
+    if (result != RecorderResult.RECORDER_OK) {
       throw MinisoundPlatformException(
           "Failed to initialize recorder stream. Error code: $result");
     }
@@ -178,14 +178,14 @@ final class WebRecorder implements PlatformRecorder {
 
   @override
   void start() {
-    if (wasm.recorder_start(_self) != wasm.RecorderResult.RECORDER_OK) {
+    if (wasm.recorder_start(_self) != RecorderResult.RECORDER_OK) {
       throw MinisoundPlatformException("Failed to start recording.");
     }
   }
 
   @override
   void stop() {
-    if (wasm.recorder_stop(_self) != wasm.RecorderResult.RECORDER_OK) {
+    if (wasm.recorder_stop(_self) != RecorderResult.RECORDER_OK) {
       throw MinisoundPlatformException("Failed to stop recording.");
     }
   }
@@ -228,59 +228,56 @@ final class WebRecorder implements PlatformRecorder {
   }
 }
 
-final class WebWave implements PlatformWave {
-  WebWave(this._self);
-
-  final Pointer<wasm.Wave> _self;
+final class WebGenerator implements PlatformGenerator {
+  WebGenerator(this._self);
+  final Pointer<wasm.Generator> _self;
 
   @override
-  Future<void> init(
-      int type, double frequency, double amplitude, int sampleRate) async {
-    final result =
-        await wasm.wave_init(_self, type, frequency, amplitude, sampleRate);
-    if (result != wasm.WaveResult.WAVE_OK) {
+  Future<void> init(int format, int channels, int sampleRate,
+      int bufferDurationSeconds) async {
+    final result = await wasm.generator_init(
+        _self, format, channels, sampleRate, bufferDurationSeconds);
+    if (result != GeneratorResult.GENERATOR_OK) {
       throw MinisoundPlatformException(
-          "Failed to initialize wave. Error code: $result");
+          "Failed to initialize generator. Error code: $result");
     }
   }
 
   @override
-  void setType(int type) {
-    if (wasm.wave_set_type(_self, type) != wasm.WaveResult.WAVE_OK) {
-      throw MinisoundPlatformException("Failed to set wave type.");
+  void setWaveform(WaveformType type, double frequency, double amplitude) {
+    final result =
+        wasm.generator_set_waveform(_self, type.index, frequency, amplitude);
+    if (result != GeneratorResult.GENERATOR_OK) {
+      throw MinisoundPlatformException("Failed to set waveform.");
     }
   }
 
   @override
-  void setFrequency(double frequency) {
-    if (wasm.wave_set_frequency(_self, frequency) != wasm.WaveResult.WAVE_OK) {
-      throw MinisoundPlatformException("Failed to set wave frequency.");
+  void setPulsewave(double frequency, double amplitude, double dutyCycle) {
+    final result =
+        wasm.generator_set_pulsewave(_self, frequency, amplitude, dutyCycle);
+    if (result != GeneratorResult.GENERATOR_OK) {
+      throw MinisoundPlatformException("Failed to set pulse wave.");
     }
   }
 
   @override
-  void setAmplitude(double amplitude) {
-    if (wasm.wave_set_amplitude(_self, amplitude) != wasm.WaveResult.WAVE_OK) {
-      throw MinisoundPlatformException("Failed to set wave amplitude.");
+  void setNoise(NoiseType type, int seed, double amplitude) {
+    final result = wasm.generator_set_noise(_self, type.index, seed, amplitude);
+    if (result != GeneratorResult.GENERATOR_OK) {
+      throw MinisoundPlatformException("Failed to set noise.");
     }
   }
 
   @override
-  void setSampleRate(int sampleRate) {
-    if (wasm.wave_set_sample_rate(_self, sampleRate) !=
-        wasm.WaveResult.WAVE_OK) {
-      throw MinisoundPlatformException("Failed to set wave sample rate.");
-    }
-  }
-
-  @override
-  Float32List read(int framesToRead) {
+  Float32List getBuffer(int framesToRead) {
     final bufferPtr = malloc.allocate<Float>(framesToRead);
     try {
-      final framesRead = wasm.wave_read(_self, bufferPtr, framesToRead);
+      final framesRead =
+          wasm.generator_get_buffer(_self, bufferPtr, framesToRead);
       if (framesRead < 0) {
         throw MinisoundPlatformException(
-            "Failed to read wave data. Error code: $framesRead");
+            "Failed to read generator data. Error code: $framesRead");
       }
       return Float32List.fromList(
           bufferPtr.asTypedList(framesRead) as List<double>);
@@ -290,8 +287,11 @@ final class WebWave implements PlatformWave {
   }
 
   @override
+  int getAvailableFrames() => wasm.generator_get_available_frames(_self);
+
+  @override
   void dispose() {
-    wasm.wave_destroy(_self);
+    wasm.generator_destroy(_self);
     malloc.free(_self);
   }
 }

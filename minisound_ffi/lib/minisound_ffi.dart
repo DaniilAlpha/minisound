@@ -40,10 +40,10 @@ class MinisoundFfi extends MinisoundPlatform {
   }
 
   @override
-  PlatformWave createWave() {
-    final self = _bindings.wave_create();
+  PlatformGenerator createGenerator() {
+    final self = _bindings.generator_create();
     if (self == nullptr) throw MinisoundPlatformOutOfMemoryException();
-    return FfiWave(self);
+    return FfiGenerator(self);
   }
 }
 
@@ -88,7 +88,7 @@ final class FfiEngine implements PlatformEngine {
 
     final maFormat = convertToMaFormat(audioData.format);
 
-    if (_bindings.engine_load_sound_ex(
+    if (_bindings.engine_load_sound(
           _self,
           sound,
           dataPtr.cast(),
@@ -280,7 +280,7 @@ class FfiRecorder implements PlatformRecorder {
       {int sampleRate = 44800,
       int channels = 1,
       int format = MaFormat.ma_format_f32,
-      double bufferDurationSeconds = 5}) async {
+      int bufferDurationSeconds = 5}) async {
     if (_bindings.recorder_init_stream(
             _self, sampleRate, channels, format, bufferDurationSeconds) !=
         ffi.RecorderResult.RECORDER_OK) {
@@ -321,73 +321,83 @@ class FfiRecorder implements PlatformRecorder {
   }
 
   @override
+  int getAvailableFrames() {
+    return _bindings.recorder_get_available_frames(_self);
+  }
+
+  @override
   void dispose() {
     _bindings.recorder_destroy(_self);
   }
 }
 
 // wave ffi
-class FfiWave implements PlatformWave {
-  FfiWave(Pointer<ffi.Wave> self) : _self = self;
+class FfiGenerator implements PlatformGenerator {
+  FfiGenerator(Pointer<ffi.Generator> self) : _self = self;
 
-  final Pointer<ffi.Wave> _self;
+  final Pointer<ffi.Generator> _self;
 
   @override
-  Future<void> init(
-      int type, double frequency, double amplitude, int sampleRate) async {
-    if (_bindings.wave_init(_self, type, frequency, amplitude, sampleRate) !=
-        ffi.WaveResult.WAVE_OK) {
-      throw MinisoundPlatformException("Failed to initialize wave.");
+  Future<void> init(int format, int channels, int sampleRate,
+      double bufferDurationSeconds) async {
+    final result = await _bindings.generator_init(
+        _self, format, channels, sampleRate, bufferDurationSeconds);
+    if (result != ffi.GeneratorResult.GENERATOR_OK) {
+      throw MinisoundPlatformException(
+          "Failed to initialize generator. Error code: $result");
     }
   }
 
   @override
-  void setType(int type) {
-    if (_bindings.wave_set_type(_self, type) != ffi.WaveResult.WAVE_OK) {
-      throw MinisoundPlatformException("Failed to set wave type.");
+  void setWaveform(WaveformType type, double frequency, double amplitude) {
+    final result = _bindings.generator_set_waveform(
+        _self, type.index, frequency, amplitude);
+    if (result != ffi.GeneratorResult.GENERATOR_OK) {
+      throw MinisoundPlatformException("Failed to set waveform.");
     }
   }
 
   @override
-  void setFrequency(double frequency) {
-    if (_bindings.wave_set_frequency(_self, frequency) !=
-        ffi.WaveResult.WAVE_OK) {
-      throw MinisoundPlatformException("Failed to set wave frequency.");
+  void setPulsewave(double frequency, double amplitude, double dutyCycle) {
+    final result = _bindings.generator_set_pulsewave(
+        _self, frequency, amplitude, dutyCycle);
+    if (result != ffi.GeneratorResult.GENERATOR_OK) {
+      throw MinisoundPlatformException("Failed to set pulse wave.");
     }
   }
 
   @override
-  void setAmplitude(double amplitude) {
-    if (_bindings.wave_set_amplitude(_self, amplitude) !=
-        ffi.WaveResult.WAVE_OK) {
-      throw MinisoundPlatformException("Failed to set wave amplitude.");
+  void setNoise(NoiseType type, int seed, double amplitude) {
+    final result =
+        _bindings.generator_set_noise(_self, type.index, seed, amplitude);
+    if (result != ffi.GeneratorResult.GENERATOR_OK) {
+      throw MinisoundPlatformException("Failed to set noise.");
     }
   }
 
   @override
-  void setSampleRate(int sampleRate) {
-    if (_bindings.wave_set_sample_rate(_self, sampleRate) !=
-        ffi.WaveResult.WAVE_OK) {
-      throw MinisoundPlatformException("Failed to set wave sample rate.");
-    }
-  }
-
-  @override
-  Float32List read(int framesToRead) {
-    final output = malloc<Float>(framesToRead);
+  Float32List getBuffer(int framesToRead) {
+    final bufferPtr = malloc.allocate<Float>(framesToRead);
     try {
-      final framesRead = _bindings.wave_read(_self, output, framesToRead);
+      final framesRead =
+          _bindings.generator_read(_self, bufferPtr, framesToRead);
       if (framesRead < 0) {
-        throw MinisoundPlatformException("Failed to read wave data.");
+        throw MinisoundPlatformException(
+            "Failed to read generator data. Error code: $framesRead");
       }
-      return output.asTypedList(framesRead);
+      return bufferPtr.asTypedList(framesRead);
     } finally {
-      malloc.free(output);
+      malloc.free(bufferPtr);
     }
+  }
+
+  @override
+  int getAvailableFrames() {
+    return _bindings.generator_get_available_frames(_self);
   }
 
   @override
   void dispose() {
-    _bindings.wave_destroy(_self);
+    _bindings.generator_destroy(_self);
   }
 }

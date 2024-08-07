@@ -24,7 +24,10 @@ class _ExamplePageState extends State<ExamplePage> {
   final engine = Engine();
   var loopDelay = 0.0;
   late Recorder recorder;
-  late Wave wave;
+  late Generator generator;
+  WaveformType waveformType = WaveformType.sine;
+  NoiseType noiseType = NoiseType.white;
+  bool isGenerating = false;
   bool isRecording = false;
   List<Float32List> recordingBuffer = [];
   int totalRecordedFrames = 0;
@@ -39,7 +42,7 @@ class _ExamplePageState extends State<ExamplePage> {
   void initState() {
     super.initState();
     recorder = Recorder();
-    wave = Wave();
+    generator = Generator();
     soundFuture = _initializeSound();
   }
 
@@ -177,73 +180,82 @@ class _ExamplePageState extends State<ExamplePage> {
                               },
                             ),
                             const SizedBox(height: 20),
-                            const Text("Wave Generator",
+                            const Text("Generator",
                                 style: TextStyle(
                                     fontSize: 20, fontWeight: FontWeight.bold)),
-                            DropdownButton<int>(
-                              value: waveType,
-                              items: const [
-                                DropdownMenuItem(value: 0, child: Text("Sine")),
-                                DropdownMenuItem(
-                                    value: 1, child: Text("Square")),
-                                DropdownMenuItem(
-                                    value: 2, child: Text("Triangle")),
-                                DropdownMenuItem(
-                                    value: 3, child: Text("Sawtooth")),
-                              ],
-                              onChanged: (value) {
-                                setState(() {
-                                  waveType = value!;
-                                  wave.setType(waveType);
-                                });
-                              },
-                            ),
                             Row(mainAxisSize: MainAxisSize.min, children: [
-                              const Text("Frequency: "),
-                              SizedBox(
-                                width: 200,
-                                child: Slider(
-                                  value: waveFrequency,
-                                  min: 20,
-                                  max: 2000,
-                                  divisions: 150,
-                                  label: waveFrequency.toStringAsFixed(2),
-                                  onChanged: (value) => setState(() {
-                                    waveFrequency = value;
-                                    wave.setFrequency(waveFrequency);
-                                  }),
-                                ),
+                              const Text("Waveform Type: "),
+                              DropdownButton<WaveformType>(
+                                value: waveformType,
+                                items: WaveformType.values.map((type) {
+                                  return DropdownMenuItem(
+                                    value: type,
+                                    child:
+                                        Text(type.toString().split(".").last),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    waveformType = value!;
+                                  });
+                                },
                               ),
                             ]),
                             Row(mainAxisSize: MainAxisSize.min, children: [
-                              const Text("Amplitude: "),
-                              SizedBox(
-                                width: 200,
-                                child: Slider(
-                                  value: waveAmplitude,
-                                  min: 0,
-                                  max: 1,
-                                  divisions: 100,
-                                  label: waveAmplitude.toStringAsFixed(2),
-                                  onChanged: (value) => setState(() {
-                                    waveAmplitude = value;
-                                    wave.setAmplitude(waveAmplitude);
-                                  }),
-                                ),
+                              const Text("Noise Type: "),
+                              DropdownButton<NoiseType>(
+                                value: noiseType,
+                                items: NoiseType.values.map((type) {
+                                  return DropdownMenuItem(
+                                    value: type,
+                                    child:
+                                        Text(type.toString().split(".").last),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    noiseType = value!;
+                                  });
+                                },
                               ),
                             ]),
                             ElevatedButton(
-                              child: const Text("PLAY WAVE"),
+                              child: Text(isGenerating ? "STOP" : "START"),
                               onPressed: () async {
-                                final waveBuffer = wave.read(1024);
-                                final audioData = AudioData(
-                                    waveBuffer.buffer.asFloat32List(),
-                                    AudioFormat.int32,
-                                    48000,
-                                    1);
-                                await engine.start();
-                                final sound = await engine.loadSound(audioData);
-                                sound.play();
+                                if (isGenerating) {
+                                  setState(() {
+                                    isGenerating = false;
+                                  });
+                                } else {
+                                  await generator.initEngine();
+                                  await generator.init(
+                                      MaFormat.ma_format_f32, 1, 44100, 5);
+
+                                  if (waveformType != WaveformType.sine) {
+                                    generator.setWaveform(
+                                        waveformType, 440.0, 0.5);
+                                  } else {
+                                    generator.setNoise(
+                                        noiseType,
+                                        DateTime.now().millisecondsSinceEpoch,
+                                        0.5);
+                                  }
+
+                                  setState(() {
+                                    isGenerating = true;
+                                  });
+
+                                  while (isGenerating) {
+                                    final frames = generator.getBuffer(1024);
+                                    // Process the generated data as needed
+                                    print("Generated ${frames.length} frames");
+
+                                    await Future.delayed(
+                                        Duration(milliseconds: 100));
+                                  }
+
+                                  generator.dispose();
+                                }
                               },
                             ),
                           ],
@@ -307,7 +319,7 @@ class _ExamplePageState extends State<ExamplePage> {
   @override
   void dispose() {
     recorder.dispose();
-    wave.dispose();
+    generator.dispose();
     super.dispose();
   }
 }
