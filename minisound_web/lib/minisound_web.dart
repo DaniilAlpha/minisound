@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'package:js/js.dart';
 import 'package:minisound_platform_interface/minisound_platform_interface.dart';
 import 'package:minisound_web/bindings/minisound.dart' as wasm;
 import 'package:minisound_web/bindings/wasm/wasm.dart';
@@ -69,7 +68,7 @@ final class WebEngine implements PlatformEngine {
     }
 
     final maFormat = convertToMaFormat(audioData.format);
-    final result = wasm.engine_load_sound_ex(
+    final result = wasm.engine_load_sound(
         _self,
         sound,
         dataPtr,
@@ -188,32 +187,6 @@ final class WebRecorder implements PlatformRecorder {
   void stop() {
     if (wasm.recorder_stop(_self) != wasm.RecorderResult.RECORDER_OK) {
       throw MinisoundPlatformException("Failed to stop recording.");
-    }
-  }
-
-  @override
-  void startStreaming(void Function(Float32List) callback) {
-    final nativeCallback =
-        allowInterop((Pointer<dynamic> frames, int frameCount) {
-      final framesArray =
-          frames.cast<Float>().asTypedList(frameCount) as List<double>;
-      callback(
-          Float32List.fromList(framesArray.map((e) => e.toDouble()).toList()));
-    });
-    final result =
-        wasm.recorder_start_streaming(_self, nativeCallback, nullptr);
-    if (result != wasm.RecorderResult.RECORDER_OK) {
-      throw MinisoundPlatformException(
-          "Failed to start streaming. Error code: $result");
-    }
-  }
-
-  @override
-  void stopStreaming() {
-    final result = wasm.recorder_stop_streaming(_self);
-    if (result != wasm.RecorderResult.RECORDER_OK) {
-      throw MinisoundPlatformException(
-          "Failed to stop streaming. Error code: $result");
     }
   }
 

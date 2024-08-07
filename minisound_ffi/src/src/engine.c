@@ -68,7 +68,7 @@ Result engine_start(Engine *const self)
     return Ok;
 }
 
-Result engine_load_sound_ex(
+Result engine_load_sound(
     Engine *const self,
     Sound *const sound,
     void const *const data,

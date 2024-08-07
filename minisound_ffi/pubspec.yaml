@@ -32,6 +32,7 @@ ffigen:
       - "src/include/sound.h"
       - "src/include/record.h"
       - "src/include/wave.h"
+      - "src/include/circular_buffer.h"
     include-directives:
       - "src/include/*.h"
       - "/usr/lib/clang/18/include/stdbool.h"

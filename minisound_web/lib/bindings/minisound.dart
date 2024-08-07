@@ -57,16 +57,35 @@ abstract class WaveType {
   static const int WAVE_TYPE_SAWTOOTH = 3;
 }
 
+// JS interop
+@JS("ccall")
+external dynamic _ccall(
+    String name, String returnType, List<String> argTypes, List args, Map opts);
+
 // Engine functions
 Pointer<Engine> engine_alloc() => Pointer(_engine_alloc(), 1, safe: true);
 Future<int> engine_init(Pointer<Engine> self, int periodMs) =>
     _engine_init(self.addr, periodMs);
 void engine_uninit(Pointer<Engine> self) => _engine_uninit(self.addr);
 int engine_start(Pointer<Engine> self) => _engine_start(self.addr);
-int engine_load_sound_ex(Pointer<Engine> self, Pointer<Sound> sound,
-        Pointer data, int dataSize, int format, int sampleRate, int channels) =>
-    _engine_load_sound_ex(self.addr, sound.addr, data.addr, dataSize, format,
+int engine_load_sound(Pointer<Engine> self, Pointer<Sound> sound, Pointer data,
+        int dataSize, int format, int sampleRate, int channels) =>
+    _engine_load_sound(self.addr, sound.addr, data.addr, dataSize, format,
         sampleRate, channels);
+
+// Engine JS bindings
+@JS()
+external int _engine_alloc();
+Future<int> _engine_init(int self, int periodMs) async =>
+    promiseToFuture(_ccall("engine_init", "number", ["number", "number"],
+        [self, periodMs], {"async": true}));
+@JS()
+external void _engine_uninit(int self);
+@JS()
+external int _engine_start(int self);
+@JS()
+external int _engine_load_sound(int self, int sound, int data, int dataSize,
+    int format, int sampleRate, int channels);
 
 // Sound functions
 Pointer<Sound> sound_alloc() => Pointer(_sound_alloc(), 1, safe: true);
@@ -82,6 +101,28 @@ double sound_get_duration(Pointer<Sound> self) =>
     _sound_get_duration(self.addr);
 void sound_set_looped(Pointer<Sound> self, bool value, int delay_ms) =>
     _sound_set_looped(self.addr, value, delay_ms);
+
+// Sound JS bindings
+@JS()
+external int _sound_alloc();
+@JS()
+external void _sound_unload(int sound);
+@JS()
+external int _sound_play(int self);
+@JS()
+external int _sound_replay(int self);
+@JS()
+external void _sound_pause(int self);
+@JS()
+external void _sound_stop(int self);
+@JS()
+external double _sound_get_volume(int self);
+@JS()
+external void _sound_set_volume(int self, double value);
+@JS()
+external double _sound_get_duration(int self);
+@JS()
+external int _sound_set_looped(int self, bool value, int delay_ms);
 
 // Recorder functions
 Pointer<Recorder> recorder_create() =>
@@ -104,11 +145,6 @@ Future<int> recorder_init_stream(Pointer<Recorder> self,
         bufferDurationSeconds: bufferDurationSeconds);
 int recorder_start(Pointer<Recorder> self) => _recorder_start(self.addr);
 int recorder_stop(Pointer<Recorder> self) => _recorder_stop(self.addr);
-int recorder_start_streaming(Pointer<Recorder> self,
-        OnFramesAvailableCallback callback, Pointer<dynamic> userData) =>
-    _recorder_start_streaming(self.addr, allowInterop(callback), userData.addr);
-int recorder_stop_streaming(Pointer<Recorder> self) =>
-    _recorder_stop_streaming(self.addr);
 int recorder_get_available_frames(Pointer<Recorder> self) =>
     _recorder_get_available_frames(self.addr);
 bool recorder_is_recording(Pointer<Recorder> self) =>
@@ -142,6 +178,8 @@ Future<int> _recorder_init_stream(int self,
         ["number", "number", "number", "number", "number"],
         [self, sampleRate, channels, format, bufferDurationSeconds],
         {"async": true}));
+
+// Recorder JS bindings
 @JS()
 external int _recorder_start(int self);
 @JS()
@@ -176,47 +214,6 @@ int wave_set_sample_rate(Pointer<Wave> self, int sample_rate) =>
 int wave_read(Pointer<Wave> self, Pointer<Float> output, int frames_to_read) =>
     _wave_read(self.addr, output.addr, frames_to_read);
 void wave_destroy(Pointer<Wave> self) => _wave_destroy(self.addr);
-
-// JS interop
-@JS("ccall")
-external dynamic _ccall(
-    String name, String returnType, List<String> argTypes, List args, Map opts);
-
-// Engine JS bindings
-@JS()
-external int _engine_alloc();
-Future<int> _engine_init(int self, int periodMs) async =>
-    promiseToFuture(_ccall("engine_init", "number", ["number", "number"],
-        [self, periodMs], {"async": true}));
-@JS()
-external void _engine_uninit(int self);
-@JS()
-external int _engine_start(int self);
-@JS("_engine_load_sound_ex")
-external int _engine_load_sound_ex(int self, int sound, int data, int dataSize,
-    int format, int sampleRate, int channels);
-
-// Sound JS bindings
-@JS()
-external int _sound_alloc();
-@JS()
-external void _sound_unload(int sound);
-@JS()
-external int _sound_play(int self);
-@JS()
-external int _sound_replay(int self);
-@JS()
-external void _sound_pause(int self);
-@JS()
-external void _sound_stop(int self);
-@JS()
-external double _sound_get_volume(int self);
-@JS()
-external void _sound_set_volume(int self, double value);
-@JS()
-external double _sound_get_duration(int self);
-@JS()
-external int _sound_set_looped(int self, bool value, int delay_ms);
 
 // Wave JS bindings
 @JS()

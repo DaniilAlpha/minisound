@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "../external/miniaudio/include/miniaudio.h"
 
@@ -32,21 +34,17 @@ EXPORT RecorderResult recorder_init_stream(Recorder *recorder, ma_uint32 sample_
 // Start recording
 EXPORT RecorderResult recorder_start(Recorder *recorder);
 
-EXPORT RecorderResult recorder_start_streaming(Recorder *recorder, void (*on_frames_available)(Recorder *recorder, float *frames, int frame_count), void *user_data);
-
-EXPORT int recorder_get_available_frames(Recorder *recorder);
-
 // Stop recording
 EXPORT RecorderResult recorder_stop(Recorder *recorder);
 
-EXPORT RecorderResult recorder_stop_streaming(Recorder *recorder);
-
-// Check if the recorder is currently recording
-EXPORT bool recorder_is_recording(const Recorder *recorder);
+// Get the number of available frames in the buffer
+EXPORT int recorder_get_available_frames(Recorder *recorder);
 
 // Get recorded audio data from the buffer
 EXPORT int recorder_get_buffer(Recorder *recorder, float *output, ma_uint32 floats_to_read);
 
+// Check if the recorder is currently recording
+EXPORT bool recorder_is_recording(const Recorder *recorder);
 
 // Destroy the recorder and free all associated resources
 EXPORT void recorder_destroy(Recorder *recorder);

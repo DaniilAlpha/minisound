@@ -196,13 +196,6 @@ final class Recorder {
   /// Stops recording.
   void stop() => _recorder.stop();
 
-  /// Starts streaming audio data.
-  void startStreaming(void Function(Float32List) callback) =>
-      _recorder.startStreaming(callback);
-
-  /// Stops streaming audio data.
-  void stopStreaming() => _recorder.stopStreaming();
-
   /// Checks if the recorder is currently recording.
   bool get isRecording => _recorder.isRecording;
 

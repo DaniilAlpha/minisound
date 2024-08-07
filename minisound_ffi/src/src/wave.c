@@ -6,6 +6,7 @@
 
 struct Wave {
     ma_waveform waveform;
+    ma_device device;
 };
 
 static ma_waveform_type convert_wave_type(WaveType type) {
@@ -89,6 +90,6 @@ int32_t wave_read(Wave* wave, float* output, int32_t frames_to_read) {
         return 0;
     }
 
-    ma_decoder_read_pcm_frames(&wave->waveform, output, (ma_uint64)frames_to_read, NULL);
+    
     return frames_to_read;
 }

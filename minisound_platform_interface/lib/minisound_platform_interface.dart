@@ -63,8 +63,6 @@ abstract interface class PlatformRecorder {
       double bufferDurationSeconds = 5});
   void start();
   void stop();
-  void startStreaming(void Function(Float32List) callback);
-  void stopStreaming();
   int getAvailableFrames();
   bool get isRecording;
   Float32List getBuffer(int framesToRead);

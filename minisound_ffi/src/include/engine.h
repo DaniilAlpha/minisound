@@ -17,7 +17,7 @@ EXPORT void engine_uninit(Engine *const self);
 
 EXPORT Result engine_start(Engine *const self);
 
-EXPORT Result engine_load_sound_ex(
+EXPORT Result engine_load_sound(
     Engine *const self,
     Sound *const sound,
     void const *const data,
