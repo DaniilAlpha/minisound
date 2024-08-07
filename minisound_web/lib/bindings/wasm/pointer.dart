@@ -7,17 +7,19 @@ final class Int32 extends Opaque {}
 final class Uint8 extends Opaque {}
 
 class Pointer<T> {
-  const Pointer(this.addr, {this.safe = false});
+  Pointer(this.addr, this.size, {this.safe = false, this.dummy = false});
 
   final int addr;
+  final int size;
   final bool safe;
+  final bool dummy;
 
   int get value => heap[addr];
   set value(int value) => heap[addr] = value;
 
-  Pointer elementAt(int index) => Pointer(addr + index);
+  Pointer elementAt(int index) => Pointer(addr + index, size, safe: safe);
 
-  Pointer<R> cast<R>() => Pointer<R>(addr);
+  Pointer<R> cast<R>() => Pointer<R>(addr, size, safe: safe);
 
   @override
   bool operator ==(Object other) =>
@@ -45,4 +47,4 @@ class Pointer<T> {
   }
 }
 
-const nullptr = Pointer(0);
+final nullptr = Pointer(0, 1);

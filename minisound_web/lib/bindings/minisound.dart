@@ -58,7 +58,7 @@ abstract class WaveType {
 }
 
 // Engine functions
-Pointer<Engine> engine_alloc() => Pointer(_engine_alloc(), safe: true);
+Pointer<Engine> engine_alloc() => Pointer(_engine_alloc(), 1, safe: true);
 Future<int> engine_init(Pointer<Engine> self, int periodMs) =>
     _engine_init(self.addr, periodMs);
 void engine_uninit(Pointer<Engine> self) => _engine_uninit(self.addr);
@@ -69,7 +69,7 @@ int engine_load_sound_ex(Pointer<Engine> self, Pointer<Sound> sound,
         sampleRate, channels);
 
 // Sound functions
-Pointer<Sound> sound_alloc() => Pointer(_sound_alloc());
+Pointer<Sound> sound_alloc() => Pointer(_sound_alloc(), 1, safe: true);
 void sound_unload(Pointer<Sound> self) => _sound_unload(self.addr);
 int sound_play(Pointer<Sound> self) => _sound_play(self.addr);
 int sound_replay(Pointer<Sound> self) => _sound_replay(self.addr);
@@ -84,7 +84,8 @@ void sound_set_looped(Pointer<Sound> self, bool value, int delay_ms) =>
     _sound_set_looped(self.addr, value, delay_ms);
 
 // Recorder functions
-Pointer<Recorder> recorder_create() => Pointer(_recorder_create(), safe: true);
+Pointer<Recorder> recorder_create() =>
+    Pointer(_recorder_create(), 1, safe: true);
 Future<int> recorder_init_file(Pointer<Recorder> self, String filename,
         {int sampleRate = 44800,
         int channels = 1,
@@ -160,7 +161,7 @@ external int _recorder_get_buffer(int self, int output, int frames_to_read);
 external void _recorder_destroy(int self);
 
 // Wave functions
-Pointer<Wave> wave_create() => Pointer(_wave_create(), safe: true);
+Pointer<Wave> wave_create() => Pointer(_wave_create(), 1, safe: true);
 Future<int> wave_init(Pointer<Wave> self, int type, double frequency,
         double amplitude, int sample_rate) =>
     _wave_init(self.addr, type, frequency, amplitude, sample_rate);
