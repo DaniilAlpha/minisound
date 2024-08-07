@@ -217,22 +217,24 @@ final class Recorder {
 /// A generator for waveforms and noise.
 final class Generator {
   Generator() : _generator = MinisoundPlatform.instance.createGenerator() {
-    _engine = Engine();
+    engine = Engine();
   }
 
   final PlatformGenerator _generator;
-  late Engine _engine;
+  late Engine engine;
   bool isCreated = false;
 
   /// Initializes the generator's engine.
   Future initEngine([int periodMs = kIsWeb ? 33 : 10]) async {
-    await _engine.init(periodMs);
-    await _engine.start();
+    await engine.init(periodMs);
   }
 
   /// Initializes the generator.
   Future<void> init(int format, int channels, int sampleRate,
       int bufferDurationSeconds) async {
+    if (!engine.isInit) {
+      await initEngine();
+    }
     await _generator.init(format, channels, sampleRate, bufferDurationSeconds);
   }
 
@@ -247,6 +249,12 @@ final class Generator {
   /// Sets the noise type, seed, and amplitude.
   void setNoise(NoiseType type, int seed, double amplitude) =>
       _generator.setNoise(type, seed, amplitude);
+
+  /// Starts the generator.
+  void start() => _generator.start();
+
+  /// Stops the generator.
+  void stop() => _generator.stop();
 
   /// Reads generated data.
   Float32List getBuffer(int framesToRead) => _generator.getBuffer(framesToRead);

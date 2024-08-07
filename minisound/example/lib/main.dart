@@ -227,7 +227,6 @@ class _ExamplePageState extends State<ExamplePage> {
                                     isGenerating = false;
                                   });
                                 } else {
-                                  await generator.initEngine();
                                   await generator.init(
                                       MaFormat.ma_format_f32, 1, 44100, 5);
 
@@ -243,10 +242,15 @@ class _ExamplePageState extends State<ExamplePage> {
 
                                   setState(() {
                                     isGenerating = true;
+                                    generator.start();
                                   });
 
                                   while (isGenerating) {
-                                    final frames = generator.getBuffer(1024);
+                                    final available =
+                                        generator.getAvailableFrames();
+                                    print("Available frames: $available");
+                                    final frames =
+                                        generator.getBuffer(available);
                                     // Process the generated data as needed
                                     print("Generated ${frames.length} frames");
 

@@ -178,6 +178,8 @@ int generator_set_noise(
 int generator_get_buffer(
         Pointer<Generator> self, Pointer<Float> output, int frames_to_read) =>
     _generator_get_buffer(self.addr, output.addr, frames_to_read);
+int generator_start(Pointer<Generator> self) => _generator_start(self.addr);
+int generator_stop(Pointer<Generator> self) => _generator_stop(self.addr);
 int generator_get_available_frames(Pointer<Generator> self) =>
     _generator_get_available_frames(self.addr);
 void generator_destroy(Pointer<Generator> self) =>
@@ -199,6 +201,10 @@ external int _generator_set_pulsewave(
 @JS()
 external int _generator_set_noise(
     int self, int type, int seed, double amplitude);
+@JS()
+external int _generator_start(int self);
+@JS()
+external int _generator_stop(int self);
 @JS()
 external int _generator_get_buffer(int self, int output, int frames_to_read);
 @JS()

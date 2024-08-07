@@ -89,6 +89,8 @@ abstract interface class PlatformGenerator {
   void setWaveform(WaveformType type, double frequency, double amplitude);
   void setPulsewave(double frequency, double amplitude, double dutyCycle);
   void setNoise(NoiseType type, int seed, double amplitude);
+  void start();
+  void stop();
   Float32List getBuffer(int framesToRead);
   int getAvailableFrames();
   void dispose();

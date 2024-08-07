@@ -270,6 +270,22 @@ final class WebGenerator implements PlatformGenerator {
   }
 
   @override
+  void start() {
+    final result = wasm.generator_start(_self);
+    if (result != GeneratorResult.GENERATOR_OK) {
+      throw MinisoundPlatformException("Failed to start generator.");
+    }
+  }
+
+  @override
+  void stop() {
+    final result = wasm.generator_stop(_self);
+    if (result != GeneratorResult.GENERATOR_OK) {
+      throw MinisoundPlatformException("Failed to stop generator.");
+    }
+  }
+
+  @override
   Float32List getBuffer(int framesToRead) {
     final bufferPtr = malloc.allocate<Float>(framesToRead);
     try {

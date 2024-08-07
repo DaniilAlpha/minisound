@@ -481,7 +481,7 @@ class MinisoundFfiBindings {
     int format,
     int channels,
     int sample_rate,
-    double buffer_duration_seconds,
+    int buffer_duration_seconds,
   ) {
     return _generator_init(
       generator,
@@ -495,9 +495,9 @@ class MinisoundFfiBindings {
   late final _generator_initPtr = _lookup<
       ffi.NativeFunction<
           ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Int32, ma_uint32,
-              ma_uint32, ffi.Float)>>('generator_init');
-  late final _generator_init = _generator_initPtr.asFunction<
-      int Function(ffi.Pointer<Generator>, int, int, int, double)>();
+              ma_uint32, ffi.Int)>>('generator_init');
+  late final _generator_init = _generator_initPtr
+      .asFunction<int Function(ffi.Pointer<Generator>, int, int, int, int)>();
 
   int generator_set_waveform(
     ffi.Pointer<Generator> generator,
@@ -562,23 +562,51 @@ class MinisoundFfiBindings {
   late final _generator_set_noise = _generator_set_noisePtr
       .asFunction<int Function(ffi.Pointer<Generator>, int, int, double)>();
 
-  int generator_read(
+  int generator_start(
+    ffi.Pointer<Generator> generator,
+  ) {
+    return _generator_start(
+      generator,
+    );
+  }
+
+  late final _generator_startPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<Generator>)>>(
+          'generator_start');
+  late final _generator_start =
+      _generator_startPtr.asFunction<int Function(ffi.Pointer<Generator>)>();
+
+  int generator_stop(
+    ffi.Pointer<Generator> generator,
+  ) {
+    return _generator_stop(
+      generator,
+    );
+  }
+
+  late final _generator_stopPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<Generator>)>>(
+          'generator_stop');
+  late final _generator_stop =
+      _generator_stopPtr.asFunction<int Function(ffi.Pointer<Generator>)>();
+
+  int generator_get_buffer(
     ffi.Pointer<Generator> generator,
     ffi.Pointer<ffi.Float> output,
     int frames_to_read,
   ) {
-    return _generator_read(
+    return _generator_get_buffer(
       generator,
       output,
       frames_to_read,
     );
   }
 
-  late final _generator_readPtr = _lookup<
+  late final _generator_get_bufferPtr = _lookup<
       ffi.NativeFunction<
           ma_uint32 Function(ffi.Pointer<Generator>, ffi.Pointer<ffi.Float>,
-              ma_uint32)>>('generator_read');
-  late final _generator_read = _generator_readPtr.asFunction<
+              ma_uint32)>>('generator_get_buffer');
+  late final _generator_get_buffer = _generator_get_bufferPtr.asFunction<
       int Function(ffi.Pointer<Generator>, ffi.Pointer<ffi.Float>, int)>();
 
   int generator_get_available_frames(
@@ -4110,6 +4138,12 @@ abstract class GeneratorResult {
   static const int GENERATOR_ERROR = 1;
 }
 
+abstract class GeneratorType {
+  static const int GENERATOR_TYPE_WAVEFORM = 0;
+  static const int GENERATOR_TYPE_PULSEWAVE = 1;
+  static const int GENERATOR_TYPE_NOISE = 2;
+}
+
 typedef Generator = UnnamedStruct55;
 
 final class UnnamedStruct55 extends ffi.Struct {
@@ -4119,6 +4153,10 @@ final class UnnamedStruct55 extends ffi.Struct {
 
   external ma_noise noise;
 
+  external ma_device device;
+
+  external ma_device_config device_config;
+
   external CircularBuffer circular_buffer;
 
   @ma_uint32()
@@ -4126,6 +4164,9 @@ final class UnnamedStruct55 extends ffi.Struct {
 
   @ma_uint32()
   external int channels;
+
+  @ffi.Int32()
+  external int type;
 }
 
 final class ma_waveform extends ffi.Struct {

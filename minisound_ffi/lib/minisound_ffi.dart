@@ -331,7 +331,7 @@ class FfiRecorder implements PlatformRecorder {
   }
 }
 
-// wave ffi
+// generator ffi
 class FfiGenerator implements PlatformGenerator {
   FfiGenerator(Pointer<ffi.Generator> self) : _self = self;
 
@@ -339,7 +339,7 @@ class FfiGenerator implements PlatformGenerator {
 
   @override
   Future<void> init(int format, int channels, int sampleRate,
-      double bufferDurationSeconds) async {
+      int bufferDurationSeconds) async {
     final result = await _bindings.generator_init(
         _self, format, channels, sampleRate, bufferDurationSeconds);
     if (result != ffi.GeneratorResult.GENERATOR_OK) {
@@ -376,11 +376,27 @@ class FfiGenerator implements PlatformGenerator {
   }
 
   @override
+  void start() {
+    final result = _bindings.generator_start(_self);
+    if (result != ffi.GeneratorResult.GENERATOR_OK) {
+      throw MinisoundPlatformException("Failed to start generator.");
+    }
+  }
+
+  @override
+  void stop() {
+    final result = _bindings.generator_stop(_self);
+    if (result != ffi.GeneratorResult.GENERATOR_OK) {
+      throw MinisoundPlatformException("Failed to stop generator.");
+    }
+  }
+
+  @override
   Float32List getBuffer(int framesToRead) {
     final bufferPtr = malloc.allocate<Float>(framesToRead);
     try {
       final framesRead =
-          _bindings.generator_read(_self, bufferPtr, framesToRead);
+          _bindings.generator_get_buffer(_self, bufferPtr, framesToRead);
       if (framesRead < 0) {
         throw MinisoundPlatformException(
             "Failed to read generator data. Error code: $framesRead");
@@ -392,9 +408,7 @@ class FfiGenerator implements PlatformGenerator {
   }
 
   @override
-  int getAvailableFrames() {
-    return _bindings.generator_get_available_frames(_self);
-  }
+  int getAvailableFrames() => _bindings.generator_get_available_frames(_self);
 
   @override
   void dispose() {
