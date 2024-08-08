@@ -171,14 +171,14 @@ class _ExamplePageState extends State<ExamplePage> {
                                 if (recorder.isRecording) {
                                   recorder.stop();
                                 }
-                                if (!recorder.isCreated) {
+                                if (!recorder.isInit) {
                                   print('Creating recorder');
                                   await recorder.initStream(
                                     sampleRate: 48000,
                                     channels: 1,
                                     format: AudioFormat.float32,
                                   );
-                                  recorder.isCreated = true;
+                                  recorder.isInit = true;
                                 }
 
                                 recorder.start();
@@ -317,14 +317,14 @@ class _ExamplePageState extends State<ExamplePage> {
                                   generator.stop();
                                 });
                               } else {
-                                if (!generator.isCreated) {
+                                if (!generator.isInit) {
                                   await generator.init(
                                     AudioFormat.float32,
                                     2,
                                     48000,
                                     5,
                                   );
-                                  generator.isCreated = true;
+                                  generator.isInit = true;
                                 }
 
                                 if (enableWaveform) {

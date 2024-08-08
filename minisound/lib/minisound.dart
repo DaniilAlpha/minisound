@@ -135,7 +135,7 @@ final class Recorder {
   late int channels;
   late int format;
   late int bufferDurationSeconds;
-  bool isCreated = false;
+  bool isInit = false;
 
   /// Initializes the recorder's engine.
   Future<void> initEngine([int periodMs = 33]) async {
@@ -172,7 +172,7 @@ final class Recorder {
     if (sampleRate <= 0 || channels <= 0 || bufferDurationSeconds <= 0) {
       throw ArgumentError("Invalid recorder parameters");
     }
-    if (!isCreated) {
+    if (!isInit) {
       this.sampleRate = sampleRate;
       this.channels = channels;
       this.format = format;
@@ -184,7 +184,7 @@ final class Recorder {
           channels: channels,
           format: format,
           bufferDurationSeconds: bufferDurationSeconds);
-      isCreated = true;
+      isInit = true;
     }
   }
 
@@ -217,7 +217,7 @@ final class Generator {
 
   final PlatformGenerator _generator;
   late Engine engine;
-  bool isCreated = false;
+  bool isInit = false;
 
   /// Initializes the generator's engine.
   Future initEngine([int periodMs = 33]) async {
@@ -230,10 +230,10 @@ final class Generator {
     if (!engine.isInit) {
       await initEngine();
     }
-    if (!isCreated) {
+    if (!isInit) {
       await _generator.init(
           format, channels, sampleRate, bufferDurationSeconds);
-      isCreated = true;
+      isInit = true;
     }
   }
 
