@@ -258,7 +258,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                 child: Slider(
                                   value: loopDelay,
                                   min: 0,
-                                  max: 1,
+                                  max: 3,
                                   divisions: 100,
                                   label: loopDelay.toStringAsFixed(2),
                                   onChanged: enablePulse
@@ -351,9 +351,9 @@ class _ExamplePageState extends State<ExamplePage> {
                                 while (isGenerating) {
                                   final available =
                                       generator.getAvailableFrames();
-                                  print('Available frames: $available');
-                                  final frames = generator.getBuffer(100);
-                                  print('Generated ${frames.length} frames');
+                                  // print('Available frames: $available');
+                                  // final frames = generator.getBuffer(available);
+                                  //print('Generated ${frames.length} frames');
                                   await Future.delayed(
                                     const Duration(milliseconds: 100),
                                   );

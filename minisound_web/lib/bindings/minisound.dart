@@ -214,7 +214,6 @@ external int _generator_set_noise(
     int self, int type, int seed, double amplitude);
 @JS()
 external int _generator_start(int self);
-
 @JS()
 external int _generator_stop(int self);
 @JS()

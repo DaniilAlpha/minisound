@@ -6,7 +6,7 @@
 
 #include "export.h"
 
-EXPORT typedef enum {
+typedef enum {
     GENERATOR_OK,
     GENERATOR_ERROR
 } GeneratorResult;

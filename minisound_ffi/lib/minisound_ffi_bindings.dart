@@ -4120,19 +4120,7 @@ typedef ma_engine_process_proc = ffi.Pointer<
         ffi.Void Function(ffi.Pointer<ffi.Void> pUserData,
             ffi.Pointer<ffi.Float> pFramesOut, ma_uint64 frameCount)>>;
 
-abstract class RecorderResult {
-  static const int RECORDER_OK = 0;
-  static const int RECORDER_ERROR_UNKNOWN = 1;
-  static const int RECORDER_ERROR_OUT_OF_MEMORY = 2;
-  static const int RECORDER_ERROR_INVALID_ARGUMENT = 3;
-  static const int RECORDER_ERROR_ALREADY_RECORDING = 4;
-  static const int RECORDER_ERROR_NOT_RECORDING = 5;
-  static const int RECORDER_ERROR_INVALID_FORMAT = 6;
-}
-
-typedef Recorder = UnnamedStruct55;
-
-final class UnnamedStruct55 extends ffi.Struct {
+final class Recorder extends ffi.Struct {
   external ma_encoder encoder;
 
   external ma_encoder_config encoder_config;
@@ -4149,8 +4137,7 @@ final class UnnamedStruct55 extends ffi.Struct {
   @ffi.Bool()
   external bool is_file_recording;
 
-  @ffi.Int()
-  external int circular_buffer;
+  external CircularBuffer circular_buffer;
 
   @ffi.Int()
   external int sample_rate;
@@ -4168,13 +4155,6 @@ final class UnnamedStruct55 extends ffi.Struct {
 
   @ffi.Size()
   external int encode_buffer_used;
-
-  external ffi.Pointer<
-      ffi.NativeFunction<
-          ffi.Void Function(
-              ffi.Pointer<ffi.Int> recorder,
-              ffi.Pointer<ffi.Float> frames,
-              ffi.Int frame_count)>> on_frames_available;
 
   external ffi.Pointer<ffi.Void> user_data;
 }
@@ -4247,13 +4227,36 @@ typedef ma_encoder_write_pcm_frames_proc = ffi.Pointer<
             ffi.Pointer<ma_uint64> pFramesWritten)>>;
 
 final class UnnamedUnion20 extends ffi.Union {
-  external UnnamedStruct56 vfs;
+  external UnnamedStruct55 vfs;
 }
 
-final class UnnamedStruct56 extends ffi.Struct {
+final class UnnamedStruct55 extends ffi.Struct {
   external ffi.Pointer<ma_vfs> pVFS;
 
   external ma_vfs_file file;
+}
+
+final class CircularBuffer extends ffi.Struct {
+  external ffi.Pointer<ffi.Float> buffer;
+
+  @ffi.Size()
+  external int capacity;
+
+  @ffi.Size()
+  external int write_pos;
+
+  @ffi.Size()
+  external int read_pos;
+}
+
+abstract class RecorderResult {
+  static const int RECORDER_OK = 0;
+  static const int RECORDER_ERROR_UNKNOWN = 1;
+  static const int RECORDER_ERROR_OUT_OF_MEMORY = 2;
+  static const int RECORDER_ERROR_INVALID_ARGUMENT = 3;
+  static const int RECORDER_ERROR_ALREADY_RECORDING = 4;
+  static const int RECORDER_ERROR_NOT_RECORDING = 5;
+  static const int RECORDER_ERROR_INVALID_FORMAT = 6;
 }
 
 abstract class GeneratorResult {
@@ -4278,19 +4281,6 @@ final class Generator extends ffi.Struct {
 
   @ffi.Int32()
   external int type;
-}
-
-final class CircularBuffer extends ffi.Struct {
-  external ffi.Pointer<ffi.Float> buffer;
-
-  @ffi.Size()
-  external int capacity;
-
-  @ffi.Size()
-  external int write_pos;
-
-  @ffi.Size()
-  external int read_pos;
 }
 
 abstract class ma_waveform_type {

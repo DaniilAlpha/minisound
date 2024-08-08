@@ -11,7 +11,7 @@
 #include "circular_buffer.h"
 #include "export.h"
 
-EXPORT typedef struct
+typedef struct
 {
     ma_encoder encoder;
     ma_encoder_config encoder_config;
