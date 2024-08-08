@@ -110,7 +110,7 @@ void main() async {
   await recorder.initStream(
     sampleRate: 48000,
     channels: 1,
-    format: minisound.AudioFormat.float32,
+    format: minisound.MaFormat.ma_format_f32,
     bufferDurationSeconds: 5,
   );
 
@@ -147,7 +147,7 @@ void main() async {
 
   // Initialize the generator
   await generator.init(
-    minisound.AudioFormat.float32,
+    minisound.MaFormat.ma_format_f32,
     2,
     48000,
     5,

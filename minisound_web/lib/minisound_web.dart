@@ -198,10 +198,9 @@ final class WebRecorder implements PlatformRecorder {
     try {
       int floatsToRead =
           framesToRead * 8; // Calculate the actual number of floats to read
-      if (bufferPtr.value <= 0) malloc.free(bufferPtr);
 
-      bufferPtr = malloc.allocate<Float>(
-          floatsToRead); // Allocate memory for the float buffer
+      bufferPtr = malloc.allocate<Float>(floatsToRead);
+      bufferPtr.retain(); // Allocate memory for the float buffer
       final floatsRead =
           wasm.recorder_get_buffer(_self, bufferPtr, floatsToRead);
 

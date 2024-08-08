@@ -1,6 +1,7 @@
 @JS()
 library wasm;
 
+import "dart:async";
 import "dart:typed_data";
 
 import "package:js/js.dart";

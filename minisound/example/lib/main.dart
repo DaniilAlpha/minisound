@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:minisound/minisound.dart';
+import 'package:minisound/minisound_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,8 +50,7 @@ class _ExamplePageState extends State<ExamplePage> {
     if (!engine.isInit) {
       await engine.init();
     }
-    final data = await rootBundle.load('assets/laser_shoot.wav');
-    return engine.loadSoundAsset(data, 'assets/laser_shoot.wav');
+    return engine.loadSoundAsset('assets/laser_shoot.wav');
   }
 
   @override

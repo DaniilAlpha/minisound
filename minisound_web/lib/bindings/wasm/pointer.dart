@@ -7,15 +7,39 @@ final class Int32 extends Opaque {}
 final class Uint8 extends Opaque {}
 
 class Pointer<T> {
-  Pointer(this.addr, this.size, {this.safe = false, this.dummy = false});
+  Pointer(this.addr, this.size,
+      {this.safe = false, this.dummy = false, this.refCount = 1}) {
+    refCount = 1;
+    lastAccessTime = DateTime.now().millisecondsSinceEpoch;
+  }
 
   final int addr;
   final int size;
   final bool safe;
   final bool dummy;
+  int refCount;
+  late int lastAccessTime;
 
-  int get value => heap[addr];
-  set value(int value) => heap[addr] = value;
+  void retain() {
+    refCount++;
+  }
+
+  void release() {
+    refCount--;
+    if (refCount == 0) {
+      malloc.free(this);
+    }
+  }
+
+  int get value {
+    lastAccessTime = DateTime.now().millisecondsSinceEpoch;
+    return heap[addr];
+  }
+
+  set value(int value) {
+    lastAccessTime = DateTime.now().millisecondsSinceEpoch;
+    heap[addr] = value;
+  }
 
   Pointer elementAt(int index) => Pointer(addr + index, size, safe: safe);
 
