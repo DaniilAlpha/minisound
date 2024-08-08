@@ -224,3 +224,7 @@ To build the project, follow these steps:
 - [x] Fix non-intuitiveness of pausing and stopping, then playing again looped sounds
 - [x] Exclude emscripten build cache from git.
 - [ ] Stop crash when no devices found for playback or capture
+- [ ] Extract buffer stuff to unified AV Buffer packages dart and C.
+- [ ] Automate local web deployment with strict origin flags for local testing.
+- [ ] Create a makefile.
+- [ ] Document dependencies for building.
