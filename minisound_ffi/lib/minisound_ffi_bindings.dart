@@ -494,8 +494,8 @@ class MinisoundFfiBindings {
 
   late final _generator_initPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Int32, ma_uint32,
-              ma_uint32, ffi.Int)>>('generator_init');
+          ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Int32, ffi.Int,
+              ffi.Int, ffi.Int)>>('generator_init');
   late final _generator_init = _generator_initPtr
       .asFunction<int Function(ffi.Pointer<Generator>, int, int, int, int)>();
 
@@ -557,7 +557,7 @@ class MinisoundFfiBindings {
 
   late final _generator_set_noisePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Int32, ma_int32,
+          ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Int32, ffi.Int,
               ffi.Double)>>('generator_set_noise');
   late final _generator_set_noise = _generator_set_noisePtr
       .asFunction<int Function(ffi.Pointer<Generator>, int, int, double)>();
@@ -593,19 +593,19 @@ class MinisoundFfiBindings {
   int generator_get_buffer(
     ffi.Pointer<Generator> generator,
     ffi.Pointer<ffi.Float> output,
-    int frames_to_read,
+    int floats_to_read,
   ) {
     return _generator_get_buffer(
       generator,
       output,
-      frames_to_read,
+      floats_to_read,
     );
   }
 
   late final _generator_get_bufferPtr = _lookup<
       ffi.NativeFunction<
-          ma_uint32 Function(ffi.Pointer<Generator>, ffi.Pointer<ffi.Float>,
-              ma_uint32)>>('generator_get_buffer');
+          ffi.Int Function(ffi.Pointer<Generator>, ffi.Pointer<ffi.Float>,
+              ffi.Int)>>('generator_get_buffer');
   late final _generator_get_buffer = _generator_get_bufferPtr.asFunction<
       int Function(ffi.Pointer<Generator>, ffi.Pointer<ffi.Float>, int)>();
 
@@ -618,7 +618,7 @@ class MinisoundFfiBindings {
   }
 
   late final _generator_get_available_framesPtr =
-      _lookup<ffi.NativeFunction<ma_uint32 Function(ffi.Pointer<Generator>)>>(
+      _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Pointer<Generator>)>>(
           'generator_get_available_frames');
   late final _generator_get_available_frames =
       _generator_get_available_framesPtr
@@ -4120,8 +4120,6 @@ typedef ma_engine_process_proc = ffi.Pointer<
         ffi.Void Function(ffi.Pointer<ffi.Void> pUserData,
             ffi.Pointer<ffi.Float> pFramesOut, ma_uint64 frameCount)>>;
 
-final class Recorder extends ffi.Opaque {}
-
 abstract class RecorderResult {
   static const int RECORDER_OK = 0;
   static const int RECORDER_ERROR_UNKNOWN = 1;
@@ -4130,6 +4128,132 @@ abstract class RecorderResult {
   static const int RECORDER_ERROR_ALREADY_RECORDING = 4;
   static const int RECORDER_ERROR_NOT_RECORDING = 5;
   static const int RECORDER_ERROR_INVALID_FORMAT = 6;
+}
+
+typedef Recorder = UnnamedStruct55;
+
+final class UnnamedStruct55 extends ffi.Struct {
+  external ma_encoder encoder;
+
+  external ma_encoder_config encoder_config;
+
+  external ma_device device;
+
+  external ma_device_config device_config;
+
+  external ffi.Pointer<ffi.Char> filename;
+
+  @ffi.Bool()
+  external bool is_recording;
+
+  @ffi.Bool()
+  external bool is_file_recording;
+
+  @ffi.Int()
+  external int circular_buffer;
+
+  @ffi.Int()
+  external int sample_rate;
+
+  @ffi.Int()
+  external int channels;
+
+  @ffi.Int32()
+  external int format;
+
+  external ffi.Pointer<ffi.Uint8> encode_buffer;
+
+  @ffi.Size()
+  external int encode_buffer_size;
+
+  @ffi.Size()
+  external int encode_buffer_used;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Pointer<ffi.Int> recorder,
+              ffi.Pointer<ffi.Float> frames,
+              ffi.Int frame_count)>> on_frames_available;
+
+  external ffi.Pointer<ffi.Void> user_data;
+}
+
+final class ma_encoder extends ffi.Struct {
+  external ma_encoder_config config;
+
+  external ma_encoder_write_proc onWrite;
+
+  external ma_encoder_seek_proc onSeek;
+
+  external ma_encoder_init_proc onInit;
+
+  external ma_encoder_uninit_proc onUninit;
+
+  external ma_encoder_write_pcm_frames_proc onWritePCMFrames;
+
+  external ffi.Pointer<ffi.Void> pUserData;
+
+  external ffi.Pointer<ffi.Void> pInternalEncoder;
+
+  external UnnamedUnion20 data;
+}
+
+final class ma_encoder_config extends ffi.Struct {
+  @ffi.Int32()
+  external int encodingFormat;
+
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channels;
+
+  @ma_uint32()
+  external int sampleRate;
+
+  external ma_allocation_callbacks allocationCallbacks;
+}
+
+abstract class ma_encoding_format {
+  static const int ma_encoding_format_unknown = 0;
+  static const int ma_encoding_format_wav = 1;
+  static const int ma_encoding_format_flac = 2;
+  static const int ma_encoding_format_mp3 = 3;
+  static const int ma_encoding_format_vorbis = 4;
+}
+
+typedef ma_encoder_write_proc = ffi.Pointer<
+    ffi.NativeFunction<
+        ffi.Int32 Function(
+            ffi.Pointer<ma_encoder> pEncoder,
+            ffi.Pointer<ffi.Void> pBufferIn,
+            ffi.Size bytesToWrite,
+            ffi.Pointer<ffi.Size> pBytesWritten)>>;
+typedef ma_encoder_seek_proc = ffi.Pointer<
+    ffi.NativeFunction<
+        ffi.Int32 Function(ffi.Pointer<ma_encoder> pEncoder, ma_int64 offset,
+            ffi.Int32 origin)>>;
+typedef ma_encoder_init_proc = ffi.Pointer<
+    ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<ma_encoder> pEncoder)>>;
+typedef ma_encoder_uninit_proc = ffi.Pointer<
+    ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ma_encoder> pEncoder)>>;
+typedef ma_encoder_write_pcm_frames_proc = ffi.Pointer<
+    ffi.NativeFunction<
+        ffi.Int32 Function(
+            ffi.Pointer<ma_encoder> pEncoder,
+            ffi.Pointer<ffi.Void> pFramesIn,
+            ma_uint64 frameCount,
+            ffi.Pointer<ma_uint64> pFramesWritten)>>;
+
+final class UnnamedUnion20 extends ffi.Union {
+  external UnnamedStruct56 vfs;
+}
+
+final class UnnamedStruct56 extends ffi.Struct {
+  external ffi.Pointer<ma_vfs> pVFS;
+
+  external ma_vfs_file file;
 }
 
 abstract class GeneratorResult {
@@ -4144,155 +4268,16 @@ abstract class GeneratorType {
 }
 
 final class Generator extends ffi.Struct {
-  external ma_waveform waveform;
-
-  external ma_pulsewave pulsewave;
-
-  external ma_noise noise;
-
-  external ma_device device;
-
-  external ma_device_config device_config;
-
   external CircularBuffer circular_buffer;
 
-  @ma_uint32()
+  @ffi.Int()
   external int sample_rate;
 
-  @ma_uint32()
+  @ffi.Int()
   external int channels;
 
   @ffi.Int32()
   external int type;
-}
-
-final class ma_waveform extends ffi.Struct {
-  external ma_data_source_base ds;
-
-  external ma_waveform_config config;
-
-  @ffi.Double()
-  external double advance;
-
-  @ffi.Double()
-  external double time;
-}
-
-final class ma_waveform_config extends ffi.Struct {
-  @ffi.Int32()
-  external int format;
-
-  @ma_uint32()
-  external int channels;
-
-  @ma_uint32()
-  external int sampleRate;
-
-  @ffi.Int32()
-  external int type;
-
-  @ffi.Double()
-  external double amplitude;
-
-  @ffi.Double()
-  external double frequency;
-}
-
-abstract class ma_waveform_type {
-  static const int ma_waveform_type_sine = 0;
-  static const int ma_waveform_type_square = 1;
-  static const int ma_waveform_type_triangle = 2;
-  static const int ma_waveform_type_sawtooth = 3;
-}
-
-final class ma_pulsewave extends ffi.Struct {
-  external ma_waveform waveform;
-
-  external ma_pulsewave_config config;
-}
-
-final class ma_pulsewave_config extends ffi.Struct {
-  @ffi.Int32()
-  external int format;
-
-  @ma_uint32()
-  external int channels;
-
-  @ma_uint32()
-  external int sampleRate;
-
-  @ffi.Double()
-  external double dutyCycle;
-
-  @ffi.Double()
-  external double amplitude;
-
-  @ffi.Double()
-  external double frequency;
-}
-
-final class ma_noise extends ffi.Struct {
-  external ma_data_source_base ds;
-
-  external ma_noise_config config;
-
-  external ma_lcg lcg;
-
-  external UnnamedUnion20 state;
-
-  external ffi.Pointer<ffi.Void> _pHeap;
-
-  @ma_bool32()
-  external int _ownsHeap;
-}
-
-final class ma_noise_config extends ffi.Struct {
-  @ffi.Int32()
-  external int format;
-
-  @ma_uint32()
-  external int channels;
-
-  @ffi.Int32()
-  external int type;
-
-  @ma_int32()
-  external int seed;
-
-  @ffi.Double()
-  external double amplitude;
-
-  @ma_bool32()
-  external int duplicateChannels;
-}
-
-abstract class ma_noise_type {
-  static const int ma_noise_type_white = 0;
-  static const int ma_noise_type_pink = 1;
-  static const int ma_noise_type_brownian = 2;
-}
-
-final class ma_lcg extends ffi.Struct {
-  @ma_int32()
-  external int state;
-}
-
-final class UnnamedUnion20 extends ffi.Union {
-  external UnnamedStruct55 pink;
-
-  external UnnamedStruct56 brownian;
-}
-
-final class UnnamedStruct55 extends ffi.Struct {
-  external ffi.Pointer<ffi.Pointer<ffi.Double>> bin;
-
-  external ffi.Pointer<ffi.Double> accumulation;
-
-  external ffi.Pointer<ma_uint32> counter;
-}
-
-final class UnnamedStruct56 extends ffi.Struct {
-  external ffi.Pointer<ffi.Double> accumulation;
 }
 
 final class CircularBuffer extends ffi.Struct {
@@ -4306,4 +4291,17 @@ final class CircularBuffer extends ffi.Struct {
 
   @ffi.Size()
   external int read_pos;
+}
+
+abstract class ma_waveform_type {
+  static const int ma_waveform_type_sine = 0;
+  static const int ma_waveform_type_square = 1;
+  static const int ma_waveform_type_triangle = 2;
+  static const int ma_waveform_type_sawtooth = 3;
+}
+
+abstract class ma_noise_type {
+  static const int ma_noise_type_white = 0;
+  static const int ma_noise_type_pink = 1;
+  static const int ma_noise_type_brownian = 2;
 }

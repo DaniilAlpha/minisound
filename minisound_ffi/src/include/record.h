@@ -8,9 +8,31 @@
 
 #include "../external/miniaudio/include/miniaudio.h"
 
+#include "circular_buffer.h"
 #include "export.h"
 
-typedef struct Recorder Recorder;
+EXPORT typedef struct
+{
+    ma_encoder encoder;
+    ma_encoder_config encoder_config;
+    ma_device device;
+    ma_device_config device_config;
+    char *filename;
+    bool is_recording;
+    bool is_file_recording;
+
+    CircularBuffer circular_buffer;
+
+    int sample_rate;
+    int channels;
+    ma_format format;
+
+    uint8_t *encode_buffer;
+    size_t encode_buffer_size;
+    size_t encode_buffer_used;
+
+    void *user_data;
+} Recorder;
 
 EXPORT typedef enum {
     RECORDER_OK = 0,

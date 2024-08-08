@@ -1,32 +1,7 @@
 #include "../include/record.h"
-#include "../include/circular_buffer.h"
-
 
 #include "../external/milo/milo.h"
 
-struct Recorder
-{
-    ma_encoder encoder;
-    ma_encoder_config encoder_config;
-    ma_device device;
-    ma_device_config device_config;
-    char *filename;
-    bool is_recording;
-    bool is_file_recording;
-
-    CircularBuffer circular_buffer;
-
-    int sample_rate;
-    int channels;
-    ma_format format;
-
-    uint8_t *encode_buffer;
-    size_t encode_buffer_size;
-    size_t encode_buffer_used;
-
-    void (*on_frames_available)(Recorder *recorder, float *frames, int frame_count);
-    void *user_data;
-};
 
 
 static void data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount)
@@ -43,11 +18,6 @@ static void data_callback(ma_device *pDevice, void *pOutput, const void *pInput,
         ma_encoder_write_pcm_frames(&recorder->encoder, pInput, frameCount, NULL);
     }
 
-    if (recorder->on_frames_available != NULL)
-    {
-        recorder->on_frames_available(recorder, (float *)pInput, frameCount);
-    }
-
     (void)pOutput;
 }
 
@@ -60,6 +30,21 @@ Recorder *recorder_create(void)
     }
     memset(recorder, 0, sizeof(Recorder));
     return recorder;
+}
+
+void recorder_destroy(Recorder *recorder)
+{
+    if (recorder != NULL)
+    {
+        ma_device_uninit(&recorder->device);
+        if (recorder->is_file_recording)
+        {
+            ma_encoder_uninit(&recorder->encoder);
+            free(recorder->filename);
+        }
+        circular_buffer_uninit(&recorder->circular_buffer);
+        free(recorder);
+    }
 }
 
 static RecorderResult recorder_init_common(Recorder *recorder, const char *filename, int sample_rate, int channels, ma_format format, int buffer_duration_seconds)
@@ -115,7 +100,6 @@ static RecorderResult recorder_init_common(Recorder *recorder, const char *filen
     }
 
     recorder->is_recording = false;
-    recorder->on_frames_available = NULL;
     recorder->user_data = NULL;
 
     return RECORDER_OK;
@@ -197,19 +181,4 @@ int recorder_get_available_frames(Recorder *recorder)
 
     size_t available_floats = circular_buffer_get_available_floats(&recorder->circular_buffer);
     return (int)(available_floats / recorder->channels);
-}
-
-void recorder_destroy(Recorder *recorder)
-{
-    if (recorder != NULL)
-    {
-        ma_device_uninit(&recorder->device);
-        if (recorder->is_file_recording)
-        {
-            ma_encoder_uninit(&recorder->encoder);
-            free(recorder->filename);
-        }
-        circular_buffer_uninit(&recorder->circular_buffer);
-        free(recorder);
-    }
 }
