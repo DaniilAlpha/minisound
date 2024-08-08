@@ -10,8 +10,8 @@ function(find_project_root current_dir filename result_var)
     set(found FALSE)  # Flag to indicate if the file is found
     set(current_check_dir "${current_dir}")  # Start from the given directory
     
-    # Traverse up to 2 levels
-    foreach(i RANGE 0 2)
+    # Windows flutter embeds 8 levels deep
+    foreach(i RANGE 0 8)
         set(filepath "${current_check_dir}/${filename}")
         
         if(EXISTS "${filepath}")
@@ -123,7 +123,7 @@ else()
         -O2 \
         -flto \
         -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall \
-        -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=5MB -sINITIAL_MEMORY=10MB -sMAXIMUM_MEMORY=1gb  \
+        -sALLOW_MEMORY_GROWTH -sMAXIMUM_MEMORY=1gb  \
         -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sFORCE_FILESYSTEM=1 -sNO_FETCH_SUPPORT_INDEXEDDB \
         -sAUDIO_WORKLET=1 -sWASM_WORKERS=1 -sASYNCIFY \
         -sSTACK_OVERFLOW_CHECK \
