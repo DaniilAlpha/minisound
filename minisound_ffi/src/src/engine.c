@@ -77,7 +77,5 @@ Result engine_load_sound(
     int sample_rate,
     int channels)
 {
-    ma_decoder_config dec_config = ma_decoder_config_init(format, channels, sample_rate);
-
     return sound_init(sound, data, data_size, format, channels, sample_rate, &self->engine);
 }
