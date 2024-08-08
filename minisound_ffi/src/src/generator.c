@@ -33,11 +33,10 @@ void data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uin
 {
     Generator *generator;
     generator = (Generator *)pDevice->pUserData;
-    if (generator == NULL)
-    {
-        printf("Error: Generator is NULL in data_callback.\n");
-        return;
-    }
+
+    printf("Debug: Data callback called with frame count: %u\n", frameCount);
+
+    circular_buffer_write(&generator->circular_buffer, pOutput, frameCount * generator->channels);
 
     switch (generator->type)
     {
@@ -55,16 +54,31 @@ void data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uin
         break;
     }
 
-    circular_buffer_write(&generator->circular_buffer, pOutput, frameCount * generator->channels);
-
     (void)pInput;
 }
 
 GeneratorResult generator_init(Generator *generator, ma_format format, ma_uint32 channels, ma_uint32 sample_rate, int buffer_duration_seconds)
 {
-    ma_device_config device_config;
+    ma_device_config deviceConfig;
     ma_device device;
-    ma_context context;
+    ma_waveform_config sineWaveConfig;
+
+    generator_set_noise(generator, ma_noise_type_white, 0, 0.5);
+    generator_set_pulsewave(generator, 440.0, 0.5, 0.5);
+    generator_set_waveform(generator, ma_waveform_type_sine, 440.0, 0.5);
+
+    deviceConfig = ma_device_config_init(ma_device_type_playback);
+    deviceConfig.playback.format = format;
+    deviceConfig.playback.channels = channels;
+    deviceConfig.sampleRate = sample_rate;
+    deviceConfig.dataCallback = data_callback;
+    deviceConfig.pUserData = generator;
+
+    if (ma_device_init(NULL, &deviceConfig, &device) != MA_SUCCESS)
+    {
+        printf("Failed to open playback device.\n");
+        return -4;
+    }
     if (generator == NULL)
     {
         printf("Error: Generator is NULL in generator_init.\n");
@@ -80,29 +94,12 @@ GeneratorResult generator_init(Generator *generator, ma_format format, ma_uint32
     printf("Debug: Initializing generator with format: %d, channels: %u, sample rate: %u, buffer duration: %d seconds\n",
            format, channels, sample_rate, buffer_duration_seconds);
 
-    device_config = ma_device_config_init(ma_device_type_playback);
-    printf("Debug: Device config initialized.\n");
-    device_config.playback.format = format;
-    device_config.playback.channels = channels;
-    device_config.sampleRate = sample_rate;
-    device_config.dataCallback = data_callback;
-    device_config.pUserData = &generator->waveform;
     generator->sample_rate = sample_rate;
     generator->channels = channels;
+    generator->device_config = deviceConfig;
+    generator->device = device;
 
-    if (ma_context_init(NULL, 0, NULL, &context) != MA_SUCCESS)
-    {
-        printf("Failed to initialize context.\n");
-        return -2;
-    }
-
-    if (ma_device_init(&context, &device_config, &device) != MA_SUCCESS)
-    {
-        printf("Error: Failed to initialize audio device.\n");
-        return GENERATOR_ERROR;
-    }
-
-    printf("Debug: Audio device initialized.\n");
+    printf("Debug: Audio device initialized.\n name: %s\n", generator->device.playback.name);
 
     size_t buffer_size_in_bytes = (size_t)(sample_rate * channels * ma_get_bytes_per_sample(format) * buffer_duration_seconds);
     if (circular_buffer_init(&generator->circular_buffer, buffer_size_in_bytes) != 0)
@@ -126,20 +123,12 @@ GeneratorResult generator_set_waveform(Generator *generator, ma_waveform_type ty
 
     printf("Debug: Setting waveform with type: %d, frequency: %f, amplitude: %f\n", type, frequency, amplitude);
 
-    generator->device_config.pUserData = &generator->waveform;
     generator->type = GENERATOR_TYPE_WAVEFORM;
 
     ma_waveform_config config = ma_waveform_config_init(generator->device.playback.format, generator->device.playback.channels, generator->device.sampleRate, type, amplitude, frequency);
     if (ma_waveform_init(&config, &generator->waveform) != MA_SUCCESS)
     {
         printf("Error: Failed to initialize waveform.\n");
-        return GENERATOR_ERROR;
-    }
-
-    if (ma_device_start(&generator->device) != MA_SUCCESS)
-    {
-        printf("Error: Failed to start playback device.\n");
-        ma_waveform_uninit(&generator->waveform);
         return GENERATOR_ERROR;
     }
 
@@ -158,7 +147,6 @@ GeneratorResult generator_set_pulsewave(Generator *generator, double frequency, 
     printf("Debug: Setting pulsewave with frequency: %f, amplitude: %f, duty cycle: %f\n", frequency, amplitude, dutyCycle);
 
     generator->type = GENERATOR_TYPE_PULSEWAVE;
-    generator->device_config.pUserData = &generator->pulsewave;
 
     ma_pulsewave_config config = ma_pulsewave_config_init(ma_format_f32, generator->channels, generator->sample_rate, dutyCycle, amplitude, frequency);
     if (ma_pulsewave_init(&config, &generator->pulsewave) != MA_SUCCESS)
@@ -182,7 +170,6 @@ GeneratorResult generator_set_noise(Generator *generator, ma_noise_type type, ma
     printf("Debug: Setting noise with type: %d, seed: %d, amplitude: %f\n", type, seed, amplitude);
 
     generator->type = GENERATOR_TYPE_NOISE;
-    generator->device_config.pUserData = &generator->noise;
 
     ma_noise_config config = ma_noise_config_init(ma_format_f32, generator->channels, type, seed, amplitude);
     if (ma_noise_init(&config, NULL, &generator->noise) != MA_SUCCESS)
@@ -204,7 +191,6 @@ GeneratorResult generator_start(Generator *generator)
     }
 
     printf("Debug: Starting generator.\n");
-
     if (ma_device_start(&generator->device) != MA_SUCCESS)
     {
         printf("Error: Failed to start generator.\n");
@@ -259,7 +245,6 @@ ma_uint32 generator_get_buffer(Generator *generator, float *output, ma_uint32 fr
     }
 
     ma_uint32 frames_read = (ma_uint32)circular_buffer_read(&generator->circular_buffer, output, frames_to_read * generator->channels);
-    ma_uint32 actual_frames_read = frames_read / generator->channels;
-    printf("Debug: Requested frames: %u, Actual frames read: %u\n", frames_to_read, actual_frames_read);
-    return actual_frames_read;
+    printf("Debug: Requested frames: %u, Actual frames read: %u\n", frames_to_read, frames_read);
+    return frames_read;
 }

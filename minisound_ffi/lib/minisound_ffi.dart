@@ -285,7 +285,7 @@ class FfiGenerator implements PlatformGenerator {
   final Pointer<ffi.Generator> _self;
 
   @override
-  Future<void> init(int format, int channels, int sampleRate,
+  Future<int> init(int format, int channels, int sampleRate,
       int bufferDurationSeconds) async {
     final result = await _bindings.generator_init(
         _self, format, channels, sampleRate, bufferDurationSeconds);
@@ -293,6 +293,7 @@ class FfiGenerator implements PlatformGenerator {
       throw MinisoundPlatformException(
           "Failed to initialize generator. Error code: $result");
     }
+    return result;
   }
 
   @override

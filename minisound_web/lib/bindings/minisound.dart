@@ -162,10 +162,13 @@ external void _recorder_destroy(int self);
 // Generator functions
 Pointer<Generator> generator_create() =>
     Pointer(_generator_create(), 1, safe: true);
-int generator_init(Pointer<Generator> self, int format, int channels,
-        int sample_rate, int buffer_duration_seconds) =>
-    _generator_init(
-        self.addr, format, channels, sample_rate, buffer_duration_seconds);
+Future<int> generator_init(Pointer<Generator> self, int format, int channels,
+        int sample_rate, int buffer_duration_seconds) async =>
+    _generator_init(self.addr,
+        format: format,
+        channels: channels,
+        sampleRate: sample_rate,
+        bufferDuration: buffer_duration_seconds);
 int generator_set_waveform(Pointer<Generator> self, int type, double frequency,
         double amplitude) =>
     _generator_set_waveform(self.addr, type, frequency, amplitude);
@@ -189,9 +192,17 @@ void generator_destroy(Pointer<Generator> self) =>
 @JS()
 external int _generator_create();
 
-@JS()
-external int _generator_init(int self, int format, int channels,
-    int sample_rate, int buffer_duration_seconds);
+Future<int> _generator_init(int self,
+        {int sampleRate = 44800,
+        int channels = 1,
+        int format = MaFormat.ma_format_f32,
+        int bufferDuration = 5}) async =>
+    promiseToFuture(_ccall(
+        "generator_init",
+        "number",
+        ["number", "number", "number", "number", "number"],
+        [self, format, channels, sampleRate, bufferDuration],
+        {"async": true}));
 @JS()
 external int _generator_set_waveform(
     int self, int type, double frequency, double amplitude);
@@ -203,6 +214,7 @@ external int _generator_set_noise(
     int self, int type, int seed, double amplitude);
 @JS()
 external int _generator_start(int self);
+
 @JS()
 external int _generator_stop(int self);
 @JS()

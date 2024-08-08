@@ -233,7 +233,11 @@ final class Generator {
     if (!engine.isInit) {
       await initEngine();
     }
-    await _generator.init(format, channels, sampleRate, bufferDurationSeconds);
+    if (!isCreated) {
+      await _generator.init(
+          format, channels, sampleRate, bufferDurationSeconds);
+      isCreated = true;
+    }
   }
 
   /// Sets the waveform type, frequency, and amplitude.

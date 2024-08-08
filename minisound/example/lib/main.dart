@@ -228,27 +228,32 @@ class _ExamplePageState extends State<ExamplePage> {
                                     isGenerating = false;
                                   });
                                 } else {
-                                  await generator.init(
-                                      MaFormat.ma_format_f32, 1, 48000, 5);
-
-                                  if (waveformType != WaveformType.sine) {
-                                    //generator.setWaveform(
-                                    //   waveformType, 440.0, 0.5);
-                                  } else {}
+                                  if (!generator.isCreated) {
+                                    await generator.init(
+                                        MaFormat.ma_format_f32, 2, 48000, 5);
+                                    generator.isCreated = true;
+                                    await Future.delayed(
+                                        const Duration(milliseconds: 500));
+                                    generator.setWaveform(
+                                        waveformType, 440.0, 0.5);
+                                    if (waveformType != WaveformType.sine) {
+                                    } else {}
+                                  }
 
                                   setState(() {
                                     isGenerating = true;
-                                    //generator.start();
+                                    generator.start();
                                   });
 
                                   while (isGenerating) {
-                                    //final available =
-                                    // generator.getAvailableFrames();
-                                    // print("Available frames: $available");
-                                    // final frames =
-                                    //    generator.getBuffer(available);
+                                    final available =
+                                        generator.getAvailableFrames();
+                                    print("Available frames: $available");
+                                    final frames = generator.getBuffer(100);
                                     // Process the generated data as needed
-                                    //print("Generated ${frames.length} frames");
+                                    print("Generated ${frames.length} frames");
+                                    await Future.delayed(
+                                        const Duration(milliseconds: 100));
                                   }
                                 }
                               },
