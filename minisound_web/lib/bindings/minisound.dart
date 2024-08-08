@@ -91,13 +91,13 @@ Pointer<Recorder> recorder_create() =>
 Future<int> recorder_init_file(Pointer<Recorder> self, String filename,
         {int sampleRate = 44800,
         int channels = 1,
-        int format = MaFormat.ma_format_f32}) =>
+        int format = AudioFormat.float32}) =>
     _recorder_init_file(self.addr, filename,
         sampleRate: sampleRate, channels: channels, format: format);
 Future<int> recorder_init_stream(Pointer<Recorder> self,
         {int sampleRate = 44800,
         int channels = 1,
-        int format = MaFormat.ma_format_f32,
+        int format = AudioFormat.float32,
         int bufferDurationSeconds = 5}) =>
     _recorder_init_stream(self.addr,
         sampleRate: sampleRate,
@@ -121,7 +121,7 @@ external int _recorder_create();
 Future<int> _recorder_init_file(int self, String filename,
         {int sampleRate = 44800,
         int channels = 1,
-        int format = MaFormat.ma_format_f32}) async =>
+        int format = AudioFormat.float32}) async =>
     promiseToFuture(_ccall(
         "recorder_init_file",
         "number",
@@ -131,7 +131,7 @@ Future<int> _recorder_init_file(int self, String filename,
 Future<int> _recorder_init_stream(int self,
         {int sampleRate = 44800,
         int channels = 1,
-        int format = MaFormat.ma_format_f32,
+        int format = AudioFormat.float32,
         int bufferDurationSeconds = 5}) async =>
     promiseToFuture(_ccall(
         "recorder_init_stream",
@@ -195,7 +195,7 @@ external int _generator_create();
 Future<int> _generator_init(int self,
         {int sampleRate = 44800,
         int channels = 1,
-        int format = MaFormat.ma_format_f32,
+        int format = 4,
         int bufferDuration = 5}) async =>
     promiseToFuture(_ccall(
         "generator_init",

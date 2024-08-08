@@ -55,11 +55,11 @@ abstract interface class PlatformRecorder {
   Future<void> initFile(String filename,
       {int sampleRate = 44800,
       int channels = 1,
-      int format = MaFormat.ma_format_f32});
+      int format = AudioFormat.float32});
   Future<void> initStream(
       {int sampleRate = 44800,
       int channels = 1,
-      int format = MaFormat.ma_format_f32,
+      int format = AudioFormat.float32,
       int bufferDurationSeconds = 5});
   void start();
   void stop();
@@ -117,44 +117,18 @@ class AudioData {
   AudioData(this.buffer, this.format, this.sampleRate, this.channels);
 
   final Float32List buffer;
-  final AudioFormat format;
+  final int format;
   final int sampleRate;
   final int channels;
 }
 
-enum AudioFormat {
-  uint8,
-  int16,
-  int32,
-  float32,
-  float64,
-}
-
-class MaFormat {
-  static const int ma_format_unknown = 0;
-  static const int ma_format_u8 = 1;
-  static const int ma_format_s16 = 2;
-  static const int ma_format_s24 = 3;
-  static const int ma_format_s32 = 4;
-  static const int ma_format_f32 = 5;
-  static const int ma_format_f64 = 6;
-}
-
-int convertToMaFormat(AudioFormat format) {
-  switch (format) {
-    case AudioFormat.uint8:
-      return MaFormat.ma_format_u8;
-    case AudioFormat.int16:
-      return MaFormat.ma_format_s16;
-    case AudioFormat.int32:
-      return MaFormat.ma_format_s32;
-    case AudioFormat.float32:
-      return MaFormat.ma_format_f32;
-    case AudioFormat.float64:
-      return MaFormat.ma_format_f64;
-    default:
-      return MaFormat.ma_format_unknown;
-  }
+class AudioFormat {
+  static const int unknown = 0;
+  static const int uint8 = 1;
+  static const int int16 = 2;
+  static const int int32 = 4;
+  static const int float32 = 5;
+  static const int float64 = 6;
 }
 
 abstract class Result {

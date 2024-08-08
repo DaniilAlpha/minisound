@@ -6,7 +6,6 @@ export "package:minisound_platform_interface/minisound_platform_interface.dart"
     show
         AudioData,
         AudioFormat,
-        MaFormat,
         MinisoundPlatformException,
         MinisoundPlatformOutOfMemoryException,
         NoiseType,
@@ -60,14 +59,13 @@ final class Engine {
     return _loadSoundFromBuffer(bytes.buffer.asFloat32List(), filePath);
   }
 
-  Future<Sound> _loadSoundFromBuffer(Float32List buffer, String path) async {
-    return loadSound(AudioData(
-        buffer,
-        AudioFormat.float32, // We pass the raw data and let miniaudio decode
-        0, // Sample rate will be detected by miniaudio
-        0 // Channels will be detected by miniaudio
-        ));
-  }
+  Future<Sound> _loadSoundFromBuffer(Float32List buffer, String path) async =>
+      loadSound(AudioData(
+          buffer,
+          AudioFormat.float32, // We pass the raw data and let miniaudio decode
+          0, // Sample rate will be detected by miniaudio
+          0 // Channels will be detected by miniaudio
+          ));
 }
 
 /// A sound.
@@ -148,7 +146,7 @@ final class Recorder {
   Future<void> initFile(String filename,
       {int sampleRate = 44800,
       int channels = 1,
-      int format = MaFormat.ma_format_f32}) async {
+      int format = AudioFormat.float32}) async {
     if (sampleRate <= 0 || channels <= 0) {
       throw ArgumentError("Invalid recorder parameters");
     }
@@ -166,10 +164,9 @@ final class Recorder {
   Future<void> initStream(
       {int sampleRate = 44800,
       int channels = 1,
-      int format = MaFormat.ma_format_f32,
+      int format = AudioFormat.float32,
       int bufferDurationSeconds = 5}) async {
     if (!engine.isInit) {
-      print("init engine");
       await initEngine();
     }
     if (sampleRate <= 0 || channels <= 0 || bufferDurationSeconds <= 0) {

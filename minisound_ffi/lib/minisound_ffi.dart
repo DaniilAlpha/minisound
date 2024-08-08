@@ -89,7 +89,7 @@ final class FfiEngine implements PlatformEngine {
         throw MinisoundPlatformException("Failed to allocate a sound.");
       }
 
-      final int maFormat = convertToMaFormat(audioData.format);
+      final int maFormat = audioData.format.toInt();
       final int result = _bindings.engine_load_sound(
         _self,
         sound,
@@ -109,24 +109,6 @@ final class FfiEngine implements PlatformEngine {
     } catch (e) {
       malloc.free(dataPtr);
       rethrow;
-    }
-  }
-  // ma_format_unknown = 0,     /* Mainly used for indicating an error, but also used as the default for the output format for decoders. */
-  // ma_format_u8      = 1,
-  // ma_format_s16     = 2,     /* Seems to be the most widely supported format. */
-  // ma_format_s24     = 3,     /* Tightly packed. 3 bytes per sample. */
-  // ma_format_s32     = 4,
-  // ma_format_f32     = 5,
-
-  void _copyAudioData(Pointer<Float> ptr, dynamic data, AudioFormat format) {
-    if (data is ByteBuffer) {
-      final byteData = data.asFloat32List();
-      ptr.asTypedList(byteData.length * sizeOf<Float>()).setAll(0, byteData);
-    } else if (data is TypedData) {
-      final byteData = data.buffer.asFloat32List();
-      ptr.asTypedList(byteData.length * sizeOf<Float>()).setAll(0, byteData);
-    } else {
-      throw ArgumentError('Unsupported data type: ${data.runtimeType}');
     }
   }
 }
@@ -198,9 +180,7 @@ class FfiRecorder implements PlatformRecorder {
 
   @override
   Future<void> initFile(String filename,
-      {int sampleRate = 44800,
-      int channels = 1,
-      int format = MaFormat.ma_format_f32}) async {
+      {int sampleRate = 44800, int channels = 1, int format = 4}) async {
     final filenamePtr = filename.toNativeUtf8();
     try {
       if (_bindings.recorder_init_file(
@@ -218,7 +198,7 @@ class FfiRecorder implements PlatformRecorder {
   Future<void> initStream(
       {int sampleRate = 44800,
       int channels = 1,
-      int format = MaFormat.ma_format_f32,
+      int format = 4, // float32
       int bufferDurationSeconds = 5}) async {
     print(channels);
     if (_bindings.recorder_init_stream(

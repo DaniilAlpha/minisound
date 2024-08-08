@@ -46,7 +46,7 @@ class Heap {
     _heapF64.setRange(startIndex, endIndex, data);
   }
 
-  void copyAudioData(Pointer ptr, dynamic data, AudioFormat format) {
+  void copyAudioData(Pointer ptr, dynamic data, int format) {
     if (data is ByteBuffer) {
       data = _getTypedDataViewFromByteBuffer(data, format);
     }
@@ -85,8 +85,7 @@ class Heap {
     }
   }
 
-  TypedData _getTypedDataViewFromByteBuffer(
-      ByteBuffer buffer, AudioFormat format) {
+  TypedData _getTypedDataViewFromByteBuffer(ByteBuffer buffer, int format) {
     switch (format) {
       case AudioFormat.uint8:
         return buffer.asUint8List();

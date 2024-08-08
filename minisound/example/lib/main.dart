@@ -176,7 +176,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                   await recorder.initStream(
                                     sampleRate: 48000,
                                     channels: 1,
-                                    format: 5,
+                                    format: AudioFormat.float32,
                                   );
                                   recorder.isCreated = true;
                                 }
@@ -319,7 +319,7 @@ class _ExamplePageState extends State<ExamplePage> {
                               } else {
                                 if (!generator.isCreated) {
                                   await generator.init(
-                                    MaFormat.ma_format_f32,
+                                    AudioFormat.float32,
                                     2,
                                     48000,
                                     5,

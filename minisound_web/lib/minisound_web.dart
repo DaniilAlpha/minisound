@@ -67,13 +67,12 @@ final class WebEngine implements PlatformEngine {
       throw MinisoundPlatformException("Failed to allocate a sound.");
     }
 
-    final maFormat = convertToMaFormat(audioData.format);
     final result = wasm.engine_load_sound(
         _self,
         sound,
         dataPtr,
         audioData.buffer.lengthInBytes,
-        maFormat,
+        audioData.format,
         audioData.sampleRate,
         audioData.channels);
 
@@ -150,7 +149,7 @@ final class WebRecorder implements PlatformRecorder {
   Future<void> initFile(String filename,
       {int sampleRate = 44800,
       int channels = 1,
-      int format = MaFormat.ma_format_f32}) async {
+      int format = AudioFormat.float32}) async {
     final result = await wasm.recorder_init_file(_self, filename,
         sampleRate: sampleRate, channels: channels, format: format);
     if (result != RecorderResult.RECORDER_OK) {
@@ -163,7 +162,7 @@ final class WebRecorder implements PlatformRecorder {
   Future<void> initStream(
       {int sampleRate = 44800,
       int channels = 1,
-      int format = MaFormat.ma_format_f32,
+      int format = AudioFormat.float32,
       int bufferDurationSeconds = 5}) async {
     final result = await wasm.recorder_init_stream(_self,
         sampleRate: sampleRate,
