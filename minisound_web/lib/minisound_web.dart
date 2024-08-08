@@ -233,6 +233,15 @@ final class WebGenerator implements PlatformGenerator {
   WebGenerator(this._self);
   final Pointer<wasm.Generator> _self;
 
+  late var _volume = wasm.generator_get_volume(_self);
+  @override
+  double get volume => _volume;
+  @override
+  set volume(double value) {
+    wasm.generator_set_volume(_self, value);
+    _volume = value;
+  }
+
   @override
   Future<void> init(int format, int channels, int sampleRate,
       int bufferDurationSeconds) async {

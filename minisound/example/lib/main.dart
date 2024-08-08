@@ -108,6 +108,8 @@ class _ExamplePageState extends State<ExamplePage> {
                                   onChanged: (value) => setState(() {
                                     sound.volume = value;
                                   }),
+                                  onChangeEnd: (value) =>
+                                      generator.volume = value,
                                 ),
                               ),
                             ],
@@ -314,10 +316,6 @@ class _ExamplePageState extends State<ExamplePage> {
                                 },
                               ),
                               const Text("Waveform"),
-                              const Text("BEWARE VOLUME"),
-                              const Text(
-                                "FIXED SOON",
-                              ),
                               const SizedBox(width: 20),
                               Checkbox(
                                 value: enableNoise,

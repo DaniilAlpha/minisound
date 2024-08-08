@@ -195,6 +195,10 @@ final class Generator {
     engine = Engine();
   }
 
+  /// a `double` greater than `0` (values greater than `1` may behave differently from platform to platform)
+  double get volume => _generator.volume;
+  set volume(double value) => _generator.volume = value < 0 ? 0 : value;
+
   final PlatformGenerator _generator;
   late Engine engine;
   bool isInit = false;

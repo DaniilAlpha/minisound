@@ -263,9 +263,20 @@ class FfiRecorder implements PlatformRecorder {
 
 // generator ffi
 class FfiGenerator implements PlatformGenerator {
-  FfiGenerator(Pointer<ffi.Generator> self) : _self = self;
+  FfiGenerator(Pointer<ffi.Generator> self, double volume)
+      : _self = self,
+        _volume = _bindings.generator_get_volume(self);
 
   final Pointer<ffi.Generator> _self;
+
+  double _volume;
+  @override
+  double get volume => _volume;
+  @override
+  set volume(double value) {
+    _bindings.sound_set_volume(_self, value);
+    _volume = value;
+  }
 
   @override
   Future<int> init(int format, int channels, int sampleRate,

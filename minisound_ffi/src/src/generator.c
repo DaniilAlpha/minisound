@@ -226,6 +226,24 @@ GeneratorResult generator_stop(Generator *generator)
     return GENERATOR_OK;
 }
 
+float volume = 0.5f;
+
+float generator_get_volume(Generator const *const self)
+{
+    return volume;
+}
+
+void generator_set_volume(Generator *const self, float const value)
+{
+    if(value < 0.0f || value > 5.0f)
+    {
+        printf("Error: Invalid volume value in generator_set_volume. Volume: %f\n", value);
+        return;
+    }
+    ma_device_set_master_volume(&device, value);
+    volume = value;
+}
+
 int generator_get_buffer(Generator *generator, float *output, int floats_to_read)
 {
     if (generator == NULL || output == NULL || floats_to_read <= 0)

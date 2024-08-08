@@ -189,6 +189,9 @@ class GeneratorMock implements PlatformGenerator {
   int sampleRate = 0;
   int bufferDurationSeconds = 0;
 
+  @override
+  var volume = 1.0;
+
   var isStarted = false;
 
   @override

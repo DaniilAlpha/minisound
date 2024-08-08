@@ -183,6 +183,10 @@ int generator_get_buffer(
     _generator_get_buffer(self.addr, output.addr, frames_to_read);
 int generator_start(Pointer<Generator> self) => _generator_start(self.addr);
 int generator_stop(Pointer<Generator> self) => _generator_stop(self.addr);
+double generator_get_volume(Pointer<Generator> self) =>
+    _sound_get_volume(self.addr);
+void generator_set_volume(Pointer<Generator> self, double value) =>
+    _generator_set_volume(self.addr, value);
 int generator_get_available_frames(Pointer<Generator> self) =>
     _generator_get_available_frames(self.addr);
 void generator_destroy(Pointer<Generator> self) =>
@@ -216,6 +220,10 @@ external int _generator_set_noise(
 external int _generator_start(int self);
 @JS()
 external int _generator_stop(int self);
+@JS()
+external double _generator_get_volume(int self);
+@JS()
+external void _generator_set_volume(int self, double value);
 @JS()
 external int _generator_get_buffer(int self, int output, int frames_to_read);
 @JS()

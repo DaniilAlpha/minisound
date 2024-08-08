@@ -90,6 +90,8 @@ enum NoiseType {
 
 abstract interface class PlatformGenerator {
   factory PlatformGenerator() => MinisoundPlatform.instance.createGenerator();
+  double get volume;
+  set volume(double value);
   Future<void> init(
       int format, int channels, int sampleRate, int bufferDurationSeconds);
   void setWaveform(WaveformType type, double frequency, double amplitude);

@@ -590,6 +590,37 @@ class MinisoundFfiBindings {
   late final _generator_stop =
       _generator_stopPtr.asFunction<int Function(ffi.Pointer<Generator>)>();
 
+  double generator_get_volume(
+    ffi.Pointer<Generator> self,
+  ) {
+    return _generator_get_volume(
+      self,
+    );
+  }
+
+  late final _generator_get_volumePtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(ffi.Pointer<Generator>)>>(
+          'generator_get_volume');
+  late final _generator_get_volume = _generator_get_volumePtr
+      .asFunction<double Function(ffi.Pointer<Generator>)>();
+
+  void generator_set_volume(
+    ffi.Pointer<Generator> self,
+    double value,
+  ) {
+    return _generator_set_volume(
+      self,
+      value,
+    );
+  }
+
+  late final _generator_set_volumePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Pointer<Generator>, ffi.Float)>>('generator_set_volume');
+  late final _generator_set_volume = _generator_set_volumePtr
+      .asFunction<void Function(ffi.Pointer<Generator>, double)>();
+
   int generator_get_buffer(
     ffi.Pointer<Generator> generator,
     ffi.Pointer<ffi.Float> output,

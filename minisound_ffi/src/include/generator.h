@@ -32,6 +32,8 @@ EXPORT GeneratorResult generator_set_pulsewave(Generator* generator, double freq
 EXPORT GeneratorResult generator_set_noise(Generator* generator, ma_noise_type type, int seed, double amplitude);
 EXPORT GeneratorResult generator_start(Generator* generator);
 EXPORT GeneratorResult generator_stop(Generator* generator);
+EXPORT float generator_get_volume(Generator const *const self);
+EXPORT void generator_set_volume(Generator *const self, float const value);
 EXPORT int generator_get_buffer(Generator* generator, float* output, int floats_to_read);
 EXPORT int generator_get_available_frames(Generator* generator);
 
