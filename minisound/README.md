@@ -95,7 +95,127 @@ void main() {
 }
 ```
 
+### Recorder Example
+
+```dart
+import "package:minisound/minisound.dart" as minisound;
+
+void main() async {
+  final recorder = minisound.Recorder();
+
+  // Initialize the recorder's engine
+  await recorder.initEngine();
+
+  // Initialize the recorder for streaming
+  await recorder.initStream(
+    sampleRate: 48000,
+    channels: 1,
+    format: minisound.MaFormat.ma_format_f32,
+    bufferDurationSeconds: 5,
+  );
+
+  // Start recording
+  recorder.start();
+
+  // Wait for some time while recording
+  await Future.delayed(Duration(seconds: 5));
+
+  // Stop recording
+  recorder.stop();
+
+  // Get the recorded buffer
+  final buffer = recorder.getBuffer(recorder.getAvailableFrames());
+
+  // Process the recorded buffer as needed
+  // ...
+
+  // Dispose of the recorder resources
+  recorder.dispose();
+}
+```
+
+### Generator Example
+
+```dart
+import "package:minisound/minisound.dart" as minisound;
+
+void main() async {
+  final generator = minisound.Generator();
+
+  // Initialize the generator's engine
+  await generator.initEngine();
+
+  // Initialize the generator
+  await generator.init(
+    minisound.MaFormat.ma_format_f32,
+    2,
+    48000,
+    5,
+  );
+
+  // Set the waveform type, frequency, and amplitude
+  generator.setWaveform(minisound.WaveformType.sine, 440.0, 0.5);
+
+  // Set the noise type, seed, and amplitude
+  generator.setNoise(minisound.NoiseType.white, 0, 0.2);
+
+  // Start the generator
+  generator.start();
+
+  // Generate and process audio data in a loop
+  while (true) {
+    final available = generator.getAvailableFrames();
+    final buffer = generator.getBuffer(available);
+
+    // Process the generated buffer as needed
+    // ...
+
+    await Future.delayed(Duration(milliseconds: 100));
+  }
+
+  // Stop the generator
+  generator.stop();
+
+  // Dispose of the generator resources
+  generator.dispose();
+}
+```
+
+## Building the project
+
+To build the project, follow these steps:
+
+1. Initialize the submodules:
+   ```
+   git submodule update --init --recursive
+   ```
+
+2. Navigate to the `minisound_ffi/src/build` directory:
+   ```
+   cd minisound_ffi/src/build
+   ```
+
+3. Run the following commands to build the project using emcmake and cmake:
+   ```
+   emcmake cmake ..
+   cmake --build .
+   ```
+
+   If you encounter issues or want to start fresh, clean the `build` folder and rerun the cmake commands:
+   ```
+   rm -rf *
+   emcmake cmake ..
+   cmake --build .
+   ```
+
+4. For development work, it's useful to run `ffigen` from the `minisound_ffi` directory:
+   ```
+   cd ../../..
+   dart run ffigen
+   ```
+
 ## TODO
 
 - Fix non-intuitiveness of pausing and stopping, then playing again looped sounds
 - Exclude emscripten build cache from git.
+- Stop crash when no devices found for playback or capture
