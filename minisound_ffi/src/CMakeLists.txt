@@ -5,20 +5,38 @@ project(minisound_ffi VERSION 1.0.0 LANGUAGES C)
 # Specify the filename to search for
 set(FILENAME ".projectroot")
 
-get_filename_component(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
-get_filename_component(PROJECT_ROOT ${PROJECT_ROOT} DIRECTORY)
+# Function to check for file existence up the directory hierarchy
+function(find_project_root current_dir filename result_var)
+    set(found FALSE)  # Flag to indicate if the file is found
+    set(current_check_dir "${current_dir}")  # Start from the given directory
+    
+    # Traverse up to 2 levels
+    foreach(i RANGE 0 2)
+        set(filepath "${current_check_dir}/${filename}")
+        
+        if(EXISTS "${filepath}")
+            set(${result_var} "${current_check_dir}" PARENT_SCOPE)
+            set(found TRUE)
+            break()
+        endif()
+        
+        # Move one level up
+        get_filename_component(current_check_dir "${current_check_dir}" DIRECTORY)
+    endforeach()
+    
+    if(NOT found)
+        set(${result_var} "" PARENT_SCOPE)  # Set to empty if not found
+    endif()
+endfunction()
 
-# Construct potential paths
-set(FILEPATH_CURRENT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
-set(FILEPATH_PROJECT_ROOT "${PROJECT_ROOT}/${FILENAME}/../../")
+# Call the function to find the project root
+find_project_root("${CMAKE_CURRENT_SOURCE_DIR}" "${FILENAME}" TARGET_FILE_PATH)
 
-# Check if the file exists in the current directory
-if(EXISTS ${FILEPATH_CURRENT_DIR})
-    set(TARGET_FILE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
-elseif(EXISTS ${FILEPATH_PROJECT_ROOT})
-    set(TARGET_FILE_PATH ${PROJECT_ROOT})
+# Check if the target file path was found
+if(TARGET_FILE_PATH)
+    message(STATUS "Project root found at ${TARGET_FILE_PATH}")
 else()
-    message(FATAL_ERROR "File ${FILENAME} not found in either ${CMAKE_CURRENT_SOURCE_DIR} or ${CMAKE_CURRENT_SOURCE_DIR}/../../")
+    message(FATAL_ERROR "File ${FILENAME} not found within 2 levels up from ${CMAKE_CURRENT_SOURCE_DIR}")
 endif()
 
 # Set lib name
