@@ -4,26 +4,6 @@
 #include "../external/milo/milo.h"
 #include "../include/miniaudio.h"
 
-struct Sound
-{
-    bool is_raw_data;
-    ma_engine *engine;
-    union
-    {
-        struct
-        {
-            ma_sound sound;
-            ma_decoder decoder;
-        } file;
-        struct
-        {
-            ma_sound sound;
-            ma_audio_buffer buffer;
-        } raw;
-    };
-    bool is_looped;
-    size_t loop_delay_ms;
-};
 
 Sound *sound_alloc()
 {
@@ -191,12 +171,31 @@ bool sound_get_is_looped(Sound const *const self)
     return self->is_looped;
 }
 
-void sound_set_looped(Sound *const self, bool const value, size_t const delay_ms)
-{
-    self->is_looped = value;
-    self->loop_delay_ms = delay_ms;
-    ma_sound *sound = self->is_raw_data ? &self->raw.sound : &self->file.sound;
-    ma_sound_set_looping(sound, value);
-    // Note: delay_ms is stored but not used in this implementation.
-    // You might need to implement custom looping logic to use the delay.
+void sound_set_looped(
+    Sound *const self,
+    bool const value,
+    size_t const delay_ms
+) {
+    if (value) {
+        if (delay_ms <= 0) {
+            ma_data_source_set_looping(&self->decoder, true);
+        } else {
+            SilenceDataSourceConfig const config = silence_data_source_config(
+                self->decoder.outputFormat,
+                self->decoder.outputChannels,
+                self->decoder.outputSampleRate,
+                (delay_ms * self->decoder.outputSampleRate) / 1000
+            );
+            silence_data_source_init(&self->loop_delay_ds, &config);
+
+            ma_data_source_set_next(&self->decoder, &self->loop_delay_ds);
+            ma_data_source_set_next(&self->loop_delay_ds, &self->decoder);
+        }
+    } else {
+        // TODO? maybe refactor this
+
+        ma_data_source_set_current(&self->decoder, &self->decoder);
+        ma_data_source_set_looping(&self->decoder, false);
+        ma_data_source_set_next(&self->decoder, NULL);
+    }
 }

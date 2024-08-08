@@ -7,8 +7,30 @@
 #include "../external/miniaudio/include/miniaudio.h"
 #include "../external/result/result.h"
 #include "export.h"
+#include "silence_data_source.h"
 
-typedef struct Sound Sound;
+typedef struct
+{
+    bool is_raw_data;
+    ma_engine *engine;
+    ma_decoder decoder;
+    union
+    {
+        struct
+        {
+            ma_sound sound;
+            ma_decoder decoder;
+        } file;
+        struct
+        {
+            ma_sound sound;
+            ma_audio_buffer buffer;
+        } raw;
+    };
+    bool is_looped;
+    size_t loop_delay_ms;
+    SilenceDataSource loop_delay_ds;
+} Sound;
 
 EXPORT Sound *sound_alloc();
 
