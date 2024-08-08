@@ -138,6 +138,12 @@ class _ExamplePageState extends State<ExamplePage> {
                                   onChanged: (value) => setState(() {
                                     loopDelay = value;
                                   }),
+                                  onChangeEnd: (value) =>
+                                      generator.setPulsewave(
+                                    440.0,
+                                    0.5,
+                                    loopDelay,
+                                  ),
                                 ),
                               ),
                             ],
@@ -225,6 +231,18 @@ class _ExamplePageState extends State<ExamplePage> {
                                         setState(() {
                                           waveformType = value!;
                                         });
+                                        generator.setWaveform(
+                                          waveformType,
+                                          440.0,
+                                          0.5,
+                                        );
+                                        if (enablePulse) {
+                                          generator.setPulsewave(
+                                            440.0,
+                                            0.5,
+                                            loopDelay,
+                                          );
+                                        }
                                       }
                                     : null,
                               ),
@@ -236,18 +254,23 @@ class _ExamplePageState extends State<ExamplePage> {
                               const Text("Noise Type: "),
                               DropdownButton<NoiseType>(
                                 value: noiseType,
-                                items: NoiseType.values.map((type) {
-                                  return DropdownMenuItem(
-                                    value: type,
-                                    child:
-                                        Text(type.toString().split(".").last),
-                                  );
-                                }).toList(),
+                                items: NoiseType.values
+                                    .map((type) => DropdownMenuItem(
+                                          value: type,
+                                          child: Text(
+                                              type.toString().split(".").last),
+                                        ))
+                                    .toList(),
                                 onChanged: enableNoise
                                     ? (value) {
                                         setState(() {
                                           noiseType = value!;
                                         });
+                                        generator.setNoise(
+                                          noiseType,
+                                          0,
+                                          0.5,
+                                        );
                                       }
                                     : null,
                               ),
