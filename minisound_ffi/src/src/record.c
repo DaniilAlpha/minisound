@@ -179,6 +179,16 @@ int recorder_get_available_frames(Recorder *recorder)
         return RECORDER_ERROR_INVALID_ARGUMENT;
     }
 
+    // Check if channels is zero to prevent division by zero
+    if (recorder->channels == 0)
+    {
+        recorder->channels = 1;
+    }
+
     size_t available_floats = circular_buffer_get_available_floats(&recorder->circular_buffer);
+    if (available_floats == 0)
+    {
+        return RECORDER_ERROR_UNKNOWN;
+    }
     return (int)(available_floats / recorder->channels);
 }
