@@ -54,6 +54,9 @@ final class FfiEngine implements PlatformEngine {
   final Pointer<ffi.Engine> _self;
 
   @override
+  EngineState state = EngineState.uninit;
+
+  @override
   Future<void> init(int periodMs) async {
     if (_bindings.engine_init(_self, periodMs) != ffi.Result.Ok) {
       throw MinisoundPlatformException("Failed to init the engine.");
@@ -267,7 +270,7 @@ class FfiGenerator implements PlatformGenerator {
   @override
   Future<int> init(int format, int channels, int sampleRate,
       int bufferDurationSeconds) async {
-    final result = await _bindings.generator_init(
+    final result = _bindings.generator_init(
         _self, format, channels, sampleRate, bufferDurationSeconds);
     if (result != ffi.GeneratorResult.GENERATOR_OK) {
       throw MinisoundPlatformException(
@@ -319,20 +322,28 @@ class FfiGenerator implements PlatformGenerator {
     }
   }
 
+  Pointer<Float> bufferPtr = malloc.allocate<Float>(0);
+
   @override
   Float32List getBuffer(int framesToRead) {
-    final bufferPtr = malloc.allocate<Float>(framesToRead);
     try {
-      final framesRead =
-          _bindings.generator_get_buffer(_self, bufferPtr, framesToRead);
-      if (framesRead < 0) {
+      final floatsToRead =
+          framesToRead * 8; // Calculate the actual number of floats to read
+
+      bufferPtr = malloc.allocate<Float>(
+          floatsToRead); // Allocate memory for the float buffer
+      final floatsRead =
+          _bindings.generator_get_buffer(_self, bufferPtr, floatsToRead);
+
+      // Error handling for negative return values
+      if (floatsRead < 0) {
         throw MinisoundPlatformException(
-            "Failed to read generator data. Error code: $framesRead");
+            "Failed to get recorder buffer. Error code: $floatsRead");
       }
-      return bufferPtr.asTypedList(framesRead);
-    } finally {
-      malloc.free(bufferPtr);
-    }
+
+      // Convert the data in the allocated memory to a Dart Float32List
+      return Float32List.fromList(bufferPtr.asTypedList(floatsRead));
+    } finally {}
   }
 
   @override

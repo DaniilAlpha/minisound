@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import "dart:typed_data";
 
 import "package:plugin_platform_interface/plugin_platform_interface.dart";
@@ -19,8 +21,12 @@ abstract class MinisoundPlatform extends PlatformInterface {
   PlatformGenerator createGenerator();
 }
 
+enum EngineState { uninit, init, started }
+
 abstract interface class PlatformEngine {
   factory PlatformEngine() => MinisoundPlatform.instance.createEngine();
+
+  EngineState state = EngineState.uninit;
 
   Future<void> init(int periodMs);
   void dispose();
@@ -153,11 +159,6 @@ abstract class RecorderResult {
   static const int RECORDER_ERROR_INVALID_ARGUMENT = 3;
   static const int RECORDER_ERROR_ALREADY_RECORDING = 4;
   static const int RECORDER_ERROR_NOT_RECORDING = 5;
-}
-
-abstract class WaveResult {
-  static const int WAVE_OK = 0;
-  static const int WAVE_ERROR = 1;
 }
 
 abstract class GeneratorResult {

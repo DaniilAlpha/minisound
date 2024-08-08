@@ -13,15 +13,17 @@ class MinisoundMock extends MinisoundPlatform {
   PlatformRecorder createRecorder() => RecorderMock();
 
   @override
-  PlatformWave createWave() => WaveMock();
+  PlatformGenerator createGenerator() => GeneratorMock();
 }
 
 // engine mock
 
-enum EngineState { uninit, init, started }
-
 class EngineMock implements PlatformEngine {
-  var state = EngineState.uninit;
+  final Map<int, SoundMock> loadedSounds = {};
+  int nextSoundId = 0;
+
+  @override
+  EngineState state = EngineState.uninit;
 
   @override
   void dispose() => state = EngineState.uninit;
@@ -35,16 +37,18 @@ class EngineMock implements PlatformEngine {
   }
 
   @override
-  Future<PlatformSound> loadSound(Uint8List data) async {
+  Future<PlatformSound> loadSound(AudioData data) async {
     if (state == EngineState.uninit) {
       throw MinisoundPlatformException("cannot load sound");
     }
-    return SoundMock(data);
+    final sound = SoundMock(nextSoundId++, data);
+    loadedSounds[sound.id] = sound;
+    return sound;
   }
 
   @override
   void start() {
-    if (state != EngineState.init && state != EngineState.started) {
+    if (state != EngineState.init) {
       throw MinisoundPlatformException("cannot start engine");
     }
     state = EngineState.started;
@@ -56,9 +60,10 @@ class EngineMock implements PlatformEngine {
 enum SoundState { playing, paused, stopped }
 
 class SoundMock implements PlatformSound {
-  SoundMock(this.data);
+  SoundMock(this.id, this.data);
 
-  final Uint8List data;
+  final int id;
+  final AudioData data;
 
   var state = SoundState.stopped;
 
@@ -66,7 +71,7 @@ class SoundMock implements PlatformSound {
   var volume = 1.0;
 
   @override
-  double get duration => double.infinity;
+  double get duration => data.buffer.length / (data.sampleRate * data.channels);
 
   @override
   PlatformSoundLooping get looping => (false, 0);
@@ -75,6 +80,7 @@ class SoundMock implements PlatformSound {
 
   @override
   void play() => state = SoundState.playing;
+
   @override
   void replay() {
     state = SoundState.stopped;
@@ -98,16 +104,32 @@ enum RecorderState { uninit, ready, recording }
 class RecorderMock implements PlatformRecorder {
   var state = RecorderState.uninit;
   String? filename;
-  final List<Uint8List> recordedBuffers = [];
+  int sampleRate = 0;
+  int channels = 0;
+  int format = 0;
+  final List<Float32List> recordedBuffers = [];
 
   @override
-  Future<void> initFile(String filename) async {
+  Future<void> initFile(String filename,
+      {int sampleRate = 44800,
+      int channels = 1,
+      int format = AudioFormat.float32}) async {
     this.filename = filename;
+    this.sampleRate = sampleRate;
+    this.channels = channels;
+    this.format = format;
     state = RecorderState.ready;
   }
 
   @override
-  Future<void> initStream() async {
+  Future<void> initStream(
+      {int sampleRate = 44800,
+      int channels = 1,
+      int format = AudioFormat.float32,
+      int bufferDurationSeconds = 5}) async {
+    this.sampleRate = sampleRate;
+    this.channels = channels;
+    this.format = format;
     state = RecorderState.ready;
   }
 
@@ -131,16 +153,24 @@ class RecorderMock implements PlatformRecorder {
   bool get isRecording => state == RecorderState.recording;
 
   @override
-  Uint8List getBuffer(int framesToRead) {
+  Float32List getBuffer(int framesToRead) {
     if (state == RecorderState.uninit) {
       throw MinisoundPlatformException("Recorder not initialized");
     }
-    final buffer = Uint8List(framesToRead);
+    final buffer = Float32List(framesToRead);
     for (var i = 0; i < framesToRead; i++) {
-      buffer[i] = i.toDouble() / framesToRead;
+      buffer[i] = math.Random().nextDouble() * 2 - 1;
     }
     recordedBuffers.add(buffer);
     return buffer;
+  }
+
+  @override
+  int getAvailableFrames() {
+    if (state == RecorderState.uninit) {
+      throw MinisoundPlatformException("Recorder not initialized");
+    }
+    return math.Random().nextInt(4096);
   }
 
   @override
@@ -151,71 +181,52 @@ class RecorderMock implements PlatformRecorder {
   }
 }
 
-// wave mock
+// generator mock
 
-enum WaveType { sine, square, triangle, sawtooth }
+class GeneratorMock implements PlatformGenerator {
+  int format = 0;
+  int channels = 0;
+  int sampleRate = 0;
+  int bufferDurationSeconds = 0;
 
-class WaveMock implements PlatformWave {
-  WaveType type = WaveType.sine;
-  double frequency = 440.0;
-  double amplitude = 1.0;
-  int sampleRate = 44100;
+  var isStarted = false;
 
   @override
-  Future<void> init(
-      int type, double frequency, double amplitude, int sampleRate) async {
-    this.type = WaveType.values[type];
-    this.frequency = frequency;
-    this.amplitude = amplitude;
+  Future<void> init(int format, int channels, int sampleRate,
+      int bufferDurationSeconds) async {
+    this.format = format;
+    this.channels = channels;
     this.sampleRate = sampleRate;
+    this.bufferDurationSeconds = bufferDurationSeconds;
   }
 
   @override
-  void setType(int type) {
-    this.type = WaveType.values[type];
-  }
+  void setWaveform(WaveformType type, double frequency, double amplitude) {}
 
   @override
-  void setFrequency(double frequency) {
-    this.frequency = frequency;
-  }
+  void setPulsewave(double frequency, double amplitude, double dutyCycle) {}
 
   @override
-  void setAmplitude(double amplitude) {
-    this.amplitude = amplitude;
-  }
+  void setNoise(NoiseType type, int seed, double amplitude) {}
 
   @override
-  void setSampleRate(int sampleRate) {
-    this.sampleRate = sampleRate;
-  }
+  void start() => isStarted = true;
 
   @override
-  Float32List read(int framesToRead) {
+  void stop() => isStarted = false;
+
+  @override
+  Float32List getBuffer(int framesToRead) {
     final buffer = Float32List(framesToRead);
-    final period = sampleRate / frequency;
     for (var i = 0; i < framesToRead; i++) {
-      final t = (i % period) / period;
-      switch (type) {
-        case WaveType.sine:
-          buffer[i] = amplitude * math.sin(2 * math.pi * t);
-        case WaveType.square:
-          buffer[i] = amplitude * (t < 0.5 ? 1 : -1);
-        case WaveType.triangle:
-          buffer[i] = amplitude * (t < 0.5 ? 4 * t - 1 : 3 - 4 * t);
-        case WaveType.sawtooth:
-          buffer[i] = amplitude * (2 * t - 1);
-      }
+      buffer[i] = math.Random().nextDouble() * 2 - 1;
     }
     return buffer;
   }
 
   @override
-  void dispose() {
-    // Reset to default values
-    type = WaveType.sine;
-    frequency = 440.0;
-    amplitude = 1.0;
-    sampleRate = 44100;
-  }
+  int getAvailableFrames() => math.Random().nextInt(4096);
+
+  @override
+  void dispose() {}
 }

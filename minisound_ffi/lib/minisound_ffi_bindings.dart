@@ -748,16 +748,25 @@ abstract class Result {
   static const int RESULT_COUNT = 11;
 }
 
-final class Sound extends ffi.Opaque {}
+final class Sound extends ffi.Struct {
+  @ffi.Bool()
+  external bool is_raw_data;
 
-abstract class ma_format {
-  static const int ma_format_unknown = 0;
-  static const int ma_format_u8 = 1;
-  static const int ma_format_s16 = 2;
-  static const int ma_format_s24 = 3;
-  static const int ma_format_s32 = 4;
-  static const int ma_format_f32 = 5;
-  static const int ma_format_count = 6;
+  external ffi.Pointer<ma_engine> engine;
+
+  external ma_decoder decoder;
+
+  external ma_sound sound;
+
+  external ma_audio_buffer buffer;
+
+  @ffi.Bool()
+  external bool is_looped;
+
+  @ffi.Size()
+  external int loop_delay_ms;
+
+  external SilenceDataSource loop_delay_ds;
 }
 
 final class ma_engine extends ffi.Struct {
@@ -1134,6 +1143,16 @@ typedef ma_log_callback_proc = ffi.Pointer<
             ffi.Pointer<ffi.Char> pMessage)>>;
 typedef ma_mutex = ma_handle;
 typedef ma_handle = ffi.Pointer<ffi.Void>;
+
+abstract class ma_format {
+  static const int ma_format_unknown = 0;
+  static const int ma_format_u8 = 1;
+  static const int ma_format_s16 = 2;
+  static const int ma_format_s24 = 3;
+  static const int ma_format_s32 = 4;
+  static const int ma_format_f32 = 5;
+  static const int ma_format_count = 6;
+}
 
 /// VFS
 /// ===
@@ -4120,6 +4139,29 @@ typedef ma_engine_process_proc = ffi.Pointer<
         ffi.Void Function(ffi.Pointer<ffi.Void> pUserData,
             ffi.Pointer<ffi.Float> pFramesOut, ma_uint64 frameCount)>>;
 
+final class SilenceDataSource extends ffi.Struct {
+  external ma_data_source_base ds;
+
+  external SilenceDataSourceConfig config;
+
+  @ma_uint64()
+  external int pos_frames;
+}
+
+final class SilenceDataSourceConfig extends ffi.Struct {
+  @ffi.Int32()
+  external int format;
+
+  @ma_uint32()
+  external int channel_count;
+
+  @ma_uint32()
+  external int sample_rate;
+
+  @ma_uint64()
+  external int len_frames;
+}
+
 final class Recorder extends ffi.Struct {
   external ma_encoder encoder;
 
@@ -4257,6 +4299,7 @@ abstract class RecorderResult {
   static const int RECORDER_ERROR_ALREADY_RECORDING = 4;
   static const int RECORDER_ERROR_NOT_RECORDING = 5;
   static const int RECORDER_ERROR_INVALID_FORMAT = 6;
+  static const int RECORDER_ERROR_INVALID_CHANNELS = 7;
 }
 
 abstract class GeneratorResult {

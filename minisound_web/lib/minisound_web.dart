@@ -37,6 +37,9 @@ final class WebEngine implements PlatformEngine {
   final Pointer<wasm.Engine> _self;
 
   @override
+  EngineState state = EngineState.uninit;
+
+  @override
   Future<void> init(int periodMs) async {
     if (await wasm.engine_init(_self, periodMs) != Result.Ok) {
       throw MinisoundPlatformException("Failed to init the engine.");

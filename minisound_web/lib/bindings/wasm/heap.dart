@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names, parameter_assignments
+
 part of "wasm.dart";
 
 class Heap {
@@ -14,7 +16,7 @@ class Heap {
   void copyUint8List(Pointer ptr, Uint8List data) {
     final end = ptr.addr + data.length;
     if (end > _heapU8.length) {
-      throw ArgumentError('Heap out of bounds');
+      throw ArgumentError("Heap out of bounds");
     }
     _heapU8.setRange(ptr.addr, end, data);
   }
@@ -23,7 +25,7 @@ class Heap {
     final startIndex = ptr.addr ~/ 4;
     final endIndex = startIndex + data.length;
     if (endIndex > _heapI32.length) {
-      throw ArgumentError('Heap out of bounds');
+      throw ArgumentError("Heap out of bounds");
     }
     _heapI32.setRange(startIndex, endIndex, data);
   }
@@ -32,7 +34,7 @@ class Heap {
     final startIndex = ptr.addr ~/ 4;
     final endIndex = startIndex + data.length;
     if (endIndex > _heapF32.length) {
-      throw ArgumentError('Heap out of bounds');
+      throw ArgumentError("Heap out of bounds");
     }
     _heapF32.setRange(startIndex, endIndex, data);
   }
@@ -41,7 +43,7 @@ class Heap {
     final startIndex = ptr.addr ~/ 8;
     final endIndex = startIndex + data.length;
     if (endIndex > _heapF64.length) {
-      throw ArgumentError('Heap out of bounds');
+      throw ArgumentError("Heap out of bounds");
     }
     _heapF64.setRange(startIndex, endIndex, data);
   }
@@ -65,11 +67,11 @@ class Heap {
           copyInt32List(ptr, data as Int32List);
           break;
         default:
-          throw ArgumentError('Unsupported audio format: $format');
+          throw ArgumentError("Unsupported audio format: $format");
       }
     } else {
       throw ArgumentError(
-          'Data must be either ByteBuffer, Float32List, or TypedData');
+          "Data must be either ByteBuffer, Float32List, or TypedData");
     }
   }
 
@@ -77,7 +79,7 @@ class Heap {
     final startIndex = ptr.addr ~/ 4;
     final endIndex = startIndex + data.length;
     if (endIndex > _heapI32.length) {
-      throw ArgumentError('Heap out of bounds');
+      throw ArgumentError("Heap out of bounds");
     }
 
     for (int i = 0; i < data.length; i++) {
@@ -96,16 +98,14 @@ class Heap {
       case AudioFormat.float32:
         return buffer.asFloat32List();
       default:
-        throw ArgumentError('Unsupported audio format: $format');
+        throw ArgumentError("Unsupported audio format: $format");
     }
   }
 }
 
 const heap = Heap();
 
-/********
- ** js **
- ********/
+// js interop
 @JS("GROWABLE_HEAP_U8")
 external Uint8List _GROWABLE_HEAP_U8();
 

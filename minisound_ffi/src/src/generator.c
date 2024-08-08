@@ -45,7 +45,7 @@ void data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uin
     Generator *generator;
     generator = (Generator *)pDevice->pUserData;
 
-    circular_buffer_write(&generator->circular_buffer, pOutput, frameCount * generator->channels);
+    circular_buffer_read_available(&generator->circular_buffer, pOutput, frameCount);
 
     switch (generator->type)
     {
@@ -62,6 +62,8 @@ void data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uin
         printf("Warning: Unknown generator type in data_callback.\n");
         break;
     }
+
+    circular_buffer_write(&generator->circular_buffer, pOutput, frameCount * generator->channels);
 
     (void)pInput;
 }
@@ -248,5 +250,13 @@ int generator_get_available_frames(Generator *generator)
     }
 
     size_t available_floats = circular_buffer_get_available_floats(&generator->circular_buffer);
+    if (generator->channels == 0)
+    {
+        generator->channels = 1;
+    }
+    if (available_floats == 0)
+    {
+        return GENERATOR_ERROR;
+    }
     return (int)(available_floats / generator->channels);
 }
