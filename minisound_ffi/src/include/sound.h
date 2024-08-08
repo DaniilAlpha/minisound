@@ -14,19 +14,8 @@ typedef struct
     bool is_raw_data;
     ma_engine *engine;
     ma_decoder decoder;
-    union
-    {
-        struct
-        {
-            ma_sound sound;
-            ma_decoder decoder;
-        } file;
-        struct
-        {
-            ma_sound sound;
-            ma_audio_buffer buffer;
-        } raw;
-    };
+    ma_sound sound;
+    ma_audio_buffer buffer;
     bool is_looped;
     size_t loop_delay_ms;
     SilenceDataSource loop_delay_ds;
