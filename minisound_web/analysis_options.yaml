@@ -100,5 +100,6 @@ linter:
 
 analyzer:
   errors:
+    avoid_positional_boolean_parameters: ignore
     todo: ignore
 

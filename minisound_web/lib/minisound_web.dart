@@ -1,3 +1,5 @@
+// ignore_for_file: omit_local_variable_types
+
 import "dart:typed_data";
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
 import "package:minisound_web/bindings/minisound.dart" as wasm;
@@ -199,7 +201,7 @@ final class WebRecorder implements PlatformRecorder {
   @override
   Float32List getBuffer(int framesToRead, {int channels = 2}) {
     try {
-      int floatsToRead =
+      final int floatsToRead =
           framesToRead * 8; // Calculate the actual number of floats to read
 
       bufferPtr = malloc.allocate<Float>(floatsToRead);

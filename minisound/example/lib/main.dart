@@ -87,11 +87,11 @@ class _ExamplePageState extends State<ExamplePage> {
                           ),
                           ElevatedButton(
                             child: const Text("PAUSE"),
-                            onPressed: () => sound.pause(),
+                            onPressed: () => sound..pause(),
                           ),
                           ElevatedButton(
                             child: const Text("STOP"),
-                            onPressed: () => sound.stop(),
+                            onPressed: () => sound..stop(),
                           ),
                           Row(
                             mainAxisSize: MainAxisSize.min,
@@ -171,8 +171,8 @@ class _ExamplePageState extends State<ExamplePage> {
                                       await createSoundFromRecorder(recorder);
                                   await recorder.engine.start();
                                   testSound.play();
-                                } catch (e) {
-                                  print(e);
+                                } on Exception catch (e) {
+                                  print("Error: $e");
                                 } finally {
                                   recorder.stop();
                                   recordingBuffer.clear();
@@ -221,13 +221,13 @@ class _ExamplePageState extends State<ExamplePage> {
                               const Text("Waveform Type: "),
                               DropdownButton<WaveformType>(
                                 value: waveformType,
-                                items: WaveformType.values.map((type) {
-                                  return DropdownMenuItem(
-                                    value: type,
-                                    child:
-                                        Text(type.toString().split(".").last),
-                                  );
-                                }).toList(),
+                                items: WaveformType.values
+                                    .map((type) => DropdownMenuItem(
+                                          value: type,
+                                          child: Text(
+                                              type.toString().split(".").last),
+                                        ))
+                                    .toList(),
                                 onChanged: enableWaveform
                                     ? (value) {
                                         setState(() {
@@ -416,19 +416,19 @@ class _ExamplePageState extends State<ExamplePage> {
   }
 
   Future<Sound> createSoundFromRecorder(Recorder recorder) async {
-    Float32List combinedBuffer = Float32List(0);
+    var combinedBuffer = Float32List(0);
     if (sounds.isNotEmpty) {
       sounds.last.stop();
       sounds.last.unload();
     }
 
-    int totalFrames =
+    final totalFrames =
         recordingBuffer.fold(0, (sum, chunk) => sum + chunk.length);
 
     combinedBuffer = Float32List(totalFrames);
 
-    int offset = 0;
-    for (var chunk in recordingBuffer) {
+    var offset = 0;
+    for (final chunk in recordingBuffer) {
       combinedBuffer.setAll(offset, chunk);
       offset += chunk.length;
     }

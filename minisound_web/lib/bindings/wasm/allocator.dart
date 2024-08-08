@@ -1,3 +1,5 @@
+// ignore_for_file: omit_local_variable_types
+
 part of "wasm.dart";
 
 abstract interface class Allocator {
@@ -46,13 +48,13 @@ class Malloc implements Allocator {
 }
 
 class MemoryPool {
-  List<int> _freeBlocks = [];
+  List<int> freeBlocks = [];
 
   Pointer allocate(int size) {
-    for (int i = 0; i < _freeBlocks.length; i++) {
-      final block = _freeBlocks[i];
+    for (int i = 0; i < freeBlocks.length; i++) {
+      final block = freeBlocks[i];
       if (block >= size) {
-        _freeBlocks.removeAt(i);
+        freeBlocks.removeAt(i);
         return Pointer(block, size);
       }
     }
@@ -64,16 +66,13 @@ class MemoryPool {
   }
 
   void deallocate(Pointer ptr) {
-    _freeBlocks.add(ptr.addr);
+    freeBlocks.add(ptr.addr);
   }
 }
 
 final _memoryPool = MemoryPool();
 Malloc malloc = Malloc();
 
-/********
- ** js **
- ********/
-
+//js
 @JS()
 external int _malloc(int size);

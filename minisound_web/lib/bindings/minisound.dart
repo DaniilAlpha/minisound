@@ -146,11 +146,6 @@ external int _recorder_start(int self);
 @JS()
 external int _recorder_stop(int self);
 @JS()
-external int _recorder_start_streaming(
-    int self, Function callback, int userData);
-@JS()
-external int _recorder_stop_streaming(int self);
-@JS()
 external int _recorder_get_available_frames(int self);
 @JS()
 external bool _recorder_is_recording(int self);
@@ -184,7 +179,7 @@ int generator_get_buffer(
 int generator_start(Pointer<Generator> self) => _generator_start(self.addr);
 int generator_stop(Pointer<Generator> self) => _generator_stop(self.addr);
 double generator_get_volume(Pointer<Generator> self) =>
-    _sound_get_volume(self.addr);
+    _generator_get_volume(self.addr);
 void generator_set_volume(Pointer<Generator> self, double value) =>
     _generator_set_volume(self.addr, value);
 int generator_get_available_frames(Pointer<Generator> self) =>

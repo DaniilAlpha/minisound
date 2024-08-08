@@ -1,3 +1,5 @@
+// ignore_for_file: omit_local_variable_types
+
 import "dart:ffi";
 import "dart:io";
 import "dart:typed_data";
@@ -43,7 +45,9 @@ class MinisoundFfi extends MinisoundPlatform {
   PlatformGenerator createGenerator() {
     final self = _bindings.generator_create();
     if (self == nullptr) throw MinisoundPlatformOutOfMemoryException();
-    return FfiGenerator(self);
+    return FfiGenerator(
+      self,
+    );
   }
 }
 
@@ -82,37 +86,31 @@ final class FfiEngine implements PlatformEngine {
     final Pointer<Float> dataPtr =
         malloc.allocate<Float>(audioData.buffer.length * sizeOf<Float>());
 
-    try {
-      final Float32List floatList =
-          dataPtr.asTypedList(audioData.buffer.length);
-      floatList.setAll(0, audioData.buffer);
+    final Float32List floatList = dataPtr.asTypedList(audioData.buffer.length);
+    floatList.setAll(0, audioData.buffer);
 
-      final Pointer<ffi.Sound> sound = _bindings.sound_alloc();
-      if (sound == nullptr) {
-        throw MinisoundPlatformException("Failed to allocate a sound.");
-      }
-
-      final int maFormat = audioData.format.toInt();
-      final int result = _bindings.engine_load_sound(
-        _self,
-        sound,
-        dataPtr,
-        dataSize,
-        maFormat,
-        audioData.sampleRate,
-        audioData.channels,
-      );
-
-      if (result != ffi.Result.Ok) {
-        _bindings.sound_unload(sound);
-        throw MinisoundPlatformException("Failed to load a sound.");
-      }
-
-      return FfiSound._fromPtrs(sound, dataPtr);
-    } catch (e) {
-      malloc.free(dataPtr);
-      rethrow;
+    final Pointer<ffi.Sound> sound = _bindings.sound_alloc();
+    if (sound == nullptr) {
+      throw MinisoundPlatformException("Failed to allocate a sound.");
     }
+
+    final int maFormat = audioData.format;
+    final int result = _bindings.engine_load_sound(
+      _self,
+      sound,
+      dataPtr,
+      dataSize,
+      maFormat,
+      audioData.sampleRate,
+      audioData.channels,
+    );
+
+    if (result != ffi.Result.Ok) {
+      _bindings.sound_unload(sound);
+      throw MinisoundPlatformException("Failed to load a sound.");
+    }
+
+    return FfiSound._fromPtrs(sound, dataPtr);
   }
 }
 
@@ -203,7 +201,6 @@ class FfiRecorder implements PlatformRecorder {
       int channels = 1,
       int format = 4, // float32
       int bufferDurationSeconds = 5}) async {
-    print(channels);
     if (_bindings.recorder_init_stream(
             _self, sampleRate, channels, format, bufferDurationSeconds) !=
         ffi.RecorderResult.RECORDER_OK) {
@@ -263,7 +260,7 @@ class FfiRecorder implements PlatformRecorder {
 
 // generator ffi
 class FfiGenerator implements PlatformGenerator {
-  FfiGenerator(Pointer<ffi.Generator> self, double volume)
+  FfiGenerator(Pointer<ffi.Generator> self)
       : _self = self,
         _volume = _bindings.generator_get_volume(self);
 
@@ -274,7 +271,7 @@ class FfiGenerator implements PlatformGenerator {
   double get volume => _volume;
   @override
   set volume(double value) {
-    _bindings.sound_set_volume(_self, value);
+    _bindings.generator_set_volume(_self, value);
     _volume = value;
   }
 

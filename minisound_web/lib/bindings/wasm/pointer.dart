@@ -66,7 +66,7 @@ class Pointer<T> {
     } else if (T == Uint8 || T == int) {
       return heap._heapU8.sublist(addr, addr + length).map((e) => e).toList();
     } else {
-      throw UnsupportedError('Unsupported type for asTypedList: $T');
+      throw UnsupportedError("Unsupported type for asTypedList: $T");
     }
   }
 }

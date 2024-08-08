@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names, parameter_assignments
+// ignore_for_file: non_constant_identifier_names, parameter_assignments, omit_local_variable_types
 
 part of "wasm.dart";
 
