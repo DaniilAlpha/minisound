@@ -35,6 +35,7 @@ class _ExamplePageState extends State<ExamplePage> {
   bool enableWaveform = false;
   bool enableNoise = false;
   bool enablePulse = false;
+  var pulseDelay = 0.25;
   final List<Float32List> recordingBuffer = [];
   final List<Float32List> generatorBuffer = [];
 
@@ -136,18 +137,12 @@ class _ExamplePageState extends State<ExamplePage> {
                                 child: Slider(
                                   value: loopDelay,
                                   min: 0,
-                                  max: 3,
+                                  max: 7,
                                   divisions: 300,
                                   label: loopDelay.toStringAsFixed(2),
                                   onChanged: (value) => setState(() {
                                     loopDelay = value;
                                   }),
-                                  onChangeEnd: (value) =>
-                                      generator.setPulsewave(
-                                    440.0,
-                                    0.5,
-                                    loopDelay,
-                                  ),
                                 ),
                               ),
                             ],
@@ -239,7 +234,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                           generator.setPulsewave(
                                             440.0,
                                             0.5,
-                                            loopDelay,
+                                            pulseDelay,
                                           );
                                         }
                                       }
@@ -272,27 +267,6 @@ class _ExamplePageState extends State<ExamplePage> {
                                         );
                                       }
                                     : null,
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text("Loop delay (Duty Cycle):"),
-                              SizedBox(
-                                width: 200,
-                                child: Slider(
-                                  value: loopDelay,
-                                  min: 0,
-                                  max: 3,
-                                  divisions: 100,
-                                  label: loopDelay.toStringAsFixed(2),
-                                  onChanged: enablePulse
-                                      ? (value) => setState(() {
-                                            loopDelay = value;
-                                          })
-                                      : null,
-                                ),
                               ),
                             ],
                           ),
@@ -338,7 +312,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                   generator.setPulsewave(
                                     440.0,
                                     0.5,
-                                    loopDelay,
+                                    pulseDelay,
                                   );
                                 },
                               ),
@@ -362,18 +336,45 @@ class _ExamplePageState extends State<ExamplePage> {
                                     48000,
                                     5,
                                   );
+                                  generator.setWaveform(
+                                      WaveformType.sine, 432, 0.5);
                                   generator.isInit = true;
                                 }
 
                                 setState(() {
                                   generator.start();
                                   generatorTimer = Timer.periodic(
-                                    const Duration(milliseconds: 1000),
+                                    const Duration(milliseconds: 100),
                                     (_) => accumulateGeneratorFrames(),
                                   );
                                 });
                               }
                             },
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text("Pulse delay:"),
+                              SizedBox(
+                                width: 200,
+                                child: Slider(
+                                  value: pulseDelay,
+                                  min: 0,
+                                  max: 1,
+                                  divisions: 300,
+                                  label: pulseDelay.toStringAsFixed(2),
+                                  onChanged: (value) => setState(() {
+                                    pulseDelay = value;
+                                  }),
+                                  onChangeEnd: (value) =>
+                                      generator.setPulsewave(
+                                    440.0,
+                                    0.5,
+                                    pulseDelay,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

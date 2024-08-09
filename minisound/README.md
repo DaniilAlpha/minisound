@@ -226,5 +226,6 @@ To build the project, follow these steps:
 - [ ] Stop crash when no devices found for playback or capture
 - [ ] Extract buffer stuff to unified AV Buffer packages dart and C.
 - [ ] Automate local web deployment with strict origin flags for local testing.
-- [ ] Create a makefile.
+- [x] Create a makefile.
 - [ ] Document dependencies for building.
+- [ ] Switch engine init to state machine.
