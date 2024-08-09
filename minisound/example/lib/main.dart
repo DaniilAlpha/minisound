@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import "dart:async";
 import "dart:typed_data";
 
@@ -184,7 +186,6 @@ class _ExamplePageState extends State<ExamplePage> {
                                 }
                               } else {
                                 if (!recorder.isInit) {
-                                  print("Creating recorder");
                                   await recorder.initStream(
                                     sampleRate: 48000,
                                     channels: 1,
