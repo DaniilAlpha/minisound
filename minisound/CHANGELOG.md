@@ -1,3 +1,12 @@
+# Change Log
+
+## 1.5.0
+
+Adds Recorder.
+Adds Generator.
+Adds tests.
+Refactored Example to show new uses.
+
 ## 1.4.1
 
 Added limit on negative loop delay.

@@ -1,3 +1,12 @@
+
+# Changelog
+
+## 1.5.0
+
+Version skip to sync with other packages.
+Adds Recorder.
+Adds Generator.
+
 ## 1.2.0
 
 Added an ability to add delay between loops.

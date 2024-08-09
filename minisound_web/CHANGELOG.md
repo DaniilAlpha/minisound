@@ -1,3 +1,14 @@
+
+# Changelog
+
+## 1.5.0
+
+Enhanced memory management.
+Uses Float32Array instead of Uint8Array for audio data.
+Adds Recorder.
+Adds Generator.
+Uses built emscripten instead of cached.
+
 ## 1.4.1
 
 Got rid of unnecessary pthreads in emscripten build, should decrease library size and possiby increase performance.
@@ -9,7 +20,7 @@ Changed behavoiur when playing sound while already playing: stops and starts aga
 
 ## 1.3.8
 
-Changed dependency for the older `js` due to compatibility issues. 
+Changed dependency for the older `js` due to compatibility issues.
 
 ## 1.3.7
 
@@ -17,23 +28,23 @@ Changed dependency for the older `js` due to compatibility issues.
 
 ## 1.3.6
 
-Unnecessary `flutter` dependency removed. 
+Unnecessary `flutter` dependency removed.
 
 ## 1.3.5
 
-Changed dependency for the newest `js`. 
+Changed dependency for the newest `js`.
 
 ## 1.3.4
 
-Changed dependency for the newest `minisound_platform_intergace`. 
+Changed dependency for the newest `minisound_platform_intergace`.
 
 ## 1.3.3
 
-Changed dependency newer `minisound_platform_intergace`. 
+Changed dependency newer `minisound_platform_intergace`.
 
 ## 1.3.0
 
-Slightly changed error messages. 
+Slightly changed error messages.
 Added looping feature.
 Volume now can exceed `1` (needs proper testing on different platforms).
 
