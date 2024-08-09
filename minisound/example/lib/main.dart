@@ -1,4 +1,5 @@
 import "dart:async";
+import "dart:math";
 import "dart:typed_data";
 
 import "package:flutter/material.dart";
@@ -24,10 +25,10 @@ class ExamplePage extends StatefulWidget {
 class _ExamplePageState extends State<ExamplePage> {
   final engine = Engine();
   var loopDelay = 0.0;
-  final recorder = Recorder();
+  late Recorder recorder;
   Timer? recorderTimer;
   Timer? generatorTimer;
-  final generator = Generator();
+  late Generator generator;
   WaveformType waveformType = WaveformType.sine;
   NoiseType noiseType = NoiseType.white;
   bool isGenerating = false;
@@ -52,6 +53,8 @@ class _ExamplePageState extends State<ExamplePage> {
   Future<Sound> _initializeSound() async {
     if (!engine.isInit) {
       await engine.init();
+      recorder = Recorder(engine: engine);
+      generator = Generator(engine: engine);
     }
     return engine.loadSoundAsset("assets/laser_shoot.wav");
   }

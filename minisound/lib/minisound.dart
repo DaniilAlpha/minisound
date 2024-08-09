@@ -105,12 +105,13 @@ final class Sound {
 }
 
 final class Recorder {
-  Recorder() : _recorder = MinisoundPlatform.instance.createRecorder() {
-    engine = Engine();
-  }
+  @override
+  Recorder({Engine? engine})
+      : engine = engine ?? Engine(),
+        _recorder = MinisoundPlatform.instance.createRecorder();
 
   final PlatformRecorder _recorder;
-  late Engine engine;
+  Engine engine;
   late int sampleRate;
   late int channels;
   late int format;
@@ -191,11 +192,10 @@ final class Recorder {
 
 /// A generator for waveforms and noise.
 final class Generator {
-  Generator() : _generator = MinisoundPlatform.instance.createGenerator() {
-    engine = Engine();
-  }
+  Generator({Engine? engine})
+      : engine = engine ?? Engine(),
+        _generator = MinisoundPlatform.instance.createGenerator();
 
-  /// a `double` greater than `0` (values greater than `1` may behave differently from platform to platform)
   double get volume => _generator.volume;
   set volume(double value) => _generator.volume = value < 0 ? 0 : value;
 
