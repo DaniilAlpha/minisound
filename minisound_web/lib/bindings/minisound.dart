@@ -49,7 +49,8 @@ external int _engine_load_sound(int self, int sound, int data, int dataSize,
     int format, int sampleRate, int channels);
 
 // Sound functions
-Pointer<Sound> sound_alloc() => Pointer(_sound_alloc(), 1, safe: true);
+Pointer<Sound> sound_alloc(int size) =>
+    Pointer(_sound_alloc(), size, safe: true);
 void sound_unload(Pointer<Sound> self) => _sound_unload(self.addr);
 int sound_play(Pointer<Sound> self) => _sound_play(self.addr);
 int sound_replay(Pointer<Sound> self) => _sound_replay(self.addr);

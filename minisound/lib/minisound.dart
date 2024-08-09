@@ -108,7 +108,11 @@ final class Recorder {
   @override
   Recorder({Engine? mainEngine})
       : engine = mainEngine ?? Engine(),
-        _recorder = MinisoundPlatform.instance.createRecorder();
+        _recorder = MinisoundPlatform.instance.createRecorder() {
+    if (!engine.isInit) {
+      initEngine();
+    }
+  }
 
   final PlatformRecorder _recorder;
   Engine engine;
@@ -131,9 +135,6 @@ final class Recorder {
     if (sampleRate <= 0 || channels <= 0) {
       throw ArgumentError("Invalid recorder parameters");
     }
-    if (!engine.isInit) {
-      await initEngine();
-    }
     if (!isInit) {
       this.sampleRate = sampleRate;
       this.channels = channels;
@@ -150,9 +151,6 @@ final class Recorder {
       int channels = 1,
       int format = AudioFormat.float32,
       int bufferDurationSeconds = 5}) async {
-    if (!engine.isInit) {
-      await initEngine();
-    }
     if (sampleRate <= 0 || channels <= 0 || bufferDurationSeconds <= 0) {
       throw ArgumentError("Invalid recorder parameters");
     }

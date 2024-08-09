@@ -66,7 +66,7 @@ final class WebEngine implements PlatformEngine {
     final dataPtr = malloc.allocate(audioData.buffer.lengthInBytes);
     heap.copyAudioData(dataPtr, audioData.buffer, audioData.format);
 
-    final sound = wasm.sound_alloc();
+    final sound = wasm.sound_alloc(audioData.buffer.lengthInBytes);
     if (sound == nullptr) {
       malloc.free(dataPtr);
       throw MinisoundPlatformException("Failed to allocate a sound.");
@@ -83,7 +83,6 @@ final class WebEngine implements PlatformEngine {
 
     if (result != Result.Ok) {
       malloc.free(dataPtr);
-      wasm.sound_unload(sound);
       throw MinisoundPlatformException("Failed to load a sound.");
     }
 

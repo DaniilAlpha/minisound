@@ -38,7 +38,7 @@ class Malloc implements Allocator {
   void _cleanupPointers() {
     final now = DateTime.now().millisecondsSinceEpoch;
     _allocatedPointers.removeWhere((ptr) {
-      if (!ptr.safe && ptr.refCount == 0 && ptr.lastAccessTime < now - 5000) {
+      if (!ptr.safe && ptr.lastAccessTime < now - 5000) {
         free(ptr);
         return true;
       }

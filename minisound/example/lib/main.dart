@@ -52,7 +52,7 @@ class _ExamplePageState extends State<ExamplePage> {
   Future<Sound> _initializeSound() async {
     if (!engine.isInit) {
       await engine.init();
-      recorder = Recorder();
+      recorder = Recorder(mainEngine: engine);
       generator = Generator(mainEngine: engine);
     }
     return engine.loadSoundAsset("assets/laser_shoot.wav");
