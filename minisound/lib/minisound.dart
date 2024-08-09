@@ -121,6 +121,7 @@ final class Recorder {
   late int format;
   late int bufferDurationSeconds;
   bool isInit = false;
+  bool isRecording = false;
 
   /// Initializes the recorder's engine.
   Future<void> initEngine([int periodMs = 10]) async {
@@ -171,13 +172,16 @@ final class Recorder {
   }
 
   /// Starts recording.
-  void start() => _recorder.start();
+  void start() {
+    _recorder.start();
+    isRecording = true;
+  }
 
   /// Stops recording.
-  void stop() => _recorder.stop();
-
-  /// Checks if the recorder is currently recording.
-  bool get isRecording => _recorder.isRecording;
+  void stop() {
+    _recorder.stop();
+    isRecording = false;
+  }
 
   /// Gets the recorded buffer.
   Float32List getBuffer(int framesToRead) => _recorder.getBuffer(framesToRead);
@@ -203,6 +207,7 @@ final class Generator {
   final PlatformGenerator _generator;
   late Engine engine;
   bool isInit = false;
+  bool isGenerating = false;
 
   /// Initializes the generator's engine.
   Future initEngine([int periodMs = 10]) async {
@@ -235,10 +240,16 @@ final class Generator {
       _generator.setNoise(type, seed, amplitude);
 
   /// Starts the generator.
-  void start() => _generator.start();
+  void start() {
+    _generator.start();
+    isGenerating = true;
+  }
 
   /// Stops the generator.
-  void stop() => _generator.stop();
+  void stop() {
+    _generator.stop();
+    isGenerating = false;
+  }
 
   /// Reads generated data.
   Float32List getBuffer(int framesToRead) => _generator.getBuffer(framesToRead);

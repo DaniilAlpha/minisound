@@ -30,8 +30,6 @@ class _ExamplePageState extends State<ExamplePage> {
   late Generator generator;
   WaveformType waveformType = WaveformType.sine;
   NoiseType noiseType = NoiseType.white;
-  bool isGenerating = false;
-  bool isRecording = false;
   bool enableWaveform = false;
   bool enableNoise = false;
   bool enablePulse = false;
@@ -162,12 +160,12 @@ class _ExamplePageState extends State<ExamplePage> {
                           ),
                           ElevatedButton(
                             child: Text(
-                              isRecording
+                              recorder.isRecording
                                   ? "STOP RECORDING"
                                   : "START RECORDING",
                             ),
                             onPressed: () async {
-                              if (isRecording) {
+                              if (recorder.isRecording) {
                                 try {
                                   final testSound =
                                       await createSoundFromRecorder(recorder);
@@ -176,7 +174,9 @@ class _ExamplePageState extends State<ExamplePage> {
                                 } on Exception catch (e) {
                                   print("Error: $e");
                                 } finally {
-                                  recorder.stop();
+                                  setState(() {
+                                    recorder.stop();
+                                  });
                                   recorderTimer!.cancel();
 
                                   recordingBuffer.clear();
@@ -192,16 +192,15 @@ class _ExamplePageState extends State<ExamplePage> {
                                   );
                                   recorder.isInit = true;
                                 }
-                                recorder.start();
+                                setState(() {
+                                  recorder.start();
+                                });
                                 recorderTimer = Timer.periodic(
                                   const Duration(milliseconds: 50),
                                   (_) => accumulateRecorderFrames(),
                                 );
                                 totalRecordedFrames = 0;
                               }
-                              setState(() {
-                                isRecording = !isRecording;
-                              });
                             },
                           ),
                           const SizedBox(height: 20),
@@ -346,11 +345,11 @@ class _ExamplePageState extends State<ExamplePage> {
                             ],
                           ),
                           ElevatedButton(
-                            child: Text(isGenerating ? "STOP" : "START"),
+                            child:
+                                Text(generator.isGenerating ? "STOP" : "START"),
                             onPressed: () async {
-                              if (isGenerating) {
+                              if (generator.isGenerating) {
                                 setState(() {
-                                  isGenerating = false;
                                   generator.stop();
                                   generatorTimer!.cancel();
                                 });
@@ -366,7 +365,6 @@ class _ExamplePageState extends State<ExamplePage> {
                                 }
 
                                 setState(() {
-                                  isGenerating = true;
                                   generator.start();
                                   generatorTimer = Timer.periodic(
                                     const Duration(milliseconds: 1000),
@@ -391,7 +389,7 @@ class _ExamplePageState extends State<ExamplePage> {
       );
 
   void accumulateRecorderFrames() {
-    if (isRecording) {
+    if (recorder.isRecording) {
       final frames = recorder.getAvailableFrames();
       final buffer = recorder.getBuffer(frames);
       if (buffer.isNotEmpty) {
@@ -402,7 +400,7 @@ class _ExamplePageState extends State<ExamplePage> {
   }
 
   void accumulateGeneratorFrames() {
-    if (isGenerating) {
+    if (generator.isGenerating) {
       final frames = generator.getAvailableFrames();
       final buffer = generator.getBuffer(frames);
       if (buffer.isNotEmpty) {
