@@ -106,8 +106,8 @@ final class Sound {
 
 final class Recorder {
   @override
-  Recorder({Engine? engine})
-      : engine = engine ?? Engine(),
+  Recorder({Engine? mainEngine})
+      : engine = mainEngine ?? Engine(),
         _recorder = MinisoundPlatform.instance.createRecorder();
 
   final PlatformRecorder _recorder;
@@ -134,11 +134,14 @@ final class Recorder {
     if (!engine.isInit) {
       await initEngine();
     }
-    this.sampleRate = sampleRate;
-    this.channels = channels;
-    this.format = format;
-    await _recorder.initFile(filename,
-        sampleRate: sampleRate, channels: channels, format: format);
+    if (!isInit) {
+      this.sampleRate = sampleRate;
+      this.channels = channels;
+      this.format = format;
+      await _recorder.initFile(filename,
+          sampleRate: sampleRate, channels: channels, format: format);
+      isInit = true;
+    }
   }
 
   /// Initializes the recorder for streaming.
@@ -192,8 +195,8 @@ final class Recorder {
 
 /// A generator for waveforms and noise.
 final class Generator {
-  Generator({Engine? engine})
-      : engine = engine ?? Engine(),
+  Generator({Engine? mainEngine})
+      : engine = mainEngine ?? Engine(),
         _generator = MinisoundPlatform.instance.createGenerator();
 
   double get volume => _generator.volume;

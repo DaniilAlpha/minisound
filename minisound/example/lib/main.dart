@@ -1,5 +1,4 @@
 import "dart:async";
-import "dart:math";
 import "dart:typed_data";
 
 import "package:flutter/material.dart";
@@ -53,8 +52,8 @@ class _ExamplePageState extends State<ExamplePage> {
   Future<Sound> _initializeSound() async {
     if (!engine.isInit) {
       await engine.init();
-      recorder = Recorder(engine: engine);
-      generator = Generator(engine: engine);
+      recorder = Recorder();
+      generator = Generator(mainEngine: engine);
     }
     return engine.loadSoundAsset("assets/laser_shoot.wav");
   }
@@ -178,14 +177,12 @@ class _ExamplePageState extends State<ExamplePage> {
                                   print("Error: $e");
                                 } finally {
                                   recorder.stop();
+                                  recorderTimer!.cancel();
+
                                   recordingBuffer.clear();
                                   totalRecordedFrames = 0;
                                 }
                               } else {
-                                if (recorder.isRecording) {
-                                  recorder.stop();
-                                  recorderTimer!.cancel();
-                                }
                                 if (!recorder.isInit) {
                                   print("Creating recorder");
                                   await recorder.initStream(
@@ -195,16 +192,13 @@ class _ExamplePageState extends State<ExamplePage> {
                                   );
                                   recorder.isInit = true;
                                 }
-
                                 recorder.start();
                                 recorderTimer = Timer.periodic(
                                   const Duration(milliseconds: 50),
                                   (_) => accumulateRecorderFrames(),
                                 );
-
                                 totalRecordedFrames = 0;
                               }
-
                               setState(() {
                                 isRecording = !isRecording;
                               });
