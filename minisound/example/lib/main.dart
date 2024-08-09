@@ -227,12 +227,12 @@ class _ExamplePageState extends State<ExamplePage> {
                                         });
                                         generator.setWaveform(
                                           waveformType,
-                                          440.0,
+                                          432.0,
                                           0.5,
                                         );
                                         if (enablePulse) {
                                           generator.setPulsewave(
-                                            440.0,
+                                            432.0,
                                             0.5,
                                             pulseDelay,
                                           );
@@ -281,7 +281,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                   });
                                   generator.setWaveform(
                                     waveformType,
-                                    440.0,
+                                    432.0,
                                     0.5,
                                   );
                                 },
@@ -310,7 +310,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                     enablePulse = value!;
                                   });
                                   generator.setPulsewave(
-                                    440.0,
+                                    432.0,
                                     0.5,
                                     pulseDelay,
                                   );
@@ -368,7 +368,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                   }),
                                   onChangeEnd: (value) =>
                                       generator.setPulsewave(
-                                    440.0,
+                                    432.0,
                                     0.5,
                                     pulseDelay,
                                   ),
