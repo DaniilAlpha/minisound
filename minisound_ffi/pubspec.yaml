@@ -1,8 +1,8 @@
+publish_to: none
 name: minisound_ffi
 description: FFI implementation of the Minisound package.
-version: 1.4.0
+version: 1.5.0
 repository: https://github.com/DaniilAlpha/minisound/tree/master/minisound_ffi
-publish_to: none
 
 #####
 
@@ -30,6 +30,9 @@ ffigen:
       - "src/include/minisound.h"
       - "src/include/engine.h"
       - "src/include/sound.h"
+      - "src/include/record.h"
+      - "src/include/generator.h"
+      - "src/include/circular_buffer.h"
     include-directives:
       - "src/include/*.h"
       - "/usr/lib/clang/18/include/stdbool.h"

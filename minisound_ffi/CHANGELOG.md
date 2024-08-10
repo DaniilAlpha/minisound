@@ -1,3 +1,13 @@
+# Changelog
+
+## 1.5.0
+
+CMake refactor with output path for Emscripten.
+Adds Recorder.
+Adds Generator.
+Adds Circular Buffer to native code.
+Uses Float32Array instead of Uint8Array for audio data.
+
 ## 1.4.0
 
 Added an ability to add delay between loops.
@@ -29,15 +39,15 @@ Fixed bug with include path of `milo.h`.
 
 ## 1.3.5
 
-Unnecessary `flutter` dependency removed. 
+Unnecessary `flutter` dependency removed.
 
 ## 1.3.4
 
-Changed dependency for the newest `minisound_platform_intergace`. 
+Changed dependency for the newest `minisound_platform_intergace`.
 
 ## 1.3.0
 
-Slightly changed error messages. 
+Slightly changed error messages.
 Added looping feature.
 Volume now can exceed `1` (needs proper testing on different platforms).
 
