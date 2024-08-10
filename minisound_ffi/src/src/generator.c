@@ -23,7 +23,6 @@ Generator *generator_create(void)
         return NULL;
     }
     memset(generator, 0, sizeof(Generator));
-    printf("Debug: Generator created successfully.\n");
     return generator;
 }
 
@@ -36,7 +35,6 @@ void generator_destroy(Generator *generator)
         ma_noise_uninit(&noise, NULL);
         circular_buffer_uninit(&generator->circular_buffer);
         free(generator);
-        printf("Debug: Generator destroyed successfully.\n");
     }
 }
 
@@ -98,13 +96,8 @@ GeneratorResult generator_init(Generator *generator, ma_format format, int chann
         return GENERATOR_ERROR;
     }
 
-    printf("Debug: Initializing generator with format: %d, channels: %u, sample rate: %u, buffer duration: %d seconds\n",
-           format, channels, sample_rate, buffer_duration_seconds);
-
     generator->sample_rate = sample_rate;
     generator->channels = channels;
-
-    printf("Debug: Audio device initialized.\n name: %s\n", device.playback.name);
 
     size_t buffer_size_in_bytes = (size_t)(sample_rate * channels * ma_get_bytes_per_sample(format) * buffer_duration_seconds);
     if (circular_buffer_init(&generator->circular_buffer, buffer_size_in_bytes) != 0)
@@ -114,7 +107,6 @@ GeneratorResult generator_init(Generator *generator, ma_format format, int chann
         return GENERATOR_ERROR;
     }
 
-    printf("Debug: Generator initialized successfully.\n");
     return GENERATOR_OK;
 }
 
@@ -126,8 +118,6 @@ GeneratorResult generator_set_waveform(Generator *generator, ma_waveform_type ty
         return GENERATOR_ERROR;
     }
 
-    printf("Debug: Setting waveform with type: %d, frequency: %f, amplitude: %f\n", type, frequency, amplitude);
-
     generator->type = GENERATOR_TYPE_WAVEFORM;
 
     ma_waveform_config config = ma_waveform_config_init(device.playback.format, device.playback.channels, device.sampleRate, type, amplitude, frequency);
@@ -137,7 +127,6 @@ GeneratorResult generator_set_waveform(Generator *generator, ma_waveform_type ty
         return GENERATOR_ERROR;
     }
 
-    printf("Debug: Waveform set successfully.\n");
     return GENERATOR_OK;
 }
 
@@ -149,8 +138,6 @@ GeneratorResult generator_set_pulsewave(Generator *generator, double frequency, 
         return GENERATOR_ERROR;
     }
 
-    printf("Debug: Setting pulsewave with frequency: %f, amplitude: %f, duty cycle: %f\n", frequency, amplitude, dutyCycle);
-
     generator->type = GENERATOR_TYPE_PULSEWAVE;
 
     ma_pulsewave_config config = ma_pulsewave_config_init(ma_format_f32, generator->channels, generator->sample_rate, dutyCycle, amplitude, frequency);
@@ -160,7 +147,6 @@ GeneratorResult generator_set_pulsewave(Generator *generator, double frequency, 
         return GENERATOR_ERROR;
     }
 
-    printf("Debug: Pulsewave set successfully.\n");
     return GENERATOR_OK;
 }
 
@@ -171,9 +157,6 @@ GeneratorResult generator_set_noise(Generator *generator, ma_noise_type type, ma
         printf("Error: Generator is NULL in generator_set_noise.\n");
         return GENERATOR_ERROR;
     }
-
-    printf("Debug: Setting noise with type: %d, seed: %d, amplitude: %f\n", type, seed, amplitude);
-
     generator->type = GENERATOR_TYPE_NOISE;
 
     ma_noise_config config = ma_noise_config_init(ma_format_f32, generator->channels, type, seed, amplitude);
@@ -182,8 +165,6 @@ GeneratorResult generator_set_noise(Generator *generator, ma_noise_type type, ma
         printf("Error: Failed to initialize noise.\n");
         return GENERATOR_ERROR;
     }
-
-    printf("Debug: Noise set successfully.\n");
     return GENERATOR_OK;
 }
 
@@ -195,14 +176,12 @@ GeneratorResult generator_start(Generator *generator)
         return GENERATOR_ERROR;
     }
 
-    printf("Debug: Starting generator.\n");
     if (ma_device_start(&device) != MA_SUCCESS)
     {
         printf("Error: Failed to start generator.\n");
         return GENERATOR_ERROR;
     }
 
-    printf("Debug: Generator started successfully.\n");
     return GENERATOR_OK;
 }
 
@@ -214,15 +193,12 @@ GeneratorResult generator_stop(Generator *generator)
         return GENERATOR_ERROR;
     }
 
-    printf("Debug: Stopping generator.\n");
-
     if (ma_device_stop(&device) != MA_SUCCESS)
     {
         printf("Error: Failed to stop generator.\n");
         return GENERATOR_ERROR;
     }
 
-    printf("Debug: Generator stopped successfully.\n");
     return GENERATOR_OK;
 }
 
@@ -235,7 +211,7 @@ float generator_get_volume(Generator const *const self)
 
 void generator_set_volume(Generator *const self, float const value)
 {
-    if(value < 0.0f || value > 5.0f)
+    if (value < 0.0f || value > 5.0f)
     {
         printf("Error: Invalid volume value in generator_set_volume. Volume: %f\n", value);
         return;
