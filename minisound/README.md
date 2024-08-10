@@ -2,6 +2,8 @@
 
 A high-level real-time audio playback library based on [miniaudio](https://miniaud.io). The library offers basic functionality and quite low latency. Not really suitable for big sounds right now. Supports MP3, WAV and FLAC formats.
 
+Run `make help` from the root project directory to get started.
+
 ## Platform support
 
 | Platform | Tested                              | Supposed to work                        | Unsupported                                |
