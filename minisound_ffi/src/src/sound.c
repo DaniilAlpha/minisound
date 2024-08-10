@@ -25,16 +25,6 @@ Result sound_init(
     self->is_looped = false;
     self->loop_delay_ms = 0;
 
-    // Debug: Print first few bytes of data
-    printf("First 16 bytes of audio data: ");
-    for (int i = 0; i < 16 && i < data_size; i++)
-    {
-        printf("%02x ", ((unsigned char *)data)[i]);
-    }
-    printf("\n");
-
-    printf("Format: %d, Channels: %d, Sample Rate: %d\n", format, channels, sample_rate);
-
     if (format != ma_format_unknown && channels > 0 && sample_rate > 0)
     {
         // Raw PCM data
