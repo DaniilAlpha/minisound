@@ -162,8 +162,6 @@ final class Recorder {
       this.channels = channels;
       this.format = format;
       this.bufferDurationSeconds = bufferDurationSeconds;
-      print(
-          "creating record with $sampleRate, $channels, $format, $bufferDurationSeconds");
       await _recorder.initStream(
           sampleRate: sampleRate,
           channels: channels,
