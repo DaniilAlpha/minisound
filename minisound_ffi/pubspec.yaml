@@ -1,8 +1,4 @@
 publish_to: none
-
-
-
-
 name: minisound_ffi
 description: FFI implementation of the Minisound package.
 version: 1.5.0

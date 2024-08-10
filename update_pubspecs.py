@@ -63,7 +63,7 @@ def update_yaml_content(content, new_version, is_release, local_packages):
         if publish_pattern.search(content):
             content = publish_pattern.sub('publish_to: none', content)
         else:
-            content = f'publish_to: none\n{content}'
+            content = f'publish_to: none{content}'
    
     return content
 
