@@ -95,7 +95,7 @@ def main(version, is_release):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Update pubspec files for release or local development.")
-    parser.add_argument("version", help="The new version number")
+    parser.add_argument("version", help="The new version number Ex. update_pubspecs.py 1.0.0")
     parser.add_argument("--release", action="store_true", help="Prepare for release (default is local development)")
     args = parser.parse_args()
     main(args.version, args.release)
