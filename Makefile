@@ -51,7 +51,7 @@ run_device:
 	@echo "󰐊 Running example on device..."
 	@cd $(EXAMPLE_DIR) && flutter run
 
-run_web:
+run_web: build_weblib
 	@echo "󰐊 Running web example..."
 	@cd $(EXAMPLE_DIR) && flutter run -d chrome --web-browser-flag --enable-features=SharedArrayBuffer
 

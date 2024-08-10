@@ -338,7 +338,9 @@ class _ExamplePageState extends State<ExamplePage> {
                                   );
                                   generator.setWaveform(
                                       WaveformType.sine, 432, 0.5);
-                                  generator.isInit = true;
+                                  setState(() {
+                                    generator.isInit = true;
+                                  });
                                 }
 
                                 setState(() {

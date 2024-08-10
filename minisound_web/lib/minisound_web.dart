@@ -298,7 +298,7 @@ final class WebGenerator implements PlatformGenerator {
 
   @override
   Float32List getBuffer(int framesToRead) {
-    final bufferPtr = malloc.allocate<Float>(framesToRead);
+    final bufferPtr = malloc.allocate<Float>(framesToRead * 8);
     try {
       final framesRead =
           wasm.generator_get_buffer(_self, bufferPtr, framesToRead);
@@ -308,9 +308,7 @@ final class WebGenerator implements PlatformGenerator {
       }
       return Float32List.fromList(
           bufferPtr.asTypedList(framesRead) as List<double>);
-    } finally {
-      malloc.free(bufferPtr);
-    }
+    } finally {}
   }
 
   @override
