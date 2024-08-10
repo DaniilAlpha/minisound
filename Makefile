@@ -21,6 +21,12 @@ SRC_DIR := .$(SLASH)minisound_ffi$(SLASH)src$(SLASH)
 BUILD_DIR := .$(SLASH)minisound_ffi$(SLASH)src$(SLASH)build$(SLASH)
 VERSION ?= 1.5.0
 
+default: run
+
+init_submodules:
+	@echo "󰐊 Initializing submodules..."
+	@git submodule update --init --recursive
+
 pubspec_local:
 	@echo "󰐊 Switching our pubspecs for local dev with version ${VERSION}."
 	@python update_pubspecs.py ${VERSION}
@@ -33,7 +39,7 @@ clean:
 	@echo "󰃢 Cleaning Example."
 	@cd $(EXAMPLE_DIR) && flutter clean
 
-run:
+run: init_submodules
 ifeq ($(DETECTED_OS), Windows)
 	@echo "󰐊 Running example on Windows..."
 	@cd $(EXAMPLE_DIR) && cmd /c flutter run -d Windows
@@ -47,7 +53,7 @@ else
 	@echo "Unsupported OS: $(DETECTED_OS)"
 endif
 
-run_device:
+run_device: init_submodules
 	@echo "󰐊 Running example on device..."
 	@cd $(EXAMPLE_DIR) && flutter run
 
@@ -55,11 +61,11 @@ run_web: build_weblib
 	@echo "󰐊 Running web example..."
 	@cd $(EXAMPLE_DIR) && flutter run -d chrome --web-browser-flag --enable-features=SharedArrayBuffer
 
-ffigen: 
+ffigen: init_submodules
 	@echo "Generating dart ffi bindings..."
 	@cd $(FFI_DIR) && dart run ffigen
 
-build_weblib:
+build_weblib: init_submodules
 	@echo "Building ffi lib to web via emscripten..."
 	@cd $(BUILD_DIR) && emcmake cmake .. && cmake --build .
 

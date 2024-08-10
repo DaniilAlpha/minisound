@@ -183,7 +183,9 @@ void main() async {
 
 ## Building the project
 
-To build the project, follow these steps:
+A Makefile is provided with recipes to build the project and ease development. Type `make help` to see a list of available commands.
+
+To manually build the project, follow these steps:
 
 1. Initialize the submodules:
 
