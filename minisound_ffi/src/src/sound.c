@@ -31,7 +31,6 @@ Result sound_init(
         self->is_raw_data = true;
 
         size_t frame_count = data_size / (channels * ma_get_bytes_per_sample(format));
-        printf("Calculated frame count: %zu\n", frame_count);
 
         ma_audio_buffer_config buffer_config = ma_audio_buffer_config_init(
             format,
