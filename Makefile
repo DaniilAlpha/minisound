@@ -47,6 +47,10 @@ else
 	@echo "Unsupported OS: $(DETECTED_OS)"
 endif
 
+run_device:
+	@echo "󰐊 Running example on device..."
+	@cd $(EXAMPLE_DIR) && flutter run
+
 run_web:
 	@echo "󰐊 Running web example..."
 	@cd $(EXAMPLE_DIR) && flutter run -d chrome --web-browser-flag --enable-features=SharedArrayBuffer
@@ -62,3 +66,16 @@ build_weblib:
 clean_weblib:
 	@echo "Cleaning web lib..."
 	@$(RMDIR_CMD) "$(BUILD_DIR)/*"
+
+help:
+	@echo "Available targets:"
+	@echo "  pubspec_local: Switches pubspecs for local dev."
+	@echo "  pubspec_release: Switches pubspecs for release."
+	@echo "  clean: Cleans the example project."
+	@echo "  run: Runs the example project on current OS."
+	@echo "  run_device: Runs the example project on chosen device."
+	@echo "  run_web: Runs the web example project."
+	@echo "  ffigen: Generates dart ffi bindings."
+	@echo "  build_weblib: Builds the ffi lib to web via emscripten."
+	@echo "  clean_weblib: Cleans the web lib."
+	@echo "  help: Shows this help message."
