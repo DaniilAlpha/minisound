@@ -23,7 +23,7 @@ SilenceDataSourceConfig silence_data_source_config(
 typedef struct SilenceDataSource {
     ma_data_source_base ds;
 
-    SilenceDataSourceConfig config;
+    SilenceDataSourceConfig _config;
     ma_uint64 pos_frames;
 } SilenceDataSource;
 

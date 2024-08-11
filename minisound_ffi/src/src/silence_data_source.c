@@ -18,8 +18,8 @@ static ma_result silence_data_source_on_read(
     SilenceDataSource *const self = vself;
 
     ma_uint64 const remaining_frames =
-        self->config.len_frames > self->pos_frames
-            ? self->config.len_frames - self->pos_frames
+        self->_config.len_frames > self->pos_frames
+            ? self->_config.len_frames - self->pos_frames
             : 0;
     ma_uint64 const read_frames =
         remaining_frames > frames ? frames : remaining_frames;
@@ -50,14 +50,14 @@ static ma_result silence_data_source_on_get_data_format(
 ) {
     SilenceDataSource const *const self = vself;
 
-    return *out_format = self->config.format,
-           *out_channels = self->config.channel_count,
-           *out_sample_rate = self->config.sample_rate,
+    return *out_format = self->_config.format,
+           *out_channels = self->_config.channel_count,
+           *out_sample_rate = self->_config.sample_rate,
            ma_channel_map_init_standard(
                ma_standard_channel_map_default,
                out_channel_map,
                channel_map_cap,
-               self->config.channel_count
+               self->_config.channel_count
            ),
            MA_SUCCESS;
 }
@@ -77,7 +77,7 @@ static ma_result silence_data_source_on_get_len(
 ) {
     SilenceDataSource const *const self = vself;
 
-    return *out_len = self->config.len_frames, MA_SUCCESS;
+    return *out_len = self->_config.len_frames, MA_SUCCESS;
 }
 
 /************
@@ -118,7 +118,7 @@ Result silence_data_source_init(
     ds_config.vtable = &vtbl;
     ma_data_source_init(&ds_config, &self->ds);
 
-    self->config = *config;
+    self->_config = *config;
     self->pos_frames = 0;
 
     return Ok;
