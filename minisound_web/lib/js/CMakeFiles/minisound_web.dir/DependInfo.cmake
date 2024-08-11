@@ -12,7 +12,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/circular_buffer.c" "CMakeFiles/minisound_web.dir/src/circular_buffer.c.o" "gcc" "CMakeFiles/minisound_web.dir/src/circular_buffer.c.o.d"
   "/home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/engine.c" "CMakeFiles/minisound_web.dir/src/engine.c.o" "gcc" "CMakeFiles/minisound_web.dir/src/engine.c.o.d"
   "/home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/generator.c" "CMakeFiles/minisound_web.dir/src/generator.c.o" "gcc" "CMakeFiles/minisound_web.dir/src/generator.c.o.d"
-  "/home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/record.c" "CMakeFiles/minisound_web.dir/src/record.c.o" "gcc" "CMakeFiles/minisound_web.dir/src/record.c.o.d"
+  "/home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/recorder.c" "CMakeFiles/minisound_web.dir/src/recorder.c.o" "gcc" "CMakeFiles/minisound_web.dir/src/recorder.c.o.d"
   "/home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/silence_data_source.c" "CMakeFiles/minisound_web.dir/src/silence_data_source.c.o" "gcc" "CMakeFiles/minisound_web.dir/src/silence_data_source.c.o.d"
   "/home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/sound.c" "CMakeFiles/minisound_web.dir/src/sound.c.o" "gcc" "CMakeFiles/minisound_web.dir/src/sound.c.o.d"
   )

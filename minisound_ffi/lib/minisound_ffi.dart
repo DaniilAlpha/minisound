@@ -1,3 +1,5 @@
+// TODO!!! ffi's malloc.allocate takes number of bytes instead of number of objects! verify if right everywhere
+
 import "dart:ffi";
 import "dart:io";
 import "dart:typed_data";

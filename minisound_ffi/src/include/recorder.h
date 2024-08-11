@@ -1,5 +1,7 @@
-#ifndef RECORD_H
-#define RECORD_H
+// TODO fix naming
+
+#ifndef RECORDER_H
+#define RECORDER_H
 
 #include <stdbool.h>
 #include <stdint.h>

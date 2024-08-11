@@ -15,7 +15,7 @@ class Malloc implements Allocator {
   @override
   Pointer<T> allocate<T>(int size) {
     final ptr = _memoryPool.allocate(size);
-    _allocatedPointers.add(ptr);
+    if (ptr != nullptr) _allocatedPointers.add(ptr);
     return Pointer(ptr.addr, size);
   }
 

@@ -1,13 +1,13 @@
-part of "minisound_ffi.dart";
+part of "minisound_web.dart";
 
-final class FfiEngine implements PlatformEngine {
-  FfiEngine._(Pointer<c.Engine> self) : _self = self;
+final class WebEngine implements PlatformEngine {
+  WebEngine._(Pointer<c.Engine> self) : _self = self;
 
   final Pointer<c.Engine> _self;
 
   @override
   Future<void> init(int periodMs) async {
-    final r = _bindings.engine_init(_self, periodMs);
+    final r = await c.engine_init(_self, periodMs);
     if (r != c.Result.Ok) {
       throw MinisoundPlatformException("Failed to init the engine (code: $r).");
     }
@@ -15,13 +15,13 @@ final class FfiEngine implements PlatformEngine {
 
   @override
   void dispose() {
-    _bindings.engine_uninit(_self);
+    c.engine_uninit(_self);
     malloc.free(_self);
   }
 
   @override
   void start() {
-    final r = _bindings.engine_start(_self);
+    final r = c.engine_start(_self);
     if (r != c.Result.Ok) {
       throw MinisoundPlatformException(
           "Failed to start the engine (code: $r).");
@@ -30,8 +30,7 @@ final class FfiEngine implements PlatformEngine {
 
   @override
   Future<PlatformSound> loadSound(AudioData audioData) async {
-    final dataPtr =
-        malloc.allocate<Float>(audioData.buffer.length * sizeOf<Float>());
+    final dataPtr = malloc.allocate<Float>(audioData.buffer.length);
     if (dataPtr == nullptr) {
       throw MinisoundPlatformOutOfMemoryException();
     }
@@ -40,15 +39,15 @@ final class FfiEngine implements PlatformEngine {
     // final floatList = dataPtr.asTypedList(audioData.buffer.length);
     // floatList.setAll(0, audioData.buffer);
 
-    _copyAudioData(dataPtr, audioData.buffer, audioData.format);
+    heap.copyAudioData(dataPtr, audioData.buffer, audioData.format);
 
-    final sound = _bindings.sound_alloc();
+    final sound = c.sound_alloc(audioData.buffer.lengthInBytes);
     if (sound == nullptr) {
       malloc.free(dataPtr);
       throw MinisoundPlatformException("Failed to allocate a sound.");
     }
 
-    final r = _bindings.engine_load_sound(
+    final r = c.engine_load_sound(
       _self,
       sound,
       dataPtr,
@@ -63,17 +62,6 @@ final class FfiEngine implements PlatformEngine {
       throw MinisoundPlatformException("Failed to load a sound (code: $r).");
     }
 
-    return FfiSound._fromPtrs(sound, dataPtr);
-  }
-
-  void _copyAudioData(
-    Pointer<Float> dataPtr,
-    Float32List data,
-    // TODO unused
-    SoundFormat soundFormat,
-  ) {
-    for (var i = 0; i < data.length; i++) {
-      (dataPtr + i).value = data[i];
-    }
+    return WebSound._fromPtrs(sound, dataPtr);
   }
 }

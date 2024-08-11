@@ -1,6 +1,6 @@
-CMakeFiles/minisound_web.dir/src/record.c.o: \
-  /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/record.c \
-  /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/../include/record.h \
+CMakeFiles/minisound_web.dir/src/recorder.c.o: \
+  /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/recorder.c \
+  /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/../include/recorder.h \
   /home/Daniil/emsdk/upstream/lib/clang/19/include/stdbool.h \
   /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/stdbool.h \
   /home/Daniil/emsdk/upstream/lib/clang/19/include/stdint.h \

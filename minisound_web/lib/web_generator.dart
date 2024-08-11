@@ -1,16 +1,16 @@
-part of "minisound_ffi.dart";
+part of "minisound_web.dart";
 
-class FfiGenerator implements PlatformGenerator {
-  FfiGenerator._(Pointer<c.Generator> self) : _self = self;
+final class WebGenerator implements PlatformGenerator {
+  WebGenerator._(Pointer<c.Generator> self) : _self = self;
 
   final Pointer<c.Generator> _self;
 
-  late var _volume = _bindings.generator_get_volume(_self);
+  late var _volume = c.generator_get_volume(_self);
   @override
   double get volume => _volume;
   @override
   set volume(double value) {
-    _bindings.generator_set_volume(_self, value);
+    c.generator_set_volume(_self, value);
     _volume = value;
   }
 
@@ -21,7 +21,7 @@ class FfiGenerator implements PlatformGenerator {
     required int sampleRate,
     required int bufferDurationSeconds,
   }) async {
-    final r = _bindings.generator_init(
+    final r = await c.generator_init(
       _self,
       format.toC(),
       channels,
@@ -30,7 +30,7 @@ class FfiGenerator implements PlatformGenerator {
     );
     if (r != c.GeneratorResult.GENERATOR_OK) {
       throw MinisoundPlatformException(
-          "Failed to initialize generator (code: $r).");
+          "Failed to initialize generator. Error code: $r");
     }
   }
 
@@ -40,12 +40,7 @@ class FfiGenerator implements PlatformGenerator {
     required double frequency,
     required double amplitude,
   }) {
-    final r = _bindings.generator_set_waveform(
-      _self,
-      type.toC(),
-      frequency,
-      amplitude,
-    );
+    final r = c.generator_set_waveform(_self, type.toC(), frequency, amplitude);
     if (r != c.GeneratorResult.GENERATOR_OK) {
       throw MinisoundPlatformException("Failed to set waveform (code: $r).");
     }
@@ -57,12 +52,7 @@ class FfiGenerator implements PlatformGenerator {
     required double amplitude,
     required double dutyCycle,
   }) {
-    final r = _bindings.generator_set_pulsewave(
-      _self,
-      frequency,
-      amplitude,
-      dutyCycle,
-    );
+    final r = c.generator_set_pulsewave(_self, frequency, amplitude, dutyCycle);
     if (r != c.GeneratorResult.GENERATOR_OK) {
       throw MinisoundPlatformException("Failed to set pulse wave (code: $r).");
     }
@@ -71,10 +61,10 @@ class FfiGenerator implements PlatformGenerator {
   @override
   void setNoise({
     required GeneratorNoiseType type,
-    required double amplitude,
     required int seed,
+    required double amplitude,
   }) {
-    final r = _bindings.generator_set_noise(_self, type.toC(), seed, amplitude);
+    final r = c.generator_set_noise(_self, type.toC(), seed, amplitude);
     if (r != c.GeneratorResult.GENERATOR_OK) {
       throw MinisoundPlatformException("Failed to set noise (code: $r).");
     }
@@ -82,7 +72,7 @@ class FfiGenerator implements PlatformGenerator {
 
   @override
   void start() {
-    final r = _bindings.generator_start(_self);
+    final r = c.generator_start(_self);
     if (r != c.GeneratorResult.GENERATOR_OK) {
       throw MinisoundPlatformException("Failed to start generator (code: $r).");
     }
@@ -90,7 +80,7 @@ class FfiGenerator implements PlatformGenerator {
 
   @override
   void stop() {
-    final r = _bindings.generator_stop(_self);
+    final r = c.generator_stop(_self);
     if (r != c.GeneratorResult.GENERATOR_OK) {
       throw MinisoundPlatformException("Failed to stop generator (code: $r).");
     }
@@ -106,8 +96,7 @@ class FfiGenerator implements PlatformGenerator {
       throw MinisoundPlatformOutOfMemoryException();
     }
 
-    final floatsRead =
-        _bindings.generator_get_buffer(_self, bufPtr, floatsToRead);
+    final floatsRead = c.generator_get_buffer(_self, bufPtr, floatsToRead);
 
     // copy data from allocated C memory to Dart list
     final buffer = Float32List.fromList(bufPtr.asTypedList(floatsRead));
@@ -118,10 +107,10 @@ class FfiGenerator implements PlatformGenerator {
   }
 
   @override
-  int getAvailableFrames() => _bindings.generator_get_available_frames(_self);
+  int getAvailableFrames() => c.generator_get_available_frames(_self);
 
   @override
-  void dispose() => _bindings.generator_destroy(_self);
+  void dispose() => c.generator_destroy(_self);
 }
 
 extension GeneratorWaveformTypeToC on GeneratorWaveformType {

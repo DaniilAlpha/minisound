@@ -54,7 +54,7 @@ struct Sound {
     ma_engine *engine;
 };
 
-Sound *sound_alloc() {
+Sound *sound_alloc(void) {
     Sound *const sound = malloc(sizeof(Sound));
     if (sound == NULL) error("%s", explain(OutOfMemErr));
     return sound;
@@ -154,8 +154,10 @@ Result sound_init_raw(
 
 Result sound_init(
     Sound *const self,
+
     float const *const data,
     size_t const data_size,
+
     SoundFormat const sound_format,
     uint32_t const channels,
     uint32_t const sample_rate,
@@ -180,8 +182,11 @@ Result sound_init(
 
 void sound_unload(Sound *const self) {
     ma_sound_uninit(&self->sound);
-    self->is_raw ? ma_audio_buffer_uninit(&self->data.raw_buf)
-                 : ma_decoder_uninit(&self->data.non_raw.decoder);
+    if (self->is_raw) {
+        ma_audio_buffer_uninit(&self->data.raw_buf);
+    } else {
+        ma_decoder_uninit(&self->data.non_raw.decoder);
+    }
 }
 
 Result sound_play(Sound *const self) {

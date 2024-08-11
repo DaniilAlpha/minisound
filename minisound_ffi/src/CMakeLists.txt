@@ -9,21 +9,21 @@ set(FILENAME ".projectroot")
 function(find_project_root current_dir filename result_var)
     set(found FALSE)  # Flag to indicate if the file is found
     set(current_check_dir "${current_dir}")  # Start from the given directory
-    
+
     # Windows flutter embeds 8 levels deep
     foreach(i RANGE 0 8)
         set(filepath "${current_check_dir}/${filename}")
-        
+
         if(EXISTS "${filepath}")
             set(${result_var} "${current_check_dir}" PARENT_SCOPE)
             set(found TRUE)
             break()
         endif()
-        
+
         # Move one level up
         get_filename_component(current_check_dir "${current_check_dir}" DIRECTORY)
     endforeach()
-    
+
     if(NOT found)
         set(${result_var} "" PARENT_SCOPE)  # Set to empty if not found
     endif()
@@ -74,7 +74,7 @@ list(APPEND MAIN_INCLUDES ${MAIN_PATH}/include/)
 target_include_directories(${MAIN_LIB} PUBLIC ${MAIN_INCLUDES})
 
 # Definitions
-target_compile_definitions(${MAIN_LIB} PUBLIC 
+target_compile_definitions(${MAIN_LIB} PUBLIC
     DART_SHARED_LIB
     MILO_DEFAULT_LVL=MILO_LVL_NONE
     MINIAUDIO_IMPLEMENTATION
@@ -96,8 +96,8 @@ elseif(APPLE)
     target_compile_definitions(${MAIN_LIB} PUBLIC MA_ENABLE_COREAUDIO)
 elseif(UNIX)
     target_compile_definitions(${MAIN_LIB} PUBLIC
-        MA_ENABLE_PULSEAUDIO
         MA_ENABLE_JACK
+        MA_ENABLE_PULSEAUDIO
         MA_ENABLE_ALSA
     )
 else()
@@ -110,6 +110,8 @@ if(NOT EMSCRIPTEN)
         PUBLIC_HEADER include/minisound.h
         OUTPUT_NAME ${MAIN_LIB}
     )
+    target_compile_options(${MAIN_LIB} PUBLIC -O0 -g)
+    target_link_options(${MAIN_LIB} PUBLIC -O0 -g)
 else()
     set_target_properties(${MAIN_LIB} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${WEB_OUTPUT_DIR}

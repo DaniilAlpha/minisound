@@ -22,7 +22,7 @@ typedef enum SoundFormat {
 
 typedef struct Sound Sound;
 
-EXPORT Sound *sound_alloc();
+EXPORT Sound *sound_alloc(void);
 
 Result sound_init(
     Sound *const self,
@@ -47,7 +47,6 @@ EXPORT void sound_set_volume(Sound *const self, float const value);
 
 EXPORT float sound_get_duration(Sound *const self);
 
-EXPORT bool sound_get_is_looped(Sound const *const self);
 EXPORT void
 sound_set_looped(Sound *const self, bool const value, size_t const delay_ms);
 

@@ -1,4 +1,4 @@
-#include "../include/record.h"
+#include "../include/recorder.h"
 
 #include "../external/milo/milo.h"
 #include "../external/miniaudio/include/miniaudio.h"

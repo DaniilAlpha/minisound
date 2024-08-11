@@ -1,3 +1,5 @@
+// TODO fix naming
+
 #ifndef GENERATOR_H
 #define GENERATOR_H
 
@@ -32,6 +34,7 @@ typedef struct Generator Generator;
 
 EXPORT Generator *generator_create(void);
 EXPORT void generator_destroy(Generator *generator);
+
 EXPORT GeneratorResult generator_init(
     Generator *generator,
     SoundFormat sound_format,

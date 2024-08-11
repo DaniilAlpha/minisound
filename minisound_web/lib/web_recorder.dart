@@ -1,12 +1,12 @@
-part of "minisound_ffi.dart";
+part of "minisound_web.dart";
 
-class FfiRecorder implements PlatformRecorder {
-  FfiRecorder._(Pointer<c.Recorder> self) : _self = self;
+final class WebRecorder implements PlatformRecorder {
+  WebRecorder._(Pointer<c.Recorder> self) : _self = self;
 
   final Pointer<c.Recorder> _self;
 
   @override
-  bool get isRecording => _bindings.recorder_is_recording(_self);
+  bool get isRecording => c.recorder_is_recording(_self);
 
   @override
   Future<void> initFile(
@@ -15,21 +15,16 @@ class FfiRecorder implements PlatformRecorder {
     required int channels,
     required SoundFormat format,
   }) async {
-    final filenamePtr = filename.toNativeUtf8();
-    try {
-      final r = _bindings.recorder_init_file(
-        _self,
-        filenamePtr.cast(),
-        sampleRate,
-        channels,
-        format.toC(),
-      );
-      if (r != c.RecorderResult.RECORDER_OK) {
-        throw MinisoundPlatformException(
-            "Failed to initialize recorder with file (code: $r).");
-      }
-    } finally {
-      malloc.free(filenamePtr);
+    final r = await c.recorder_init_file(
+      _self,
+      filename,
+      sampleRate,
+      channels,
+      format.toC(),
+    );
+    if (r != c.RecorderResult.RECORDER_OK) {
+      throw MinisoundPlatformException(
+          "Failed to initialize recorder with file. Error code: $r");
     }
   }
 
@@ -40,7 +35,7 @@ class FfiRecorder implements PlatformRecorder {
     required SoundFormat format,
     required int bufferDurationSeconds,
   }) async {
-    final r = _bindings.recorder_init_stream(
+    final r = await c.recorder_init_stream(
       _self,
       sampleRate,
       channels,
@@ -49,16 +44,16 @@ class FfiRecorder implements PlatformRecorder {
     );
     if (r != c.RecorderResult.RECORDER_OK) {
       throw MinisoundPlatformException(
-          "Failed to initialize recorder stream (code: $r).");
+          "Failed to initialize recorder stream. Error code: $r");
     }
   }
 
   @override
-  void dispose() => _bindings.recorder_destroy(_self);
+  void dispose() => c.recorder_destroy(_self);
 
   @override
   void start() {
-    final r = _bindings.recorder_start(_self);
+    final r = c.recorder_start(_self);
     if (r != c.RecorderResult.RECORDER_OK) {
       throw MinisoundPlatformException("Failed to start recording (code: $r).");
     }
@@ -66,26 +61,26 @@ class FfiRecorder implements PlatformRecorder {
 
   @override
   void stop() {
-    final r = _bindings.recorder_stop(_self);
+    final r = c.recorder_stop(_self);
     if (r != c.RecorderResult.RECORDER_OK) {
       throw MinisoundPlatformException("Failed to stop recording (code: $r).");
     }
   }
 
   @override
-  int getAvailableFrames() => _bindings.recorder_get_available_frames(_self);
+  int getAvailableFrames() => c.recorder_get_available_frames(_self);
   @override
-  Float32List getBuffer(int framesToRead) {
-    // TODO! should multiply by channels, but cannot test at the moment
-    final floatsToRead = framesToRead * sizeOf<Float>();
+  Float32List getBuffer(int framesToRead, {int channels = 2}) {
+    // TODO! probably should multiply by channels, but cannot test at the moment
+    final floatsToRead = framesToRead * sizeOf<Float>() * 2;
 
     final bufPtr = malloc.allocate<Float>(floatsToRead);
     if (bufPtr == nullptr) {
       throw MinisoundPlatformOutOfMemoryException();
     }
+    bufPtr.retain();
 
-    final floatsRead =
-        _bindings.recorder_get_buffer(_self, bufPtr, floatsToRead);
+    final floatsRead = c.recorder_get_buffer(_self, bufPtr, floatsToRead);
 
     // copy data from allocated C memory to Dart list
     final buffer = Float32List.fromList(bufPtr.asTypedList(floatsRead));

@@ -33,7 +33,7 @@ ffigen:
       - "src/include/sound.h"
       - "src/include/engine.h"
       - "src/include/generator.h"
-      - "src/include/record.h"
+      - "src/include/recorder.h"
       - "/usr/lib/clang/18/include/stdbool.h"
   structs:
     dependency-only: opaque

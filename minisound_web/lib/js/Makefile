@@ -238,29 +238,29 @@ src/generator.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/minisound_web.dir/build.make CMakeFiles/minisound_web.dir/src/generator.c.s
 .PHONY : src/generator.c.s
 
-src/record.o: src/record.c.o
-.PHONY : src/record.o
+src/recorder.o: src/recorder.c.o
+.PHONY : src/recorder.o
 
 # target to build an object file
-src/record.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/minisound_web.dir/build.make CMakeFiles/minisound_web.dir/src/record.c.o
-.PHONY : src/record.c.o
+src/recorder.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/minisound_web.dir/build.make CMakeFiles/minisound_web.dir/src/recorder.c.o
+.PHONY : src/recorder.c.o
 
-src/record.i: src/record.c.i
-.PHONY : src/record.i
+src/recorder.i: src/recorder.c.i
+.PHONY : src/recorder.i
 
 # target to preprocess a source file
-src/record.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/minisound_web.dir/build.make CMakeFiles/minisound_web.dir/src/record.c.i
-.PHONY : src/record.c.i
+src/recorder.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/minisound_web.dir/build.make CMakeFiles/minisound_web.dir/src/recorder.c.i
+.PHONY : src/recorder.c.i
 
-src/record.s: src/record.c.s
-.PHONY : src/record.s
+src/recorder.s: src/recorder.c.s
+.PHONY : src/recorder.s
 
 # target to generate assembly for a file
-src/record.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/minisound_web.dir/build.make CMakeFiles/minisound_web.dir/src/record.c.s
-.PHONY : src/record.c.s
+src/recorder.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/minisound_web.dir/build.make CMakeFiles/minisound_web.dir/src/recorder.c.s
+.PHONY : src/recorder.c.s
 
 src/silence_data_source.o: src/silence_data_source.c.o
 .PHONY : src/silence_data_source.o
@@ -332,9 +332,9 @@ help:
 	@echo "... src/generator.o"
 	@echo "... src/generator.i"
 	@echo "... src/generator.s"
-	@echo "... src/record.o"
-	@echo "... src/record.i"
-	@echo "... src/record.s"
+	@echo "... src/recorder.o"
+	@echo "... src/recorder.i"
+	@echo "... src/recorder.s"
 	@echo "... src/silence_data_source.o"
 	@echo "... src/silence_data_source.i"
 	@echo "... src/silence_data_source.s"

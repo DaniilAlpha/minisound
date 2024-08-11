@@ -129,20 +129,20 @@ CMakeFiles/minisound_web.dir/src/generator.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/minisound_web.dir/src/generator.c.s"
 	/home/Daniil/emsdk/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/generator.c -o CMakeFiles/minisound_web.dir/src/generator.c.s
 
-CMakeFiles/minisound_web.dir/src/record.c.o: CMakeFiles/minisound_web.dir/flags.make
-CMakeFiles/minisound_web.dir/src/record.c.o: CMakeFiles/minisound_web.dir/includes_C.rsp
-CMakeFiles/minisound_web.dir/src/record.c.o: /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/record.c
-CMakeFiles/minisound_web.dir/src/record.c.o: CMakeFiles/minisound_web.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/Daniil/_work/_projects/_flutter/minisound/minisound_web/lib/js/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/minisound_web.dir/src/record.c.o"
-	/home/Daniil/emsdk/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/minisound_web.dir/src/record.c.o -MF CMakeFiles/minisound_web.dir/src/record.c.o.d -o CMakeFiles/minisound_web.dir/src/record.c.o -c /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/record.c
+CMakeFiles/minisound_web.dir/src/recorder.c.o: CMakeFiles/minisound_web.dir/flags.make
+CMakeFiles/minisound_web.dir/src/recorder.c.o: CMakeFiles/minisound_web.dir/includes_C.rsp
+CMakeFiles/minisound_web.dir/src/recorder.c.o: /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/recorder.c
+CMakeFiles/minisound_web.dir/src/recorder.c.o: CMakeFiles/minisound_web.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/Daniil/_work/_projects/_flutter/minisound/minisound_web/lib/js/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/minisound_web.dir/src/recorder.c.o"
+	/home/Daniil/emsdk/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/minisound_web.dir/src/recorder.c.o -MF CMakeFiles/minisound_web.dir/src/recorder.c.o.d -o CMakeFiles/minisound_web.dir/src/recorder.c.o -c /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/recorder.c
 
-CMakeFiles/minisound_web.dir/src/record.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/minisound_web.dir/src/record.c.i"
-	/home/Daniil/emsdk/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/record.c > CMakeFiles/minisound_web.dir/src/record.c.i
+CMakeFiles/minisound_web.dir/src/recorder.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/minisound_web.dir/src/recorder.c.i"
+	/home/Daniil/emsdk/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/recorder.c > CMakeFiles/minisound_web.dir/src/recorder.c.i
 
-CMakeFiles/minisound_web.dir/src/record.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/minisound_web.dir/src/record.c.s"
-	/home/Daniil/emsdk/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/record.c -o CMakeFiles/minisound_web.dir/src/record.c.s
+CMakeFiles/minisound_web.dir/src/recorder.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/minisound_web.dir/src/recorder.c.s"
+	/home/Daniil/emsdk/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/recorder.c -o CMakeFiles/minisound_web.dir/src/recorder.c.s
 
 CMakeFiles/minisound_web.dir/src/silence_data_source.c.o: CMakeFiles/minisound_web.dir/flags.make
 CMakeFiles/minisound_web.dir/src/silence_data_source.c.o: CMakeFiles/minisound_web.dir/includes_C.rsp
@@ -180,7 +180,7 @@ minisound_web_OBJECTS = \
 "CMakeFiles/minisound_web.dir/src/circular_buffer.c.o" \
 "CMakeFiles/minisound_web.dir/src/engine.c.o" \
 "CMakeFiles/minisound_web.dir/src/generator.c.o" \
-"CMakeFiles/minisound_web.dir/src/record.c.o" \
+"CMakeFiles/minisound_web.dir/src/recorder.c.o" \
 "CMakeFiles/minisound_web.dir/src/silence_data_source.c.o" \
 "CMakeFiles/minisound_web.dir/src/sound.c.o"
 
@@ -191,7 +191,7 @@ minisound_web_EXTERNAL_OBJECTS =
 /home/Daniil/_work/_projects/_flutter/minisound/minisound_web/lib/build/minisound_web.js: CMakeFiles/minisound_web.dir/src/circular_buffer.c.o
 /home/Daniil/_work/_projects/_flutter/minisound/minisound_web/lib/build/minisound_web.js: CMakeFiles/minisound_web.dir/src/engine.c.o
 /home/Daniil/_work/_projects/_flutter/minisound/minisound_web/lib/build/minisound_web.js: CMakeFiles/minisound_web.dir/src/generator.c.o
-/home/Daniil/_work/_projects/_flutter/minisound/minisound_web/lib/build/minisound_web.js: CMakeFiles/minisound_web.dir/src/record.c.o
+/home/Daniil/_work/_projects/_flutter/minisound/minisound_web/lib/build/minisound_web.js: CMakeFiles/minisound_web.dir/src/recorder.c.o
 /home/Daniil/_work/_projects/_flutter/minisound/minisound_web/lib/build/minisound_web.js: CMakeFiles/minisound_web.dir/src/silence_data_source.c.o
 /home/Daniil/_work/_projects/_flutter/minisound/minisound_web/lib/build/minisound_web.js: CMakeFiles/minisound_web.dir/src/sound.c.o
 /home/Daniil/_work/_projects/_flutter/minisound/minisound_web/lib/build/minisound_web.js: CMakeFiles/minisound_web.dir/build.make

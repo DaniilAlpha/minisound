@@ -13,3 +13,4 @@ part "heap.dart";
 part "allocator.dart";
 part "opaque.dart";
 part "pointer.dart";
+part "primitive.dart";

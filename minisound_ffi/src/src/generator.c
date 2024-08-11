@@ -52,6 +52,7 @@ struct Generator {
     GeneratorType type;
 };
 
+// TODO! move out of global variables to make multi-generator setup work
 ma_waveform waveform;
 ma_pulsewave pulsewave;
 ma_noise noise;
@@ -69,6 +70,7 @@ Generator *generator_create(void) {
     return generator;
 }
 
+// TODO! create uninit funciton instead of destroy
 void generator_destroy(Generator *generator) {
     if (generator != NULL) {
         ma_waveform_uninit(&waveform);

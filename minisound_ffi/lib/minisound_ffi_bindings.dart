@@ -185,20 +185,6 @@ class MinisoundFfiBindings {
   late final _sound_get_duration =
       _sound_get_durationPtr.asFunction<double Function(ffi.Pointer<Sound>)>();
 
-  bool sound_get_is_looped(
-    ffi.Pointer<Sound> self,
-  ) {
-    return _sound_get_is_looped(
-      self,
-    );
-  }
-
-  late final _sound_get_is_loopedPtr =
-      _lookup<ffi.NativeFunction<ffi.Bool Function(ffi.Pointer<Sound>)>>(
-          'sound_get_is_looped');
-  late final _sound_get_is_looped =
-      _sound_get_is_loopedPtr.asFunction<bool Function(ffi.Pointer<Sound>)>();
-
   void sound_set_looped(
     ffi.Pointer<Sound> self,
     bool value,
