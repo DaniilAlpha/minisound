@@ -7,7 +7,6 @@ library minisound;
 
 import "package:js/js.dart";
 import "package:js/js_util.dart";
-import "package:minisound_platform_interface/minisound_platform_interface.dart";
 import "package:minisound_web/bindings/wasm/wasm.dart";
 
 final class Engine extends Opaque {}
@@ -89,22 +88,34 @@ external int _sound_set_looped(int self, bool value, int delay_ms);
 // Recorder functions
 Pointer<Recorder> recorder_create() =>
     Pointer(_recorder_create(), 1, safe: true);
-Future<int> recorder_init_file(Pointer<Recorder> self, String filename,
-        {int sampleRate = 44800,
-        int channels = 1,
-        int format = AudioFormat.float32}) =>
-    _recorder_init_file(self.addr, filename,
-        sampleRate: sampleRate, channels: channels, format: format);
-Future<int> recorder_init_stream(Pointer<Recorder> self,
-        {int sampleRate = 44800,
-        int channels = 1,
-        int format = AudioFormat.float32,
-        int bufferDurationSeconds = 5}) =>
-    _recorder_init_stream(self.addr,
-        sampleRate: sampleRate,
-        channels: channels,
-        format: format,
-        bufferDurationSeconds: bufferDurationSeconds);
+Future<int> recorder_init_file(
+  Pointer<Recorder> self,
+  String filename,
+  int sampleRate,
+  int channels,
+  int format,
+) =>
+    _recorder_init_file(
+      self.addr,
+      filename,
+      sampleRate,
+      channels,
+      format,
+    );
+Future<int> recorder_init_stream(
+  Pointer<Recorder> self,
+  int sampleRate,
+  int channels,
+  int format,
+  int bufferDurationSeconds,
+) =>
+    _recorder_init_stream(
+      self.addr,
+      sampleRate,
+      channels,
+      format,
+      bufferDurationSeconds,
+    );
 int recorder_start(Pointer<Recorder> self) => _recorder_start(self.addr);
 int recorder_stop(Pointer<Recorder> self) => _recorder_stop(self.addr);
 int recorder_get_available_frames(Pointer<Recorder> self) =>
@@ -119,21 +130,26 @@ void recorder_destroy(Pointer<Recorder> self) => _recorder_destroy(self.addr);
 // Recorder JS bindings
 @JS()
 external int _recorder_create();
-Future<int> _recorder_init_file(int self, String filename,
-        {int sampleRate = 44800,
-        int channels = 1,
-        int format = AudioFormat.float32}) async =>
+Future<int> _recorder_init_file(
+  int self,
+  String filename,
+  int sampleRate,
+  int channels,
+  int format,
+) async =>
     promiseToFuture(_ccall(
         "recorder_init_file",
         "number",
         ["number", "string", "number", "number", "number"],
         [self, filename, sampleRate, channels, format],
         {"async": true}));
-Future<int> _recorder_init_stream(int self,
-        {int sampleRate = 44800,
-        int channels = 1,
-        int format = AudioFormat.float32,
-        int bufferDurationSeconds = 5}) async =>
+Future<int> _recorder_init_stream(
+  int self,
+  int sampleRate,
+  int channels,
+  int format,
+  int bufferDurationSeconds,
+) async =>
     promiseToFuture(_ccall(
         "recorder_init_stream",
         "number",
@@ -160,11 +176,13 @@ Pointer<Generator> generator_create() =>
     Pointer(_generator_create(), 1, safe: true);
 Future<int> generator_init(Pointer<Generator> self, int format, int channels,
         int sample_rate, int buffer_duration_seconds) async =>
-    _generator_init(self.addr,
-        format: format,
-        channels: channels,
-        sampleRate: sample_rate,
-        bufferDuration: buffer_duration_seconds);
+    _generator_init(
+      self.addr,
+      sample_rate,
+      channels,
+      format,
+      buffer_duration_seconds,
+    );
 int generator_set_waveform(Pointer<Generator> self, int type, double frequency,
         double amplitude) =>
     _generator_set_waveform(self.addr, type, frequency, amplitude);
@@ -192,11 +210,13 @@ void generator_destroy(Pointer<Generator> self) =>
 @JS()
 external int _generator_create();
 
-Future<int> _generator_init(int self,
-        {int sampleRate = 44800,
-        int channels = 1,
-        int format = 4,
-        int bufferDuration = 5}) async =>
+Future<int> _generator_init(
+  int self,
+  int sampleRate,
+  int channels,
+  int format,
+  int bufferDuration,
+) async =>
     promiseToFuture(_ccall(
         "generator_init",
         "number",
@@ -226,3 +246,63 @@ external int _generator_get_buffer(int self, int output, int frames_to_read);
 external int _generator_get_available_frames(int self);
 @JS()
 external void _generator_destroy(int self);
+
+abstract class SoundFormat {
+  static const int SOUND_FORMAT_UNKNOWN = 0;
+  static const int SOUND_FORMAT_U8 = 1;
+  static const int SOUND_FORMAT_S16 = 2;
+  static const int SOUND_FORMAT_S24 = 3;
+  static const int SOUND_FORMAT_S32 = 4;
+  static const int SOUND_FORMAT_F32 = 5;
+  static const int SOUND_FORMAT_COUNT = 6;
+}
+
+abstract class Result {
+  static const int Ok = 0;
+  static const int UnknownErr = 1;
+  static const int OutOfMemErr = 2;
+  static const int RangeErr = 3;
+  static const int HashCollisionErr = 4;
+  static const int FileUnavailableErr = 5;
+  static const int FileReadingErr = 6;
+  static const int FileWritingErr = 7;
+  static const int FormatErr = 8;
+  static const int ArgErr = 9;
+  static const int StateErr = 10;
+  static const int RESULT_COUNT = 11;
+}
+
+abstract class GeneratorResult {
+  static const int GENERATOR_OK = 0;
+  static const int GENERATOR_ERROR = 1;
+}
+
+abstract class GeneratorType {
+  static const int GENERATOR_TYPE_WAVEFORM = 0;
+  static const int GENERATOR_TYPE_PULSEWAVE = 1;
+  static const int GENERATOR_TYPE_NOISE = 2;
+}
+
+abstract class GeneratorWaveformType {
+  static const int GENERATOR_WAVEFORM_TYPE_SINE = 0;
+  static const int GENERATOR_WAVEFORM_TYPE_SQUARE = 1;
+  static const int GENERATOR_WAVEFORM_TYPE_TRIANGLE = 2;
+  static const int GENERATOR_WAVEFORM_TYPE_SAWTOOTH = 3;
+}
+
+abstract class GeneratorNoiseType {
+  static const int GENERATOR_NOISE_TYPE_WHITE = 0;
+  static const int GENERATOR_NOISE_TYPE_PINK = 1;
+  static const int GENERATOR_NOISE_TYPE_BROWNIAN = 2;
+}
+
+abstract class RecorderResult {
+  static const int RECORDER_OK = 0;
+  static const int RECORDER_ERROR_UNKNOWN = 1;
+  static const int RECORDER_ERROR_OUT_OF_MEMORY = 2;
+  static const int RECORDER_ERROR_INVALID_ARGUMENT = 3;
+  static const int RECORDER_ERROR_ALREADY_RECORDING = 4;
+  static const int RECORDER_ERROR_NOT_RECORDING = 5;
+  static const int RECORDER_ERROR_INVALID_FORMAT = 6;
+  static const int RECORDER_ERROR_INVALID_CHANNELS = 7;
+}

@@ -18,11 +18,12 @@ class MinisoundMock extends MinisoundPlatform {
 
 // engine mock
 
+enum EngineState { uninit, init, started }
+
 class EngineMock implements PlatformEngine {
   final Map<int, SoundMock> loadedSounds = {};
   int nextSoundId = 0;
 
-  @override
   EngineState state = EngineState.uninit;
 
   @override
@@ -106,14 +107,16 @@ class RecorderMock implements PlatformRecorder {
   String? filename;
   int sampleRate = 0;
   int channels = 0;
-  int format = 0;
+  SoundFormat? format;
   final List<Float32List> recordedBuffers = [];
 
   @override
-  Future<void> initFile(String filename,
-      {int sampleRate = 44800,
-      int channels = 1,
-      int format = AudioFormat.float32}) async {
+  Future<void> initFile(
+    String filename, {
+    required int sampleRate,
+    required int channels,
+    required SoundFormat format,
+  }) async {
     this.filename = filename;
     this.sampleRate = sampleRate;
     this.channels = channels;
@@ -122,11 +125,12 @@ class RecorderMock implements PlatformRecorder {
   }
 
   @override
-  Future<void> initStream(
-      {int sampleRate = 44800,
-      int channels = 1,
-      int format = AudioFormat.float32,
-      int bufferDurationSeconds = 5}) async {
+  Future<void> initStream({
+    required int sampleRate,
+    required int channels,
+    required SoundFormat format,
+    required int bufferDurationSeconds,
+  }) async {
     this.sampleRate = sampleRate;
     this.channels = channels;
     this.format = format;
@@ -184,7 +188,7 @@ class RecorderMock implements PlatformRecorder {
 // generator mock
 
 class GeneratorMock implements PlatformGenerator {
-  int format = 0;
+  SoundFormat? format;
   int channels = 0;
   int sampleRate = 0;
   int bufferDurationSeconds = 0;
@@ -195,8 +199,12 @@ class GeneratorMock implements PlatformGenerator {
   var isStarted = false;
 
   @override
-  Future<void> init(int format, int channels, int sampleRate,
-      int bufferDurationSeconds) async {
+  Future<void> init({
+    required SoundFormat format,
+    required int channels,
+    required int sampleRate,
+    required int bufferDurationSeconds,
+  }) async {
     this.format = format;
     this.channels = channels;
     this.sampleRate = sampleRate;
@@ -204,13 +212,25 @@ class GeneratorMock implements PlatformGenerator {
   }
 
   @override
-  void setWaveform(WaveformType type, double frequency, double amplitude) {}
+  void setWaveform({
+    required GeneratorWaveformType type,
+    required double frequency,
+    required double amplitude,
+  }) {}
 
   @override
-  void setPulsewave(double frequency, double amplitude, double dutyCycle) {}
+  void setPulsewave({
+    required double frequency,
+    required double amplitude,
+    required double dutyCycle,
+  }) {}
 
   @override
-  void setNoise(NoiseType type, int seed, double amplitude) {}
+  void setNoise({
+    required GeneratorNoiseType type,
+    required int seed,
+    required double amplitude,
+  }) {}
 
   @override
   void start() => isStarted = true;

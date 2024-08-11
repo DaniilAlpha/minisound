@@ -9,31 +9,31 @@
 
 // this ensures safe casting between `SoundFormat` and `ma_format`
 _Static_assert(
-    SOUND_FORMAT_UNKNOWN == ma_format_unknown,
+    (int)SOUND_FORMAT_UNKNOWN == (int)ma_format_unknown,
     "SOUND_FORMAT_UNKNOWN should match ma_format_unknown."
 );
 _Static_assert(
-    SOUND_FORMAT_U8 == ma_format_u8,
+    (int)SOUND_FORMAT_U8 == (int)ma_format_u8,
     "SOUND_FORMAT_U8 should match ma_format_u8."
 );
 _Static_assert(
-    SOUND_FORMAT_S16 == ma_format_s16,
+    (int)SOUND_FORMAT_S16 == (int)ma_format_s16,
     "SOUND_FORMAT_S16 should match ma_format_s16."
 );
 _Static_assert(
-    SOUND_FORMAT_S24 == ma_format_s24,
+    (int)SOUND_FORMAT_S24 == (int)ma_format_s24,
     "SOUND_FORMAT_S24 should match ma_format_s24."
 );
 _Static_assert(
-    SOUND_FORMAT_S32 == ma_format_s32,
+    (int)SOUND_FORMAT_S32 == (int)ma_format_s32,
     "SOUND_FORMAT_S32 should match ma_format_s32."
 );
 _Static_assert(
-    SOUND_FORMAT_F32 == ma_format_f32,
+    (int)SOUND_FORMAT_F32 == (int)ma_format_f32,
     "SOUND_FORMAT_F32 should match ma_format_f32."
 );
 _Static_assert(
-    SOUND_FORMAT_COUNT == ma_format_count,
+    (size_t)SOUND_FORMAT_COUNT == (size_t)ma_format_count,
     "Count of `SoundFormat` members and `ma_format` members does not match."
 );
 

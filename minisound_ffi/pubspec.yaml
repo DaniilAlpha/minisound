@@ -28,14 +28,15 @@ ffigen:
   headers:
     entry-points:
       - "src/include/minisound.h"
-      - "src/include/engine.h"
-      - "src/include/sound.h"
-      - "src/include/record.h"
-      - "src/include/generator.h"
-      - "src/include/circular_buffer.h"
     include-directives:
-      - "src/include/*.h"
+      # to generate only what is needed, specified only headers directly used in bindings
+      - "src/include/sound.h"
+      - "src/include/engine.h"
+      - "src/include/generator.h"
+      - "src/include/record.h"
       - "/usr/lib/clang/18/include/stdbool.h"
+  structs:
+    dependency-only: opaque
   preamble: |
     // ignore_for_file: camel_case_types
     // ignore_for_file: prefer_double_quotes

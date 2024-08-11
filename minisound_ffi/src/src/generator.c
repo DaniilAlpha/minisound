@@ -14,33 +14,33 @@
 // this ensures safe casting between `GeneratorWaveformType` and
 // `ma_waveform_type`
 _Static_assert(
-    GENERATOR_WAVEFORM_TYPE_SINE == ma_waveform_type_sine,
+    (int)GENERATOR_WAVEFORM_TYPE_SINE == (int)ma_waveform_type_sine,
     "GENERATOR_WAVEFORM_TYPE_SINE should match ma_vaweform_type_sine."
 );
 _Static_assert(
-    GENERATOR_WAVEFORM_TYPE_SQUARE == ma_waveform_type_square,
+    (int)GENERATOR_WAVEFORM_TYPE_SQUARE == (int)ma_waveform_type_square,
     "GENERATOR_WAVEFORM_TYPE_SQUARE should match ma_waveform_type_square."
 );
 _Static_assert(
-    GENERATOR_WAVEFORM_TYPE_TRIANGLE == ma_waveform_type_triangle,
+    (int)GENERATOR_WAVEFORM_TYPE_TRIANGLE == (int)ma_waveform_type_triangle,
     "GENERATOR_WAVEFORM_TYPE_TRIANGLE should match ma_waveform_type_triangle."
 );
 _Static_assert(
-    GENERATOR_WAVEFORM_TYPE_SAWTOOTH == ma_waveform_type_sawtooth,
+    (int)GENERATOR_WAVEFORM_TYPE_SAWTOOTH == (int)ma_waveform_type_sawtooth,
     "GENERATOR_WAVEFORM_TYPE_SAWTOOTH should match ma_waveform_type_sawtooth."
 );
 // this ensures safe casting between `GeneratorNoiseType` and
 // `ma_noise_type`
 _Static_assert(
-    GENERATOR_NOISE_TYPE_WHITE == ma_noise_type_white,
+    (int)GENERATOR_NOISE_TYPE_WHITE == (int)ma_noise_type_white,
     "GENERATOR_NOISE_TYPE_WHITE should match ma_noise_type_white."
 );
 _Static_assert(
-    GENERATOR_NOISE_TYPE_PINK == ma_noise_type_pink,
+    (int)GENERATOR_NOISE_TYPE_PINK == (int)ma_noise_type_pink,
     "GENERATOR_NOISE_TYPE_PINK should match ma_noise_type_pink."
 );
 _Static_assert(
-    GENERATOR_NOISE_TYPE_BROWNIAN == ma_noise_type_brownian,
+    (int)GENERATOR_NOISE_TYPE_BROWNIAN == (int)ma_noise_type_brownian,
     "GENERATOR_NOISE_TYPE_BROWNIAN should match ma_noise_type_brownian."
 );
 
@@ -302,7 +302,7 @@ void generator_set_volume(Generator *const self, float const value) {
     volume = value;
 }
 
-int generator_get_buffer(
+size_t generator_get_buffer(
     Generator *const self,
     float *const output,
     size_t const floats_to_read
@@ -322,18 +322,18 @@ int generator_get_buffer(
     size_t const to_read =
         (floats_to_read < available_floats) ? floats_to_read : available_floats;
 
-    return (int)circular_buffer_read(&self->circular_buffer, output, to_read);
+    return circular_buffer_read(&self->circular_buffer, output, to_read);
 }
 
-int generator_get_available_frames(Generator *generator) {
+size_t generator_get_available_frames(Generator *generator) {
     if (generator == NULL) {
         printf("Error: Generator is NULL in generator_get_available_frames.\n");
         return 0;
     }
 
-    size_t available_floats =
+    size_t const available_floats =
         circular_buffer_get_available_floats(&generator->circular_buffer);
-    if (generator->channels == 0) { generator->channels = 1; }
-    if (available_floats == 0) { return GENERATOR_ERROR; }
-    return (int)(available_floats / generator->channels);
+    if (generator->channels == 0) generator->channels = 1;
+    if (available_floats == 0) return GENERATOR_ERROR;
+    return available_floats / generator->channels;
 }

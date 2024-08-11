@@ -41,7 +41,7 @@ EXPORT RecorderResult recorder_init_stream(
 EXPORT RecorderResult recorder_start(Recorder *recorder);
 EXPORT RecorderResult recorder_stop(Recorder *recorder);
 EXPORT size_t recorder_get_available_frames(Recorder *const self);
-EXPORT int recorder_get_buffer(
+EXPORT size_t recorder_get_buffer(
     Recorder *const self,
     float *const output,
     size_t const floats_to_read

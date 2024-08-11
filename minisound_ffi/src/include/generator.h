@@ -61,11 +61,11 @@ EXPORT GeneratorResult generator_start(Generator *generator);
 EXPORT GeneratorResult generator_stop(Generator *generator);
 EXPORT float generator_get_volume(Generator const *const self);
 EXPORT void generator_set_volume(Generator *const self, float const value);
-EXPORT int generator_get_buffer(
+EXPORT size_t generator_get_buffer(
     Generator *const self,
     float *const output,
     size_t const floats_to_read
 );
-EXPORT int generator_get_available_frames(Generator *generator);
+EXPORT size_t generator_get_available_frames(Generator *generator);
 
 #endif  // GENERATOR_H

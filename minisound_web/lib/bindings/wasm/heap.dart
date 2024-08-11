@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names, parameter_assignments, omit_local_variable_types
+// ignore_for_file: non_constant_identifier_names
 
 part of "wasm.dart";
 
@@ -48,8 +48,9 @@ class Heap {
     _heapF64.setRange(startIndex, endIndex, data);
   }
 
-  void copyAudioData(Pointer ptr, dynamic data, int format) {
+  void copyAudioData(Pointer ptr, dynamic data, SoundFormat format) {
     if (data is ByteBuffer) {
+      // ignore: parameter_assignments
       data = _getTypedDataViewFromByteBuffer(data, format);
     }
 
@@ -57,15 +58,15 @@ class Heap {
       copyFloat32List(ptr, data);
     } else if (data is TypedData) {
       switch (format) {
-        case AudioFormat.uint8:
+        case SoundFormat.u8:
           copyUint8List(ptr, data as Uint8List);
-          break;
-        case AudioFormat.int16:
+
+        case SoundFormat.s16:
           _copyInt16ListAsInt32(ptr, data as Int16List);
-          break;
-        case AudioFormat.int32:
+
+        case SoundFormat.s32:
           copyInt32List(ptr, data as Int32List);
-          break;
+
         default:
           throw ArgumentError("Unsupported audio format: $format");
       }
@@ -82,25 +83,23 @@ class Heap {
       throw ArgumentError("Heap out of bounds");
     }
 
-    for (int i = 0; i < data.length; i++) {
+    for (var i = 0; i < data.length; i++) {
       _heapI32[startIndex + i] = data[i];
     }
   }
 
-  TypedData _getTypedDataViewFromByteBuffer(ByteBuffer buffer, int format) {
-    switch (format) {
-      case AudioFormat.uint8:
-        return buffer.asUint8List();
-      case AudioFormat.int16:
-        return buffer.asInt16List();
-      case AudioFormat.int32:
-        return buffer.asInt32List();
-      case AudioFormat.float32:
-        return buffer.asFloat32List();
-      default:
-        throw ArgumentError("Unsupported audio format: $format");
-    }
-  }
+  TypedData _getTypedDataViewFromByteBuffer(
+    ByteBuffer buffer,
+    SoundFormat format,
+  ) =>
+      switch (format) {
+        SoundFormat.u8 => buffer.asUint8List(),
+        SoundFormat.s16 => buffer.asInt16List(),
+        SoundFormat.s32 => buffer.asInt32List(),
+        SoundFormat.f32 => buffer.asFloat32List(),
+        // TODO!!! we need to support all formats
+        _ => throw ArgumentError("Unsupported audio format: $format"),
+      };
 }
 
 const heap = Heap();

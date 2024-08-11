@@ -202,7 +202,7 @@ bool recorder_is_recording(Recorder const *recorder) {
     return recorder != NULL && recorder->is_recording;
 }
 
-int recorder_get_buffer(
+size_t recorder_get_buffer(
     Recorder *const self,
     float *const output,
     size_t const floats_to_read
@@ -214,17 +214,14 @@ int recorder_get_buffer(
     size_t const to_read =
         (floats_to_read < available_floats) ? floats_to_read : available_floats;
 
-    return (int)circular_buffer_read(&self->circular_buffer, output, to_read);
+    return circular_buffer_read(&self->circular_buffer, output, to_read);
 }
 
 size_t recorder_get_available_frames(Recorder *const self) {
-    if (self == NULL) return RECORDER_ERROR_INVALID_ARGUMENT;
-
     // Check if channels is zero to prevent division by zero
     if (self->channels == 0) self->channels = 1;
 
     size_t const available_floats =
         circular_buffer_get_available_floats(&self->circular_buffer);
-    if (available_floats == 0) return RECORDER_ERROR_UNKNOWN;
     return available_floats / self->channels;
 }

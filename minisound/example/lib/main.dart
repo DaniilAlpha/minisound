@@ -4,8 +4,10 @@ import "dart:async";
 import "dart:typed_data";
 
 import "package:flutter/material.dart";
-import "package:minisound/minisound.dart";
-import "package:minisound/minisound_flutter.dart";
+import "package:minisound/engine.dart";
+import "package:minisound/engine_flutter.dart";
+import "package:minisound/generator.dart";
+import "package:minisound/recorder.dart";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,20 +28,22 @@ class ExamplePage extends StatefulWidget {
 class _ExamplePageState extends State<ExamplePage> {
   final engine = Engine();
   var loopDelay = 0.0;
+
+  final List<Float32List> recordingBuffer = [];
   late Recorder recorder;
   Timer? recorderTimer;
   Timer? generatorTimer;
+  int totalRecordedFrames = 0;
+
+  final List<Float32List> generatorBuffer = [];
   late Generator generator;
-  WaveformType waveformType = WaveformType.sine;
-  NoiseType noiseType = NoiseType.white;
+  GeneratorWaveformType waveformType = GeneratorWaveformType.sine;
+  GeneratorNoiseType noiseType = GeneratorNoiseType.white;
   bool enableWaveform = false;
   bool enableNoise = false;
   bool enablePulse = false;
   var pulseDelay = 0.25;
-  final List<Float32List> recordingBuffer = [];
-  final List<Float32List> generatorBuffer = [];
 
-  int totalRecordedFrames = 0;
   final List<Sound> sounds = [];
 
   late final Future<Sound> soundFuture;
@@ -181,12 +185,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                 }
                               } else {
                                 if (!recorder.isInit) {
-                                  await recorder.initStream(
-                                    sampleRate: 48000,
-                                    channels: 1,
-                                    format: AudioFormat.float32,
-                                  );
-                                  recorder.isInit = true;
+                                  await recorder.initStream();
                                 }
                                 setState(() {
                                   recorder.start();
@@ -211,9 +210,9 @@ class _ExamplePageState extends State<ExamplePage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const Text("Waveform Type: "),
-                              DropdownButton<WaveformType>(
+                              DropdownButton<GeneratorWaveformType>(
                                 value: waveformType,
-                                items: WaveformType.values
+                                items: GeneratorWaveformType.values
                                     .map((type) => DropdownMenuItem(
                                           value: type,
                                           child: Text(
@@ -226,15 +225,13 @@ class _ExamplePageState extends State<ExamplePage> {
                                           waveformType = value!;
                                         });
                                         generator.setWaveform(
-                                          waveformType,
-                                          432.0,
-                                          0.5,
+                                          type: waveformType,
+                                          frequency: 432.0,
                                         );
                                         if (enablePulse) {
                                           generator.setPulsewave(
-                                            432.0,
-                                            0.5,
-                                            pulseDelay,
+                                            frequency: 432.0,
+                                            dutyCycle: pulseDelay,
                                           );
                                         }
                                       }
@@ -246,13 +243,12 @@ class _ExamplePageState extends State<ExamplePage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const Text("Noise Type: "),
-                              DropdownButton<NoiseType>(
+                              DropdownButton<GeneratorNoiseType>(
                                 value: noiseType,
-                                items: NoiseType.values
+                                items: GeneratorNoiseType.values
                                     .map((type) => DropdownMenuItem(
                                           value: type,
-                                          child: Text(
-                                              type.toString().split(".").last),
+                                          child: Text(type.name),
                                         ))
                                     .toList(),
                                 onChanged: enableNoise
@@ -260,11 +256,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                         setState(() {
                                           noiseType = value!;
                                         });
-                                        generator.setNoise(
-                                          noiseType,
-                                          0,
-                                          0.5,
-                                        );
+                                        generator.setNoise(type: noiseType);
                                       }
                                     : null,
                               ),
@@ -279,11 +271,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                   setState(() {
                                     enableWaveform = value!;
                                   });
-                                  generator.setWaveform(
-                                    waveformType,
-                                    432.0,
-                                    0.5,
-                                  );
+                                  generator.setWaveform(type: waveformType);
                                 },
                               ),
                               const Text("Waveform"),
@@ -294,11 +282,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                   setState(() {
                                     enableNoise = value!;
                                   });
-                                  generator.setNoise(
-                                    noiseType,
-                                    0,
-                                    0.5,
-                                  );
+                                  generator.setNoise(type: noiseType);
                                 },
                               ),
                               const Text("Noise"),
@@ -310,9 +294,8 @@ class _ExamplePageState extends State<ExamplePage> {
                                     enablePulse = value!;
                                   });
                                   generator.setPulsewave(
-                                    432.0,
-                                    0.5,
-                                    pulseDelay,
+                                    frequency: 432.0,
+                                    dutyCycle: pulseDelay,
                                   );
                                 },
                               ),
@@ -330,17 +313,8 @@ class _ExamplePageState extends State<ExamplePage> {
                                 });
                               } else {
                                 if (!generator.isInit) {
-                                  await generator.init(
-                                    AudioFormat.float32,
-                                    2,
-                                    48000,
-                                    5,
-                                  );
-                                  generator.setWaveform(
-                                      WaveformType.sine, 432, 0.5);
-                                  setState(() {
-                                    generator.isInit = true;
-                                  });
+                                  await generator.init();
+                                  generator.setWaveform();
                                 }
 
                                 setState(() {
@@ -353,31 +327,26 @@ class _ExamplePageState extends State<ExamplePage> {
                               }
                             },
                           ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text("Pulse delay:"),
-                              SizedBox(
-                                width: 200,
-                                child: Slider(
-                                  value: pulseDelay,
-                                  min: 0,
-                                  max: 1,
-                                  divisions: 300,
-                                  label: pulseDelay.toStringAsFixed(2),
-                                  onChanged: (value) => setState(() {
-                                    pulseDelay = value;
-                                  }),
-                                  onChangeEnd: (value) =>
-                                      generator.setPulsewave(
-                                    432.0,
-                                    0.5,
-                                    pulseDelay,
-                                  ),
+                          Row(mainAxisSize: MainAxisSize.min, children: [
+                            const Text("Pulse delay:"),
+                            SizedBox(
+                              width: 200,
+                              child: Slider(
+                                value: pulseDelay,
+                                min: 0,
+                                max: 1,
+                                divisions: 300,
+                                label: pulseDelay.toStringAsFixed(2),
+                                onChanged: (value) => setState(() {
+                                  pulseDelay = value;
+                                }),
+                                onChangeEnd: (value) => generator.setPulsewave(
+                                  frequency: 432.0,
+                                  dutyCycle: value,
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ]),
                         ],
                       ),
                     );
@@ -437,9 +406,10 @@ class _ExamplePageState extends State<ExamplePage> {
 
     final audioData = AudioData(
       combinedBuffer.buffer.asFloat32List(),
-      AudioFormat.float32,
-      recorder.sampleRate,
-      recorder.channels,
+      SoundFormat.f32,
+      // TODO!!! replace placeholder values
+      44100,
+      1,
     );
 
     recordingBuffer.clear();

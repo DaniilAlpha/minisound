@@ -1,5 +1,3 @@
-// ignore_for_file: omit_local_variable_types
-
 part of "wasm.dart";
 
 abstract interface class Allocator {
@@ -51,7 +49,7 @@ class MemoryPool {
   List<int> freeBlocks = [];
 
   Pointer allocate(int size) {
-    for (int i = 0; i < freeBlocks.length; i++) {
+    for (var i = 0; i < freeBlocks.length; i++) {
       final block = freeBlocks[i];
       if (block >= size) {
         freeBlocks.removeAt(i);
