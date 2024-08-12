@@ -12,10 +12,7 @@ import "package:minisound/recorder.dart";
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(const MaterialApp(
-    title: "Minisound Example",
-    home: ExamplePage(),
-  ));
+  runApp(const MaterialApp(title: "Minisound Example", home: ExamplePage()));
 }
 
 class ExamplePage extends StatefulWidget {
@@ -43,24 +40,30 @@ class _ExamplePageState extends State<ExamplePage> {
   bool enableNoise = false;
   bool enablePulse = false;
   var pulseDelay = 0.25;
-
   final List<Sound> sounds = [];
 
-  late final Future<Sound> soundFuture;
+  Sound? currentSound;
+  late final Future<Map<String, Sound>> soundsFuture;
 
   @override
   void initState() {
     super.initState();
-    soundFuture = _initializeSound();
+    soundsFuture = _initializeSounds();
   }
 
-  Future<Sound> _initializeSound() async {
+  Future<Map<String, Sound>> _initializeSounds() async {
     if (!engine.isInit) {
       await engine.init();
       recorder = Recorder(mainEngine: engine);
       generator = Generator(mainEngine: engine);
     }
-    return engine.loadSoundAsset("assets/laser_shoot.wav");
+    final soundNames = [
+      "assets/laser_shoot.wav",
+      "assets/laser_shoot.mp3",
+    ];
+    return Future.wait(soundNames.map(
+      engine.loadSoundAsset,
+    )).then((sounds) => Map.fromIterables(soundNames, sounds));
   }
 
   @override
@@ -68,12 +71,12 @@ class _ExamplePageState extends State<ExamplePage> {
         appBar: AppBar(title: const Text("Minisound Example")),
         body: Center(
           child: FutureBuilder(
-            future: soundFuture,
+            future: soundsFuture,
             builder: (_, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.done:
                   if (snapshot.hasData) {
-                    final sound = snapshot.data!;
+                    final sounds = snapshot.data!;
                     return SingleChildScrollView(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -85,20 +88,34 @@ class _ExamplePageState extends State<ExamplePage> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
+                          DropdownButton(
+                            items: sounds.entries
+                                .map((entry) => DropdownMenuItem(
+                                      value: entry.value,
+                                      child: Text(entry.key),
+                                    ))
+                                .toList(),
+                            value: currentSound,
+                            onChanged: (sound) => setState(() {
+                              currentSound = sound;
+                            }),
+                          ),
                           ElevatedButton(
+                            onPressed: currentSound == null
+                                ? null
+                                : () async {
+                                    await engine.start();
+                                    currentSound!.play();
+                                  },
                             child: const Text("PLAY"),
-                            onPressed: () async {
-                              await engine.start();
-                              sound.play();
-                            },
                           ),
                           ElevatedButton(
+                            onPressed: currentSound?.pause,
                             child: const Text("PAUSE"),
-                            onPressed: () => sound..pause(),
                           ),
                           ElevatedButton(
+                            onPressed: currentSound?.stop,
                             child: const Text("STOP"),
-                            onPressed: () => sound..stop(),
                           ),
                           Row(
                             mainAxisSize: MainAxisSize.min,
@@ -107,13 +124,14 @@ class _ExamplePageState extends State<ExamplePage> {
                               SizedBox(
                                 width: 200,
                                 child: Slider(
-                                  value: sound.volume,
+                                  value: currentSound?.volume ?? 0,
                                   min: 0,
                                   max: 10,
                                   divisions: 20,
-                                  label: sound.volume.toStringAsFixed(2),
+                                  label:
+                                      currentSound?.volume.toStringAsFixed(2),
                                   onChanged: (value) => setState(() {
-                                    sound.volume = value;
+                                    currentSound?.volume = value;
                                   }),
                                   onChangeEnd: (value) =>
                                       generator.volume = value,
@@ -122,15 +140,18 @@ class _ExamplePageState extends State<ExamplePage> {
                             ],
                           ),
                           ElevatedButton(
+                            onPressed: currentSound == null
+                                ? null
+                                : () async {
+                                    await engine.start();
+                                    currentSound!.playLooped(
+                                      delay: Duration(
+                                        milliseconds:
+                                            (loopDelay * 1000).toInt(),
+                                      ),
+                                    );
+                                  },
                             child: const Text("PLAY LOOPED"),
-                            onPressed: () async {
-                              await engine.start();
-                              sound.playLooped(
-                                delay: Duration(
-                                  milliseconds: (loopDelay * 1000).toInt(),
-                                ),
-                              );
-                            },
                           ),
                           Row(
                             mainAxisSize: MainAxisSize.min,
