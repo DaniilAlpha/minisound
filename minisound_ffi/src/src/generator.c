@@ -1,52 +1,86 @@
 #include "../include/generator.h"
+
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
-#define DEVICE_FORMAT ma_format_f32
-#define DEVICE_CHANNELS 2
-#define DEVICE_SAMPLE_RATE 48000
+#include "../external/miniaudio/include/miniaudio.h"
+#include "../include/circular_buffer.h"
 
+#define MILO_LVL GENERATOR_MILO_LVL
+#include "../external/milo/milo.h"
+
+#define DEVICE_FORMAT      (ma_format_f32)
+#define DEVICE_CHANNELS    (2)
+#define DEVICE_SAMPLE_RATE (48000)
+
+// this ensures safe casting between `GeneratorWaveformType` and
+// `ma_waveform_type`
+_Static_assert(
+    (int)GENERATOR_WAVEFORM_TYPE_SINE == (int)ma_waveform_type_sine,
+    "GENERATOR_WAVEFORM_TYPE_SINE should match ma_vaweform_type_sine."
+);
+_Static_assert(
+    (int)GENERATOR_WAVEFORM_TYPE_SQUARE == (int)ma_waveform_type_square,
+    "GENERATOR_WAVEFORM_TYPE_SQUARE should match ma_waveform_type_square."
+);
+_Static_assert(
+    (int)GENERATOR_WAVEFORM_TYPE_TRIANGLE == (int)ma_waveform_type_triangle,
+    "GENERATOR_WAVEFORM_TYPE_TRIANGLE should match ma_waveform_type_triangle."
+);
+_Static_assert(
+    (int)GENERATOR_WAVEFORM_TYPE_SAWTOOTH == (int)ma_waveform_type_sawtooth,
+    "GENERATOR_WAVEFORM_TYPE_SAWTOOTH should match ma_waveform_type_sawtooth."
+);
+// this ensures safe casting between `GeneratorNoiseType` and
+// `ma_noise_type`
+_Static_assert(
+    (int)GENERATOR_NOISE_TYPE_WHITE == (int)ma_noise_type_white,
+    "GENERATOR_NOISE_TYPE_WHITE should match ma_noise_type_white."
+);
+_Static_assert(
+    (int)GENERATOR_NOISE_TYPE_PINK == (int)ma_noise_type_pink,
+    "GENERATOR_NOISE_TYPE_PINK should match ma_noise_type_pink."
+);
+_Static_assert(
+    (int)GENERATOR_NOISE_TYPE_BROWNIAN == (int)ma_noise_type_brownian,
+    "GENERATOR_NOISE_TYPE_BROWNIAN should match ma_noise_type_brownian."
+);
+
+struct Generator {
+    CircularBuffer circular_buffer;
+    uint32_t channels;
+    uint32_t sample_rate;
+
+    GeneratorType type;
+};
+
+// TODO! move out of global variables to make multi-generator setup work
 ma_waveform waveform;
 ma_pulsewave pulsewave;
 ma_noise noise;
 ma_device device;
-ma_device_config deviceConfig;
 ma_waveform_config sineWaveConfig;
 
-Generator *generator_create(void)
-{
-    Generator *generator = (Generator *)malloc(sizeof(Generator));
-    if (generator == NULL)
-    {
-        printf("Error: Failed to allocate memory for Generator.\n");
-        return NULL;
-    }
-    memset(generator, 0, sizeof(Generator));
-    return generator;
-}
+/*************
+ ** private **
+ *************/
 
-void generator_destroy(Generator *generator)
-{
-    if (generator != NULL)
-    {
-        ma_waveform_uninit(&waveform);
-        ma_pulsewave_uninit(&pulsewave);
-        ma_noise_uninit(&noise, NULL);
-        circular_buffer_uninit(&generator->circular_buffer);
-        free(generator);
-    }
-}
-
-void data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount)
-{
+static void data_callback(
+    ma_device *pDevice,
+    void *pOutput,
+    void const *pInput,
+    ma_uint32 frameCount
+) {
     Generator *generator;
     generator = (Generator *)pDevice->pUserData;
 
-    circular_buffer_read_available(&generator->circular_buffer, pOutput, frameCount);
+    circular_buffer_read_available(
+        &generator->circular_buffer,
+        pOutput,
+        frameCount
+    );
 
-    switch (generator->type)
-    {
+    switch (generator->type) {
     case GENERATOR_TYPE_WAVEFORM:
         ma_waveform_read_pcm_frames(&waveform, pOutput, frameCount, NULL);
         break;
@@ -56,201 +90,186 @@ void data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uin
     case GENERATOR_TYPE_NOISE:
         ma_noise_read_pcm_frames(&noise, pOutput, frameCount, NULL);
         break;
-    default:
-        printf("Warning: Unknown generator type in data_callback.\n");
-        break;
+    default: warn("unknown generator type.\n");
     }
 
-    circular_buffer_write(&generator->circular_buffer, pOutput, frameCount * generator->channels);
+    circular_buffer_write(
+        &generator->circular_buffer,
+        pOutput,
+        frameCount * generator->channels
+    );
 
     (void)pInput;
 }
 
-GeneratorResult generator_init(Generator *generator, ma_format format, int channels, int sample_rate, int buffer_duration_seconds)
-{
-    generator_set_noise(generator, ma_noise_type_white, 0, 0.5);
-    generator_set_pulsewave(generator, 440.0, 0.5, 0.5);
-    generator_set_waveform(generator, ma_waveform_type_sine, 440.0, 0.5);
+/************
+ ** public **
+ ************/
 
-    deviceConfig = ma_device_config_init(ma_device_type_playback);
-    deviceConfig.playback.format = format;
-    deviceConfig.playback.channels = channels;
-    deviceConfig.sampleRate = sample_rate;
-    deviceConfig.dataCallback = data_callback;
-    deviceConfig.pUserData = generator;
+Generator *generator_create(void) {
+    Generator *const generator = malloc(sizeof(*generator));
+    if (generator == NULL) return error("failed to allocate generator"), NULL;
+    memset(generator, 0, sizeof(Generator));
+    return generator;
+}
 
-    if (ma_device_init(NULL, &deviceConfig, &device) != MA_SUCCESS)
-    {
-        printf("Failed to open playback device.\n");
-        return -4;
-    }
-    if (generator == NULL)
-    {
-        printf("Error: Generator is NULL in generator_init.\n");
-        return GENERATOR_ERROR;
-    }
-    if (buffer_duration_seconds <= 0 || sample_rate <= 0 || channels <= 0)
-    {
-        printf("Error: Invalid parameters in generator_init. Buffer duration: %d, Sample rate: %u, Channels: %u\n",
-               buffer_duration_seconds, sample_rate, channels);
-        return GENERATOR_ERROR;
-    }
+GeneratorResult generator_init(
+    Generator *const self,
+    SoundFormat const sound_format,
+    uint32_t const channels,
+    uint32_t const sample_rate,
+    float const buffer_len_s
+) {
+    self->channels = channels;
+    self->sample_rate = sample_rate;
 
-    generator->sample_rate = sample_rate;
-    generator->channels = channels;
+    ma_format const format = (ma_format)sound_format;
 
-    size_t buffer_size_in_bytes = (size_t)(sample_rate * channels * ma_get_bytes_per_sample(format) * buffer_duration_seconds);
-    if (circular_buffer_init(&generator->circular_buffer, buffer_size_in_bytes) != 0)
-    {
-        printf("Error: Failed to initialize circular buffer.\n");
-        ma_device_uninit(&device);
-        return GENERATOR_ERROR;
-    }
+    if (buffer_len_s <= 0 || sample_rate <= 0 || channels <= 0)
+        return error(
+                   "`generator_init` invalid arg: %i, %u, %u, %f",
+                   sound_format,
+                   channels,
+                   sample_rate,
+                   buffer_duration_seconds,
+               ),
+               GENERATOR_ARG_ERROR;
+
+    size_t const buffer_size_in_bytes =
+        (size_t)(sample_rate * channels * ma_get_bytes_per_sample(format) *
+                 buffer_len_s);
+    if (circular_buffer_init(&self->circular_buffer, buffer_size_in_bytes) != 0)
+        return error("failed to init circular buffer"),
+               GENERATOR_CIRCULAR_BUFFER_INIT_ERROR;
+
+    ma_device_config device_config =
+        ma_device_config_init(ma_device_type_playback);
+    device_config.playback.format = format;
+    device_config.playback.channels = channels;
+    device_config.sampleRate = sample_rate;
+    device_config.dataCallback = data_callback;
+    device_config.pUserData = self;
+    if (ma_device_init(NULL, &device_config, &device) != MA_SUCCESS)
+        return circular_buffer_uninit(&self->circular_buffer),
+               error("failed to init device"), GENERATOR_DEVICE_INIT_ERROR;
+
+    generator_set_noise(self, GENERATOR_NOISE_TYPE_WHITE, 0, 0.5);
+    generator_set_pulsewave(self, 440.0, 0.5, 0.5);
+    generator_set_waveform(self, GENERATOR_WAVEFORM_TYPE_SINE, 440.0, 0.5);
 
     return GENERATOR_OK;
 }
-
-GeneratorResult generator_set_waveform(Generator *generator, ma_waveform_type type, double frequency, double amplitude)
-{
-    if (generator == NULL)
-    {
-        printf("Error: Generator is NULL in generator_set_waveform.\n");
-        return GENERATOR_ERROR;
-    }
-
-    generator->type = GENERATOR_TYPE_WAVEFORM;
-
-    ma_waveform_config config = ma_waveform_config_init(device.playback.format, device.playback.channels, device.sampleRate, type, amplitude, frequency);
-    if (ma_waveform_init(&config, &waveform) != MA_SUCCESS)
-    {
-        printf("Error: Failed to initialize waveform.\n");
-        return GENERATOR_ERROR;
-    }
-
-    return GENERATOR_OK;
+void generator_uninit(Generator *const self) {
+    ma_waveform_uninit(&waveform);
+    ma_pulsewave_uninit(&pulsewave);
+    ma_noise_uninit(&noise, NULL);
+    circular_buffer_uninit(&self->circular_buffer);
 }
 
-GeneratorResult generator_set_pulsewave(Generator *generator, double frequency, double amplitude, double dutyCycle)
-{
-    if (generator == NULL)
-    {
-        printf("Error: Generator is NULL in generator_set_pulsewave.\n");
-        return GENERATOR_ERROR;
-    }
-
-    generator->type = GENERATOR_TYPE_PULSEWAVE;
-
-    ma_pulsewave_config config = ma_pulsewave_config_init(ma_format_f32, generator->channels, generator->sample_rate, dutyCycle, amplitude, frequency);
-    if (ma_pulsewave_init(&config, &pulsewave) != MA_SUCCESS)
-    {
-        printf("Error: Failed to initialize pulsewave.\n");
-        return GENERATOR_ERROR;
-    }
-
-    return GENERATOR_OK;
-}
-
-GeneratorResult generator_set_noise(Generator *generator, ma_noise_type type, ma_int32 seed, double amplitude)
-{
-    if (generator == NULL)
-    {
-        printf("Error: Generator is NULL in generator_set_noise.\n");
-        return GENERATOR_ERROR;
-    }
-    generator->type = GENERATOR_TYPE_NOISE;
-
-    ma_noise_config config = ma_noise_config_init(ma_format_f32, generator->channels, type, seed, amplitude);
-    if (ma_noise_init(&config, NULL, &noise) != MA_SUCCESS)
-    {
-        printf("Error: Failed to initialize noise.\n");
-        return GENERATOR_ERROR;
-    }
-    return GENERATOR_OK;
-}
-
-GeneratorResult generator_start(Generator *generator)
-{
-    if (generator == NULL)
-    {
-        printf("Error: Generator is NULL in generator_start.\n");
-        return GENERATOR_ERROR;
-    }
-
-    if (ma_device_start(&device) != MA_SUCCESS)
-    {
-        printf("Error: Failed to start generator.\n");
-        return GENERATOR_ERROR;
-    }
-
-    return GENERATOR_OK;
-}
-
-GeneratorResult generator_stop(Generator *generator)
-{
-    if (generator == NULL)
-    {
-        printf("Error: Generator is NULL in generator_stop.\n");
-        return GENERATOR_ERROR;
-    }
-
-    if (ma_device_stop(&device) != MA_SUCCESS)
-    {
-        printf("Error: Failed to stop generator.\n");
-        return GENERATOR_ERROR;
-    }
-
-    return GENERATOR_OK;
-}
-
-float volume = 0.5f;
-
-float generator_get_volume(Generator const *const self)
-{
+float generator_get_volume(Generator const *const self) {
+    float volume;
+    ma_device_get_master_volume(&device, &volume);
     return volume;
 }
-
-void generator_set_volume(Generator *const self, float const value)
-{
-    if (value < 0.0f || value > 5.0f)
-    {
-        printf("Error: Invalid volume value in generator_set_volume. Volume: %f\n", value);
-        return;
-    }
+void generator_set_volume(Generator *const self, float const value) {
     ma_device_set_master_volume(&device, value);
-    volume = value;
 }
 
-int generator_get_buffer(Generator *generator, float *output, int floats_to_read)
-{
-    if (generator == NULL || output == NULL || floats_to_read <= 0)
-    {
-        printf("Error: Invalid parameters in generator_get_buffer. Generator: %p, Output: %p, Frames to read: %u\n",
-               generator, output, floats_to_read);
-        return 0;
-    }
+GeneratorResult generator_set_waveform(
+    Generator *const self,
+    GeneratorWaveformType const type,
+    double const frequency,
+    double const amplitude
+) {
+    self->type = GENERATOR_TYPE_WAVEFORM;
 
-    size_t available_floats = circular_buffer_get_available_floats(&generator->circular_buffer);
-    size_t to_read = (floats_to_read < available_floats) ? floats_to_read : available_floats;
+    ma_waveform_config const config = ma_waveform_config_init(
+        device.playback.format,
+        device.playback.channels,
+        device.sampleRate,
+        (ma_waveform_type)type,
+        amplitude,
+        frequency
+    );
 
-    return (int)circular_buffer_read(&generator->circular_buffer, output, to_read);
+    // TODO! we are possibly leaking memory here (coz waveform can already be
+    // init)
+    if (ma_waveform_init(&config, &waveform) != MA_SUCCESS)
+        return error("failed to initialize waveform"), GENERATOR_SET_TYPE_ERROR;
+
+    return GENERATOR_OK;
 }
 
-int generator_get_available_frames(Generator *generator)
-{
-    if (generator == NULL)
-    {
-        printf("Error: Generator is NULL in generator_get_available_frames.\n");
-        return 0;
-    }
+GeneratorResult generator_set_pulsewave(
+    Generator *const generator,
+    double const frequency,
+    double const amplitude,
+    double const duty_cycle
+) {
+    generator->type = GENERATOR_TYPE_PULSEWAVE;
 
-    size_t available_floats = circular_buffer_get_available_floats(&generator->circular_buffer);
-    if (generator->channels == 0)
-    {
-        generator->channels = 1;
-    }
-    if (available_floats == 0)
-    {
-        return GENERATOR_ERROR;
-    }
-    return (int)(available_floats / generator->channels);
+    ma_pulsewave_config const config = ma_pulsewave_config_init(
+        device.playback.format,
+        device.playback.channels,
+        device.sampleRate,
+        duty_cycle,
+        amplitude,
+        frequency
+    );
+    // TODO! we are possibly leaking memory here (coz waveform can already be
+    // init)
+    if (ma_pulsewave_init(&config, &pulsewave) != MA_SUCCESS)
+        return error("failed to initialize pulsewave"),
+               GENERATOR_SET_TYPE_ERROR;
+
+    return GENERATOR_OK;
+}
+
+GeneratorResult generator_set_noise(
+    Generator *const self,
+    GeneratorNoiseType const type,
+    int32_t const seed,
+    double const amplitude
+) {
+    self->type = GENERATOR_TYPE_NOISE;
+
+    ma_noise_config const config = ma_noise_config_init(
+        device.playback.format,
+        device.playback.channels,
+        (ma_noise_type)type,
+        seed,
+        amplitude
+    );
+    // TODO! we are possibly leaking memory here (coz waveform can already be
+    // init)
+    if (ma_noise_init(&config, NULL, &noise) != MA_SUCCESS)
+        return error("failed to initialize noise"), GENERATOR_SET_TYPE_ERROR;
+
+    return GENERATOR_OK;
+}
+
+GeneratorResult generator_start(Generator *const self) {
+    if (ma_device_start(&device) != MA_SUCCESS)
+        return error("Error: Failed to start generator.\n"),
+               GENERATOR_DEVICE_START_ERROR;
+
+    return GENERATOR_OK;
+}
+void generator_stop(Generator *const self) { ma_device_stop(&device); }
+
+size_t generator_get_available_frame_count(Generator *const self) {
+    return circular_buffer_get_available_floats(&self->circular_buffer) /
+           (self->channels == 0 ? 1 : self->channels);
+}
+size_t generator_load_buffer(
+    Generator *const self,
+    float *const output,
+    size_t const floats_to_read
+) {
+    size_t const available_floats =
+        circular_buffer_get_available_floats(&self->circular_buffer);
+    size_t const to_read =
+        floats_to_read < available_floats ? floats_to_read : available_floats;
+
+    return circular_buffer_read(&self->circular_buffer, output, to_read);
 }

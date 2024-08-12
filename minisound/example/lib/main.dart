@@ -4,16 +4,15 @@ import "dart:async";
 import "dart:typed_data";
 
 import "package:flutter/material.dart";
-import "package:minisound/minisound.dart";
-import "package:minisound/minisound_flutter.dart";
+import "package:minisound/engine.dart";
+import "package:minisound/engine_flutter.dart";
+import "package:minisound/generator.dart";
+import "package:minisound/recorder.dart";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(const MaterialApp(
-    title: "Minisound Example",
-    home: ExamplePage(),
-  ));
+  runApp(const MaterialApp(title: "Minisound Example", home: ExamplePage()));
 }
 
 class ExamplePage extends StatefulWidget {
@@ -26,37 +25,45 @@ class ExamplePage extends StatefulWidget {
 class _ExamplePageState extends State<ExamplePage> {
   final engine = Engine();
   var loopDelay = 0.0;
+
+  final List<Float32List> recordingBuffer = [];
   late Recorder recorder;
   Timer? recorderTimer;
   Timer? generatorTimer;
+  int totalRecordedFrames = 0;
+
+  final List<Float32List> generatorBuffer = [];
   late Generator generator;
-  WaveformType waveformType = WaveformType.sine;
-  NoiseType noiseType = NoiseType.white;
+  GeneratorWaveformType waveformType = GeneratorWaveformType.sine;
+  GeneratorNoiseType noiseType = GeneratorNoiseType.white;
   bool enableWaveform = false;
   bool enableNoise = false;
   bool enablePulse = false;
   var pulseDelay = 0.25;
-  final List<Float32List> recordingBuffer = [];
-  final List<Float32List> generatorBuffer = [];
-
-  int totalRecordedFrames = 0;
   final List<Sound> sounds = [];
 
-  late final Future<Sound> soundFuture;
+  Sound? currentSound;
+  late final Future<Map<String, Sound>> soundsFuture;
 
   @override
   void initState() {
     super.initState();
-    soundFuture = _initializeSound();
+    soundsFuture = _initializeSounds();
   }
 
-  Future<Sound> _initializeSound() async {
+  Future<Map<String, Sound>> _initializeSounds() async {
     if (!engine.isInit) {
       await engine.init();
       recorder = Recorder(mainEngine: engine);
       generator = Generator(mainEngine: engine);
     }
-    return engine.loadSoundAsset("assets/laser_shoot.wav");
+    final soundNames = [
+      "assets/laser_shoot.wav",
+      "assets/laser_shoot.mp3",
+    ];
+    return Future.wait(soundNames.map(
+      engine.loadSoundAsset,
+    )).then((sounds) => Map.fromIterables(soundNames, sounds));
   }
 
   @override
@@ -64,12 +71,12 @@ class _ExamplePageState extends State<ExamplePage> {
         appBar: AppBar(title: const Text("Minisound Example")),
         body: Center(
           child: FutureBuilder(
-            future: soundFuture,
+            future: soundsFuture,
             builder: (_, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.done:
                   if (snapshot.hasData) {
-                    final sound = snapshot.data!;
+                    final sounds = snapshot.data!;
                     return SingleChildScrollView(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -81,20 +88,34 @@ class _ExamplePageState extends State<ExamplePage> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
+                          DropdownButton(
+                            items: sounds.entries
+                                .map((entry) => DropdownMenuItem(
+                                      value: entry.value,
+                                      child: Text(entry.key),
+                                    ))
+                                .toList(),
+                            value: currentSound,
+                            onChanged: (sound) => setState(() {
+                              currentSound = sound;
+                            }),
+                          ),
                           ElevatedButton(
+                            onPressed: currentSound == null
+                                ? null
+                                : () async {
+                                    await engine.start();
+                                    currentSound!.play();
+                                  },
                             child: const Text("PLAY"),
-                            onPressed: () async {
-                              await engine.start();
-                              sound.play();
-                            },
                           ),
                           ElevatedButton(
+                            onPressed: currentSound?.pause,
                             child: const Text("PAUSE"),
-                            onPressed: () => sound..pause(),
                           ),
                           ElevatedButton(
+                            onPressed: currentSound?.stop,
                             child: const Text("STOP"),
-                            onPressed: () => sound..stop(),
                           ),
                           Row(
                             mainAxisSize: MainAxisSize.min,
@@ -103,13 +124,14 @@ class _ExamplePageState extends State<ExamplePage> {
                               SizedBox(
                                 width: 200,
                                 child: Slider(
-                                  value: sound.volume,
+                                  value: currentSound?.volume ?? 0,
                                   min: 0,
                                   max: 10,
                                   divisions: 20,
-                                  label: sound.volume.toStringAsFixed(2),
+                                  label:
+                                      currentSound?.volume.toStringAsFixed(2),
                                   onChanged: (value) => setState(() {
-                                    sound.volume = value;
+                                    currentSound?.volume = value;
                                   }),
                                   onChangeEnd: (value) =>
                                       generator.volume = value,
@@ -118,15 +140,18 @@ class _ExamplePageState extends State<ExamplePage> {
                             ],
                           ),
                           ElevatedButton(
+                            onPressed: currentSound == null
+                                ? null
+                                : () async {
+                                    await engine.start();
+                                    currentSound!.playLooped(
+                                      delay: Duration(
+                                        milliseconds:
+                                            (loopDelay * 1000).toInt(),
+                                      ),
+                                    );
+                                  },
                             child: const Text("PLAY LOOPED"),
-                            onPressed: () async {
-                              await engine.start();
-                              sound.playLooped(
-                                delay: Duration(
-                                  milliseconds: (loopDelay * 1000).toInt(),
-                                ),
-                              );
-                            },
                           ),
                           Row(
                             mainAxisSize: MainAxisSize.min,
@@ -181,12 +206,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                 }
                               } else {
                                 if (!recorder.isInit) {
-                                  await recorder.initStream(
-                                    sampleRate: 48000,
-                                    channels: 1,
-                                    format: AudioFormat.float32,
-                                  );
-                                  recorder.isInit = true;
+                                  await recorder.initStream();
                                 }
                                 setState(() {
                                   recorder.start();
@@ -211,9 +231,9 @@ class _ExamplePageState extends State<ExamplePage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const Text("Waveform Type: "),
-                              DropdownButton<WaveformType>(
+                              DropdownButton<GeneratorWaveformType>(
                                 value: waveformType,
-                                items: WaveformType.values
+                                items: GeneratorWaveformType.values
                                     .map((type) => DropdownMenuItem(
                                           value: type,
                                           child: Text(
@@ -226,15 +246,13 @@ class _ExamplePageState extends State<ExamplePage> {
                                           waveformType = value!;
                                         });
                                         generator.setWaveform(
-                                          waveformType,
-                                          432.0,
-                                          0.5,
+                                          type: waveformType,
+                                          frequency: 432.0,
                                         );
                                         if (enablePulse) {
                                           generator.setPulsewave(
-                                            432.0,
-                                            0.5,
-                                            pulseDelay,
+                                            frequency: 432.0,
+                                            dutyCycle: pulseDelay,
                                           );
                                         }
                                       }
@@ -246,13 +264,12 @@ class _ExamplePageState extends State<ExamplePage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const Text("Noise Type: "),
-                              DropdownButton<NoiseType>(
+                              DropdownButton<GeneratorNoiseType>(
                                 value: noiseType,
-                                items: NoiseType.values
+                                items: GeneratorNoiseType.values
                                     .map((type) => DropdownMenuItem(
                                           value: type,
-                                          child: Text(
-                                              type.toString().split(".").last),
+                                          child: Text(type.name),
                                         ))
                                     .toList(),
                                 onChanged: enableNoise
@@ -260,11 +277,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                         setState(() {
                                           noiseType = value!;
                                         });
-                                        generator.setNoise(
-                                          noiseType,
-                                          0,
-                                          0.5,
-                                        );
+                                        generator.setNoise(type: noiseType);
                                       }
                                     : null,
                               ),
@@ -279,11 +292,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                   setState(() {
                                     enableWaveform = value!;
                                   });
-                                  generator.setWaveform(
-                                    waveformType,
-                                    432.0,
-                                    0.5,
-                                  );
+                                  generator.setWaveform(type: waveformType);
                                 },
                               ),
                               const Text("Waveform"),
@@ -294,11 +303,7 @@ class _ExamplePageState extends State<ExamplePage> {
                                   setState(() {
                                     enableNoise = value!;
                                   });
-                                  generator.setNoise(
-                                    noiseType,
-                                    0,
-                                    0.5,
-                                  );
+                                  generator.setNoise(type: noiseType);
                                 },
                               ),
                               const Text("Noise"),
@@ -310,9 +315,8 @@ class _ExamplePageState extends State<ExamplePage> {
                                     enablePulse = value!;
                                   });
                                   generator.setPulsewave(
-                                    432.0,
-                                    0.5,
-                                    pulseDelay,
+                                    frequency: 432.0,
+                                    dutyCycle: pulseDelay,
                                   );
                                 },
                               ),
@@ -330,17 +334,8 @@ class _ExamplePageState extends State<ExamplePage> {
                                 });
                               } else {
                                 if (!generator.isInit) {
-                                  await generator.init(
-                                    AudioFormat.float32,
-                                    2,
-                                    48000,
-                                    5,
-                                  );
-                                  generator.setWaveform(
-                                      WaveformType.sine, 432, 0.5);
-                                  setState(() {
-                                    generator.isInit = true;
-                                  });
+                                  await generator.init();
+                                  generator.setWaveform();
                                 }
 
                                 setState(() {
@@ -353,31 +348,26 @@ class _ExamplePageState extends State<ExamplePage> {
                               }
                             },
                           ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text("Pulse delay:"),
-                              SizedBox(
-                                width: 200,
-                                child: Slider(
-                                  value: pulseDelay,
-                                  min: 0,
-                                  max: 1,
-                                  divisions: 300,
-                                  label: pulseDelay.toStringAsFixed(2),
-                                  onChanged: (value) => setState(() {
-                                    pulseDelay = value;
-                                  }),
-                                  onChangeEnd: (value) =>
-                                      generator.setPulsewave(
-                                    432.0,
-                                    0.5,
-                                    pulseDelay,
-                                  ),
+                          Row(mainAxisSize: MainAxisSize.min, children: [
+                            const Text("Pulse delay:"),
+                            SizedBox(
+                              width: 200,
+                              child: Slider(
+                                value: pulseDelay,
+                                min: 0,
+                                max: 1,
+                                divisions: 300,
+                                label: pulseDelay.toStringAsFixed(2),
+                                onChanged: (value) => setState(() {
+                                  pulseDelay = value;
+                                }),
+                                onChangeEnd: (value) => generator.setPulsewave(
+                                  frequency: 432.0,
+                                  dutyCycle: value,
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ]),
                         ],
                       ),
                     );
@@ -405,7 +395,7 @@ class _ExamplePageState extends State<ExamplePage> {
 
   void accumulateGeneratorFrames() {
     if (generator.isGenerating) {
-      final frames = generator.getAvailableFrames();
+      final frames = generator.availableFrameCount;
       final buffer = generator.getBuffer(frames);
       if (buffer.isNotEmpty) {
         generatorBuffer.add(buffer);
@@ -437,9 +427,10 @@ class _ExamplePageState extends State<ExamplePage> {
 
     final audioData = AudioData(
       combinedBuffer.buffer.asFloat32List(),
-      AudioFormat.float32,
-      recorder.sampleRate,
-      recorder.channels,
+      SoundFormat.f32,
+      // TODO! replace placeholder values
+      44100,
+      1,
     );
 
     recordingBuffer.clear();

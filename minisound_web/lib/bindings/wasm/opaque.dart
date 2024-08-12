@@ -1,3 +1,3 @@
 part of "wasm.dart";
 
-base class Opaque {}
+abstract base class Opaque {}

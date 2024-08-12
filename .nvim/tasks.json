@@ -49,8 +49,7 @@
                 "export SRC=./minisound_ffi/src/",
                 "export BUILD=./minisound_web/lib/js/",
                 "emcmake cmake -S $SRC -B $BUILD",
-                "cmake --build $BUILD",
-                "sed -i 's|audioWorklet.addModule(\"minisound_web.aw.js\")|audioWorklet.addModule(locateFile(\"minisound_web.aw.js\"))|g' $BUILD/emscripten/minisound_web.js"
+                "cmake --build $BUILD"
             ]
         },
         "clean web lib": {

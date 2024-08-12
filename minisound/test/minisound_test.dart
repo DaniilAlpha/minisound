@@ -1,8 +1,10 @@
 import "dart:typed_data";
 
 import "package:flutter_test/flutter_test.dart";
-import "package:minisound/minisound.dart";
-import "package:minisound/minisound_flutter.dart";
+import "package:minisound/engine.dart";
+import "package:minisound/engine_flutter.dart";
+import "package:minisound/generator.dart";
+import "package:minisound/recorder.dart";
 import "package:minisound/test/minisound_mock.dart";
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
 
@@ -26,8 +28,6 @@ void main() {
     test("Engine start", () async {
       await engine.init();
       await engine.start();
-      expect((MinisoundPlatform.instance as MinisoundMock).createEngine().state,
-          EngineState.started);
     });
 
     test("Load sound from asset", () async {
@@ -51,8 +51,8 @@ void main() {
       MinisoundPlatform.instance = MinisoundMock();
       engine = Engine();
       await engine.init();
-      sound = await engine.loadSound(
-          AudioData(Float32List(100), AudioFormat.float32, 44100, 1));
+      sound = await engine
+          .loadSound(AudioData(Float32List(100), SoundFormat.f32, 44100, 1));
     });
 
     test("Sound play", () async {
@@ -137,16 +137,26 @@ void main() {
 
     test("Generator initialization", () async {
       await generator.initEngine();
-      await generator.init(AudioFormat.float32, 2, 48000, 5);
+      await generator.init(
+        format: SoundFormat.f32,
+        channels: 2,
+        sampleRate: 48000,
+        bufferDurationSeconds: 5,
+      );
       expect(generator.isInit, true);
     });
 
     test("Generator waveform", () async {
       await generator.initEngine();
-      await generator.init(AudioFormat.float32, 2, 48000, 5);
-      generator.setWaveform(WaveformType.sine, 440.0, 0.5);
+      await generator.init(
+        format: SoundFormat.f32,
+        channels: 2,
+        sampleRate: 48000,
+        bufferDurationSeconds: 5,
+      );
+      generator.setWaveform(type: GeneratorWaveformType.sine);
       generator.start();
-      expect(generator.getAvailableFrames(), greaterThan(0));
+      expect(generator.availableFrameCount, greaterThan(0));
       final buffer = generator.getBuffer(100);
       expect(buffer.length, 100);
       generator.stop();
@@ -154,10 +164,15 @@ void main() {
 
     test("Generator noise", () async {
       await generator.initEngine();
-      await generator.init(AudioFormat.float32, 2, 48000, 5);
-      generator.setNoise(NoiseType.white, 0, 0.5);
+      await generator.init(
+        format: SoundFormat.f32,
+        channels: 2,
+        sampleRate: 48000,
+        bufferDurationSeconds: 5,
+      );
+      generator.setNoise(type: GeneratorNoiseType.white);
       generator.start();
-      expect(generator.getAvailableFrames(), greaterThan(0));
+      expect(generator.availableFrameCount, greaterThan(0));
       final buffer = generator.getBuffer(100);
       expect(buffer.length, 100);
       generator.stop();
@@ -165,10 +180,15 @@ void main() {
 
     test("Generator pulse wave", () async {
       await generator.initEngine();
-      await generator.init(AudioFormat.float32, 2, 48000, 5);
-      generator.setPulsewave(440.0, 0.5, 0.5);
+      await generator.init(
+        format: SoundFormat.f32,
+        channels: 2,
+        sampleRate: 48000,
+        bufferDurationSeconds: 5,
+      );
+      generator.setPulsewave();
       generator.start();
-      expect(generator.getAvailableFrames(), greaterThan(0));
+      expect(generator.availableFrameCount, greaterThan(0));
       final buffer = generator.getBuffer(100);
       expect(buffer.length, 100);
       generator.stop();

@@ -5,8 +5,7 @@
 
 #include "export.h"
 
-typedef struct
-{
+typedef struct CircularBuffer {
     float *buffer;
     size_t capacity;
     size_t write_pos;
@@ -15,9 +14,18 @@ typedef struct
 
 int circular_buffer_init(CircularBuffer *cb, size_t size_in_bytes);
 void circular_buffer_uninit(CircularBuffer *cb);
-void circular_buffer_write(CircularBuffer *cb, const float *data, size_t size_in_floats);
-size_t circular_buffer_read(CircularBuffer *cb, float *data, size_t size_in_floats);
+void circular_buffer_write(
+    CircularBuffer *cb,
+    float const *data,
+    size_t size_in_floats
+);
+size_t
+circular_buffer_read(CircularBuffer *cb, float *data, size_t size_in_floats);
 size_t circular_buffer_get_available_floats(CircularBuffer *cb);
-size_t circular_buffer_read_available(CircularBuffer *cb, float *data, size_t max_size_in_floats);
+size_t circular_buffer_read_available(
+    CircularBuffer *cb,
+    float *data,
+    size_t max_size_in_floats
+);
 
-#endif // CIRCULAR_BUFFER_H
+#endif  // CIRCULAR_BUFFER_H

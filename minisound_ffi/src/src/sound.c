@@ -1,107 +1,198 @@
 #include "../include/sound.h"
+
 #include <stdbool.h>
 #include <stdlib.h>
-#include "../external/milo/milo.h"
-#include "../include/miniaudio.h"
 
-Sound *sound_alloc()
-{
+#include "../external/miniaudio/include/miniaudio.h"
+#include "../include/silence_data_source.h"
+
+#define MILO_LVL SOUND_MILO_LVL
+#include "../external/milo/milo.h"
+
+// this ensures safe casting between `SoundFormat` and `ma_format`
+_Static_assert(
+    (int)SOUND_FORMAT_UNKNOWN == (int)ma_format_unknown,
+    "SOUND_FORMAT_UNKNOWN should match ma_format_unknown."
+);
+_Static_assert(
+    (int)SOUND_FORMAT_U8 == (int)ma_format_u8,
+    "SOUND_FORMAT_U8 should match ma_format_u8."
+);
+_Static_assert(
+    (int)SOUND_FORMAT_S16 == (int)ma_format_s16,
+    "SOUND_FORMAT_S16 should match ma_format_s16."
+);
+_Static_assert(
+    (int)SOUND_FORMAT_S24 == (int)ma_format_s24,
+    "SOUND_FORMAT_S24 should match ma_format_s24."
+);
+_Static_assert(
+    (int)SOUND_FORMAT_S32 == (int)ma_format_s32,
+    "SOUND_FORMAT_S32 should match ma_format_s32."
+);
+_Static_assert(
+    (int)SOUND_FORMAT_F32 == (int)ma_format_f32,
+    "SOUND_FORMAT_F32 should match ma_format_f32."
+);
+_Static_assert(
+    (size_t)SOUND_FORMAT_COUNT == (size_t)ma_format_count,
+    "Count of `SoundFormat` members and `ma_format` members does not match."
+);
+
+struct Sound {
+    ma_sound sound;
+
+    bool is_raw;
+    union {
+        struct {
+            ma_decoder decoder;
+            bool is_looped;
+            size_t loop_delay_ms;
+            SilenceDataSource loop_delay_ds;
+        } non_raw;
+        ma_audio_buffer raw_buf;
+    } data;
+
+    ma_engine *engine;
+};
+
+Sound *sound_alloc(void) {
     Sound *const sound = malloc(sizeof(Sound));
-    if (sound == NULL)
-        error("%s", explain(OutOfMemErr));
+    if (sound == NULL) error("%s", explain(OutOfMemErr));
     return sound;
+}
+
+Result sound_init_from_data(
+    Sound *const self,
+    float const *const data,
+    size_t const data_size,
+    void *const vengine
+) {
+    self->is_raw = false;
+    self->data.non_raw.is_looped = false;
+    self->data.non_raw.loop_delay_ms = 0;
+
+    self->engine = vengine;
+
+    ma_result result = ma_decoder_init_memory(
+        data,
+        data_size,
+        NULL,
+        &self->data.non_raw.decoder
+    );
+    if (result != MA_SUCCESS) {
+        return error(
+                   "miniaudio decoder initialization error! Error code: %d",
+                   result
+               ),
+               UnknownErr;
+    }
+
+    result = ma_sound_init_from_data_source(
+        vengine,
+        &self->data.non_raw.decoder,
+        MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION,
+        NULL,
+        &self->sound
+    );
+    if (result != MA_SUCCESS) {
+        ma_decoder_uninit(&self->data.non_raw.decoder);
+        return error(
+                   "miniaudio sound initialization error! Error code: %d",
+                   result
+               ),
+               UnknownErr;
+    }
+
+    return Ok;
+}
+
+Result sound_init_raw(
+    Sound *const self,
+    float const *const data,
+    size_t const data_size,
+    SoundFormat const sound_format,
+    uint32_t const channels,
+    // uint32_t const sample_rate,  // TODO! unused, maybe by mistake
+    void *const vengine
+) {
+    self->is_raw = true;
+
+    ma_format const format = (ma_format)sound_format;
+
+    size_t const frame_count =
+        data_size / (channels * ma_get_bytes_per_sample(format));
+
+    ma_audio_buffer_config const buffer_config =
+        ma_audio_buffer_config_init(format, channels, frame_count, data, NULL);
+
+    ma_result r = ma_audio_buffer_init(&buffer_config, &self->data.raw_buf);
+    if (r != MA_SUCCESS) {
+        return error(
+                   "miniaudio audio buffer initialization error! Error code: %d",
+                   r
+               ),
+               UnknownErr;
+    }
+
+    r = ma_sound_init_from_data_source(
+        vengine,
+        &self->data.raw_buf,
+        MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION,
+        NULL,
+        &self->sound
+    );
+    if (r != MA_SUCCESS) {
+        ma_audio_buffer_uninit(&self->data.raw_buf);
+        return error(
+                   "miniaudio raw sound initialization error! Error code: %d",
+                   r
+               ),
+               UnknownErr;
+    }
+
+    return Ok;
 }
 
 Result sound_init(
     Sound *const self,
-    float *data,
+
+    float const *const data,
     size_t const data_size,
-    const ma_format format,
-    const int channels,
-    const int sample_rate,
-    ma_engine *const engine)
-{
-    self->engine = engine;
-    self->is_looped = false;
-    self->loop_delay_ms = 0;
 
-    if (format != ma_format_unknown && channels > 0 && sample_rate > 0)
-    {
-        // Raw PCM data
-        self->is_raw_data = true;
-
-        size_t frame_count = data_size / (channels * ma_get_bytes_per_sample(format));
-
-        ma_audio_buffer_config buffer_config = ma_audio_buffer_config_init(
-            format,
-            channels,
-            frame_count,
-            data,
-            NULL);
-
-        ma_result result = ma_audio_buffer_init(&buffer_config, &self->buffer);
-        if (result != MA_SUCCESS)
-        {
-            return error("miniaudio audio buffer initialization error! Error code: %d", result), UnknownErr;
-        }
-
-        result = ma_sound_init_from_data_source(
-            engine,
-            &self->buffer,
-            MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION,
-            NULL,
-            &self->sound);
-        if (result != MA_SUCCESS)
-        {
-            ma_audio_buffer_uninit(&self->buffer);
-            return error("miniaudio raw sound initialization error! Error code: %d", result), UnknownErr;
-        }
-    }
-    else
-    {
-        // Encoded audio file data
-        self->is_raw_data = false;
-
-        ma_result result = ma_decoder_init_memory(data, data_size, NULL, &self->decoder);
-        if (result != MA_SUCCESS)
-        {
-            return error("miniaudio decoder initialization error! Error code: %d", result), UnknownErr;
-        }
-
-        result = ma_sound_init_from_data_source(
-            engine,
-            &self->decoder,
-            MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION,
-            NULL,
-            &self->sound);
-        if (result != MA_SUCCESS)
-        {
-            ma_decoder_uninit(&self->decoder);
-            return error("miniaudio sound initialization error! Error code: %d", result), UnknownErr;
-        }
-    }
+    SoundFormat const sound_format,
+    uint32_t const channels,
+    uint32_t const sample_rate,
+    void *const vengine
+) {
+    UNROLL(
+        sound_format != SOUND_FORMAT_UNKNOWN && channels > 0 && sample_rate > 0
+            ? sound_init_raw(
+                  self,
+                  data,
+                  data_size,
+                  sound_format,
+                  channels,
+                  vengine
+              )
+            : sound_init_from_data(self, data, data_size, vengine)
+    );
 
     info("sound loaded successfully");
     return Ok;
 }
 
-void sound_unload(Sound *const self)
-{
-    if (self->is_raw_data)
-    {
-        ma_sound_uninit(&self->sound);
-        ma_audio_buffer_uninit(&self->buffer);
-    }
-    else
-    {
-        ma_sound_uninit(&self->sound);
-        ma_decoder_uninit(&self->decoder);
+void sound_unload(Sound *const self) {
+    ma_sound_uninit(&self->sound);
+    if (self->is_raw) {
+        ma_audio_buffer_uninit(&self->data.raw_buf);
+    } else {
+        ma_decoder_uninit(&self->data.non_raw.decoder);
     }
 }
 
-Result sound_play(Sound *const self)
-{
-    ma_sound *sound =  &self->sound;
+Result sound_play(Sound *const self) {
+    ma_sound *sound = &self->sound;
     if (ma_sound_start(sound) != MA_SUCCESS)
         return error("miniaudio sound starting error!"), UnknownErr;
 
@@ -109,86 +200,78 @@ Result sound_play(Sound *const self)
     return Ok;
 }
 
-Result sound_replay(Sound *const self)
-{
+Result sound_replay(Sound *const self) {
     sound_stop(self);
     return sound_play(self);
 }
 
-void sound_pause(Sound *const self)
-{
-    ma_sound *sound =  &self->sound;
+void sound_pause(Sound *const self) {
+    ma_sound *sound = &self->sound;
     ma_sound_stop(sound);
 }
 
-void sound_stop(Sound *const self)
-{
-    ma_sound *sound =  &self->sound;
+void sound_stop(Sound *const self) {
+    ma_sound *sound = &self->sound;
     ma_sound_stop(sound);
     ma_sound_seek_to_pcm_frame(sound, 0);
 }
 
-float sound_get_volume(Sound const *const self)
-{
-    ma_sound *sound =  &self->sound;
-    return ma_sound_get_volume(sound);
+float sound_get_volume(Sound const *const self) {
+    return ma_sound_get_volume(&self->sound);
 }
 
-void sound_set_volume(Sound *const self, float const value)
-{
-    ma_sound *sound = &self->sound;
-    ma_sound_set_volume(sound, value);
+void sound_set_volume(Sound *const self, float const value) {
+    ma_sound_set_volume(&self->sound, value);
 }
 
-float sound_get_duration(Sound *const self)
-{
+float sound_get_duration(Sound *const self) {
     ma_uint64 length_in_frames;
-    if (self->is_raw_data)
-    {
-        ma_audio_buffer_get_length_in_pcm_frames(&self->buffer, &length_in_frames);
-    }
-    else
-    {
+    if (self->is_raw) {
+        ma_audio_buffer_get_length_in_pcm_frames(
+            &self->data.raw_buf,
+            &length_in_frames
+        );
+    } else {
         ma_sound_get_length_in_pcm_frames(&self->sound, &length_in_frames);
     }
     return (float)length_in_frames / ma_engine_get_sample_rate(self->engine);
 }
 
-bool sound_get_is_looped(Sound const *const self)
-{
-    return self->is_looped;
+bool sound_get_is_looped(Sound const *const self) {
+    return self->is_raw ? true : self->data.non_raw.is_looped;
 }
 
 void sound_set_looped(
     Sound *const self,
     bool const value,
-    size_t const delay_ms)
-{
-    if (value)
-    {
-        if (delay_ms <= 0)
-        {
-            ma_data_source_set_looping(&self->decoder, true);
-        }
-        else
-        {
-            SilenceDataSourceConfig const config = silence_data_source_config(
-                self->decoder.outputFormat,
-                self->decoder.outputChannels,
-                self->decoder.outputSampleRate,
-                (delay_ms * self->decoder.outputSampleRate) / 1000);
-            silence_data_source_init(&self->loop_delay_ds, &config);
+    size_t const delay_ms
+) {
+    // set_looped shuld not affect raw sounds (for now)
+    if (self->is_raw) return;
 
-            ma_data_source_set_next(&self->decoder, &self->loop_delay_ds);
-            ma_data_source_set_next(&self->loop_delay_ds, &self->decoder);
+    ma_decoder *const decoder = &self->data.non_raw.decoder;
+    SilenceDataSource *const loop_delay_ds = &self->data.non_raw.loop_delay_ds;
+
+    if (value) {
+        if (delay_ms == 0) {
+            ma_data_source_set_looping(decoder, true);
+        } else {
+            SilenceDataSourceConfig const config = silence_data_source_config(
+                decoder->outputFormat,
+                decoder->outputChannels,
+                decoder->outputSampleRate,
+                (delay_ms * decoder->outputSampleRate) / 1000
+            );
+            silence_data_source_init(loop_delay_ds, &config);
+
+            ma_data_source_set_next(decoder, loop_delay_ds);
+            ma_data_source_set_next(loop_delay_ds, decoder);
         }
-    }
-    else
-    {
+    } else {
         // TODO? maybe refactor this
 
-        ma_data_source_set_current(&self->decoder, &self->decoder);
-        ma_data_source_set_looping(&self->decoder, false);
-        ma_data_source_set_next(&self->decoder, NULL);
+        ma_data_source_set_current(decoder, decoder);
+        ma_data_source_set_looping(decoder, false);
+        ma_data_source_set_next(decoder, NULL);
     }
 }

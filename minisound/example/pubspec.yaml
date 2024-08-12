@@ -26,3 +26,4 @@ flutter:
 
   assets:
     - assets/laser_shoot.wav
+    - assets/laser_shoot.mp3
