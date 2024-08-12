@@ -53,10 +53,10 @@ packages:
     dependency: transitive
     description:
       name: ffi
-      sha256: "493f37e7df1804778ff3a53bd691d8692ddf69702cf4c1c1096a2e41b4779e21"
+      sha256: "16ed7b077ef01ad6170a3d0c57caa4a112a38d7a2ed5602e0aca9ca6f3d98da6"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.2"
+    version: "2.1.3"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -154,23 +154,26 @@ packages:
   minisound_ffi:
     dependency: transitive
     description:
-      path: "../../minisound_ffi"
-      relative: true
-    source: path
+      name: minisound_ffi
+      sha256: c1c8506e68cf6b0cbbf4806013c415fccca160bce935791c711b07e575b371a8
+      url: "https://pub.dev"
+    source: hosted
     version: "1.5.0"
   minisound_platform_interface:
     dependency: transitive
     description:
-      path: "../../minisound_platform_interface"
-      relative: true
-    source: path
+      name: minisound_platform_interface
+      sha256: "65d621f6201ab1e2295f6f8a4fd7ba38fad00e3b1318c152aff0c858985fd0f0"
+      url: "https://pub.dev"
+    source: hosted
     version: "1.5.0"
   minisound_web:
     dependency: transitive
     description:
-      path: "../../minisound_web"
-      relative: true
-    source: path
+      name: minisound_web
+      sha256: "70447d934e165cf1672800a262b7d2cd337489e3081b0e43ecb9764d2760a2b4"
+      url: "https://pub.dev"
+    source: hosted
     version: "1.5.0"
   path:
     dependency: transitive
