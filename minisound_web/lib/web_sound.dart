@@ -58,7 +58,7 @@ final class WebSound implements PlatformSound {
   void stop() => c.sound_stop(_self);
 }
 
-extension SoundFormatToC on SoundFormat {
+extension on SoundFormat {
   int toC() => switch (this) {
         SoundFormat.u8 => c.SoundFormat.SOUND_FORMAT_U8,
         SoundFormat.s16 => c.SoundFormat.SOUND_FORMAT_S16,

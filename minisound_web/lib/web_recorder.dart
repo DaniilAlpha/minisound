@@ -49,7 +49,10 @@ final class WebRecorder implements PlatformRecorder {
   }
 
   @override
-  void dispose() => c.recorder_destroy(_self);
+  void dispose() {
+    c.recorder_uninit(_self);
+    malloc.free(_self);
+  }
 
   @override
   void start() {
@@ -72,13 +75,12 @@ final class WebRecorder implements PlatformRecorder {
   @override
   Float32List getBuffer(int framesToRead, {int channels = 2}) {
     // TODO! probably should multiply by channels, but cannot test at the moment
-    final floatsToRead = framesToRead * sizeOf<Float>() * 2;
+    final floatsToRead = framesToRead * 2;
 
-    final bufPtr = malloc.allocate<Float>(floatsToRead);
+    final bufPtr = malloc.allocate<Float>(floatsToRead * sizeOf<Float>());
     if (bufPtr == nullptr) {
       throw MinisoundPlatformOutOfMemoryException();
     }
-    bufPtr.retain();
 
     final floatsRead = c.recorder_get_buffer(_self, bufPtr, floatsToRead);
 

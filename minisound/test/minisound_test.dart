@@ -28,7 +28,6 @@ void main() {
     test("Engine start", () async {
       await engine.init();
       await engine.start();
-      expect(null, null); // TODO!!!
     });
 
     test("Load sound from asset", () async {

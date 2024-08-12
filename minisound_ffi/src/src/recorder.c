@@ -25,6 +25,10 @@ struct Recorder {
     void *user_data;
 };
 
+/*************
+ ** private **
+ *************/
+
 static void data_callback(
     ma_device *pDevice,
     void *pOutput,
@@ -54,23 +58,15 @@ static void data_callback(
     (void)pOutput;
 }
 
+/************
+ ** public **
+ ************/
+
 Recorder *recorder_create(void) {
     Recorder *recorder = (Recorder *)malloc(sizeof(Recorder));
     if (recorder == NULL) { return NULL; }
     memset(recorder, 0, sizeof(Recorder));
     return recorder;
-}
-
-void recorder_destroy(Recorder *recorder) {
-    if (recorder != NULL) {
-        ma_device_uninit(&recorder->device);
-        if (recorder->is_file_recording) {
-            ma_encoder_uninit(&recorder->encoder);
-            free(recorder->filename);
-        }
-        circular_buffer_uninit(&recorder->circular_buffer);
-        free(recorder);
-    }
 }
 
 static RecorderResult recorder_init_common(
@@ -176,6 +172,16 @@ RecorderResult recorder_init_stream(
         sound_format,
         buffer_duration_seconds
     );
+}
+void recorder_uninit(Recorder *const self) {
+    if (self != NULL) {
+        ma_device_uninit(&self->device);
+        if (self->is_file_recording) {
+            ma_encoder_uninit(&self->encoder);
+            free(self->filename);
+        }
+        circular_buffer_uninit(&self->circular_buffer);
+    }
 }
 
 RecorderResult recorder_start(Recorder *recorder) {

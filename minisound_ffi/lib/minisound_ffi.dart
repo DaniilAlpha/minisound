@@ -1,5 +1,3 @@
-// TODO!!! ffi's malloc.allocate takes number of bytes instead of number of objects! verify if right everywhere
-
 import "dart:ffi";
 import "dart:io";
 import "dart:typed_data";
@@ -26,6 +24,25 @@ final _bindings = c.MinisoundFfiBindings(() {
   }
   throw UnsupportedError("Unsupported platform: ${Platform.operatingSystem}");
 }());
+
+extension PointerFloatCopy on Pointer<Float> {
+  void copy(Float32List data) => asTypedList(data.length).setAll(0, data);
+}
+
+extension PointerInt32Copy on Pointer<Int32> {
+  void copy(Int32List data) => asTypedList(data.length).setAll(0, data);
+}
+
+extension PointerInt16Copy on Pointer<Int16> {
+  void copy(Int16List data) => asTypedList(data.length).setAll(0, data);
+}
+
+extension PointerCopy on Pointer {
+  void copy(TypedData typedData) {
+    final data = typedData.buffer.asUint8List();
+    cast<Uint8>().asTypedList(data.length).setAll(0, data);
+  }
+}
 
 // minisound ffi
 

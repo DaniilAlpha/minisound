@@ -36,11 +36,7 @@ final class FfiEngine implements PlatformEngine {
       throw MinisoundPlatformOutOfMemoryException();
     }
 
-    // TODO! maybe was needed
-    // final floatList = dataPtr.asTypedList(audioData.buffer.length);
-    // floatList.setAll(0, audioData.buffer);
-
-    _copyAudioData(dataPtr, audioData.buffer, audioData.format);
+    dataPtr.copy(audioData.buffer);
 
     final sound = _bindings.sound_alloc();
     if (sound == nullptr) {
@@ -64,16 +60,5 @@ final class FfiEngine implements PlatformEngine {
     }
 
     return FfiSound._fromPtrs(sound, dataPtr);
-  }
-
-  void _copyAudioData(
-    Pointer<Float> dataPtr,
-    Float32List data,
-    // TODO unused
-    SoundFormat soundFormat,
-  ) {
-    for (var i = 0; i < data.length; i++) {
-      (dataPtr + i).value = data[i];
-    }
   }
 }

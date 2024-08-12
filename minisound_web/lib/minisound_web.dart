@@ -1,4 +1,4 @@
-// TODO!!! ffi's malloc.allocate takes number of bytes instead of number of objects! verify if right everywhere
+// TODO fix sometimes hang on recording or generating on web
 
 import "dart:typed_data";
 import "package:minisound_platform_interface/minisound_platform_interface.dart";

@@ -40,6 +40,8 @@ EXPORT RecorderResult recorder_init_stream(
     SoundFormat const sound_format,
     int const buffer_duration_seconds
 );
+EXPORT void recorder_uninit(Recorder *const self);
+
 EXPORT RecorderResult recorder_start(Recorder *recorder);
 EXPORT RecorderResult recorder_stop(Recorder *recorder);
 EXPORT size_t recorder_get_available_frames(Recorder *const self);
@@ -49,6 +51,5 @@ EXPORT size_t recorder_get_buffer(
     size_t const floats_to_read
 );
 EXPORT bool recorder_is_recording(Recorder const *recorder);
-EXPORT void recorder_destroy(Recorder *recorder);
 
 #endif  // RECORD_H

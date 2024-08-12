@@ -54,7 +54,10 @@ class FfiRecorder implements PlatformRecorder {
   }
 
   @override
-  void dispose() => _bindings.recorder_destroy(_self);
+  void dispose() {
+    _bindings.recorder_uninit(_self);
+    malloc.free(_self);
+  }
 
   @override
   void start() {
@@ -77,9 +80,9 @@ class FfiRecorder implements PlatformRecorder {
   @override
   Float32List getBuffer(int framesToRead) {
     // TODO! should multiply by channels, but cannot test at the moment
-    final floatsToRead = framesToRead * sizeOf<Float>();
+    final floatsToRead = framesToRead;
 
-    final bufPtr = malloc.allocate<Float>(floatsToRead);
+    final bufPtr = malloc.allocate<Float>(floatsToRead * sizeOf<Float>());
     if (bufPtr == nullptr) {
       throw MinisoundPlatformOutOfMemoryException();
     }

@@ -33,7 +33,6 @@ typedef enum GeneratorNoiseType {
 typedef struct Generator Generator;
 
 EXPORT Generator *generator_create(void);
-EXPORT void generator_destroy(Generator *generator);
 
 EXPORT GeneratorResult generator_init(
     Generator *generator,
@@ -42,6 +41,8 @@ EXPORT GeneratorResult generator_init(
     uint32_t sample_rate,
     int buffer_duration_seconds  // TODO? maybe should be float/double
 );
+EXPORT void generator_uninit(Generator *const self);
+
 EXPORT GeneratorResult generator_set_waveform(
     Generator *generator,
     GeneratorWaveformType type,

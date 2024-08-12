@@ -30,18 +30,15 @@ final class WebEngine implements PlatformEngine {
 
   @override
   Future<PlatformSound> loadSound(AudioData audioData) async {
-    final dataPtr = malloc.allocate<Float>(audioData.buffer.length);
+    final dataPtr =
+        malloc.allocate<Float>(audioData.buffer.length * sizeOf<Float>());
     if (dataPtr == nullptr) {
       throw MinisoundPlatformOutOfMemoryException();
     }
 
-    // TODO! maybe was needed
-    // final floatList = dataPtr.asTypedList(audioData.buffer.length);
-    // floatList.setAll(0, audioData.buffer);
+    dataPtr.copy(audioData.buffer);
 
-    heap.copyAudioData(dataPtr, audioData.buffer, audioData.format);
-
-    final sound = c.sound_alloc(audioData.buffer.lengthInBytes);
+    final sound = c.sound_alloc();
     if (sound == nullptr) {
       malloc.free(dataPtr);
       throw MinisoundPlatformException("Failed to allocate a sound.");

@@ -98,10 +98,10 @@ class FfiGenerator implements PlatformGenerator {
 
   @override
   Float32List getBuffer(int framesToRead) {
-    final floatsToRead = framesToRead *
-        8; // TODO! suspicious (probably shuld use sizeOf<Float>() * channels)
+    final floatsToRead =
+        framesToRead * 2; // TODO! suspicious (probably shuld use channels)
 
-    final bufPtr = malloc.allocate<Float>(floatsToRead);
+    final bufPtr = malloc.allocate<Float>(floatsToRead * sizeOf<Float>());
     if (bufPtr == nullptr) {
       throw MinisoundPlatformOutOfMemoryException();
     }
@@ -121,10 +121,13 @@ class FfiGenerator implements PlatformGenerator {
   int getAvailableFrames() => _bindings.generator_get_available_frames(_self);
 
   @override
-  void dispose() => _bindings.generator_destroy(_self);
+  void dispose() {
+    _bindings.generator_uninit(_self);
+    malloc.free(_self);
+  }
 }
 
-extension GeneratorWaveformTypeToC on GeneratorWaveformType {
+extension on GeneratorWaveformType {
   int toC() => switch (this) {
         GeneratorWaveformType.sine =>
           c.GeneratorWaveformType.GENERATOR_WAVEFORM_TYPE_SINE,
@@ -137,7 +140,7 @@ extension GeneratorWaveformTypeToC on GeneratorWaveformType {
       };
 }
 
-extension GeneratorNoiseTypeToC on GeneratorNoiseType {
+extension on GeneratorNoiseType {
   int toC() => switch (this) {
         GeneratorNoiseType.white =>
           c.GeneratorNoiseType.GENERATOR_NOISE_TYPE_WHITE,

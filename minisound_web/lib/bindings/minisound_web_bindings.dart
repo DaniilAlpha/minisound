@@ -28,7 +28,7 @@ abstract class Result {
 
 final class Engine extends Opaque {}
 
-Pointer<Engine> engine_alloc() => Pointer(_engine_alloc(), 1, safe: true);
+Pointer<Engine> engine_alloc() => Pointer(_engine_alloc());
 
 Future<int> engine_init(Pointer<Engine> self, int period_ms) =>
     _engine_init(self.addr, period_ms);
@@ -69,9 +69,7 @@ abstract class SoundFormat {
 
 final class Sound extends Opaque {}
 
-// TODO! this should not be here
-Pointer<Sound> sound_alloc(int size) =>
-    Pointer(_sound_alloc(), size, safe: true);
+Pointer<Sound> sound_alloc() => Pointer(_sound_alloc());
 void sound_unload(Pointer<Sound> self) => _sound_unload(self.addr);
 
 double sound_get_volume(Pointer<Sound> self) => _sound_get_volume(self.addr);
@@ -104,9 +102,7 @@ abstract class RecorderResult {
 
 final class Recorder extends Opaque {}
 
-Pointer<Recorder> recorder_create() =>
-    Pointer(_recorder_create(), 1, safe: true);
-void recorder_destroy(Pointer<Recorder> self) => _recorder_destroy(self.addr);
+Pointer<Recorder> recorder_create() => Pointer(_recorder_create());
 
 Future<int> recorder_init_file(
   Pointer<Recorder> self,
@@ -136,6 +132,7 @@ Future<int> recorder_init_stream(
       format,
       buffer_duration_seconds,
     );
+void recorder_uninit(Pointer<Recorder> self) => _recorder_uninit(self.addr);
 
 bool recorder_is_recording(Pointer<Recorder> self) =>
     _recorder_is_recording(self.addr) != 0;
@@ -180,10 +177,7 @@ abstract class GeneratorNoiseType {
 
 final class Generator extends Opaque {}
 
-Pointer<Generator> generator_create() =>
-    Pointer(_generator_create(), 1, safe: true);
-void generator_destroy(Pointer<Generator> self) =>
-    _generator_destroy(self.addr);
+Pointer<Generator> generator_create() => Pointer(_generator_create());
 
 Future<int> generator_init(
   Pointer<Generator> self,
@@ -199,6 +193,7 @@ Future<int> generator_init(
       sample_rate,
       buffer_duration_seconds,
     );
+void generator_uninit(Pointer<Generator> self) => _generator_uninit(self.addr);
 
 double generator_get_volume(Pointer<Generator> self) =>
     _generator_get_volume(self.addr);
@@ -301,8 +296,6 @@ external int _sound_set_looped(int self, bool value, int delay_ms);
 // recorder JS bindings
 @JS()
 external int _recorder_create();
-@JS()
-external void _recorder_destroy(int self);
 Future<int> _recorder_init_file(
   int self,
   String filename,
@@ -332,6 +325,8 @@ Future<int> _recorder_init_stream(
       {"async": true},
     ));
 @JS()
+external void _recorder_uninit(int self);
+@JS()
 external int _recorder_start(int self);
 @JS()
 external int _recorder_stop(int self);
@@ -346,8 +341,6 @@ external int _recorder_is_recording(int self);
 // generator JS bindings
 @JS()
 external int _generator_create();
-@JS()
-external void _generator_destroy(int self);
 Future<int> _generator_init(
   int self,
   int sound_format,
@@ -362,6 +355,8 @@ Future<int> _generator_init(
       [self, sound_format, channels, sample_rate, buffer_duration_seconds],
       {"async": true},
     ));
+@JS()
+external void _generator_uninit(int self);
 @JS()
 external int _generator_set_waveform(
   int self,

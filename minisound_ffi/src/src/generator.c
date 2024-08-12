@@ -60,28 +60,11 @@ ma_device device;
 ma_device_config deviceConfig;
 ma_waveform_config sineWaveConfig;
 
-Generator *generator_create(void) {
-    Generator *generator = malloc(sizeof(*generator));
-    if (generator == NULL) {
-        printf("Error: Failed to allocate memory for Generator.\n");
-        return NULL;
-    }
-    memset(generator, 0, sizeof(Generator));
-    return generator;
-}
+/*************
+ ** private **
+ *************/
 
-// TODO! create uninit funciton instead of destroy
-void generator_destroy(Generator *generator) {
-    if (generator != NULL) {
-        ma_waveform_uninit(&waveform);
-        ma_pulsewave_uninit(&pulsewave);
-        ma_noise_uninit(&noise, NULL);
-        circular_buffer_uninit(&generator->circular_buffer);
-        free(generator);
-    }
-}
-
-void data_callback(
+static void data_callback(
     ma_device *pDevice,
     void *pOutput,
     void const *pInput,
@@ -118,6 +101,20 @@ void data_callback(
     );
 
     (void)pInput;
+}
+
+/************
+ ** public **
+ ************/
+
+Generator *generator_create(void) {
+    Generator *generator = malloc(sizeof(*generator));
+    if (generator == NULL) {
+        printf("Error: Failed to allocate memory for Generator.\n");
+        return NULL;
+    }
+    memset(generator, 0, sizeof(Generator));
+    return generator;
 }
 
 GeneratorResult generator_init(
@@ -174,6 +171,14 @@ GeneratorResult generator_init(
     }
 
     return GENERATOR_OK;
+}
+void generator_uninit(Generator *const self) {
+    if (self != NULL) {
+        ma_waveform_uninit(&waveform);
+        ma_pulsewave_uninit(&pulsewave);
+        ma_noise_uninit(&noise, NULL);
+        circular_buffer_uninit(&self->circular_buffer);
+    }
 }
 
 GeneratorResult generator_set_waveform(

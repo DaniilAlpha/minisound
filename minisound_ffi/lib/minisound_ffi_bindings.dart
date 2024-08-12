@@ -302,20 +302,6 @@ class MinisoundFfiBindings {
   late final _generator_create =
       _generator_createPtr.asFunction<ffi.Pointer<Generator> Function()>();
 
-  void generator_destroy(
-    ffi.Pointer<Generator> generator,
-  ) {
-    return _generator_destroy(
-      generator,
-    );
-  }
-
-  late final _generator_destroyPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<Generator>)>>(
-          'generator_destroy');
-  late final _generator_destroy =
-      _generator_destroyPtr.asFunction<void Function(ffi.Pointer<Generator>)>();
-
   int generator_init(
     ffi.Pointer<Generator> generator,
     int sound_format,
@@ -338,6 +324,20 @@ class MinisoundFfiBindings {
               ffi.Uint32, ffi.Int)>>('generator_init');
   late final _generator_init = _generator_initPtr
       .asFunction<int Function(ffi.Pointer<Generator>, int, int, int, int)>();
+
+  void generator_uninit(
+    ffi.Pointer<Generator> self,
+  ) {
+    return _generator_uninit(
+      self,
+    );
+  }
+
+  late final _generator_uninitPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<Generator>)>>(
+          'generator_uninit');
+  late final _generator_uninit =
+      _generator_uninitPtr.asFunction<void Function(ffi.Pointer<Generator>)>();
 
   int generator_set_waveform(
     ffi.Pointer<Generator> generator,
@@ -552,6 +552,20 @@ class MinisoundFfiBindings {
   late final _recorder_init_stream = _recorder_init_streamPtr
       .asFunction<int Function(ffi.Pointer<Recorder>, int, int, int, int)>();
 
+  void recorder_uninit(
+    ffi.Pointer<Recorder> self,
+  ) {
+    return _recorder_uninit(
+      self,
+    );
+  }
+
+  late final _recorder_uninitPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<Recorder>)>>(
+          'recorder_uninit');
+  late final _recorder_uninit =
+      _recorder_uninitPtr.asFunction<void Function(ffi.Pointer<Recorder>)>();
+
   int recorder_start(
     ffi.Pointer<Recorder> recorder,
   ) {
@@ -626,20 +640,6 @@ class MinisoundFfiBindings {
           'recorder_is_recording');
   late final _recorder_is_recording = _recorder_is_recordingPtr
       .asFunction<bool Function(ffi.Pointer<Recorder>)>();
-
-  void recorder_destroy(
-    ffi.Pointer<Recorder> recorder,
-  ) {
-    return _recorder_destroy(
-      recorder,
-    );
-  }
-
-  late final _recorder_destroyPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<Recorder>)>>(
-          'recorder_destroy');
-  late final _recorder_destroy =
-      _recorder_destroyPtr.asFunction<void Function(ffi.Pointer<Recorder>)>();
 }
 
 abstract class SoundFormat {
