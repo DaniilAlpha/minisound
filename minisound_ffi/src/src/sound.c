@@ -3,9 +3,11 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "../external/milo/milo.h"
 #include "../external/miniaudio/include/miniaudio.h"
 #include "../include/silence_data_source.h"
+
+#define MILO_LVL SOUND_MILO_LVL
+#include "../external/milo/milo.h"
 
 // this ensures safe casting between `SoundFormat` and `ma_format`
 _Static_assert(

@@ -191,7 +191,7 @@ class GeneratorMock implements PlatformGenerator {
   SoundFormat? format;
   int channels = 0;
   int sampleRate = 0;
-  int bufferDurationSeconds = 0;
+  double bufferDurationSeconds = 0;
 
   @override
   var volume = 1.0;
@@ -203,7 +203,7 @@ class GeneratorMock implements PlatformGenerator {
     required SoundFormat format,
     required int channels,
     required int sampleRate,
-    required int bufferDurationSeconds,
+    required double bufferDurationSeconds,
   }) async {
     this.format = format;
     this.channels = channels;
@@ -248,7 +248,7 @@ class GeneratorMock implements PlatformGenerator {
   }
 
   @override
-  int getAvailableFrames() => math.Random().nextInt(4096);
+  int get availableFrameCount => math.Random().nextInt(4096);
 
   @override
   void dispose() {}

@@ -36,7 +36,7 @@ final class Generator {
     SoundFormat format = SoundFormat.f32,
     int channels = 1,
     int sampleRate = 44100,
-    int bufferDurationSeconds = 5,
+    double bufferDurationSeconds = 5,
   }) async {
     if (!_isInit) {
       if (!engine.isInit) await initEngine();
@@ -100,7 +100,7 @@ final class Generator {
   }
 
   /// Gets the number of available frames in the generator's buffer.
-  int getAvailableFrames() => _generator.getAvailableFrames();
+  int get availableFrameCount => _generator.availableFrameCount;
 
   /// Reads generated data.
   Float32List getBuffer(int framesToRead) => _generator.getBuffer(framesToRead);

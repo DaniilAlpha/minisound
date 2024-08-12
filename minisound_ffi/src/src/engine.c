@@ -5,7 +5,7 @@
 
 #include "../external/miniaudio/include/miniaudio.h"
 
-#define MILO_IMPL
+#define MILO_LVL ENGINE_MILO_LVL
 #include "../external/milo/milo.h"
 
 /*************

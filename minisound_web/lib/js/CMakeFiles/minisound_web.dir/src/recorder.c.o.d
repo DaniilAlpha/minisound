@@ -37,9 +37,6 @@ CMakeFiles/minisound_web.dir/src/recorder.c.o: \
   /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/../include/sound.h \
   /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/../include/../external/result/result.h \
   /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/assert.h \
-  /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/../external/milo/milo.h \
-  /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/stdio.h \
-  /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/wasi/api.h \
   /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/../external/miniaudio/include/miniaudio.h \
   /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/pthread.h \
   /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/sched.h \
@@ -55,4 +52,7 @@ CMakeFiles/minisound_web.dir/src/recorder.c.o: \
   /home/Daniil/emsdk/upstream/lib/clang/19/include/__stdarg_va_list.h \
   /home/Daniil/emsdk/upstream/lib/clang/19/include/__stdarg_va_arg.h \
   /home/Daniil/emsdk/upstream/lib/clang/19/include/__stdarg___va_copy.h \
-  /home/Daniil/emsdk/upstream/lib/clang/19/include/__stdarg_va_copy.h
+  /home/Daniil/emsdk/upstream/lib/clang/19/include/__stdarg_va_copy.h \
+  /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/../external/milo/milo.h \
+  /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/stdio.h \
+  /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/wasi/api.h

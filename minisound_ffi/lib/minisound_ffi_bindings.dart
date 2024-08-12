@@ -303,27 +303,27 @@ class MinisoundFfiBindings {
       _generator_createPtr.asFunction<ffi.Pointer<Generator> Function()>();
 
   int generator_init(
-    ffi.Pointer<Generator> generator,
+    ffi.Pointer<Generator> self,
     int sound_format,
     int channels,
     int sample_rate,
-    int buffer_duration_seconds,
+    double buffer_len_s,
   ) {
     return _generator_init(
-      generator,
+      self,
       sound_format,
       channels,
       sample_rate,
-      buffer_duration_seconds,
+      buffer_len_s,
     );
   }
 
   late final _generator_initPtr = _lookup<
       ffi.NativeFunction<
           ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Int32, ffi.Uint32,
-              ffi.Uint32, ffi.Int)>>('generator_init');
-  late final _generator_init = _generator_initPtr
-      .asFunction<int Function(ffi.Pointer<Generator>, int, int, int, int)>();
+              ffi.Uint32, ffi.Float)>>('generator_init');
+  late final _generator_init = _generator_initPtr.asFunction<
+      int Function(ffi.Pointer<Generator>, int, int, int, double)>();
 
   void generator_uninit(
     ffi.Pointer<Generator> self,
@@ -338,97 +338,6 @@ class MinisoundFfiBindings {
           'generator_uninit');
   late final _generator_uninit =
       _generator_uninitPtr.asFunction<void Function(ffi.Pointer<Generator>)>();
-
-  int generator_set_waveform(
-    ffi.Pointer<Generator> generator,
-    int type,
-    double frequency,
-    double amplitude,
-  ) {
-    return _generator_set_waveform(
-      generator,
-      type,
-      frequency,
-      amplitude,
-    );
-  }
-
-  late final _generator_set_waveformPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Int32, ffi.Double,
-              ffi.Double)>>('generator_set_waveform');
-  late final _generator_set_waveform = _generator_set_waveformPtr
-      .asFunction<int Function(ffi.Pointer<Generator>, int, double, double)>();
-
-  int generator_set_pulsewave(
-    ffi.Pointer<Generator> generator,
-    double frequency,
-    double amplitude,
-    double dutyCycle,
-  ) {
-    return _generator_set_pulsewave(
-      generator,
-      frequency,
-      amplitude,
-      dutyCycle,
-    );
-  }
-
-  late final _generator_set_pulsewavePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Double, ffi.Double,
-              ffi.Double)>>('generator_set_pulsewave');
-  late final _generator_set_pulsewave = _generator_set_pulsewavePtr.asFunction<
-      int Function(ffi.Pointer<Generator>, double, double, double)>();
-
-  int generator_set_noise(
-    ffi.Pointer<Generator> generator,
-    int type,
-    int seed,
-    double amplitude,
-  ) {
-    return _generator_set_noise(
-      generator,
-      type,
-      seed,
-      amplitude,
-    );
-  }
-
-  late final _generator_set_noisePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Int32, ffi.Int32,
-              ffi.Double)>>('generator_set_noise');
-  late final _generator_set_noise = _generator_set_noisePtr
-      .asFunction<int Function(ffi.Pointer<Generator>, int, int, double)>();
-
-  int generator_start(
-    ffi.Pointer<Generator> generator,
-  ) {
-    return _generator_start(
-      generator,
-    );
-  }
-
-  late final _generator_startPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<Generator>)>>(
-          'generator_start');
-  late final _generator_start =
-      _generator_startPtr.asFunction<int Function(ffi.Pointer<Generator>)>();
-
-  int generator_stop(
-    ffi.Pointer<Generator> generator,
-  ) {
-    return _generator_stop(
-      generator,
-    );
-  }
-
-  late final _generator_stopPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<Generator>)>>(
-          'generator_stop');
-  late final _generator_stop =
-      _generator_stopPtr.asFunction<int Function(ffi.Pointer<Generator>)>();
 
   double generator_get_volume(
     ffi.Pointer<Generator> self,
@@ -461,39 +370,130 @@ class MinisoundFfiBindings {
   late final _generator_set_volume = _generator_set_volumePtr
       .asFunction<void Function(ffi.Pointer<Generator>, double)>();
 
-  int generator_get_buffer(
+  int generator_set_waveform(
+    ffi.Pointer<Generator> self,
+    int type,
+    double frequency,
+    double amplitude,
+  ) {
+    return _generator_set_waveform(
+      self,
+      type,
+      frequency,
+      amplitude,
+    );
+  }
+
+  late final _generator_set_waveformPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Int32, ffi.Double,
+              ffi.Double)>>('generator_set_waveform');
+  late final _generator_set_waveform = _generator_set_waveformPtr
+      .asFunction<int Function(ffi.Pointer<Generator>, int, double, double)>();
+
+  int generator_set_pulsewave(
+    ffi.Pointer<Generator> generator,
+    double frequency,
+    double amplitude,
+    double duty_cycle,
+  ) {
+    return _generator_set_pulsewave(
+      generator,
+      frequency,
+      amplitude,
+      duty_cycle,
+    );
+  }
+
+  late final _generator_set_pulsewavePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Double, ffi.Double,
+              ffi.Double)>>('generator_set_pulsewave');
+  late final _generator_set_pulsewave = _generator_set_pulsewavePtr.asFunction<
+      int Function(ffi.Pointer<Generator>, double, double, double)>();
+
+  int generator_set_noise(
+    ffi.Pointer<Generator> self,
+    int type,
+    int seed,
+    double amplitude,
+  ) {
+    return _generator_set_noise(
+      self,
+      type,
+      seed,
+      amplitude,
+    );
+  }
+
+  late final _generator_set_noisePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Int32, ffi.Int32,
+              ffi.Double)>>('generator_set_noise');
+  late final _generator_set_noise = _generator_set_noisePtr
+      .asFunction<int Function(ffi.Pointer<Generator>, int, int, double)>();
+
+  int generator_start(
+    ffi.Pointer<Generator> self,
+  ) {
+    return _generator_start(
+      self,
+    );
+  }
+
+  late final _generator_startPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<Generator>)>>(
+          'generator_start');
+  late final _generator_start =
+      _generator_startPtr.asFunction<int Function(ffi.Pointer<Generator>)>();
+
+  void generator_stop(
+    ffi.Pointer<Generator> self,
+  ) {
+    return _generator_stop(
+      self,
+    );
+  }
+
+  late final _generator_stopPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<Generator>)>>(
+          'generator_stop');
+  late final _generator_stop =
+      _generator_stopPtr.asFunction<void Function(ffi.Pointer<Generator>)>();
+
+  int generator_get_available_frame_count(
+    ffi.Pointer<Generator> self,
+  ) {
+    return _generator_get_available_frame_count(
+      self,
+    );
+  }
+
+  late final _generator_get_available_frame_countPtr =
+      _lookup<ffi.NativeFunction<ffi.Size Function(ffi.Pointer<Generator>)>>(
+          'generator_get_available_frame_count');
+  late final _generator_get_available_frame_count =
+      _generator_get_available_frame_countPtr
+          .asFunction<int Function(ffi.Pointer<Generator>)>();
+
+  int generator_load_buffer(
     ffi.Pointer<Generator> self,
     ffi.Pointer<ffi.Float> output,
     int floats_to_read,
   ) {
-    return _generator_get_buffer(
+    return _generator_load_buffer(
       self,
       output,
       floats_to_read,
     );
   }
 
-  late final _generator_get_bufferPtr = _lookup<
+  late final _generator_load_bufferPtr = _lookup<
       ffi.NativeFunction<
           ffi.Size Function(ffi.Pointer<Generator>, ffi.Pointer<ffi.Float>,
-              ffi.Size)>>('generator_get_buffer');
-  late final _generator_get_buffer = _generator_get_bufferPtr.asFunction<
+              ffi.Size)>>('generator_load_buffer');
+  late final _generator_load_buffer = _generator_load_bufferPtr.asFunction<
       int Function(ffi.Pointer<Generator>, ffi.Pointer<ffi.Float>, int)>();
-
-  int generator_get_available_frames(
-    ffi.Pointer<Generator> generator,
-  ) {
-    return _generator_get_available_frames(
-      generator,
-    );
-  }
-
-  late final _generator_get_available_framesPtr =
-      _lookup<ffi.NativeFunction<ffi.Size Function(ffi.Pointer<Generator>)>>(
-          'generator_get_available_frames');
-  late final _generator_get_available_frames =
-      _generator_get_available_framesPtr
-          .asFunction<int Function(ffi.Pointer<Generator>)>();
 
   ffi.Pointer<Recorder> recorder_create() {
     return _recorder_create();
@@ -673,7 +673,12 @@ final class Engine extends ffi.Opaque {}
 
 abstract class GeneratorResult {
   static const int GENERATOR_OK = 0;
-  static const int GENERATOR_ERROR = 1;
+  static const int GENERATOR_UNKNOWN_ERROR = 1;
+  static const int GENERATOR_DEVICE_INIT_ERROR = 2;
+  static const int GENERATOR_ARG_ERROR = 3;
+  static const int GENERATOR_CIRCULAR_BUFFER_INIT_ERROR = 4;
+  static const int GENERATOR_SET_TYPE_ERROR = 5;
+  static const int GENERATOR_DEVICE_START_ERROR = 6;
 }
 
 abstract class GeneratorType {

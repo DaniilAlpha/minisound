@@ -1,7 +1,9 @@
 #include "../include/recorder.h"
 
-#include "../external/milo/milo.h"
 #include "../external/miniaudio/include/miniaudio.h"
+
+#define MILO_LVL RECORDER_MILO_LVL
+#include "../external/milo/milo.h"
 
 struct Recorder {
     ma_encoder encoder;

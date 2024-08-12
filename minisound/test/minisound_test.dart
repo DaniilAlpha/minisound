@@ -156,7 +156,7 @@ void main() {
       );
       generator.setWaveform(type: GeneratorWaveformType.sine);
       generator.start();
-      expect(generator.getAvailableFrames(), greaterThan(0));
+      expect(generator.availableFrameCount, greaterThan(0));
       final buffer = generator.getBuffer(100);
       expect(buffer.length, 100);
       generator.stop();
@@ -172,7 +172,7 @@ void main() {
       );
       generator.setNoise(type: GeneratorNoiseType.white);
       generator.start();
-      expect(generator.getAvailableFrames(), greaterThan(0));
+      expect(generator.availableFrameCount, greaterThan(0));
       final buffer = generator.getBuffer(100);
       expect(buffer.length, 100);
       generator.stop();
@@ -188,7 +188,7 @@ void main() {
       );
       generator.setPulsewave();
       generator.start();
-      expect(generator.getAvailableFrames(), greaterThan(0));
+      expect(generator.availableFrameCount, greaterThan(0));
       final buffer = generator.getBuffer(100);
       expect(buffer.length, 100);
       generator.stop();

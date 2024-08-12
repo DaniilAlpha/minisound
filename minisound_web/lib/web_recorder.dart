@@ -74,7 +74,7 @@ final class WebRecorder implements PlatformRecorder {
   int getAvailableFrames() => c.recorder_get_available_frames(_self);
   @override
   Float32List getBuffer(int framesToRead, {int channels = 2}) {
-    // TODO! probably should multiply by channels, but cannot test at the moment
+    // TODO! should multiply by channels instead of 2
     final floatsToRead = framesToRead * 2;
 
     final bufPtr = malloc.allocate<Float>(floatsToRead * sizeOf<Float>());

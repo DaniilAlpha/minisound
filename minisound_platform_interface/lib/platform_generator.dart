@@ -14,7 +14,7 @@ abstract interface class PlatformGenerator {
     required SoundFormat format,
     required int channels,
     required int sampleRate,
-    required int bufferDurationSeconds,
+    required double bufferDurationSeconds,
   });
   void dispose();
 
@@ -37,6 +37,6 @@ abstract interface class PlatformGenerator {
   void start();
   void stop();
 
-  int getAvailableFrames();
+  int get availableFrameCount;
   Float32List getBuffer(int framesToRead);
 }

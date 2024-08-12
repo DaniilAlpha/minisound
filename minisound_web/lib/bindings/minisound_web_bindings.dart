@@ -184,7 +184,7 @@ Future<int> generator_init(
   int sound_format,
   int channels,
   int sample_rate,
-  int buffer_duration_seconds,
+  double buffer_duration_seconds,
 ) async =>
     _generator_init(
       self.addr,
@@ -223,16 +223,16 @@ int generator_set_noise(
     _generator_set_noise(self.addr, type, seed, amplitude);
 
 int generator_start(Pointer<Generator> self) => _generator_start(self.addr);
-int generator_stop(Pointer<Generator> self) => _generator_stop(self.addr);
+void generator_stop(Pointer<Generator> self) => _generator_stop(self.addr);
 
-int generator_get_available_frames(Pointer<Generator> self) =>
-    _generator_get_available_frames(self.addr);
-int generator_get_buffer(
+int generator_get_available_frame_count(Pointer<Generator> self) =>
+    _generator_get_available_frame_count(self.addr);
+int generator_load_buffer(
   Pointer<Generator> self,
   Pointer<Float> output,
   int frames_to_read,
 ) =>
-    _generator_get_buffer(self.addr, output.addr, frames_to_read);
+    _generator_load_buffer(self.addr, output.addr, frames_to_read);
 
 // JS
 
@@ -346,17 +346,21 @@ Future<int> _generator_init(
   int sound_format,
   int channels,
   int sample_rate,
-  int buffer_duration_seconds,
+  double buffer_len_s,
 ) async =>
     promiseToFuture(_ccall(
       "generator_init",
       "number",
       ["number", "number", "number", "number", "number"],
-      [self, sound_format, channels, sample_rate, buffer_duration_seconds],
+      [self, sound_format, channels, sample_rate, buffer_len_s],
       {"async": true},
     ));
 @JS()
 external void _generator_uninit(int self);
+@JS()
+external double _generator_get_volume(int self);
+@JS()
+external void _generator_set_volume(int self, double value);
 @JS()
 external int _generator_set_waveform(
   int self,
@@ -381,12 +385,8 @@ external int _generator_set_noise(
 @JS()
 external int _generator_start(int self);
 @JS()
-external int _generator_stop(int self);
+external void _generator_stop(int self);
 @JS()
-external double _generator_get_volume(int self);
+external int _generator_get_available_frame_count(int self);
 @JS()
-external void _generator_set_volume(int self, double value);
-@JS()
-external int _generator_get_buffer(int self, int output, int frames_to_read);
-@JS()
-external int _generator_get_available_frames(int self);
+external int _generator_load_buffer(int self, int output, int frames_to_read);

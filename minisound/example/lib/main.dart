@@ -374,7 +374,7 @@ class _ExamplePageState extends State<ExamplePage> {
 
   void accumulateGeneratorFrames() {
     if (generator.isGenerating) {
-      final frames = generator.getAvailableFrames();
+      final frames = generator.availableFrameCount;
       final buffer = generator.getBuffer(frames);
       if (buffer.isNotEmpty) {
         generatorBuffer.add(buffer);

@@ -33,8 +33,6 @@ CMakeFiles/minisound_web.dir/src/generator.c.o: \
   /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/bits/stdint.h \
   /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/../include/../external/result/result.h \
   /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/assert.h \
-  /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/stdio.h \
-  /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/wasi/api.h \
   /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/compat/string.h \
   /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/string.h \
   /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/strings.h \
@@ -54,4 +52,7 @@ CMakeFiles/minisound_web.dir/src/generator.c.o: \
   /home/Daniil/emsdk/upstream/lib/clang/19/include/__stdarg_va_arg.h \
   /home/Daniil/emsdk/upstream/lib/clang/19/include/__stdarg___va_copy.h \
   /home/Daniil/emsdk/upstream/lib/clang/19/include/__stdarg_va_copy.h \
-  /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/../include/circular_buffer.h
+  /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/../include/circular_buffer.h \
+  /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/../external/milo/milo.h \
+  /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/stdio.h \
+  /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/wasi/api.h

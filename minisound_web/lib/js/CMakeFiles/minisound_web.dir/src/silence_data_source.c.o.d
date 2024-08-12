@@ -33,10 +33,4 @@ CMakeFiles/minisound_web.dir/src/silence_data_source.c.o: \
   /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/compat/string.h \
   /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/string.h \
   /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/strings.h \
-  /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/../external/milo/milo.h \
-  /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/stdio.h \
-  /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/wasi/api.h \
-  /home/Daniil/emsdk/upstream/lib/clang/19/include/stdint.h \
-  /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/stdint.h \
-  /home/Daniil/emsdk/upstream/emscripten/cache/sysroot/include/bits/stdint.h \
   /home/Daniil/_work/_projects/_flutter/minisound/minisound_ffi/src/src/../external/result/result.h

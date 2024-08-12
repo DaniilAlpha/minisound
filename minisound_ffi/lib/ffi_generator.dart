@@ -19,7 +19,7 @@ class FfiGenerator implements PlatformGenerator {
     required SoundFormat format,
     required int channels,
     required int sampleRate,
-    required int bufferDurationSeconds,
+    required double bufferDurationSeconds,
   }) async {
     final r = _bindings.generator_init(
       _self,
@@ -89,12 +89,7 @@ class FfiGenerator implements PlatformGenerator {
   }
 
   @override
-  void stop() {
-    final r = _bindings.generator_stop(_self);
-    if (r != c.GeneratorResult.GENERATOR_OK) {
-      throw MinisoundPlatformException("Failed to stop generator (code: $r).");
-    }
-  }
+  void stop() => _bindings.generator_stop(_self);
 
   @override
   Float32List getBuffer(int framesToRead) {
@@ -107,7 +102,7 @@ class FfiGenerator implements PlatformGenerator {
     }
 
     final floatsRead =
-        _bindings.generator_get_buffer(_self, bufPtr, floatsToRead);
+        _bindings.generator_load_buffer(_self, bufPtr, floatsToRead);
 
     // copy data from allocated C memory to Dart list
     final buffer = Float32List.fromList(bufPtr.asTypedList(floatsRead));
@@ -118,7 +113,8 @@ class FfiGenerator implements PlatformGenerator {
   }
 
   @override
-  int getAvailableFrames() => _bindings.generator_get_available_frames(_self);
+  int get availableFrameCount =>
+      _bindings.generator_get_available_frame_count(_self);
 
   @override
   void dispose() {

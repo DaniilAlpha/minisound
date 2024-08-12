@@ -1,5 +1,3 @@
-// TODO fix naming
-
 #ifndef GENERATOR_H
 #define GENERATOR_H
 
@@ -7,8 +5,13 @@
 #include "sound.h"
 
 typedef enum GeneratorResult {
-    GENERATOR_OK,
-    GENERATOR_ERROR,
+    GENERATOR_OK = 0,
+    GENERATOR_UNKNOWN_ERROR,
+    GENERATOR_DEVICE_INIT_ERROR,
+    GENERATOR_ARG_ERROR,
+    GENERATOR_CIRCULAR_BUFFER_INIT_ERROR,
+    GENERATOR_SET_TYPE_ERROR,
+    GENERATOR_DEVICE_START_ERROR,
 } GeneratorResult;
 
 typedef enum GeneratorType {
@@ -35,41 +38,44 @@ typedef struct Generator Generator;
 EXPORT Generator *generator_create(void);
 
 EXPORT GeneratorResult generator_init(
-    Generator *generator,
-    SoundFormat sound_format,
-    uint32_t channels,
-    uint32_t sample_rate,
-    int buffer_duration_seconds  // TODO? maybe should be float/double
+    Generator *const self,
+    SoundFormat const sound_format,
+    uint32_t const channels,
+    uint32_t const sample_rate,
+    float const buffer_len_s
 );
 EXPORT void generator_uninit(Generator *const self);
 
-EXPORT GeneratorResult generator_set_waveform(
-    Generator *generator,
-    GeneratorWaveformType type,
-    double frequency,
-    double amplitude
-);
-EXPORT GeneratorResult generator_set_pulsewave(
-    Generator *generator,
-    double frequency,
-    double amplitude,
-    double dutyCycle
-);
-EXPORT GeneratorResult generator_set_noise(
-    Generator *generator,
-    GeneratorNoiseType type,
-    int32_t seed,
-    double amplitude
-);
-EXPORT GeneratorResult generator_start(Generator *generator);
-EXPORT GeneratorResult generator_stop(Generator *generator);
 EXPORT float generator_get_volume(Generator const *const self);
 EXPORT void generator_set_volume(Generator *const self, float const value);
-EXPORT size_t generator_get_buffer(
+
+EXPORT GeneratorResult generator_set_waveform(
+    Generator *const self,
+    GeneratorWaveformType const type,
+    double const frequency,
+    double const amplitude
+);
+EXPORT GeneratorResult generator_set_pulsewave(
+    Generator *const generator,
+    double const frequency,
+    double const amplitude,
+    double const duty_cycle
+);
+EXPORT GeneratorResult generator_set_noise(
+    Generator *const self,
+    GeneratorNoiseType const type,
+    int32_t const seed,
+    double const amplitude
+);
+
+EXPORT GeneratorResult generator_start(Generator *const self);
+EXPORT void generator_stop(Generator *const self);
+
+EXPORT size_t generator_get_available_frame_count(Generator *const self);
+EXPORT size_t generator_load_buffer(
     Generator *const self,
     float *const output,
     size_t const floats_to_read
 );
-EXPORT size_t generator_get_available_frames(Generator *generator);
 
 #endif  // GENERATOR_H

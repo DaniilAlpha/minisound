@@ -5,4 +5,7 @@
 #include "generator.h"
 #include "recorder.h"
 
+#define MILO_IMPL
+#include "../external/milo/milo.h"
+
 #endif
