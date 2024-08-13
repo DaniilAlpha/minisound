@@ -1,5 +1,3 @@
-// TODO fix naming
-
 #ifndef RECORDER_H
 #define RECORDER_H
 
@@ -26,6 +24,7 @@ typedef enum RecorderResult {
 typedef struct Recorder Recorder;
 
 EXPORT Recorder *recorder_create(void);
+
 EXPORT RecorderResult recorder_init_file(
     Recorder *const self,
     char const *const filename,
@@ -38,14 +37,14 @@ EXPORT RecorderResult recorder_init_stream(
     uint32_t const sample_rate,
     uint32_t const channels,
     SoundFormat const sound_format,
-    int const buffer_duration_seconds
+    float const buffer_duration_seconds
 );
 EXPORT void recorder_uninit(Recorder *const self);
 
-EXPORT bool recorder_is_recording(Recorder const *recorder);
+EXPORT bool recorder_get_is_recording(Recorder const *recorder);
 
-EXPORT RecorderResult recorder_start(Recorder *recorder);
-EXPORT RecorderResult recorder_stop(Recorder *recorder);
+EXPORT RecorderResult recorder_start(Recorder *const self);
+EXPORT void recorder_stop(Recorder *const self);
 
 EXPORT size_t recorder_get_available_float_count(Recorder *const self);
 EXPORT size_t recorder_load_buffer(

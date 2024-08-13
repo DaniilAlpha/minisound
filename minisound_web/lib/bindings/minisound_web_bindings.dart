@@ -123,7 +123,7 @@ Future<int> recorder_init_stream(
   int sample_rate,
   int channels,
   int format,
-  int buffer_duration_seconds,
+  double buffer_duration_seconds,
 ) =>
     _recorder_init_stream(
       self.addr,
@@ -134,11 +134,11 @@ Future<int> recorder_init_stream(
     );
 void recorder_uninit(Pointer<Recorder> self) => _recorder_uninit(self.addr);
 
-bool recorder_is_recording(Pointer<Recorder> self) =>
-    _recorder_is_recording(self.addr) != 0;
+bool recorder_get_is_recording(Pointer<Recorder> self) =>
+    _recorder_get_is_recording(self.addr) != 0;
 
 int recorder_start(Pointer<Recorder> self) => _recorder_start(self.addr);
-int recorder_stop(Pointer<Recorder> self) => _recorder_stop(self.addr);
+void recorder_stop(Pointer<Recorder> self) => _recorder_stop(self.addr);
 
 int recorder_get_available_float_count(Pointer<Recorder> self) =>
     _recorder_get_available_float_count(self.addr);
@@ -315,7 +315,7 @@ Future<int> _recorder_init_stream(
   int sample_rate,
   int channels,
   int format,
-  int buffer_len_s,
+  double buffer_len_s,
 ) async =>
     promiseToFuture(_ccall(
       "recorder_init_stream",
@@ -328,11 +328,11 @@ Future<int> _recorder_init_stream(
 external void _recorder_uninit(int self);
 @JS()
 // watch out: enscripten does not support `bool`
-external int _recorder_is_recording(int self);
+external int _recorder_get_is_recording(int self);
 @JS()
 external int _recorder_start(int self);
 @JS()
-external int _recorder_stop(int self);
+external void _recorder_stop(int self);
 @JS()
 external int _recorder_get_available_float_count(int self);
 @JS()

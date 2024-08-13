@@ -54,9 +54,9 @@ final class Recorder {
     int sampleRate = 44100,
     int channels = 1,
     SoundFormat format = SoundFormat.f32,
-    int bufferDurationSeconds = 5,
+    double bufferLenS = 5.0,
   }) async {
-    if (sampleRate <= 0 || channels <= 0 || bufferDurationSeconds <= 0) {
+    if (sampleRate <= 0 || channels <= 0 || bufferLenS <= 0) {
       throw ArgumentError("Invalid recorder parameters");
     }
     if (!_isInit) {
@@ -66,7 +66,7 @@ final class Recorder {
         sampleRate: sampleRate,
         channels: channels,
         format: format,
-        bufferDurationSeconds: bufferDurationSeconds,
+        bufferLenS: bufferLenS,
       );
 
       _isInit = true;

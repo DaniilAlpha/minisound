@@ -6,7 +6,7 @@ final class WebRecorder implements PlatformRecorder {
   final Pointer<c.Recorder> _self;
 
   @override
-  bool get isRecording => c.recorder_is_recording(_self);
+  bool get isRecording => c.recorder_get_is_recording(_self);
 
   @override
   Future<void> initFile(
@@ -33,14 +33,14 @@ final class WebRecorder implements PlatformRecorder {
     required int sampleRate,
     required int channels,
     required SoundFormat format,
-    required int bufferDurationSeconds,
+    required double bufferLenS,
   }) async {
     final r = await c.recorder_init_stream(
       _self,
       sampleRate,
       channels,
       format.toC(),
-      bufferDurationSeconds,
+      bufferLenS,
     );
     if (r != c.RecorderResult.RECORDER_OK) {
       throw MinisoundPlatformException(
@@ -63,12 +63,7 @@ final class WebRecorder implements PlatformRecorder {
   }
 
   @override
-  void stop() {
-    final r = c.recorder_stop(_self);
-    if (r != c.RecorderResult.RECORDER_OK) {
-      throw MinisoundPlatformException("Failed to stop recording (code: $r).");
-    }
-  }
+  void stop() => c.recorder_stop(_self);
 
   @override
   int get availableFloatCount => c.recorder_get_available_float_count(_self);

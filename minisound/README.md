@@ -113,7 +113,7 @@ void main() async {
     sampleRate: 48000,
     channels: 1,
     format: minisound.AudioFormat.float32,
-    bufferDurationSeconds: 5,
+    bufferLenS: 5,
   );
 
   // Start recording
