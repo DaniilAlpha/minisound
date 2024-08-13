@@ -1,4 +1,4 @@
-
+publish_to: none
 name: minisound_ffi
 description: FFI implementation of the Minisound package.
 version: 1.5.0
@@ -12,7 +12,8 @@ environment:
 
 dependencies:
   ffi: ^2.0.2
-  minisound_platform_interface: ^1.5.0
+  minisound_platform_interface:
+    path: ../minisound_platform_interface
 
 dev_dependencies:
   flutter_lints: ^2.0.1
