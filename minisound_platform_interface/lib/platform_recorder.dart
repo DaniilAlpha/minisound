@@ -22,6 +22,6 @@ abstract interface class PlatformRecorder {
   void start();
   void stop();
 
-  int getAvailableFrames();
-  Float32List getBuffer(int framesToRead);
+  int get availableFloatCount;
+  Float32List getBuffer(int floatsToRead);
 }

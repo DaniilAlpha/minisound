@@ -35,6 +35,12 @@ final class WebGenerator implements PlatformGenerator {
   }
 
   @override
+  void dispose() {
+    c.generator_uninit(_self);
+    malloc.free(_self);
+  }
+
+  @override
   void setWaveform({
     required GeneratorWaveformType type,
     required double frequency,
@@ -82,10 +88,9 @@ final class WebGenerator implements PlatformGenerator {
   void stop() => c.generator_stop(_self);
 
   @override
-  Float32List getBuffer(int framesToRead) {
-    final floatsToRead =
-        framesToRead * 2; // TODO! suspicious (probably shuld use  * channels)
-
+  int get availableFloatCount => c.generator_get_available_float_count(_self);
+  @override
+  Float32List getBuffer(int floatsToRead) {
     final bufPtr = malloc.allocate<Float>(floatsToRead * sizeOf<Float>());
     if (bufPtr == nullptr) {
       throw MinisoundPlatformOutOfMemoryException();
@@ -99,15 +104,6 @@ final class WebGenerator implements PlatformGenerator {
     malloc.free(bufPtr);
 
     return buffer;
-  }
-
-  @override
-  int get availableFrameCount => c.generator_get_available_frame_count(_self);
-
-  @override
-  void dispose() {
-    c.generator_uninit(_self);
-    malloc.free(_self);
   }
 }
 

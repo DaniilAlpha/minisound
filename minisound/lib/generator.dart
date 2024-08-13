@@ -100,8 +100,8 @@ final class Generator {
   }
 
   /// Gets the number of available frames in the generator's buffer.
-  int get availableFrameCount => _generator.availableFrameCount;
+  int get availableFloatCount => _generator.availableFloatCount;
 
   /// Reads generated data.
-  Float32List getBuffer(int framesToRead) => _generator.getBuffer(framesToRead);
+  Float32List getBuffer(int floatsToRead) => _generator.getBuffer(floatsToRead);
 }

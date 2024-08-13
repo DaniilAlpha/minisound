@@ -140,14 +140,14 @@ bool recorder_is_recording(Pointer<Recorder> self) =>
 int recorder_start(Pointer<Recorder> self) => _recorder_start(self.addr);
 int recorder_stop(Pointer<Recorder> self) => _recorder_stop(self.addr);
 
-int recorder_get_available_frames(Pointer<Recorder> self) =>
-    _recorder_get_available_frames(self.addr);
-int recorder_get_buffer(
+int recorder_get_available_float_count(Pointer<Recorder> self) =>
+    _recorder_get_available_float_count(self.addr);
+int recorder_load_buffer(
   Pointer<Recorder> self,
   Pointer<Float> output,
-  int frames_to_read,
+  int floats_to_read,
 ) =>
-    _recorder_get_buffer(self.addr, output.addr, frames_to_read);
+    _recorder_load_buffer(self.addr, output.addr, floats_to_read);
 
 // generator
 
@@ -225,14 +225,14 @@ int generator_set_noise(
 int generator_start(Pointer<Generator> self) => _generator_start(self.addr);
 void generator_stop(Pointer<Generator> self) => _generator_stop(self.addr);
 
-int generator_get_available_frame_count(Pointer<Generator> self) =>
-    _generator_get_available_frame_count(self.addr);
+int generator_get_available_float_count(Pointer<Generator> self) =>
+    _generator_get_available_float_count(self.addr);
 int generator_load_buffer(
   Pointer<Generator> self,
   Pointer<Float> output,
-  int frames_to_read,
+  int floats_to_read,
 ) =>
-    _generator_load_buffer(self.addr, output.addr, frames_to_read);
+    _generator_load_buffer(self.addr, output.addr, floats_to_read);
 
 // JS
 
@@ -315,28 +315,28 @@ Future<int> _recorder_init_stream(
   int sample_rate,
   int channels,
   int format,
-  int buffer_duration_seconds,
+  int buffer_len_s,
 ) async =>
     promiseToFuture(_ccall(
       "recorder_init_stream",
       "number",
       ["number", "number", "number", "number", "number"],
-      [self, sample_rate, channels, format, buffer_duration_seconds],
+      [self, sample_rate, channels, format, buffer_len_s],
       {"async": true},
     ));
 @JS()
 external void _recorder_uninit(int self);
 @JS()
+// watch out: enscripten does not support `bool`
+external int _recorder_is_recording(int self);
+@JS()
 external int _recorder_start(int self);
 @JS()
 external int _recorder_stop(int self);
 @JS()
-external int _recorder_get_available_frames(int self);
+external int _recorder_get_available_float_count(int self);
 @JS()
-external int _recorder_get_buffer(int self, int output, int frames_to_read);
-@JS()
-// watch out: enscripten does not support `bool`
-external int _recorder_is_recording(int self);
+external int _recorder_load_buffer(int self, int output, int floats_to_read);
 
 // generator JS bindings
 @JS()
@@ -387,6 +387,6 @@ external int _generator_start(int self);
 @JS()
 external void _generator_stop(int self);
 @JS()
-external int _generator_get_available_frame_count(int self);
+external int _generator_get_available_float_count(int self);
 @JS()
-external int _generator_load_buffer(int self, int output, int frames_to_read);
+external int _generator_load_buffer(int self, int output, int floats_to_read);

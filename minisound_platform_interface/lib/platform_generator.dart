@@ -37,6 +37,6 @@ abstract interface class PlatformGenerator {
   void start();
   void stop();
 
-  int get availableFrameCount;
-  Float32List getBuffer(int framesToRead);
+  int get availableFloatCount;
+  Float32List getBuffer(int floatsToRead);
 }

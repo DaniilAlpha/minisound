@@ -34,13 +34,14 @@ struct Generator {
     uint32_t sample_rate;
 
     GeneratorType type;
+
+    ma_device device;
 };
 
 // TODO! move out of global variables to make multi-generator setup work
 ma_waveform waveform;
 ma_pulsewave pulsewave;
 ma_noise noise;
-ma_device device;
 ma_waveform_config sineWaveConfig;
 
 /*************
@@ -53,16 +54,11 @@ static void data_callback(
     void const *pInput,
     ma_uint32 frameCount
 ) {
-    Generator *generator;
-    generator = (Generator *)pDevice->pUserData;
+    Generator *const self = pDevice->pUserData;
 
-    circular_buffer_read_available(
-        &generator->circular_buffer,
-        pOutput,
-        frameCount
-    );
+    circular_buffer_read_available(&self->circular_buffer, pOutput, frameCount);
 
-    switch (generator->type) {
+    switch (self->type) {
     case GENERATOR_TYPE_WAVEFORM:
         ma_waveform_read_pcm_frames(&waveform, pOutput, frameCount, NULL);
         break;
@@ -76,9 +72,9 @@ static void data_callback(
     }
 
     circular_buffer_write(
-        &generator->circular_buffer,
+        &self->circular_buffer,
         pOutput,
-        frameCount * generator->channels
+        frameCount * self->channels
     );
 
     (void)pInput;
@@ -131,7 +127,7 @@ GeneratorResult generator_init(
     device_config.sampleRate = sample_rate;
     device_config.dataCallback = data_callback;
     device_config.pUserData = self;
-    if (ma_device_init(NULL, &device_config, &device) != MA_SUCCESS)
+    if (ma_device_init(NULL, &device_config, &self->device) != MA_SUCCESS)
         return circular_buffer_uninit(&self->circular_buffer),
                error("failed to init device"), GENERATOR_DEVICE_INIT_ERROR;
 
@@ -148,13 +144,13 @@ void generator_uninit(Generator *const self) {
     circular_buffer_uninit(&self->circular_buffer);
 }
 
-float generator_get_volume(Generator const *const self) {
+float generator_get_volume(Generator *const self) {
     float volume;
-    ma_device_get_master_volume(&device, &volume);
+    ma_device_get_master_volume(&self->device, &volume);
     return volume;
 }
 void generator_set_volume(Generator *const self, float const value) {
-    ma_device_set_master_volume(&device, value);
+    ma_device_set_master_volume(&self->device, value);
 }
 
 GeneratorResult generator_set_waveform(
@@ -166,9 +162,9 @@ GeneratorResult generator_set_waveform(
     self->type = GENERATOR_TYPE_WAVEFORM;
 
     ma_waveform_config const config = ma_waveform_config_init(
-        device.playback.format,
-        device.playback.channels,
-        device.sampleRate,
+        self->device.playback.format,
+        self->device.playback.channels,
+        self->device.sampleRate,
         (ma_waveform_type)type,
         amplitude,
         frequency
@@ -183,17 +179,17 @@ GeneratorResult generator_set_waveform(
 }
 
 GeneratorResult generator_set_pulsewave(
-    Generator *const generator,
+    Generator *const self,
     double const frequency,
     double const amplitude,
     double const duty_cycle
 ) {
-    generator->type = GENERATOR_TYPE_PULSEWAVE;
+    self->type = GENERATOR_TYPE_PULSEWAVE;
 
     ma_pulsewave_config const config = ma_pulsewave_config_init(
-        device.playback.format,
-        device.playback.channels,
-        device.sampleRate,
+        self->device.playback.format,
+        self->device.playback.channels,
+        self->device.sampleRate,
         duty_cycle,
         amplitude,
         frequency
@@ -216,8 +212,8 @@ GeneratorResult generator_set_noise(
     self->type = GENERATOR_TYPE_NOISE;
 
     ma_noise_config const config = ma_noise_config_init(
-        device.playback.format,
-        device.playback.channels,
+        self->device.playback.format,
+        self->device.playback.channels,
         (ma_noise_type)type,
         seed,
         amplitude
@@ -231,25 +227,23 @@ GeneratorResult generator_set_noise(
 }
 
 GeneratorResult generator_start(Generator *const self) {
-    if (ma_device_start(&device) != MA_SUCCESS)
+    if (ma_device_start(&self->device) != MA_SUCCESS)
         return error("Error: Failed to start generator.\n"),
                GENERATOR_DEVICE_START_ERROR;
 
     return GENERATOR_OK;
 }
-void generator_stop(Generator *const self) { ma_device_stop(&device); }
+void generator_stop(Generator *const self) { ma_device_stop(&self->device); }
 
-size_t generator_get_available_frame_count(Generator *const self) {
-    return circular_buffer_get_available_floats(&self->circular_buffer) /
-           (self->channels == 0 ? 1 : self->channels);
+size_t generator_get_available_float_count(Generator *const self) {
+    return circular_buffer_get_available_floats(&self->circular_buffer);
 }
 size_t generator_load_buffer(
     Generator *const self,
     float *const output,
     size_t const floats_to_read
 ) {
-    size_t const available_floats =
-        circular_buffer_get_available_floats(&self->circular_buffer);
+    size_t const available_floats = generator_get_available_float_count(self);
     size_t const to_read =
         floats_to_read < available_floats ? floats_to_read : available_floats;
 

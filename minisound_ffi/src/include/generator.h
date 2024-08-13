@@ -46,7 +46,7 @@ EXPORT GeneratorResult generator_init(
 );
 EXPORT void generator_uninit(Generator *const self);
 
-EXPORT float generator_get_volume(Generator const *const self);
+EXPORT float generator_get_volume(Generator *const self);
 EXPORT void generator_set_volume(Generator *const self, float const value);
 
 EXPORT GeneratorResult generator_set_waveform(
@@ -71,7 +71,7 @@ EXPORT GeneratorResult generator_set_noise(
 EXPORT GeneratorResult generator_start(Generator *const self);
 EXPORT void generator_stop(Generator *const self);
 
-EXPORT size_t generator_get_available_frame_count(Generator *const self);
+EXPORT size_t generator_get_available_float_count(Generator *const self);
 EXPORT size_t generator_load_buffer(
     Generator *const self,
     float *const output,

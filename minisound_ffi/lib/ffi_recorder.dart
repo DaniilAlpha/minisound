@@ -76,19 +76,17 @@ class FfiRecorder implements PlatformRecorder {
   }
 
   @override
-  int getAvailableFrames() => _bindings.recorder_get_available_frames(_self);
+  int get availableFloatCount =>
+      _bindings.recorder_get_available_float_count(_self);
   @override
-  Float32List getBuffer(int framesToRead) {
-    // TODO! should multiply by channels, but cannot test at the moment
-    final floatsToRead = framesToRead;
-
+  Float32List getBuffer(int floatsToRead) {
     final bufPtr = malloc.allocate<Float>(floatsToRead * sizeOf<Float>());
     if (bufPtr == nullptr) {
       throw MinisoundPlatformOutOfMemoryException();
     }
 
     final floatsRead =
-        _bindings.recorder_get_buffer(_self, bufPtr, floatsToRead);
+        _bindings.recorder_load_buffer(_self, bufPtr, floatsToRead);
 
     // copy data from allocated C memory to Dart list
     final buffer = Float32List.fromList(bufPtr.asTypedList(floatsRead));

@@ -117,12 +117,12 @@ void main() {
       recorder.stop();
     });
 
-    test("Recorder get available frames", () async {
+    test("Recorder get available float count", () async {
       await recorder.initEngine();
       await recorder.initStream();
       recorder.start();
-      final availableFrames = recorder.getAvailableFrames();
-      expect(availableFrames, greaterThan(0));
+      final availableFloats = recorder.availableFloatCount;
+      expect(availableFloats, greaterThan(0));
       recorder.stop();
     });
   });
@@ -156,7 +156,7 @@ void main() {
       );
       generator.setWaveform(type: GeneratorWaveformType.sine);
       generator.start();
-      expect(generator.availableFrameCount, greaterThan(0));
+      expect(generator.availableFloatCount, greaterThan(0));
       final buffer = generator.getBuffer(100);
       expect(buffer.length, 100);
       generator.stop();
@@ -172,7 +172,7 @@ void main() {
       );
       generator.setNoise(type: GeneratorNoiseType.white);
       generator.start();
-      expect(generator.availableFrameCount, greaterThan(0));
+      expect(generator.availableFloatCount, greaterThan(0));
       final buffer = generator.getBuffer(100);
       expect(buffer.length, 100);
       generator.stop();
@@ -188,7 +188,7 @@ void main() {
       );
       generator.setPulsewave();
       generator.start();
-      expect(generator.availableFrameCount, greaterThan(0));
+      expect(generator.availableFloatCount, greaterThan(0));
       final buffer = generator.getBuffer(100);
       expect(buffer.length, 100);
       generator.stop();

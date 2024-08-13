@@ -157,12 +157,12 @@ class RecorderMock implements PlatformRecorder {
   bool get isRecording => state == RecorderState.recording;
 
   @override
-  Float32List getBuffer(int framesToRead) {
+  Float32List getBuffer(int floatsToRead) {
     if (state == RecorderState.uninit) {
       throw MinisoundPlatformException("Recorder not initialized");
     }
-    final buffer = Float32List(framesToRead);
-    for (var i = 0; i < framesToRead; i++) {
+    final buffer = Float32List(floatsToRead);
+    for (var i = 0; i < floatsToRead; i++) {
       buffer[i] = math.Random().nextDouble() * 2 - 1;
     }
     recordedBuffers.add(buffer);
@@ -170,7 +170,7 @@ class RecorderMock implements PlatformRecorder {
   }
 
   @override
-  int getAvailableFrames() {
+  int get availableFloatCount {
     if (state == RecorderState.uninit) {
       throw MinisoundPlatformException("Recorder not initialized");
     }
@@ -239,16 +239,16 @@ class GeneratorMock implements PlatformGenerator {
   void stop() => isStarted = false;
 
   @override
-  Float32List getBuffer(int framesToRead) {
-    final buffer = Float32List(framesToRead);
-    for (var i = 0; i < framesToRead; i++) {
+  Float32List getBuffer(int floatsToRead) {
+    final buffer = Float32List(floatsToRead);
+    for (var i = 0; i < floatsToRead; i++) {
       buffer[i] = math.Random().nextDouble() * 2 - 1;
     }
     return buffer;
   }
 
   @override
-  int get availableFrameCount => math.Random().nextInt(4096);
+  int get availableFloatCount => math.Random().nextInt(4096);
 
   @override
   void dispose() {}

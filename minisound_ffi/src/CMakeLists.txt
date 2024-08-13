@@ -114,24 +114,24 @@ if(NOT EMSCRIPTEN)
         PUBLIC_HEADER include/minisound.h
         OUTPUT_NAME ${MAIN_LIB}
     )
-    target_compile_options(${MAIN_LIB} PUBLIC -O0 -g)
-    target_link_options(${MAIN_LIB} PUBLIC -O0 -g)
+    target_compile_options(${MAIN_LIB} PUBLIC -Og -g)
+    target_link_options(${MAIN_LIB} PUBLIC -Og -g)
 else()
     set_target_properties(${MAIN_LIB} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${WEB_OUTPUT_DIR}
     )
     target_compile_options(${MAIN_LIB} PUBLIC
-        -O0
-        -flto -fno-rtti
+        -Og -g
+        -flto -fno-rtti -fno-exceptions
         -sWASM_WORKERS=1
     )
     set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
-        -O2 \
+        -Og -g \
         -flto \
         -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall \
-        -sALLOW_MEMORY_GROWTH -sMAXIMUM_MEMORY=1gb  \
-        -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sFORCE_FILESYSTEM=1 -sNO_FETCH_SUPPORT_INDEXEDDB \
-        -sAUDIO_WORKLET=1 -sWASM_WORKERS=1 -sASYNCIFY -sSTACK_SIZE=1mb \
+        -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb  \
+        -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sNO_FETCH_SUPPORT_INDEXEDDB \
+        -sAUDIO_WORKLET=1 -sWASM_WORKERS=1 -sASYNCIFY -sASYNCIFY_STACK_SIZE=16384  \
         -sSTACK_OVERFLOW_CHECK \
     ")
 endif()

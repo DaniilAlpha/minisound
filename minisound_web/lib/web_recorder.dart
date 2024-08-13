@@ -71,18 +71,15 @@ final class WebRecorder implements PlatformRecorder {
   }
 
   @override
-  int getAvailableFrames() => c.recorder_get_available_frames(_self);
+  int get availableFloatCount => c.recorder_get_available_float_count(_self);
   @override
-  Float32List getBuffer(int framesToRead, {int channels = 2}) {
-    // TODO! should multiply by channels instead of 2
-    final floatsToRead = framesToRead * 2;
-
+  Float32List getBuffer(int floatsToRead) {
     final bufPtr = malloc.allocate<Float>(floatsToRead * sizeOf<Float>());
     if (bufPtr == nullptr) {
       throw MinisoundPlatformOutOfMemoryException();
     }
 
-    final floatsRead = c.recorder_get_buffer(_self, bufPtr, floatsToRead);
+    final floatsRead = c.recorder_load_buffer(_self, bufPtr, floatsToRead);
 
     // copy data from allocated C memory to Dart list
     final buffer = Float32List.fromList(bufPtr.asTypedList(floatsRead));

@@ -126,7 +126,7 @@ void main() async {
   recorder.stop();
 
   // Get the recorded buffer
-  final buffer = recorder.getBuffer(recorder.getAvailableFrames());
+  final buffer = recorder.getBuffer(recorder.availableFloatCount);
 
   // Process the recorded buffer as needed
   // ...
@@ -166,8 +166,7 @@ void main() async {
 
   // Generate and process audio data in a loop
   while (true) {
-    final available = generator.getAvailableFrames();
-    final buffer = generator.getBuffer(available);
+    final buffer = generator.getBuffer(generator.availableFloatCount);
 
     // Process the generated buffer as needed
     // ...

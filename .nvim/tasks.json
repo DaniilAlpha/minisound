@@ -52,10 +52,6 @@
                 "cmake --build $BUILD"
             ]
         },
-        "clean web lib": {
-            "cmd": "rm -r ./minisound_web/lib/js/*",
-            "noninteractive": true
-        },
         "run web": {
             "icon": "󰐊",
             "cmd": [

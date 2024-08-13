@@ -35,6 +35,12 @@ class FfiGenerator implements PlatformGenerator {
   }
 
   @override
+  void dispose() {
+    _bindings.generator_uninit(_self);
+    malloc.free(_self);
+  }
+
+  @override
   void setWaveform({
     required GeneratorWaveformType type,
     required double frequency,
@@ -92,10 +98,10 @@ class FfiGenerator implements PlatformGenerator {
   void stop() => _bindings.generator_stop(_self);
 
   @override
-  Float32List getBuffer(int framesToRead) {
-    final floatsToRead =
-        framesToRead * 2; // TODO! suspicious (probably shuld use channels)
-
+  int get availableFloatCount =>
+      _bindings.generator_get_available_float_count(_self);
+  @override
+  Float32List getBuffer(int floatsToRead) {
     final bufPtr = malloc.allocate<Float>(floatsToRead * sizeOf<Float>());
     if (bufPtr == nullptr) {
       throw MinisoundPlatformOutOfMemoryException();
@@ -110,16 +116,6 @@ class FfiGenerator implements PlatformGenerator {
     malloc.free(bufPtr);
 
     return buffer;
-  }
-
-  @override
-  int get availableFrameCount =>
-      _bindings.generator_get_available_frame_count(_self);
-
-  @override
-  void dispose() {
-    _bindings.generator_uninit(_self);
-    malloc.free(_self);
   }
 }
 

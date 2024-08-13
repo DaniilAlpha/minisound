@@ -88,9 +88,9 @@ final class Recorder {
     _isRecording = false;
   }
 
-  /// Gets available frames from the recorder.
-  int getAvailableFrames() => _recorder.getAvailableFrames();
+  /// Gets available float from the recorder.
+  int get availableFloatCount => _recorder.availableFloatCount;
 
   /// Gets the recorded buffer.
-  Float32List getBuffer(int framesToRead) => _recorder.getBuffer(framesToRead);
+  Float32List getBuffer(int floatsToRead) => _recorder.getBuffer(floatsToRead);
 }

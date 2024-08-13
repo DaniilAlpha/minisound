@@ -23,8 +23,6 @@ struct Recorder {
     uint8_t *encode_buffer;
     size_t encode_buffer_size;
     size_t encode_buffer_used;
-
-    void *user_data;
 };
 
 /*************
@@ -37,24 +35,19 @@ static void data_callback(
     void const *pInput,
     ma_uint32 frameCount
 ) {
-    Recorder *recorder = (Recorder *)pDevice->pUserData;
+    Recorder *const self = pDevice->pUserData;
 
-    size_t floatsToWrite = frameCount * recorder->channels;
+    size_t const floatsToWrite = frameCount * self->channels;
 
     // Write raw PCM data directly to the circular buffer
     circular_buffer_write(
-        &recorder->circular_buffer,
+        &self->circular_buffer,
         (float const *)pInput,
         floatsToWrite
     );
 
-    if (recorder->is_file_recording) {
-        ma_encoder_write_pcm_frames(
-            &recorder->encoder,
-            pInput,
-            frameCount,
-            NULL
-        );
+    if (self->is_file_recording) {
+        ma_encoder_write_pcm_frames(&self->encoder, pInput, frameCount, NULL);
     }
 
     (void)pOutput;
@@ -136,7 +129,6 @@ static RecorderResult recorder_init_common(
     }
 
     self->is_recording = false;
-    self->user_data = NULL;
 
     return RECORDER_OK;
 }
@@ -210,26 +202,19 @@ bool recorder_is_recording(Recorder const *recorder) {
     return recorder != NULL && recorder->is_recording;
 }
 
-size_t recorder_get_buffer(
+size_t recorder_get_available_float_count(Recorder *const self) {
+    return circular_buffer_get_available_floats(&self->circular_buffer);
+}
+size_t recorder_load_buffer(
     Recorder *const self,
     float *const output,
     size_t const floats_to_read
 ) {
     if (self == NULL || output == NULL || floats_to_read <= 0) { return 0; }
 
-    size_t const available_floats =
-        circular_buffer_get_available_floats(&self->circular_buffer);
+    size_t const available_floats = recorder_get_available_float_count(self);
     size_t const to_read =
         (floats_to_read < available_floats) ? floats_to_read : available_floats;
 
     return circular_buffer_read(&self->circular_buffer, output, to_read);
-}
-
-size_t recorder_get_available_frames(Recorder *const self) {
-    // Check if channels is zero to prevent division by zero
-    if (self->channels == 0) self->channels = 1;
-
-    size_t const available_floats =
-        circular_buffer_get_available_floats(&self->circular_buffer);
-    return available_floats / self->channels;
 }
