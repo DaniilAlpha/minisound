@@ -1,4 +1,4 @@
-
+publish_to: none
 name: minisound_web
 description: Web implementation of the Minisound package.
 version: 1.5.1
@@ -12,7 +12,8 @@ environment:
 
 dependencies:
   js: ^0.6.3
-  minisound_platform_interface: ^1.5.1
+  minisound_platform_interface:
+    path: ../minisound_platform_interface
 
 dev_dependencies:
   flutter_lints: ^3.0.1

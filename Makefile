@@ -19,7 +19,7 @@ MINISOUND_DIR := .$(SLASH)minisound$(SLASH)
 EXAMPLE_DIR := .$(SLASH)minisound$(SLASH)example$(SLASH)
 SRC_DIR := .$(SLASH)minisound_ffi$(SLASH)src$(SLASH)
 BUILD_DIR := .$(SLASH)minisound_ffi$(SLASH)src$(SLASH)build$(SLASH)
-VERSION ?= 1.5.0
+VERSION ?= 1.5.1
 
 default: run
 
