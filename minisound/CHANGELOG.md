@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.5.1
+
+Temporary patch.
+
 ## 1.5.0
 
 Adds Recorder.

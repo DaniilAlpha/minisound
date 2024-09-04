@@ -1,7 +1,7 @@
 
 name: minisound_web
 description: Web implementation of the Minisound package.
-version: 1.5.0
+version: 1.5.1
 repository: https://github.com/DaniilAlpha/minisound/tree/master/minisound_web
 
 #####
@@ -12,7 +12,7 @@ environment:
 
 dependencies:
   js: ^0.6.3
-  minisound_platform_interface: ^1.5.0
+  minisound_platform_interface: ^1.5.1
 
 dev_dependencies:
   flutter_lints: ^3.0.1

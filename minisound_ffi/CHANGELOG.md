@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.1
+
+Temporary patch.
+
 ## 1.5.0
 
 CMake refactor with output path for Emscripten.

@@ -1,9 +1,12 @@
 
 # Changelog
 
+## 1.5.1
+
+Temporary patch.
+
 ## 1.5.0
 
-Enhanced memory management.
 Uses Float32Array instead of Uint8Array for audio data.
 Adds Recorder.
 Adds Generator.

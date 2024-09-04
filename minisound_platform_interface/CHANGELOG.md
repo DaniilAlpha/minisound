@@ -1,6 +1,10 @@
 
 # Changelog
 
+## 1.5.1
+
+Temporary patch just to make it work.
+
 ## 1.5.0
 
 Version skip to sync with other packages.
