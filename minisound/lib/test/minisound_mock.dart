@@ -129,7 +129,7 @@ class RecorderMock implements PlatformRecorder {
     required int sampleRate,
     required int channels,
     required SoundFormat format,
-    required int bufferDurationSeconds,
+    required double bufferLenS,
   }) async {
     this.sampleRate = sampleRate;
     this.channels = channels;
@@ -191,7 +191,7 @@ class GeneratorMock implements PlatformGenerator {
   SoundFormat? format;
   int channels = 0;
   int sampleRate = 0;
-  double bufferDurationSeconds = 0;
+  double bufferLenS = 0;
 
   @override
   var volume = 1.0;
@@ -203,12 +203,12 @@ class GeneratorMock implements PlatformGenerator {
     required SoundFormat format,
     required int channels,
     required int sampleRate,
-    required double bufferDurationSeconds,
+    required double bufferLenS,
   }) async {
     this.format = format;
     this.channels = channels;
     this.sampleRate = sampleRate;
-    this.bufferDurationSeconds = bufferDurationSeconds;
+    this.bufferLenS = bufferLenS;
   }
 
   @override

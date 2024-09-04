@@ -19,14 +19,14 @@ final class WebGenerator implements PlatformGenerator {
     required SoundFormat format,
     required int channels,
     required int sampleRate,
-    required double bufferDurationSeconds,
+    required double bufferLenS,
   }) async {
     final r = await c.generator_init(
       _self,
       format.toC(),
       channels,
       sampleRate,
-      bufferDurationSeconds,
+      bufferLenS,
     );
     if (r != c.GeneratorResult.GENERATOR_OK) {
       throw MinisoundPlatformException(

@@ -94,13 +94,11 @@ void main() {
     });
 
     test("Recorder initialization", () async {
-      await recorder.initEngine();
       await recorder.initStream();
       expect(recorder.isInit, true);
     });
 
     test("Recorder start and stop", () async {
-      await recorder.initEngine();
       await recorder.initStream();
       recorder.start();
       expect(recorder.isRecording, true);
@@ -109,7 +107,6 @@ void main() {
     });
 
     test("Recorder get buffer", () async {
-      await recorder.initEngine();
       await recorder.initStream();
       recorder.start();
       final buffer = recorder.getBuffer(100);
@@ -118,7 +115,6 @@ void main() {
     });
 
     test("Recorder get available float count", () async {
-      await recorder.initEngine();
       await recorder.initStream();
       recorder.start();
       final availableFloats = recorder.availableFloatCount;
@@ -141,7 +137,7 @@ void main() {
         format: SoundFormat.f32,
         channels: 2,
         sampleRate: 48000,
-        bufferDurationSeconds: 5,
+        bufferLenS: 5,
       );
       expect(generator.isInit, true);
     });
@@ -152,7 +148,7 @@ void main() {
         format: SoundFormat.f32,
         channels: 2,
         sampleRate: 48000,
-        bufferDurationSeconds: 5,
+        bufferLenS: 5,
       );
       generator.setWaveform(type: GeneratorWaveformType.sine);
       generator.start();
@@ -168,7 +164,7 @@ void main() {
         format: SoundFormat.f32,
         channels: 2,
         sampleRate: 48000,
-        bufferDurationSeconds: 5,
+        bufferLenS: 5,
       );
       generator.setNoise(type: GeneratorNoiseType.white);
       generator.start();
@@ -184,7 +180,7 @@ void main() {
         format: SoundFormat.f32,
         channels: 2,
         sampleRate: 48000,
-        bufferDurationSeconds: 5,
+        bufferLenS: 5,
       );
       generator.setPulsewave();
       generator.start();

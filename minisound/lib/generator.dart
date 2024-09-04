@@ -36,7 +36,7 @@ final class Generator {
     SoundFormat format = SoundFormat.f32,
     int channels = 1,
     int sampleRate = 44100,
-    double bufferDurationSeconds = 5,
+    double bufferLenS = 5,
   }) async {
     if (!_isInit) {
       if (!engine.isInit) await initEngine();
@@ -45,7 +45,7 @@ final class Generator {
         format: format,
         channels: channels,
         sampleRate: sampleRate,
-        bufferDurationSeconds: bufferDurationSeconds,
+        bufferLenS: bufferLenS,
       );
 
       _isInit = true;

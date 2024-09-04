@@ -100,8 +100,8 @@ elseif(APPLE)
     target_compile_definitions(${MAIN_LIB} PUBLIC MA_ENABLE_COREAUDIO)
 elseif(UNIX)
     target_compile_definitions(${MAIN_LIB} PUBLIC
-        MA_ENABLE_JACK
         MA_ENABLE_PULSEAUDIO
+        MA_ENABLE_JACK
         MA_ENABLE_ALSA
     )
 else()
@@ -121,18 +121,23 @@ else()
         RUNTIME_OUTPUT_DIRECTORY ${WEB_OUTPUT_DIR}
     )
     target_compile_options(${MAIN_LIB} PUBLIC
-        -Og -g
+        -O3
         -flto -fno-rtti -fno-exceptions
         -sWASM_WORKERS=1
+
+        # TODO!!! for some reason recording not working on the web without this
+        -fsanitize=address
     )
     set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
-        -Og -g \
+        -O3 \
         -flto \
         -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall \
         -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb  \
         -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sNO_FETCH_SUPPORT_INDEXEDDB \
         -sAUDIO_WORKLET=1 -sWASM_WORKERS=1 -sASYNCIFY -sASYNCIFY_STACK_SIZE=16384  \
         -sSTACK_OVERFLOW_CHECK \
+        \
+        -fsanitize=address \
     ")
 endif()
 

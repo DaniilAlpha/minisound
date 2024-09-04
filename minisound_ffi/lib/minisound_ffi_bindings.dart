@@ -534,7 +534,7 @@ class MinisoundFfiBindings {
     int sample_rate,
     int channels,
     int sound_format,
-    int buffer_duration_seconds,
+    double buffer_duration_seconds,
   ) {
     return _recorder_init_stream(
       self,
@@ -548,9 +548,9 @@ class MinisoundFfiBindings {
   late final _recorder_init_streamPtr = _lookup<
       ffi.NativeFunction<
           ffi.Int32 Function(ffi.Pointer<Recorder>, ffi.Uint32, ffi.Uint32,
-              ffi.Int32, ffi.Int)>>('recorder_init_stream');
+              ffi.Int32, ffi.Float)>>('recorder_init_stream');
   late final _recorder_init_stream = _recorder_init_streamPtr
-      .asFunction<int Function(ffi.Pointer<Recorder>, int, int, int, int)>();
+      .asFunction<int Function(ffi.Pointer<Recorder>, int, int, int, double)>();
 
   void recorder_uninit(
     ffi.Pointer<Recorder> self,
@@ -566,25 +566,25 @@ class MinisoundFfiBindings {
   late final _recorder_uninit =
       _recorder_uninitPtr.asFunction<void Function(ffi.Pointer<Recorder>)>();
 
-  bool recorder_is_recording(
+  bool recorder_get_is_recording(
     ffi.Pointer<Recorder> recorder,
   ) {
-    return _recorder_is_recording(
+    return _recorder_get_is_recording(
       recorder,
     );
   }
 
-  late final _recorder_is_recordingPtr =
+  late final _recorder_get_is_recordingPtr =
       _lookup<ffi.NativeFunction<ffi.Bool Function(ffi.Pointer<Recorder>)>>(
-          'recorder_is_recording');
-  late final _recorder_is_recording = _recorder_is_recordingPtr
+          'recorder_get_is_recording');
+  late final _recorder_get_is_recording = _recorder_get_is_recordingPtr
       .asFunction<bool Function(ffi.Pointer<Recorder>)>();
 
   int recorder_start(
-    ffi.Pointer<Recorder> recorder,
+    ffi.Pointer<Recorder> self,
   ) {
     return _recorder_start(
-      recorder,
+      self,
     );
   }
 
@@ -594,19 +594,19 @@ class MinisoundFfiBindings {
   late final _recorder_start =
       _recorder_startPtr.asFunction<int Function(ffi.Pointer<Recorder>)>();
 
-  int recorder_stop(
-    ffi.Pointer<Recorder> recorder,
+  void recorder_stop(
+    ffi.Pointer<Recorder> self,
   ) {
     return _recorder_stop(
-      recorder,
+      self,
     );
   }
 
   late final _recorder_stopPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<Recorder>)>>(
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<Recorder>)>>(
           'recorder_stop');
   late final _recorder_stop =
-      _recorder_stopPtr.asFunction<int Function(ffi.Pointer<Recorder>)>();
+      _recorder_stopPtr.asFunction<void Function(ffi.Pointer<Recorder>)>();
 
   int recorder_get_available_float_count(
     ffi.Pointer<Recorder> self,

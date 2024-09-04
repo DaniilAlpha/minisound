@@ -6,7 +6,7 @@ class FfiRecorder implements PlatformRecorder {
   final Pointer<c.Recorder> _self;
 
   @override
-  bool get isRecording => _bindings.recorder_is_recording(_self);
+  bool get isRecording => _bindings.recorder_get_is_recording(_self);
 
   @override
   Future<void> initFile(
@@ -38,14 +38,14 @@ class FfiRecorder implements PlatformRecorder {
     required int sampleRate,
     required int channels,
     required SoundFormat format,
-    required int bufferDurationSeconds,
+    required double bufferLenS,
   }) async {
     final r = _bindings.recorder_init_stream(
       _self,
       sampleRate,
       channels,
       format.toC(),
-      bufferDurationSeconds,
+      bufferLenS,
     );
     if (r != c.RecorderResult.RECORDER_OK) {
       throw MinisoundPlatformException(
@@ -68,12 +68,7 @@ class FfiRecorder implements PlatformRecorder {
   }
 
   @override
-  void stop() {
-    final r = _bindings.recorder_stop(_self);
-    if (r != c.RecorderResult.RECORDER_OK) {
-      throw MinisoundPlatformException("Failed to stop recording (code: $r).");
-    }
-  }
+  void stop() => _bindings.recorder_stop(_self);
 
   @override
   int get availableFloatCount =>

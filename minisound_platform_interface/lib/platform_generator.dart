@@ -14,7 +14,7 @@ abstract interface class PlatformGenerator {
     required SoundFormat format,
     required int channels,
     required int sampleRate,
-    required double bufferDurationSeconds,
+    required double bufferLenS,
   });
   void dispose();
 

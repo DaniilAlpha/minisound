@@ -15,7 +15,7 @@ abstract interface class PlatformRecorder {
     required int sampleRate,
     required int channels,
     required SoundFormat format,
-    required int bufferDurationSeconds,
+    required double bufferLenS,
   });
   void dispose();
 

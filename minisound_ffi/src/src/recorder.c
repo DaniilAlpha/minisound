@@ -46,22 +46,10 @@ static void data_callback(
         floatsToWrite
     );
 
-    if (self->is_file_recording) {
+    if (self->is_file_recording)
         ma_encoder_write_pcm_frames(&self->encoder, pInput, frameCount, NULL);
-    }
 
     (void)pOutput;
-}
-
-/************
- ** public **
- ************/
-
-Recorder *recorder_create(void) {
-    Recorder *recorder = (Recorder *)malloc(sizeof(Recorder));
-    if (recorder == NULL) { return NULL; }
-    memset(recorder, 0, sizeof(Recorder));
-    return recorder;
 }
 
 static RecorderResult recorder_init_common(
@@ -70,20 +58,18 @@ static RecorderResult recorder_init_common(
     uint32_t const sample_rate,
     uint32_t const channels,
     SoundFormat const sound_format,
-    int const buffer_duration_seconds
+    float const buffer_len_s
 ) {
     ma_format const format = (ma_format)sound_format;
-
-    if (self == NULL) { return RECORDER_ERROR_INVALID_ARGUMENT; }
 
     self->is_file_recording = (filename != NULL);
     self->sample_rate = sample_rate;
     self->channels = channels;
     self->format = format;
 
-    size_t buffer_size_in_bytes =
+    size_t const buffer_size_in_bytes =
         (size_t)(sample_rate * channels * ma_get_bytes_per_sample(format) *
-                 buffer_duration_seconds);
+                 buffer_len_s);
     circular_buffer_init(&self->circular_buffer, buffer_size_in_bytes);
 
     if (self->is_file_recording) {
@@ -133,6 +119,17 @@ static RecorderResult recorder_init_common(
     return RECORDER_OK;
 }
 
+/************
+ ** public **
+ ************/
+
+Recorder *recorder_create(void) {
+    Recorder *const recorder = (Recorder *)malloc(sizeof(Recorder));
+    if (recorder == NULL) { return NULL; }
+    memset(recorder, 0, sizeof(Recorder));
+    return recorder;
+}
+
 RecorderResult recorder_init_file(
     Recorder *const self,
     char const *const filename,
@@ -140,7 +137,7 @@ RecorderResult recorder_init_file(
     uint32_t const channels,
     SoundFormat const sound_format
 ) {
-    if (filename == NULL) { return RECORDER_ERROR_INVALID_ARGUMENT; }
+    if (filename == NULL) return RECORDER_ERROR_INVALID_ARGUMENT;
     return recorder_init_common(
         self,
         filename,
@@ -148,7 +145,7 @@ RecorderResult recorder_init_file(
         channels,
         sound_format,
         5.0f
-    );  // 5 seconds buffer
+    );
 }
 
 RecorderResult recorder_init_stream(
@@ -156,7 +153,7 @@ RecorderResult recorder_init_stream(
     uint32_t const sample_rate,
     uint32_t const channels,
     SoundFormat const sound_format,
-    int const buffer_duration_seconds
+    float const buffer_len_s
 ) {
     return recorder_init_common(
         self,
@@ -164,42 +161,36 @@ RecorderResult recorder_init_stream(
         sample_rate,
         channels,
         sound_format,
-        buffer_duration_seconds
+        buffer_len_s
     );
 }
 void recorder_uninit(Recorder *const self) {
-    if (self != NULL) {
-        ma_device_uninit(&self->device);
-        if (self->is_file_recording) {
-            ma_encoder_uninit(&self->encoder);
-            free(self->filename);
-        }
-        circular_buffer_uninit(&self->circular_buffer);
+    ma_device_uninit(&self->device);
+    if (self->is_file_recording) {
+        ma_encoder_uninit(&self->encoder);
+        free(self->filename);
     }
+    circular_buffer_uninit(&self->circular_buffer);
 }
 
-RecorderResult recorder_start(Recorder *recorder) {
-    if (recorder == NULL) { return RECORDER_ERROR_INVALID_ARGUMENT; }
-    if (recorder->is_recording) { return RECORDER_ERROR_ALREADY_RECORDING; }
+bool recorder_get_is_recording(Recorder const *recorder) {
+    return recorder->is_recording;
+}
 
-    if (ma_device_start(&recorder->device) != MA_SUCCESS) {
+RecorderResult recorder_start(Recorder *const self) {
+    if (self->is_recording) return RECORDER_ERROR_ALREADY_RECORDING;
+
+    if (ma_device_start(&self->device) != MA_SUCCESS)
         return RECORDER_ERROR_UNKNOWN;
-    }
-    recorder->is_recording = true;
+
+    self->is_recording = true;
+
     return RECORDER_OK;
 }
+void recorder_stop(Recorder *const self) {
+    ma_device_stop(&self->device);
 
-RecorderResult recorder_stop(Recorder *recorder) {
-    if (recorder == NULL) { return RECORDER_ERROR_INVALID_ARGUMENT; }
-    if (!recorder->is_recording) { return RECORDER_ERROR_NOT_RECORDING; }
-
-    ma_device_stop(&recorder->device);
-    recorder->is_recording = false;
-    return RECORDER_OK;
-}
-
-bool recorder_is_recording(Recorder const *recorder) {
-    return recorder != NULL && recorder->is_recording;
+    self->is_recording = false;
 }
 
 size_t recorder_get_available_float_count(Recorder *const self) {

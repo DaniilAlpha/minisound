@@ -24,7 +24,7 @@ class ExamplePage extends StatefulWidget {
 
 class _ExamplePageState extends State<ExamplePage> {
   final engine = Engine();
-  late final recorder = Recorder(mainEngine: engine);
+  late final recorder = Recorder();
   late final generator = Generator(mainEngine: engine);
 
   late final initFuture = engine
@@ -97,7 +97,7 @@ class _ExamplePageState extends State<ExamplePage> {
     );
 
     recordingBuffer.clear();
-    sounds.add(await recorder.engine.loadSound(audioData));
+    sounds.add(await engine.loadSound(audioData));
     return sounds.last;
   }
 
@@ -145,9 +145,9 @@ class _ExamplePageState extends State<ExamplePage> {
                     onPressed: () async {
                       if (recorder.isRecording) {
                         try {
+                          await engine.start();
                           final testSound =
                               await createSoundFromRecorder(recorder);
-                          await recorder.engine.start();
                           testSound.play();
                         } on Exception catch (e) {
                           print("Error: $e");

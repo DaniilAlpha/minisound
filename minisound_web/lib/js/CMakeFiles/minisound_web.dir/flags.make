@@ -6,5 +6,5 @@ C_DEFINES = -DDART_SHARED_LIB -DENGINE_MILO_LVL=MILO_LVL_NONE -DGENERATOR_MILO_L
 
 C_INCLUDES = @CMakeFiles/minisound_web.dir/includes_C.rsp
 
-C_FLAGS = -Og -g -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1
+C_FLAGS = -O3 -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1 -fsanitize=address
 
