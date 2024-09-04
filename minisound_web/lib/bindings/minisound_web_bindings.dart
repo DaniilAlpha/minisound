@@ -123,14 +123,14 @@ Future<int> recorder_init_stream(
   int sample_rate,
   int channels,
   int format,
-  double buffer_duration_seconds,
+  double buffer_len_s,
 ) =>
     _recorder_init_stream(
       self.addr,
       sample_rate,
       channels,
       format,
-      buffer_duration_seconds,
+      buffer_len_s,
     );
 void recorder_uninit(Pointer<Recorder> self) => _recorder_uninit(self.addr);
 
@@ -314,14 +314,14 @@ Future<int> _recorder_init_stream(
   int self,
   int sample_rate,
   int channels,
-  int format,
+  int sound_format,
   double buffer_len_s,
 ) async =>
     promiseToFuture(_ccall(
       "recorder_init_stream",
       "number",
       ["number", "number", "number", "number", "number"],
-      [self, sample_rate, channels, format, buffer_len_s],
+      [self, sample_rate, channels, sound_format, buffer_len_s],
       {"async": true},
     ));
 @JS()

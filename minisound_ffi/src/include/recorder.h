@@ -37,7 +37,7 @@ EXPORT RecorderResult recorder_init_stream(
     uint32_t const sample_rate,
     uint32_t const channels,
     SoundFormat const sound_format,
-    float const buffer_duration_seconds
+    float const buffer_len_s
 );
 EXPORT void recorder_uninit(Recorder *const self);
 

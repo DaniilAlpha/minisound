@@ -46,9 +46,8 @@ static void data_callback(
         floatsToWrite
     );
 
-    if (self->is_file_recording) {
+    if (self->is_file_recording)
         ma_encoder_write_pcm_frames(&self->encoder, pInput, frameCount, NULL);
-    }
 
     (void)pOutput;
 }
@@ -59,7 +58,7 @@ static RecorderResult recorder_init_common(
     uint32_t const sample_rate,
     uint32_t const channels,
     SoundFormat const sound_format,
-    float const buffer_duration_seconds
+    float const buffer_len_s
 ) {
     ma_format const format = (ma_format)sound_format;
 
@@ -70,7 +69,7 @@ static RecorderResult recorder_init_common(
 
     size_t const buffer_size_in_bytes =
         (size_t)(sample_rate * channels * ma_get_bytes_per_sample(format) *
-                 buffer_duration_seconds);
+                 buffer_len_s);
     circular_buffer_init(&self->circular_buffer, buffer_size_in_bytes);
 
     if (self->is_file_recording) {
@@ -154,7 +153,7 @@ RecorderResult recorder_init_stream(
     uint32_t const sample_rate,
     uint32_t const channels,
     SoundFormat const sound_format,
-    float const buffer_duration_seconds
+    float const buffer_len_s
 ) {
     return recorder_init_common(
         self,
@@ -162,7 +161,7 @@ RecorderResult recorder_init_stream(
         sample_rate,
         channels,
         sound_format,
-        buffer_duration_seconds
+        buffer_len_s
     );
 }
 void recorder_uninit(Recorder *const self) {

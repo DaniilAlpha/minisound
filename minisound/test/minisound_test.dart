@@ -94,13 +94,11 @@ void main() {
     });
 
     test("Recorder initialization", () async {
-      await recorder.initEngine();
       await recorder.initStream();
       expect(recorder.isInit, true);
     });
 
     test("Recorder start and stop", () async {
-      await recorder.initEngine();
       await recorder.initStream();
       recorder.start();
       expect(recorder.isRecording, true);
@@ -109,7 +107,6 @@ void main() {
     });
 
     test("Recorder get buffer", () async {
-      await recorder.initEngine();
       await recorder.initStream();
       recorder.start();
       final buffer = recorder.getBuffer(100);
@@ -118,7 +115,6 @@ void main() {
     });
 
     test("Recorder get available float count", () async {
-      await recorder.initEngine();
       await recorder.initStream();
       recorder.start();
       final availableFloats = recorder.availableFloatCount;

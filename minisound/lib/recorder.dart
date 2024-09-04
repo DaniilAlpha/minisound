@@ -1,6 +1,5 @@
 import "dart:typed_data";
 
-import "package:minisound/engine.dart";
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
 
 export "package:minisound_platform_interface/minisound_platform_interface.dart"
@@ -10,20 +9,15 @@ export "package:minisound_platform_interface/minisound_platform_interface.dart"
         SoundFormat;
 
 final class Recorder {
-  Recorder({Engine? mainEngine}) : engine = mainEngine ?? Engine();
+  Recorder();
 
   final _recorder = PlatformRecorder();
-
-  final Engine engine;
 
   bool _isInit = false;
   bool get isInit => _isInit;
 
   bool _isRecording = false;
   bool get isRecording => _isRecording;
-
-  /// Initializes the recorder's engine.
-  Future<void> initEngine([int periodMs = 10]) async => engine.init(periodMs);
 
   /// Initializes the recorder to save to a file.
   Future<void> initFile(
@@ -36,8 +30,6 @@ final class Recorder {
       throw ArgumentError("Invalid recorder parameters");
     }
     if (!_isInit) {
-      if (!engine.isInit) await initEngine();
-
       await _recorder.initFile(
         filename,
         sampleRate: sampleRate,
@@ -60,8 +52,6 @@ final class Recorder {
       throw ArgumentError("Invalid recorder parameters");
     }
     if (!_isInit) {
-      if (!engine.isInit) await initEngine();
-
       await _recorder.initStream(
         sampleRate: sampleRate,
         channels: channels,
