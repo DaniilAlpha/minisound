@@ -1,9 +1,13 @@
-
 # Changelog
 
-## 1.5.1
+## 1.6.0 
+
+Fixed.
+
+## 1.5.1 (broken)
 
 Temporary patch.
+Appeared to be broken.
 
 ## 1.5.0
 
