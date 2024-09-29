@@ -28,25 +28,26 @@ While the main script is quite large, there are a loader script provided. Includ
 And at the bottom, at the body's `<script>` do like this
 
 ```js
-window.addEventListener(
-  'load',
-  // ADD 'async'
-  async function (ev) {
-      // ADD THIS LINE AT THE TOP
-      await _minisound.loader.load();
+                                // ADD 'async'
+window.addEventListener('load', async function (ev) {
+    {{flutter_js}}
+    {{flutter_build_config}}
 
-      // LEAVE THE REST IN PLACE
-      // Download main.dart.js
-      _flutter.loader.loadEntrypoint({
+    // ADD THIS LINE TO LOAD THE LIBRARY 
+    await _minisound.loader.load();
+
+    // LEAVE THE REST IN PLACE
+    // Download main.dart.js
+    _flutter.loader.load({
         serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion
+            serviceWorkerVersion: {{flutter_service_worker_version}},
         },
         onEntrypointLoaded: function (engineInitializer) {
-          engineInitializer.initializeEngine().then(function (appRunner) {
-            appRunner.runApp();
-          });
-        }
-      });
+            engineInitializer.initializeEngine().then(function (appRunner) {
+                appRunner.runApp();
+            });
+        },
+    });
     }
   );
 ```
