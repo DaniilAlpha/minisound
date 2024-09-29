@@ -15,9 +15,9 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
-  minisound_platform_interface: ^1.5.1
-  minisound_ffi: ^1.5.1
-  minisound_web: ^1.5.1
+  minisound_platform_interface: ^1.6.0
+  minisound_ffi: ^1.6.0
+  minisound_web: ^1.6.0
 
 dev_dependencies:
   flutter_test:
