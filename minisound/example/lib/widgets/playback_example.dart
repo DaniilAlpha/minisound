@@ -48,13 +48,8 @@ class _PlaybackExampleState extends State<PlaybackExample> {
         builder: (_, snapshot) => switch (snapshot) {
           AsyncSnapshot(hasData: true, data: final sounds!) =>
             Column(children: [
-              const Text(
-                "Sound Playback",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              Text("Playback",
+                  style: Theme.of(context).textTheme.headlineMedium),
               DropdownButton(
                 items: sounds.entries
                     .map((entry) => DropdownMenuItem(

@@ -150,31 +150,28 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.5.0"
+    version: "1.6.0"
   minisound_ffi:
     dependency: transitive
     description:
-      name: minisound_ffi
-      sha256: c1c8506e68cf6b0cbbf4806013c415fccca160bce935791c711b07e575b371a8
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.5.0"
+      path: "../../minisound_ffi"
+      relative: true
+    source: path
+    version: "1.6.0"
   minisound_platform_interface:
     dependency: transitive
     description:
-      name: minisound_platform_interface
-      sha256: "0bb3ee1991adeefefefae6e0d6e7142a87ab2387b7fa92c10353549e2a842cb8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.5.1"
+      path: "../../minisound_platform_interface"
+      relative: true
+    source: path
+    version: "1.6.0"
   minisound_web:
     dependency: transitive
     description:
-      name: minisound_web
-      sha256: "70447d934e165cf1672800a262b7d2cd337489e3081b0e43ecb9764d2760a2b4"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.5.0"
+      path: "../../minisound_web"
+      relative: true
+    source: path
+    version: "1.6.0"
   path:
     dependency: transitive
     description:
@@ -256,10 +253,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: f652077d0bdf60abe4c1f6377448e8655008eef28f128bc023f7b5e8dfeb48fc
+      sha256: "5c5f338a667b4c644744b661f309fb8080bb94b18a7e91ef1dbd343bed00ed6d"
       url: "https://pub.dev"
     source: hosted
-    version: "14.2.4"
+    version: "14.2.5"
 sdks:
   dart: ">=3.3.0 <4.0.0"
   flutter: ">=3.18.0-18.0.pre.54"
