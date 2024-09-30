@@ -4,6 +4,3 @@
 [submodule "result"]
 	path = minisound_ffi/src/external/result
 	url = https://github.com/DaniilAlpha/result
-[submodule "minisound_ffi/src/external/miniaudio"]
-	path = minisound_ffi/src/external/miniaudio/miniaudio
-	url = https://github.com/mackron/miniaudio.git
