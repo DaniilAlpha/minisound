@@ -30,8 +30,14 @@ final class Engine extends Opaque {}
 
 Pointer<Engine> engine_alloc() => Pointer(_engine_alloc());
 
+// Future<int> engine_init(Pointer<Engine> self, int period_ms) async {
+//   final result = _engine_init(self.addr, period_ms);
+//   await Future.delayed(const Duration(seconds: 2));
+//   return result;
+// }
 Future<int> engine_init(Pointer<Engine> self, int period_ms) =>
     _engine_init(self.addr, period_ms);
+
 void engine_uninit(Pointer<Engine> self) => _engine_uninit(self.addr);
 
 int engine_start(Pointer<Engine> self) => _engine_start(self.addr);
@@ -256,6 +262,8 @@ Future<int> _engine_init(int self, int period_ms) async =>
       [self, period_ms],
       {"async": true},
     ));
+// @JS()
+// external int _engine_init(int self, int period_ms);
 @JS()
 external void _engine_uninit(int self);
 @JS()

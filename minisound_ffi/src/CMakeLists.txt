@@ -23,42 +23,7 @@ endif()
 # Set paths
 set(MAIN_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 if (EMSCRIPTEN)
-    # Specify the filename to search for
-    set(FILENAME ".projectroot")
-
-    # Function to check for file existence up the directory hierarchy
-    function(find_project_root current_dir filename result_var)
-        set(found FALSE)  # Flag to indicate if the file is found
-        set(current_check_dir "${current_dir}")  # Start from the given directory
-
-        # Windows flutter embeds 8 levels deep
-        foreach(i RANGE 0 8)
-            set(filepath "${current_check_dir}/${filename}")
-
-            if(EXISTS "${filepath}")
-                set(${result_var} "${current_check_dir}" PARENT_SCOPE)
-                set(found TRUE)
-                break()
-            endif()
-
-            # Move one level up
-            get_filename_component(current_check_dir "${current_check_dir}" DIRECTORY)
-        endforeach()
-
-        if(NOT found)
-            set(${result_var} "" PARENT_SCOPE)  # Set to empty if not found
-        endif()
-    endfunction()
-
-    # Call the function to find the project root
-    find_project_root("${CMAKE_CURRENT_SOURCE_DIR}" "${FILENAME}" TARGET_FILE_PATH)
-
-    # Check if the target file path was found
-    if(NOT TARGET_FILE_PATH)
-        message(FATAL_ERROR "File '${FILENAME}' not found within the project.\nIt seems that you are trying to (re)build the web library after installing the package via pub.dev, but you don't need to. In case you really want to build it yourself, clone the repo.")
-    endif()
-
-    set(WEB_OUT_DIR ${TARGET_FILE_PATH}/minisound_web/lib/build)
+    set(WEB_OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/../)
 endif()
 
 
@@ -70,11 +35,12 @@ file(GLOB_RECURSE MAIN_SOURCES
 target_sources(${MAIN_LIB} PUBLIC ${MAIN_SOURCES})
 
 # Includes
-file(GLOB_RECURSE MAIN_INCLUDES LIST_DIRECTORIES TRUE
-    ${MAIN_PATH}/external/*/include/
-)
-list(APPEND MAIN_INCLUDES ${MAIN_PATH}/include/)
-target_include_directories(${MAIN_LIB} PUBLIC ${MAIN_INCLUDES})
+# file(GLOB_RECURSE MAIN_INCLUDES LIST_DIRECTORIES TRUE
+#     ${MAIN_PATH}/external/*/include/
+# )
+# message(FATAL_ERROR ${MAIN_INCLUDES})
+# list(APPEND MAIN_INCLUDES ${MAIN_PATH}/include/)
+# target_include_directories(${MAIN_LIB} PUBLIC ${MAIN_INCLUDES})
 
 
 # Definitions
@@ -82,11 +48,10 @@ target_compile_definitions(${MAIN_LIB} PUBLIC DART_SHARED_LIB
     # ours
     MILO_DEFAULT_LVL=MILO_LVL_NONE
     ENGINE_MILO_LVL=MILO_LVL_NONE
+    SOUND_MILO_LVL=MILO_LVL_NONE
     GENERATOR_MILO_LVL=MILO_LVL_NONE
     RECORDER_MILO_LVL=MILO_LVL_NONE
-    SOUND_MILO_LVL=MILO_LVL_NONE
     # miniaudio
-    MINIAUDIO_IMPLEMENTATION
     MA_ENABLE_ONLY_SPECIFIC_BACKENDS
     MA_DEBUG_OUTPUT
 )
@@ -138,12 +103,12 @@ else()
         -O3 \
         -flto -fno-rtti -fno-exceptions \
         -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall \
-        -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb  \
+        -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb \
         -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sNO_FETCH_SUPPORT_INDEXEDDB \
-        -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 -sASYNCIFY -sASYNCIFY_STACK_SIZE=16384  \
-        -sSTACK_OVERFLOW_CHECK \
+        -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=65536 \
+        -sSTACK_OVERFLOW_CHECK=1 \
         \
-        -fsanitize=address,leak \
+        -fsanitize=address \
     ")
 endif()
 

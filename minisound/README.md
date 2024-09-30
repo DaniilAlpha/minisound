@@ -20,7 +20,7 @@ Run `make help` from the root project directory to get started.
 While the main script is quite large, there are a loader script provided. Include it in the `web/index.html` file like this
 
 ```html
-  <script src="assets/packages/minisound_web/js/minisound_web.loader.js"></script>
+  <script src="assets/packages/minisound_web/build/minisound_web.loader.js"></script>
 ```
 
 > It is highly recommended NOT to make the script `defer`, as loading may not work properly. Also, it is very small (only 18 lines).
@@ -59,7 +59,7 @@ window.addEventListener('load', async function (ev) {
 To use this plugin, add `minisound` as a [dependency in your pubspec.yaml file](https://flutter.dev/platform-plugins/).
 
 ```dart
-import "package:minisound/minisound.dart" as minisound;
+import "package:minisound/engine.dart" as minisound;
 
 void main() {
   final engine = minisound.Engine();
@@ -101,7 +101,7 @@ void main() {
 ### Recorder Example
 
 ```dart
-import "package:minisound/minisound.dart" as minisound;
+import "package:minisound/recorder.dart" as minisound;
 
 void main() async {
   final recorder = minisound.Recorder();
@@ -140,7 +140,7 @@ void main() async {
 ### Generator Example
 
 ```dart
-import "package:minisound/minisound.dart" as minisound;
+import "package:minisound/generator.dart" as minisound;
 
 void main() async {
   final generator = minisound.Generator();
@@ -191,45 +191,35 @@ To manually build the project, follow these steps:
 
 1. Initialize the submodules:
 
-   ```bash
-   git submodule update --init --recursive
-   ```
+    ```bash
+    git submodule update --init --recursive
+    ```
 
-2. Make and/or Navigate to the `minisound_ffi/src/build` directory:
+2. Run the following commands to build the project using emcmake:
 
-   ```bash
-   cd minisound_ffi/src/build
-   ```
+    ```bash
+    emcmake cmake -S ./minisound_ffi/src/ -B ./minisound_web/lib/build/cmake_stuff 
+    cmake --build ./minisound_web/lib/build/cmake_stuff 
+    ```
 
-3. Run the following commands to build the project using emcmake and cmake:
-
-   ```bash
-   emcmake cmake ..
-   cmake --build .
-   ```
-
-   If you want to build the native version, encounter issues or want to start fresh, clean the `build` folder and rerun the cmake commands:
+    If you encounter issues or want to start fresh, clean the `build` folder and rerun the cmake commands:
 
     ```bash
     rm -rf *
-    cmake ..
-    cmake --build .
+    emcmake cmake -S ./minisound_ffi/src/ -B ./minisound_web/lib/build/cmake_stuff 
+    cmake --build ./minisound_web/lib/build/cmake_stuff 
     ```
 
 4. For development work, it's useful to run `ffigen` from the `minisound_ffi` directory:
 
-   ```bash
-   cd minisound_ffi
-   dart run ffigen
-   ```
+    ```bash
+    cd ./minisound_ffi/
+    dart run ffigen
+    ```
 
 ## TODO
 
-- [x] Fix non-intuitiveness of pausing and stopping, then playing again looped sounds
-- [x] Exclude emscripten build cache from git.
+- [ ] Fix non-intuitiveness of pausing and stopping, then playing again looped sounds
 - [ ] Stop crash when no devices found for playback or capture
 - [ ] Extract buffer stuff to unified AV Buffer packages dart and C.
-- [ ] Automate local web deployment with strict origin flags for local testing.
-- [x] Create a makefile.
-- [ ] Document dependencies for building.
-- [ ] Switch engine init to state machine.
+<!-- - [ ] Switch engine init to state machine. -->
