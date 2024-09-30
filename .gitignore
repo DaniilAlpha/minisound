@@ -1,3 +1,3 @@
-.vscode/settings.json
-.vscode/launch.json
+.vscode/
 .nvim/
+lib/build/cmake_stuff/

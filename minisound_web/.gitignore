@@ -27,3 +27,6 @@ migrate_working_dir/
 **/doc/api/
 .dart_tool/
 .packages
+
+# Cmake build directory
+lib/build/cmake_stuff

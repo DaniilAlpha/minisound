@@ -4,27 +4,22 @@
             "icon": "󰇚",
             "desc": "get flutter packages",
             "cmd": [
-                "flutter pub get -C ./minisound_platform_interface/",
-                "flutter pub upgrade -C ./minisound_platform_interface/",
-                "flutter pub get -C ./minisound_ffi/",
-                "flutter pub upgrade -C ./minisound_ffi/",
-                "flutter pub get -C ./minisound_web/",
-                "flutter pub upgrade -C ./minisound_web/",
-                "flutter pub get -C ./minisound/",
-                "flutter pub upgrade -C ./minisound/",
-                "flutter pub get -C ./minisound/example/",
-                "flutter pub upgrade -C ./minisound/example/"
+                "cd ./minisound_platform_interface/ && flutter pub get && flutter pub upgrade && cd ../",
+                "cd ./minisound_ffi/ && flutter pub get && flutter pub upgrade && cd ../",
+                "cd ./minisound_web/ && flutter pub get && flutter pub upgrade && cd ../",
+                "cd ./minisound/ && flutter pub get && flutter pub upgrade && cd ../",
+                "cd ./minisound/example/ && flutter pub get && flutter pub upgrade && cd ../"
             ],
             "noninteractive": true
         },
         "clean": {
             "icon": "󰃢",
             "cmd": [
-                "cd ./minisound_platform_interface/; flutter clean; cd ../",
-                "cd ./minisound_ffi/; flutter clean; cd ../",
-                "cd ./minisound_web/; flutter clean; cd ../",
-                "cd ./minisound/; flutter clean; cd ../",
-                "cd ./minisound/example/; flutter clean; cd ../"
+                "cd ./minisound_platform_interface/ && flutter clean && cd ../",
+                "cd ./minisound_ffi/ && flutter clean && cd ../",
+                "cd ./minisound_web/ && flutter clean && cd ../",
+                "cd ./minisound/ && flutter clean && cd ../",
+                "cd ./minisound/example/ && flutter clean && cd ../"
             ],
             "noninteractive": true
         },
@@ -46,11 +41,11 @@
             "desc": "build ffi lib to web via emscripten",
             "cmd": [
                 "export EMSDK_QUIET=1; . ~/emsdk/emsdk_env.sh",
-                "export SRC=./minisound_ffi/src/",
-                "export BUILD=./minisound_web/lib/js/",
-                "emcmake cmake -S $SRC -B $BUILD",
-                "cmake --build $BUILD"
+                "make build_web_lib"
             ]
+        },
+        "clean web lib": {
+            "cmd": "make clean_web_lib"
         },
         "run web": {
             "icon": "󰐊",
