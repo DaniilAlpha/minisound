@@ -14,32 +14,21 @@ class PlaybackExample extends StatefulWidget {
 }
 
 class _PlaybackExampleState extends State<PlaybackExample> {
-  Future<Map<String, Sound>> soundsFuture = Future.delayed(
-    const Duration(seconds: 30),
-    () => Future.error(TimeoutException("Took too long to load sounds!")),
-  );
   Sound? currentSound;
-
   var loopDelay = 0.0;
 
+  late Future<Map<String, Sound>> soundsFuture = _initSounds();
+
   Future<Map<String, Sound>> _initSounds() async {
-    final soundNames = [
+    const soundNames = [
       "assets/laser_shoot.wav",
       "assets/laser_shoot.mp3",
     ];
     return Future.wait(soundNames.map(widget.engine.loadSoundAsset))
         .then((sounds) {
-      setState(() {
-        currentSound = sounds.first;
-      });
+      currentSound = sounds.first;
       return Map.fromIterables(soundNames, sounds);
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    soundsFuture = _initSounds();
   }
 
   @override

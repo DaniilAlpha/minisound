@@ -83,33 +83,35 @@ endif()
 
 
 # Set properties
+target_compile_options(${MAIN_LIB} PUBLIC -W -Wall -Wextra -Wformat -Wno-unused-function)
+
 if(NOT EMSCRIPTEN)
     set_target_properties(${MAIN_LIB} PROPERTIES
         PUBLIC_HEADER include/minisound.h
         OUTPUT_NAME ${MAIN_LIB}
     )
 
-    set(COMMON_OPTIONS -O3)
-    target_compile_options(${MAIN_LIB} PUBLIC ${COMMON_OPTIONS})
-    target_link_options(${MAIN_LIB} PUBLIC ${COMMON_OPTIONS})
+    set(COMPILE_AND_LINK_OPTS -O3)
+    target_compile_options(${MAIN_LIB} PUBLIC ${COMPILE_AND_LINK_OPTS})
+    target_link_options(${MAIN_LIB} PUBLIC ${COMPILE_AND_LINK_OPTS})
     unset(COMMON_OPTIONS)
 else()
     set_target_properties(${MAIN_LIB} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${WEB_OUT_DIR}
     )
 
-    target_compile_options(${MAIN_LIB} PUBLIC -O3 -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
+    target_compile_options(${MAIN_LIB} PUBLIC -Og -g -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
     set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
-        -O3 \
+        -Og -g -gsource-map \
         -flto -fno-rtti -fno-exceptions \
         -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall \
-        -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb \
+        -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1048576 -sMAXIMUM_MEMORY=1gb \
         -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sNO_FETCH_SUPPORT_INDEXEDDB \
-        -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=65536 \
-        -sSTACK_OVERFLOW_CHECK=1 \
-        \
-        -fsanitize=address \
+        -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=524288 \
+        -sSTACK_OVERFLOW_CHECK=1 -sSAFE_HEAP \
     ")
+    # \
+    # -fsanitize=address \
 endif()
 
 

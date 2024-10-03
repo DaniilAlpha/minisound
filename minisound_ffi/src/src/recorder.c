@@ -6,23 +6,17 @@
 #include "../external/milo/milo.h"
 
 struct Recorder {
-    ma_encoder encoder;
-    ma_encoder_config encoder_config;
-    ma_device device;
-    ma_device_config device_config;
-    char *filename;
     bool is_recording;
-    bool is_file_recording;
+
+    ma_device device;
+    ma_encoder encoder;
 
     CircularBuffer circular_buffer;
 
-    int sample_rate;
-    int channels;
-    ma_format format;
+    bool do_write_to_file;
 
-    uint8_t *encode_buffer;
-    size_t encode_buffer_size;
-    size_t encode_buffer_used;
+    ma_format format;
+    uint32_t channels;
 };
 
 /*************
@@ -46,7 +40,7 @@ static void data_callback(
         floatsToWrite
     );
 
-    if (self->is_file_recording)
+    if (self->do_write_to_file)
         ma_encoder_write_pcm_frames(&self->encoder, pInput, frameCount, NULL);
 
     (void)pOutput;
@@ -54,67 +48,33 @@ static void data_callback(
 
 static RecorderResult recorder_init_common(
     Recorder *const self,
-    char const *const filename,
     uint32_t const sample_rate,
     uint32_t const channels,
     SoundFormat const sound_format,
     float const buffer_len_s
 ) {
-    ma_format const format = (ma_format)sound_format;
-
-    self->is_file_recording = (filename != NULL);
-    self->sample_rate = sample_rate;
+    self->is_recording = false;
+    self->format = (ma_format)sound_format;
     self->channels = channels;
-    self->format = format;
 
     size_t const buffer_size_in_bytes =
-        (size_t)(sample_rate * channels * ma_get_bytes_per_sample(format) *
+        (size_t)(sample_rate *
+                 ma_get_bytes_per_frame(self->format, self->channels) *
                  buffer_len_s);
-    circular_buffer_init(&self->circular_buffer, buffer_size_in_bytes);
+    if (circular_buffer_init(&self->circular_buffer, buffer_size_in_bytes) != 0)
+        return RECORDER_ERROR_OUT_OF_MEMORY;
 
-    if (self->is_file_recording) {
-        self->filename = strdup(filename);
-        if (self->filename == NULL) {
-            circular_buffer_uninit(&self->circular_buffer);
-            return RECORDER_ERROR_OUT_OF_MEMORY;
-        }
-
-        self->encoder_config = ma_encoder_config_init(
-            ma_encoding_format_wav,
-            format,
-            channels,
-            sample_rate
-        );
-
-        if (ma_encoder_init_file(
-                self->filename,
-                &self->encoder_config,
-                &self->encoder
-            ) != MA_SUCCESS) {
-            free(self->filename);
-            circular_buffer_uninit(&self->circular_buffer);
-            return RECORDER_ERROR_UNKNOWN;
-        }
-    }
-
-    self->device_config = ma_device_config_init(ma_device_type_capture);
-    self->device_config.capture.format = format;
-    self->device_config.capture.channels = channels;
-    self->device_config.sampleRate = sample_rate;
-    self->device_config.dataCallback = data_callback;
-    self->device_config.pUserData = self;
-
-    if (ma_device_init(NULL, &self->device_config, &self->device) !=
-        MA_SUCCESS) {
-        if (self->is_file_recording) {
-            ma_encoder_uninit(&self->encoder);
-            free(self->filename);
-        }
+    ma_device_config device_config =
+        ma_device_config_init(ma_device_type_capture);
+    device_config.capture.format = self->format;
+    device_config.capture.channels = self->channels;
+    device_config.sampleRate = sample_rate;
+    device_config.dataCallback = data_callback;
+    device_config.pUserData = self;
+    if (ma_device_init(NULL, &device_config, &self->device) != MA_SUCCESS) {
         circular_buffer_uninit(&self->circular_buffer);
         return RECORDER_ERROR_UNKNOWN;
     }
-
-    self->is_recording = false;
 
     return RECORDER_OK;
 }
@@ -123,12 +83,7 @@ static RecorderResult recorder_init_common(
  ** public **
  ************/
 
-Recorder *recorder_create(void) {
-    Recorder *const recorder = (Recorder *)malloc(sizeof(Recorder));
-    if (recorder == NULL) { return NULL; }
-    memset(recorder, 0, sizeof(Recorder));
-    return recorder;
-}
+Recorder *recorder_create(void) { return malloc(sizeof(Recorder)); }
 
 RecorderResult recorder_init_file(
     Recorder *const self,
@@ -138,14 +93,24 @@ RecorderResult recorder_init_file(
     SoundFormat const sound_format
 ) {
     if (filename == NULL) return RECORDER_ERROR_INVALID_ARGUMENT;
-    return recorder_init_common(
-        self,
-        filename,
-        sample_rate,
+
+    self->do_write_to_file = true;
+
+    ma_encoder_config encoder_config = ma_encoder_config_init(
+        ma_encoding_format_wav,
+        (ma_format)sound_format,
         channels,
-        sound_format,
-        5.0f
+        sample_rate
     );
+    if (ma_encoder_init_file(filename, &encoder_config, &self->encoder) !=
+        MA_SUCCESS)
+        return RECORDER_ERROR_UNKNOWN;
+
+    RecorderResult const r =
+        recorder_init_common(self, sample_rate, channels, sound_format, 5.0f);
+    if (r != RECORDER_OK)
+        if (self->do_write_to_file) ma_encoder_uninit(&self->encoder);
+    return r;
 }
 
 RecorderResult recorder_init_stream(
@@ -155,9 +120,10 @@ RecorderResult recorder_init_stream(
     SoundFormat const sound_format,
     float const buffer_len_s
 ) {
+    self->do_write_to_file = false;
+
     return recorder_init_common(
         self,
-        NULL,
         sample_rate,
         channels,
         sound_format,
@@ -166,10 +132,7 @@ RecorderResult recorder_init_stream(
 }
 void recorder_uninit(Recorder *const self) {
     ma_device_uninit(&self->device);
-    if (self->is_file_recording) {
-        ma_encoder_uninit(&self->encoder);
-        free(self->filename);
-    }
+    if (self->do_write_to_file) ma_encoder_uninit(&self->encoder);
     circular_buffer_uninit(&self->circular_buffer);
 }
 
