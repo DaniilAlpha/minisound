@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "../external/miniaudio/include/miniaudio.h"
+#include "../include/sound_data.h"
 
 #define MILO_LVL ENGINE_MILO_LVL
 #include "../external/milo/milo.h"
@@ -23,11 +24,7 @@ struct Engine {
  ** public **
  ************/
 
-Engine *engine_alloc(void) {
-    Engine *const engine = malloc(sizeof(Engine));
-    if (engine == NULL) error("%s", explain(OutOfMemErr));
-    return engine;
-}
+Engine *engine_alloc(void) { return malloc(sizeof(Engine)); }
 
 Result engine_init(Engine *const self, uint32_t const period_ms) {
     self->is_started = false;
@@ -67,18 +64,25 @@ Result engine_load_sound(
     Engine *const self,
     Sound *const sound,
     float const *const data,
-    size_t const data_size,
-    SoundFormat const sound_format,
-    uint32_t const channels,
-    uint32_t const sample_rate
+    size_t const data_size
 ) {
-    return sound_init(
-        sound,
-        data,
-        data_size,
-        sound_format,
-        channels,
-        sample_rate,
-        &self->engine
-    );
+    EncodedSoundData *const sound_data = encoded_sound_data_alloc();
+    if (sound_data == NULL) return OutOfMemErr;
+    UNROLL(encoded_sound_data_init(sound_data, data, data_size));
+
+    return sound_init(sound, sound_data, self);
+}
+
+Result engine_generate_waveform(
+    Engine *const self,
+    Sound *const sound,
+    WaveformType const type,
+    double const frequency,
+    double const amplitude
+) {
+    WaveformSoundData *const sound_data = waveform_sound_data_alloc();
+    if (sound_data == NULL) return OutOfMemErr;
+    UNROLL(waveform_sound_data_init(sound_data, type, frequency, amplitude));
+
+    return sound_init(sound, sound_data, self);
 }

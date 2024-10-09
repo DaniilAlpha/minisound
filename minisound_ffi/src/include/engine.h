@@ -17,10 +17,10 @@ EXPORT Result engine_load_sound(
     Engine *const self,
     Sound *const sound,
     float const *const data,
-    size_t const data_size,
-    SoundFormat const sound_format,
-    uint32_t const channels,
-    uint32_t const sample_rate
+    size_t const data_size
+    // SoundFormat const sound_format,
+    // uint32_t const channels,
+    // uint32_t const sample_rate
 );
 
 #endif
