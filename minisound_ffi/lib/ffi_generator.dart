@@ -1,6 +1,6 @@
 part of "minisound_ffi.dart";
 
-class FfiGenerator implements PlatformGenerator {
+/* class FfiGenerator implements PlatformGenerator {
   FfiGenerator._(Pointer<c.Generator> self) : _self = self;
 
   final Pointer<c.Generator> _self;
@@ -119,26 +119,4 @@ class FfiGenerator implements PlatformGenerator {
   }
 }
 
-extension on GeneratorWaveformType {
-  int toC() => switch (this) {
-        GeneratorWaveformType.sine =>
-          c.GeneratorWaveformType.GENERATOR_WAVEFORM_TYPE_SINE,
-        GeneratorWaveformType.square =>
-          c.GeneratorWaveformType.GENERATOR_WAVEFORM_TYPE_SQUARE,
-        GeneratorWaveformType.triangle =>
-          c.GeneratorWaveformType.GENERATOR_WAVEFORM_TYPE_TRIANGLE,
-        GeneratorWaveformType.sawtooth =>
-          c.GeneratorWaveformType.GENERATOR_WAVEFORM_TYPE_SAWTOOTH,
-      };
-}
-
-extension on GeneratorNoiseType {
-  int toC() => switch (this) {
-        GeneratorNoiseType.white =>
-          c.GeneratorNoiseType.GENERATOR_NOISE_TYPE_WHITE,
-        GeneratorNoiseType.pink =>
-          c.GeneratorNoiseType.GENERATOR_NOISE_TYPE_PINK,
-        GeneratorNoiseType.brownian =>
-          c.GeneratorNoiseType.GENERATOR_NOISE_TYPE_BROWNIAN,
-      };
-}
+ */

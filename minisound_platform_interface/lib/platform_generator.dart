@@ -1,10 +1,10 @@
 part of "minisound_platform_interface.dart";
 
-enum GeneratorWaveformType { sine, square, triangle, sawtooth }
+enum WaveformType { sine, square, triangle, sawtooth }
 
-enum GeneratorNoiseType { white, pink, brownian }
+enum NoiseType { white, pink, brownian }
 
-abstract interface class PlatformGenerator {
+/* abstract interface class PlatformGenerator {
   factory PlatformGenerator() => MinisoundPlatform.instance.createGenerator();
 
   double get volume;
@@ -39,4 +39,4 @@ abstract interface class PlatformGenerator {
 
   int get availableFloatCount;
   Float32List getBuffer(int floatsToRead);
-}
+} */

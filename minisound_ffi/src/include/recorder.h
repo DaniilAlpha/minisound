@@ -31,14 +31,14 @@ EXPORT RecorderResult recorder_init_file(
     Recorder *const self,
     char const *const filename,
     uint32_t const sample_rate,
-    uint32_t const channels,
-    SoundFormat const sound_format
+    uint32_t const channels
+    // SoundFormat const sound_format
 );
 EXPORT RecorderResult recorder_init_stream(
     Recorder *const self,
     uint32_t const sample_rate,
     uint32_t const channels,
-    SoundFormat const sound_format,
+    // SoundFormat const sound_format,
     float const buffer_len_s
 );
 EXPORT void recorder_uninit(Recorder *const self);

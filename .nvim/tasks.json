@@ -27,7 +27,7 @@
             "icon": "󰐊",
             "cmd": [
                 "cd ./minisound/example/",
-                "valgrind flutter run -d linux --release"
+                "flutter run -d linux"
             ]
         },
         "ffigen": {

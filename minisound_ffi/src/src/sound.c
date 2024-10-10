@@ -11,38 +11,27 @@
 struct Sound {
     ma_sound sound;
 
-    SoundData *sound_data;
+    SoundData sound_data;
 
     ma_engine *engine;
 };
 
-Sound *sound_alloc(void) {
-    Sound *const sound = malloc(sizeof(Sound));
-    if (sound == NULL) error("%s", explain(OutOfMemErr));
-    return sound;
-}
-
-Result sound_init(
-    Sound *const self,
-    SoundData *const sound_data,
-    void *const vengine
-) {
+Sound *sound_alloc(void) { return malloc(sizeof(Sound)); }
+Result
+sound_init(Sound *const self, SoundData const sound_data, void *const vengine) {
     self->sound_data = sound_data;
     self->engine = vengine;
 
     ma_result const r = ma_sound_init_from_data_source(
-        vengine,
-        &self->sound,
+        self->engine,
+        sound_data_get_ds(&self->sound_data),
         MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION,
         NULL,
-        sound_data_get_ds(sound_data)
+        &self->sound
     );
     if (r != MA_SUCCESS)
-        return sound_data_uninit(sound_data),
-               error(
-                   "miniaudio sound initialization error! Error code: %d",
-                   result
-               ),
+        return sound_data_uninit(&self->sound_data),
+               error("miniaudio sound initialization error! Error code: %d", r),
                UnknownErr;
 
     return Ok;
@@ -100,7 +89,7 @@ Result sound_init(
 
 void sound_unload(Sound *const self) {
     ma_sound_uninit(&self->sound);
-    sound_data_uninit(self->sound_data);
+    sound_data_uninit(&self->sound_data);
 }
 
 Result sound_play(Sound *const self) {
@@ -141,16 +130,3 @@ float sound_get_duration(Sound *const self) {
     ma_sound_get_length_in_pcm_frames(&self->sound, &length_in_frames);
     return (float)length_in_frames / ma_engine_get_sample_rate(self->engine);
 }
-
-// clang-format off
-
-// // this ensures safe casting between `SoundFormat` and `ma_format`
-// _Static_assert((int)SOUND_FORMAT_UNKNOWN == (int)ma_format_unknown, "SOUND_FORMAT_UNKNOWN should match ma_format_unknown.");
-// _Static_assert((int)SOUND_FORMAT_U8 == (int)ma_format_u8, "SOUND_FORMAT_U8 should match ma_format_u8.");
-// _Static_assert((int)SOUND_FORMAT_S16 == (int)ma_format_s16, "SOUND_FORMAT_S16 should match ma_format_s16.");
-// _Static_assert((int)SOUND_FORMAT_S24 == (int)ma_format_s24, "SOUND_FORMAT_S24 should match ma_format_s24.");
-// _Static_assert((int)SOUND_FORMAT_S32 == (int)ma_format_s32, "SOUND_FORMAT_S32 should match ma_format_s32.");
-// _Static_assert((int)SOUND_FORMAT_F32 == (int)ma_format_f32, "SOUND_FORMAT_F32 should match ma_format_f32.");
-// _Static_assert((size_t)SOUND_FORMAT_COUNT == (size_t)ma_format_count, "Count of `SoundFormat` members and `ma_format` members does not match.");
-
-// clang-format on

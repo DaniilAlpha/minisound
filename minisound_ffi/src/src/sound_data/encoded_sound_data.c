@@ -19,7 +19,7 @@ EncodedSoundData *encoded_sound_data_alloc() {
 }
 Result encoded_sound_data_init(
     EncodedSoundData *const self,
-    float const *const data,
+    uint8_t const *const data,
     size_t const data_size
 ) {
     self->is_looped = false;
@@ -29,7 +29,7 @@ Result encoded_sound_data_init(
     if (r != MA_SUCCESS) {
         return error(
                    "miniaudio decoder initialization error! Error code: %d",
-                   result
+                   r
                ),
                UnknownErr;
     }
@@ -41,7 +41,7 @@ void encoded_sound_data_uninit(EncodedSoundData *const self) {
 }
 
 ma_data_source *encoded_sound_data_get_ds(EncodedSoundData *const self) {
-    return (ma_data_source *)&self->decoder;
+    return &self->decoder;
 }
 
 bool encoded_sound_data_get_is_looped(EncodedSoundData const *const self) {

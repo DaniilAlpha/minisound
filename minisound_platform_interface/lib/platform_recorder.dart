@@ -1,6 +1,6 @@
 part of "minisound_platform_interface.dart";
 
-abstract interface class PlatformRecorder {
+/* abstract interface class PlatformRecorder {
   factory PlatformRecorder() => MinisoundPlatform.instance.createRecorder();
 
   bool get isRecording;
@@ -24,4 +24,4 @@ abstract interface class PlatformRecorder {
 
   int get availableFloatCount;
   Float32List getBuffer(int floatsToRead);
-}
+} */

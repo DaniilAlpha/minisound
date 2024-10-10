@@ -1,16 +1,9 @@
 part of "minisound_platform_interface.dart";
 
 class AudioData {
-  AudioData(this.buffer, this.format, this.sampleRate, this.channels);
-  AudioData.detectFromBuffer(this.buffer)
-      : format = SoundFormat.f32,
-        sampleRate = 0,
-        channels = 0;
+  AudioData(this.buffer);
 
-  final Float32List buffer;
-  final SoundFormat format;
-  final int sampleRate;
-  final int channels;
+  final TypedData buffer;
 }
 
 abstract interface class PlatformEngine {
@@ -22,4 +15,9 @@ abstract interface class PlatformEngine {
   void start();
 
   Future<PlatformSound> loadSound(AudioData audioData);
+  Future<PlatformSound> generateWaveform({
+    required WaveformType type,
+    required double frequency,
+    required double amplitude,
+  });
 }

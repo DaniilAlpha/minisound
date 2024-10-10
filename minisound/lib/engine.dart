@@ -5,8 +5,7 @@ export "package:minisound_platform_interface/minisound_platform_interface.dart"
     show
         AudioData,
         MinisoundPlatformException,
-        MinisoundPlatformOutOfMemoryException,
-        SoundFormat;
+        MinisoundPlatformOutOfMemoryException;
 
 /// Controls the loading and unloading of `Sound`s.
 ///
@@ -26,7 +25,7 @@ final class Engine {
   var _isInit = false;
   bool get isInit => _isInit;
 
-  /// Initializes an engine.
+  /// Initializes the engine.
   ///
   /// Change an update period (affects the sound latency).
   Future<void> init([int periodMs = 10]) async {
@@ -36,7 +35,7 @@ final class Engine {
     _isInit = true;
   }
 
-  /// Starts an engine.
+  /// Starts the engine.
   Future<void> start() async => _engine.start();
 
   /// Copies `data` to the internal memory location and creates a `Sound` from it.
@@ -51,7 +50,23 @@ final class Engine {
   Future<Sound> loadSoundFile(String filePath) async {
     final file = File(filePath);
     final bytes = await file.readAsBytes();
-    return loadSound(AudioData.detectFromBuffer(bytes.buffer.asFloat32List()));
+    return loadSound(AudioData(bytes));
+  }
+
+  /// Generates a sound of waveform using given parameters.
+  Future<Sound> generateWaveform({
+    WaveformType type = WaveformType.sine,
+    double frequency = 440.0,
+    double amplitude = 0.5,
+  }) async {
+    final engineSound = await _engine.generateWaveform(
+      type: type,
+      frequency: frequency,
+      amplitude: amplitude,
+    );
+    final sound = Sound._(engineSound);
+    _soundsFinalizer.attach(this, sound);
+    return sound;
   }
 }
 
@@ -71,7 +86,7 @@ final class Sound {
   bool get isLooped => _sound.looping.$1;
   Duration get loopDelay => Duration(milliseconds: _sound.looping.$2);
 
-  /// Starts a sound. Stopped and played again if it is already started.
+  /// Starts the sound. Stopped and played again if it is already started.
   void play() {
     if (_sound.looping.$1) _sound.looping = (false, 0);
 
@@ -90,7 +105,7 @@ final class Sound {
     _sound.play();
   }
 
-  /// Does not reset a sound position.
+  /// Like `stop()`, but does not reset a sound position.
   ///
   /// If sound is looped, when played again will wait `loopDelay` and play. If you do not want this, use `stop()`.
   void pause() {
@@ -99,7 +114,7 @@ final class Sound {
     _sound.pause();
   }
 
-  /// Resets a sound position.
+  /// Stops sound and resets a sound position.
   ///
   /// If sound is looped, when played again will NOT wait `loopDelay` and play. If you do not want this, use `pause()`.
   void stop() {

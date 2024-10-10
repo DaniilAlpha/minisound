@@ -7,19 +7,7 @@
 
 #include "../external/result/result.h"
 #include "export.h"
-#include "sound_data.h"
-
-// // this is just a redirection to exclude miniaudio.h from generated bindings
-// typedef enum SoundFormat {
-//     SOUND_FORMAT_UNKNOWN = 0,
-//     SOUND_FORMAT_U8 = 1,
-//     SOUND_FORMAT_S16 = 2,
-//     SOUND_FORMAT_S24 = 3,
-//     SOUND_FORMAT_S32 = 4,
-//     SOUND_FORMAT_F32 = 5,
-//
-//     SOUND_FORMAT_COUNT
-// } SoundFormat;
+#include "sound_data/sound_data.h"
 
 typedef struct Sound Sound;
 
@@ -27,7 +15,7 @@ EXPORT Sound *sound_alloc(void);
 
 Result sound_init(
     Sound *const self,
-    SoundData *const sound_data,
+    SoundData const sound_data,
     //
     // float const *const data,
     // size_t const data_size,

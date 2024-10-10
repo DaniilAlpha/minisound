@@ -1,10 +1,7 @@
 import "package:example/widgets/generator_example.dart";
 import "package:example/widgets/playback_example.dart";
-import "package:example/widgets/recorder_example.dart";
 import "package:flutter/material.dart";
 import "package:minisound/engine.dart";
-import "package:minisound/generator.dart";
-import "package:minisound/recorder.dart";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,18 +18,18 @@ class ExamplePage extends StatefulWidget {
 
 class _ExamplePageState extends State<ExamplePage> {
   final engine = Engine();
-  late final recorder = Recorder();
-  late final generator = Generator(mainEngine: engine);
+  // late final recorder = Recorder();
+  // late final generator = Generator(mainEngine: engine);
 
-  late final initFuture = engine
-      .init()
-      .then((_) => recorder.initStream(channels: 1))
-      .then((_) => generator.init());
+  late final initFuture = engine.init().then((_) => print("engine init!"))
+      // .then((_) => recorder.initStream(channels: 1))
+      // .then((_) => generator.init())
+      ;
 
   @override
   void dispose() {
-    recorder.dispose();
-    generator.dispose();
+    // recorder.dispose();
+    // generator.dispose();
     super.dispose();
   }
 
@@ -53,9 +50,9 @@ class _ExamplePageState extends State<ExamplePage> {
                 Column(children: [
                   PlaybackExample(engine),
                   space,
-                  RecorderExample(engine, recorder),
-                  space,
-                  GeneratorExample(engine, generator),
+                  // RecorderExample(engine, recorder),
+                  // space,
+                  GeneratorExample(engine),
                 ]),
               AsyncSnapshot(connectionState: ConnectionState.waiting) =>
                 const Center(child: CircularProgressIndicator()),

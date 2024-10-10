@@ -1,6 +1,6 @@
 part of "minisound_ffi.dart";
 
-class FfiRecorder implements PlatformRecorder {
+/* class FfiRecorder implements PlatformRecorder {
   FfiRecorder._(Pointer<c.Recorder> self) : _self = self;
 
   final Pointer<c.Recorder> _self;
@@ -90,4 +90,4 @@ class FfiRecorder implements PlatformRecorder {
 
     return buffer;
   }
-}
+} */

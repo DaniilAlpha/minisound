@@ -1,7 +1,6 @@
 import "dart:async";
 
 import "package:flutter/material.dart";
-import "package:minisound/engine.dart";
 import "package:minisound/engine_flutter.dart";
 
 class PlaybackExample extends StatefulWidget {

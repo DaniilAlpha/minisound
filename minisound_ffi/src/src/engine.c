@@ -4,7 +4,8 @@
 #include <stdlib.h>
 
 #include "../external/miniaudio/include/miniaudio.h"
-#include "../include/sound_data.h"
+#include "../include/sound_data/encoded_sound_data.h"
+#include "../include/sound_data/generated_sound_data.h"
 
 #define MILO_LVL ENGINE_MILO_LVL
 #include "../external/milo/milo.h"
@@ -63,14 +64,18 @@ Result engine_start(Engine *const self) {
 Result engine_load_sound(
     Engine *const self,
     Sound *const sound,
-    float const *const data,
+    uint8_t const *const data,
     size_t const data_size
 ) {
     EncodedSoundData *const sound_data = encoded_sound_data_alloc();
     if (sound_data == NULL) return OutOfMemErr;
     UNROLL(encoded_sound_data_init(sound_data, data, data_size));
 
-    return sound_init(sound, sound_data, self);
+    return sound_init(
+        sound,
+        encoded_sound_data_ww_sound_data(sound_data),
+        self
+    );
 }
 
 Result engine_generate_waveform(
@@ -80,9 +85,9 @@ Result engine_generate_waveform(
     double const frequency,
     double const amplitude
 ) {
-    WaveformSoundData *const sound_data = waveform_sound_data_alloc();
-    if (sound_data == NULL) return OutOfMemErr;
-    UNROLL(waveform_sound_data_init(sound_data, type, frequency, amplitude));
+    WaveformSoundData *const waveform = waveform_sound_data_alloc();
+    if (waveform == NULL) return OutOfMemErr;
+    UNROLL(waveform_sound_data_init(waveform, type, frequency, amplitude));
 
-    return sound_init(sound, sound_data, self);
+    return sound_init(sound, waveform_sound_data_ww_sound_data(waveform), self);
 }

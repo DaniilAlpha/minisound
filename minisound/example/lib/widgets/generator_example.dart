@@ -1,6 +1,3 @@
-import "dart:async";
-import "dart:typed_data";
-
 import "package:flutter/material.dart";
 import "package:minisound/engine.dart";
 import "package:minisound/generator.dart";
@@ -8,38 +5,24 @@ import "package:minisound/generator.dart";
 enum GeneratorType { wave, noise, pulse }
 
 class GeneratorExample extends StatefulWidget {
-  const GeneratorExample(this.engine, this.generator, {super.key});
+  const GeneratorExample(this.engine, {super.key});
 
   final Engine engine;
-  final Generator generator;
 
   @override
   State<GeneratorExample> createState() => _GeneratorExampleState();
 }
 
 class _GeneratorExampleState extends State<GeneratorExample> {
-  static const pulsewaveFrequency = 432.0;
+  // static const pulsewaveFrequency = 432.0;
 
   var generatorType = GeneratorType.wave;
-  var waveformType = GeneratorWaveformType.sine;
-  var noiseType = GeneratorNoiseType.white;
+
+  var waveformType = WaveformType.sine;
+  var noiseType = NoiseType.white;
   var pulseDelay = 0.25;
 
-  final buf = <Float32List>[];
-  var totalFloats = 0;
-
-  Timer? timer;
-
-  void accumulateFloats() {
-    if (widget.generator.isGenerating) {
-      final floats = widget.generator.availableFloatCount;
-      final currentBuf = widget.generator.getBuffer(floats);
-      if (currentBuf.isNotEmpty) {
-        buf.add(currentBuf);
-        totalFloats += floats;
-      }
-    }
-  }
+  Sound? sound;
 
   @override
   Widget build(BuildContext context) {
@@ -53,24 +36,9 @@ class _GeneratorExampleState extends State<GeneratorExample> {
               .map((t) => DropdownMenuItem(value: t, child: Text(t.name)))
               .toList(),
           value: generatorType,
-          onChanged: (type) {
-            setState(() {
-              generatorType = type!;
-            });
-            switch (generatorType) {
-              case GeneratorType.wave:
-                widget.generator.setWaveform(type: waveformType);
-
-              case GeneratorType.noise:
-                widget.generator.setNoise(type: noiseType);
-
-              case GeneratorType.pulse:
-                widget.generator.setPulsewave(
-                  frequency: pulsewaveFrequency,
-                  dutyCycle: pulseDelay,
-                );
-            }
-          },
+          onChanged: (type) => setState(() {
+            generatorType = type!;
+          }),
         ),
       ]),
       switch (generatorType) {
@@ -78,30 +46,24 @@ class _GeneratorExampleState extends State<GeneratorExample> {
             const Text("Waveform Type: "),
             DropdownButton(
               value: waveformType,
-              items: GeneratorWaveformType.values
+              items: WaveformType.values
                   .map((t) => DropdownMenuItem(value: t, child: Text(t.name)))
                   .toList(),
-              onChanged: (value) {
-                setState(() {
-                  waveformType = value!;
-                });
-                widget.generator.setWaveform(type: waveformType);
-              },
+              onChanged: (value) => setState(() {
+                waveformType = value!;
+              }),
             ),
           ]),
         GeneratorType.noise => Row(mainAxisSize: MainAxisSize.min, children: [
             const Text("Noise Type: "),
             DropdownButton(
               value: noiseType,
-              items: GeneratorNoiseType.values
+              items: NoiseType.values
                   .map((t) => DropdownMenuItem(value: t, child: Text(t.name)))
                   .toList(),
-              onChanged: (value) {
-                setState(() {
-                  noiseType = value!;
-                });
-                widget.generator.setNoise(type: noiseType);
-              },
+              onChanged: (value) => setState(() {
+                noiseType = value!;
+              }),
             ),
           ]),
         GeneratorType.pulse => Row(mainAxisSize: MainAxisSize.min, children: [
@@ -115,29 +77,39 @@ class _GeneratorExampleState extends State<GeneratorExample> {
                 onChanged: (value) => setState(() {
                   pulseDelay = value;
                 }),
-                onChangeEnd: (value) => widget.generator.setPulsewave(
-                  frequency: pulsewaveFrequency,
-                  dutyCycle: value,
-                ),
               ),
             ),
           ]),
       },
       ElevatedButton(
-        child: Text(widget.generator.isGenerating ? "STOP" : "START"),
-        onPressed: () async => setState(() {
-          if (widget.generator.isGenerating) {
-            timer?.cancel();
-            widget.generator.stop();
-          } else {
-            widget.generator.start();
-            timer ??= Timer.periodic(
-              const Duration(milliseconds: 100),
-              (_) => accumulateFloats(),
-            );
-          }
-        }),
+        child: const Text("PLAY"),
+        onPressed: () async {
+          sound?.stop();
+          sound = await switch (generatorType) {
+            GeneratorType.wave =>
+              widget.engine.generateWaveform(type: waveformType),
+            _ => throw UnimplementedError(),
+
+            // case GeneratorType.noise:
+            //   widget.generator.setNoise(type: noiseType);
+            //
+            // case GeneratorType.pulse:
+            //   widget.generator.setPulsewave(
+            //     frequency: pulsewaveFrequency,
+            //     dutyCycle: pulseDelay,
+            //   );
+          };
+          print("generated");
+          sound!.play();
+          setState(() {});
+        },
       ),
+      ElevatedButton(
+          child: const Text("STOP"),
+          onPressed: () {
+            sound?.stop();
+            sound = null;
+          }),
     ]);
   }
 }

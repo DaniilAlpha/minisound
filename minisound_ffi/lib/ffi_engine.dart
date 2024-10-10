@@ -29,36 +29,68 @@ final class FfiEngine implements PlatformEngine {
   }
 
   @override
-  Future<PlatformSound> loadSound(AudioData audioData) async {
-    final dataPtr =
-        malloc.allocate<Float>(audioData.buffer.length * sizeOf<Float>());
+  Future<FfiSound> loadSound(AudioData audioData) async {
+    final sound = _bindings.sound_alloc();
+    if (sound == nullptr) throw MinisoundPlatformOutOfMemoryException();
+
+    final dataLength = audioData.buffer.lengthInBytes;
+    final dataPtr = malloc.allocate<Uint8>(dataLength);
     if (dataPtr == nullptr) {
+      malloc.free(sound);
       throw MinisoundPlatformOutOfMemoryException();
     }
 
     dataPtr.copy(audioData.buffer);
 
-    final sound = _bindings.sound_alloc();
-    if (sound == nullptr) {
-      malloc.free(dataPtr);
-      throw MinisoundPlatformException("Failed to allocate a sound.");
-    }
-
-    final r = _bindings.engine_load_sound(
-      _self,
-      sound,
-      dataPtr,
-      audioData.buffer.lengthInBytes,
-      audioData.format.toC(),
-      audioData.channels,
-      audioData.sampleRate,
-    );
+    final r = _bindings.engine_load_sound(_self, sound, dataPtr, dataLength);
     if (r != c.Result.Ok) {
-      malloc.free(dataPtr);
       malloc.free(sound);
+      malloc.free(dataPtr);
       throw MinisoundPlatformException("Failed to load a sound (code: $r).");
     }
 
     return FfiSound._fromPtrs(sound, dataPtr);
   }
+
+  @override
+  Future<FfiSound> generateWaveform({
+    required WaveformType type,
+    required double frequency,
+    required double amplitude,
+  }) async {
+    final sound = _bindings.sound_alloc();
+    if (sound == nullptr) throw MinisoundPlatformOutOfMemoryException();
+
+    final r = _bindings.engine_generate_waveform(
+      _self,
+      sound,
+      type.toC(),
+      frequency,
+      amplitude,
+    );
+    print("");
+    if (r != c.Result.Ok) {
+      malloc.free(sound);
+      throw MinisoundPlatformException("Failed to load a sound (code: $r).");
+    }
+
+    return FfiSound._fromPtrs(sound);
+  }
 }
+
+extension on WaveformType {
+  int toC() => switch (this) {
+        WaveformType.sine => c.WaveformType.WAVEFORM_TYPE_SINE,
+        WaveformType.square => c.WaveformType.WAVEFORM_TYPE_SQUARE,
+        WaveformType.triangle => c.WaveformType.WAVEFORM_TYPE_TRIANGLE,
+        WaveformType.sawtooth => c.WaveformType.WAVEFORM_TYPE_SAWTOOTH,
+      };
+}
+
+// extension on NoiseType {
+//   int toC() => switch (this) {
+//         NoiseType.white => c.WaveformType.NOISE_TYPE_WHITE,
+//         NoiseType.pink => c.NoiseType.NOISE_TYPE_PINK,
+//         NoiseType.brownian => c.NoiseType.NOISE_TYPE_BROWNIAN,
+//       };
+// }

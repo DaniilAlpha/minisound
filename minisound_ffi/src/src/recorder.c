@@ -43,7 +43,7 @@ static RecorderResult recorder_init_common(
     Recorder *const self,
     uint32_t const sample_rate,
     uint32_t const channels,
-    SoundFormat const sound_format,
+    // SoundFormat const sound_format,
     float const buffer_len_s
 ) {
     // self->is_recording = false;
@@ -70,7 +70,7 @@ static RecorderResult recorder_init_common(
     //     return RECORDER_ERROR_UNKNOWN;
     // }
     //
-    // return RECORDER_OK;
+    return RECORDER_OK;
 }
 
 /************
@@ -83,8 +83,8 @@ RecorderResult recorder_init_file(
     Recorder *const self,
     char const *const filename,
     uint32_t const sample_rate,
-    uint32_t const channels,
-    SoundFormat const sound_format
+    uint32_t const channels
+    // SoundFormat const sound_format
 ) {
     // if (filename == NULL) return RECORDER_ERROR_INVALID_ARGUMENT;
     //
@@ -104,20 +104,21 @@ RecorderResult recorder_init_file(
     //     recorder_init_common(self, sample_rate, channels,
     //     sound_format, 5.0f);
     // return r;
+    return RECORDER_OK;
 }
 
 RecorderResult recorder_init_stream(
     Recorder *const self,
     uint32_t const sample_rate,
     uint32_t const channels,
-    SoundFormat const sound_format,
+    // SoundFormat const sound_format,
     float const buffer_len_s
 ) {
     return recorder_init_common(
         self,
         sample_rate,
         channels,
-        sound_format,
+        // sound_format,
         buffer_len_s
     );
 }
@@ -149,6 +150,7 @@ void recorder_stop(Recorder *const self) {
 
 size_t recorder_get_available_float_count(Recorder *const self) {
     // return circular_buffer_get_available_floats(&self->circular_buffer);
+    return 0;
 }
 size_t recorder_load_buffer(
     Recorder *const self,
@@ -163,4 +165,5 @@ size_t recorder_load_buffer(
     //     available_floats;
 
     // return circular_buffer_read(&self->circular_buffer, output, to_read);
+    return 0;
 }

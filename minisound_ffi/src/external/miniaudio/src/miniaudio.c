@@ -28454,15 +28454,12 @@ typedef struct
 
 static EM_BOOL ma_audio_worklet_process_callback__webaudio(int inputCount, const AudioSampleFrame* pInputs, int outputCount, AudioSampleFrame* pOutputs, int paramCount, const AudioParamFrame* pParams, void* pUserData)
 {
-    printf("%i\n", __LINE__);
     ma_device* pDevice = (ma_device*)pUserData;
     ma_uint32 frameCount;
 
-    printf("%i\n", __LINE__);
     (void)paramCount;
     (void)pParams;
 
-    printf("%i\n", __LINE__);
     if (ma_device_get_state(pDevice) != ma_device_state_started) {
         return EM_TRUE;
     }
@@ -28477,7 +28474,6 @@ static EM_BOOL ma_audio_worklet_process_callback__webaudio(int inputCount, const
     */
     frameCount = 128;
 
-    printf("%i\n", __LINE__);
 
     if (inputCount > 0) {
         /* Input data needs to be interleaved before we hand it to the client. */
@@ -28487,22 +28483,16 @@ static EM_BOOL ma_audio_worklet_process_callback__webaudio(int inputCount, const
             }
         }
 
-    printf("%i\n", __LINE__);
         ma_device_process_pcm_frames_capture__webaudio(pDevice, frameCount, pDevice->webaudio.pIntermediaryBuffer);
-    printf("%i\n", __LINE__);
     }
 
-    printf("%i\n", __LINE__);
     if (outputCount > 0) {
         /* If it's a capture-only device, we'll need to output silence. */
         if (pDevice->type == ma_device_type_capture) {
-    printf("%i\n", __LINE__);
             MA_ZERO_MEMORY(pOutputs[0].data, frameCount * pDevice->playback.internalChannels * sizeof(float));
         } else {
-    printf("%i\n", __LINE__);
             ma_device_process_pcm_frames_playback__webaudio(pDevice, frameCount, pDevice->webaudio.pIntermediaryBuffer);
 
-    printf("%i\n", __LINE__);
             /* We've read the data from the client. Now we need to deinterleave the buffer and output to the output buffer. */
             for (ma_uint32 iChannel = 0; iChannel < pDevice->playback.internalChannels; iChannel += 1) {
                 for (ma_uint32 iFrame = 0; iFrame < frameCount; iFrame += 1) {
@@ -28512,7 +28502,6 @@ static EM_BOOL ma_audio_worklet_process_callback__webaudio(int inputCount, const
         }
     }
 
-    printf("%i\n", __LINE__);
     return EM_TRUE;
 }
 

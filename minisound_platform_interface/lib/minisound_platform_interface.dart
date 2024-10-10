@@ -20,8 +20,8 @@ abstract class MinisoundPlatform extends PlatformInterface {
   }
 
   PlatformEngine createEngine();
-  PlatformRecorder createRecorder();
-  PlatformGenerator createGenerator();
+  // PlatformRecorder createRecorder();
+  // PlatformGenerator createGenerator();
 }
 
 base class MinisoundPlatformException implements Exception {
