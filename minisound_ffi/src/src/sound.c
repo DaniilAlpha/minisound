@@ -30,8 +30,7 @@ sound_init(Sound *const self, SoundData const sound_data, void *const vengine) {
         &self->sound
     );
     if (r != MA_SUCCESS)
-        return sound_data_uninit(&self->sound_data),
-               error("miniaudio sound initialization error! Error code: %d", r),
+        return error("miniaudio sound initialization error! Error code: %d", r),
                UnknownErr;
 
     return Ok;
@@ -90,6 +89,7 @@ sound_init(Sound *const self, SoundData const sound_data, void *const vengine) {
 void sound_unload(Sound *const self) {
     ma_sound_uninit(&self->sound);
     sound_data_uninit(&self->sound_data);
+    free(self->sound_data._self);
 }
 
 Result sound_play(Sound *const self) {

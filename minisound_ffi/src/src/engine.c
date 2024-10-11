@@ -67,15 +67,21 @@ Result engine_load_sound(
     uint8_t const *const data,
     size_t const data_size
 ) {
-    EncodedSoundData *const sound_data = encoded_sound_data_alloc();
-    if (sound_data == NULL) return OutOfMemErr;
-    UNROLL(encoded_sound_data_init(sound_data, data, data_size));
+    EncodedSoundData *const encoded = encoded_sound_data_alloc();
+    if (encoded == NULL) return OutOfMemErr;
+    UNROLL_CLEANUP(encoded_sound_data_init(encoded, data, data_size), {
+        free(encoded);
+    });
 
-    return sound_init(
-        sound,
-        encoded_sound_data_ww_sound_data(sound_data),
-        self
+    UNROLL_CLEANUP(
+        sound_init(sound, encoded_sound_data_ww_sound_data(encoded), self),
+        {
+            encoded_sound_data_uninit(encoded);
+            free(encoded);
+        }
     );
+
+    return Ok;
 }
 
 Result engine_generate_waveform(
@@ -87,7 +93,18 @@ Result engine_generate_waveform(
 ) {
     WaveformSoundData *const waveform = waveform_sound_data_alloc();
     if (waveform == NULL) return OutOfMemErr;
-    UNROLL(waveform_sound_data_init(waveform, type, frequency, amplitude));
+    UNROLL_CLEANUP(
+        waveform_sound_data_init(waveform, type, frequency, amplitude),
+        { free(waveform); }
+    );
 
-    return sound_init(sound, waveform_sound_data_ww_sound_data(waveform), self);
+    UNROLL_CLEANUP(
+        sound_init(sound, waveform_sound_data_ww_sound_data(waveform), self),
+        {
+            waveform_sound_data_uninit(waveform);
+            free(waveform);
+        }
+    );
+
+    return Ok;
 }

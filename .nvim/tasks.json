@@ -1,4 +1,9 @@
 {
+    "init": {
+        "cmds": [
+            "export CMAKE_LOG_LEVEL=NOTICE"
+        ]
+    },
     "tasks": {
         "get": {
             "icon": "󰇚",
@@ -30,10 +35,18 @@
                 "flutter run -d linux"
             ]
         },
+        "test": {
+            "icon": "󰙨",
+            "cmd": [
+                "make clean_native_test",
+                "export CMAKE_EXPORT_COMPILE_COMMANDS=1; make build_native_test",
+                "echo; gdb ./minisound_ffi/test_native/build/minisound_test"
+            ]
+        },
         "ffigen": {
             "desc": "generate dart ffi bindings",
             "cmd": [
-                "cd ./minisound_ffi",
+                "cd ./minisound_ffi/",
                 "dart run ffigen"
             ]
         },

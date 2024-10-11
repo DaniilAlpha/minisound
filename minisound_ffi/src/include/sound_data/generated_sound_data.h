@@ -24,6 +24,7 @@ Result waveform_sound_data_init(
     double const frequency,
     double const amplitude
 );
+void waveform_sound_data_uninit(WaveformSoundData *const self);
 
 SoundData waveform_sound_data_ww_sound_data(WaveformSoundData *const self);
 

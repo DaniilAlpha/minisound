@@ -32,19 +32,18 @@ file(GLOB_RECURSE MAIN_SOURCES
     ${MAIN_PATH}/src/*.c
     ${MAIN_PATH}/external/*/src/*.c
 )
-target_sources(${MAIN_LIB} PUBLIC ${MAIN_SOURCES})
+target_sources(${MAIN_LIB} PRIVATE ${MAIN_SOURCES})
 
 # Includes
 # file(GLOB_RECURSE MAIN_INCLUDES LIST_DIRECTORIES TRUE
 #     ${MAIN_PATH}/external/*/include/
 # )
-# message(FATAL_ERROR ${MAIN_INCLUDES})
 # list(APPEND MAIN_INCLUDES ${MAIN_PATH}/include/)
-# target_include_directories(${MAIN_LIB} PUBLIC ${MAIN_INCLUDES})
+# target_include_directories(${MAIN_LIB} PRIVATE ${MAIN_INCLUDES})
 
 
 # Definitions
-target_compile_definitions(${MAIN_LIB} PUBLIC DART_SHARED_LIB
+target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB
     # ours
     MILO_DEFAULT_LVL=MILO_LVL_NONE
     ENGINE_MILO_LVL=MILO_LVL_INFO
@@ -62,7 +61,7 @@ if(NOT EMSCRIPTEN)
         message(ERROR "No miniaudio backend for your platform enabled! Sound will not work!")
     endif()
 
-    target_compile_definitions(${MAIN_LIB} PUBLIC
+    target_compile_definitions(${MAIN_LIB} PRIVATE
         # windows
         MA_ENABLE_WASAPI
         # linux
@@ -75,7 +74,7 @@ if(NOT EMSCRIPTEN)
         MA_ENABLE_COREAUDIO
     )
 else()
-    target_compile_definitions(${MAIN_LIB} PUBLIC
+    target_compile_definitions(${MAIN_LIB} PRIVATE
         MA_ENABLE_WEBAUDIO
         MA_ENABLE_AUDIO_WORKLETS
     )
@@ -83,7 +82,7 @@ endif()
 
 
 # Set properties
-target_compile_options(${MAIN_LIB} PUBLIC -W -Wall -Wextra -Wformat -Wno-unused-function)
+target_compile_options(${MAIN_LIB} PRIVATE -W -Wall -Wextra -Wformat -Wno-unused-function)
 
 if(NOT EMSCRIPTEN)
     set_target_properties(${MAIN_LIB} PROPERTIES
@@ -91,16 +90,16 @@ if(NOT EMSCRIPTEN)
         OUTPUT_NAME ${MAIN_LIB}
     )
 
-    set(COMPILE_AND_LINK_OPTS -Og -g -fsanitize=leak)
-    target_compile_options(${MAIN_LIB} PUBLIC ${COMPILE_AND_LINK_OPTS})
-    target_link_options(${MAIN_LIB} PUBLIC ${COMPILE_AND_LINK_OPTS})
+    set(COMPILE_AND_LINK_OPTS -Og -g )
+    target_compile_options(${MAIN_LIB} PRIVATE ${COMPILE_AND_LINK_OPTS})
+    target_link_options(${MAIN_LIB} PRIVATE ${COMPILE_AND_LINK_OPTS})
     unset(COMMON_OPTIONS)
 else()
     set_target_properties(${MAIN_LIB} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${WEB_OUT_DIR}
     )
 
-    target_compile_options(${MAIN_LIB} PUBLIC -Og -g -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
+    target_compile_options(${MAIN_LIB} PRIVATE -Og -g -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
     set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
         -Og -g -gsource-map \
         -flto -fno-rtti -fno-exceptions \
