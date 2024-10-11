@@ -40,7 +40,7 @@
             "cmd": [
                 "make clean_native_test",
                 "export CMAKE_EXPORT_COMPILE_COMMANDS=1; make build_native_test",
-                "echo; gdb ./minisound_ffi/test_native/build/minisound_test"
+                "echo; ./minisound_ffi/test_native/build/minisound_test"
             ]
         },
         "ffigen": {

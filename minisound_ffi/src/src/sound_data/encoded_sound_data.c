@@ -26,13 +26,12 @@ Result encoded_sound_data_init(
 
     ma_result const r =
         ma_decoder_init_memory(data, data_size, NULL, &self->decoder);
-    if (r != MA_SUCCESS) {
+    if (r != MA_SUCCESS)
         return error(
                    "miniaudio decoder initialization error! Error code: %d",
                    r
                ),
                UnknownErr;
-    }
 
     return Ok;
 }

@@ -1,3 +1,7 @@
+/* TODO!!! for some reason on miniaudio.c:63139 ma_engine_get_channels() returns
+ `0`, after error happened it becomes `2`. Very likely that something was not
+ initialized at that moment. */
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -69,10 +73,11 @@ int main(int const argc, char const *const argv[]) {
     Engine *const engine = engine_alloc();
     if (engine == NULL) return -2;
 
-    engine_init(engine, 33), engine_start(engine);
+    engine_init(engine, 33);
+    engine_start(engine);
 
     Result const r =
-        test_sound(engine, "../minisound/example/assets/laser_shoot.wav");
+        test_sound(engine, "./minisound/example/assets/laser_shoot.wav");
     if (r != Ok) printf("ERROR: %s\n", explain(r));
 
     engine_uninit(engine), free(engine);

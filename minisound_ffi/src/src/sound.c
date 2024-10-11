@@ -17,10 +17,13 @@ struct Sound {
 };
 
 Sound *sound_alloc(void) { return malloc(sizeof(Sound)); }
-Result
-sound_init(Sound *const self, SoundData const sound_data, void *const vengine) {
+Result sound_init(
+    Sound *const self,
+    SoundData const sound_data,
+    void *const v_engine
+) {
     self->sound_data = sound_data;
-    self->engine = vengine;
+    self->engine = v_engine;
 
     ma_result const r = ma_sound_init_from_data_source(
         self->engine,

@@ -18,7 +18,6 @@ struct Engine {
     bool is_started;
 
     ma_engine engine;
-    ma_decoder_config dec_config;
 };
 
 /************
@@ -36,11 +35,11 @@ Result engine_init(Engine *const self, uint32_t const period_ms) {
     if (ma_engine_init(&engine_config, &self->engine) != MA_SUCCESS)
         return error("miniaudio engine initialization error!"), UnknownErr;
 
-    self->dec_config = ma_decoder_config_init(
-        self->engine.pDevice->playback.format,
-        self->engine.pDevice->playback.channels,
-        self->engine.sampleRate
-    );
+    // self->dec_config = ma_decoder_config_init(
+    //     self->engine.pDevice->playback.format,
+    //     self->engine.pDevice->playback.channels,
+    //     self->engine.sampleRate
+    // );
 
     info("engine initialized");
 
@@ -57,6 +56,7 @@ Result engine_start(Engine *const self) {
     self->is_started = true;
 
     info("engine started");
+    info("%i", ma_engine_get_channels(&self->engine));
 
     return Ok;
 }
@@ -74,7 +74,11 @@ Result engine_load_sound(
     });
 
     UNROLL_CLEANUP(
-        sound_init(sound, encoded_sound_data_ww_sound_data(encoded), self),
+        sound_init(
+            sound,
+            encoded_sound_data_ww_sound_data(encoded),
+            &self->engine
+        ),
         {
             encoded_sound_data_uninit(encoded);
             free(encoded);

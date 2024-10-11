@@ -23,7 +23,7 @@ Result sound_init(
     // SoundFormat const sound_format,
     // uint32_t const channels,
     // uint32_t const sample_rate,
-    void *const vengine
+    void *const v_engine
 );
 EXPORT void sound_unload(Sound *const self);
 
