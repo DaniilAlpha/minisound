@@ -13,6 +13,7 @@ file(GLOB_RECURSE TEST_SOURCES
 target_sources(${TEST} PRIVATE ${TEST_SOURCES})
 
 target_include_directories(${TEST} PRIVATE ${MAIN_PATH}/include/)
+target_include_directories(${TEST} PRIVATE ${TEST_PATH}/external/miunte/)
 
 set(COMPILE_AND_LINK_OPTS -Og -g -fsanitize=address)
 target_compile_options(${TEST} PRIVATE ${COMPILE_AND_LINK_OPTS})

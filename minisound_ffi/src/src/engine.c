@@ -103,7 +103,11 @@ Result engine_generate_waveform(
     );
 
     UNROLL_CLEANUP(
-        sound_init(sound, waveform_sound_data_ww_sound_data(waveform), self),
+        sound_init(
+            sound,
+            waveform_sound_data_ww_sound_data(waveform),
+            &self->engine
+        ),
         {
             waveform_sound_data_uninit(waveform);
             free(waveform);

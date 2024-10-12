@@ -68,7 +68,6 @@ final class FfiEngine implements PlatformEngine {
       frequency,
       amplitude,
     );
-    print("");
     if (r != c.Result.Ok) {
       malloc.free(sound);
       throw MinisoundPlatformException("Failed to load a sound (code: $r).");
