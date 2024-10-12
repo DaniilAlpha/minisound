@@ -56,7 +56,6 @@ Result engine_start(Engine *const self) {
     self->is_started = true;
 
     info("engine started");
-    info("%i", ma_engine_get_channels(&self->engine));
 
     return Ok;
 }
@@ -92,15 +91,13 @@ Result engine_generate_waveform(
     Engine *const self,
     Sound *const sound,
     WaveformType const type,
-    double const frequency,
-    double const amplitude
+    double const frequency
 ) {
     WaveformSoundData *const waveform = waveform_sound_data_alloc();
     if (waveform == NULL) return OutOfMemErr;
-    UNROLL_CLEANUP(
-        waveform_sound_data_init(waveform, type, frequency, amplitude),
-        { free(waveform); }
-    );
+    UNROLL_CLEANUP(waveform_sound_data_init(waveform, type, frequency), {
+        free(waveform);
+    });
 
     UNROLL_CLEANUP(
         sound_init(
@@ -111,6 +108,48 @@ Result engine_generate_waveform(
         {
             waveform_sound_data_uninit(waveform);
             free(waveform);
+        }
+    );
+
+    return Ok;
+}
+Result engine_generate_noise(
+    Engine *const self,
+    Sound *const sound,
+    NoiseType const type,
+    int32_t const seed
+) {
+    NoiseSoundData *const noise = noise_sound_data_alloc();
+    if (noise == NULL) return OutOfMemErr;
+    UNROLL_CLEANUP(noise_sound_data_init(noise, type, seed), { free(noise); });
+
+    UNROLL_CLEANUP(
+        sound_init(sound, noise_sound_data_ww_sound_data(noise), &self->engine),
+        {
+            noise_sound_data_uninit(noise);
+            free(noise);
+        }
+    );
+
+    return Ok;
+}
+Result engine_generate_pulse(
+    Engine *const self,
+    Sound *const sound,
+    double const frequency,
+    double const duty_cycle
+) {
+    PulseSoundData *const pulse = pulse_sound_data_alloc();
+    if (pulse == NULL) return OutOfMemErr;
+    UNROLL_CLEANUP(pulse_sound_data_init(pulse, frequency, duty_cycle), {
+        free(pulse);
+    });
+
+    UNROLL_CLEANUP(
+        sound_init(sound, pulse_sound_data_ww_sound_data(pulse), &self->engine),
+        {
+            pulse_sound_data_uninit(pulse);
+            free(pulse);
         }
     );
 

@@ -7,14 +7,12 @@
 #define MILO_LVL SOUND_MILO_LVL
 #include "../../external/milo/milo.h"
 
+#define DEFAULT_AMPLITUDE (0.5)
+
+// waveform
+
 struct WaveformSoundData {
     ma_waveform waveform;
-};
-struct NoiseSoundData {
-    ma_noise noise;
-};
-struct PulseSoundData {
-    ma_pulsewave pulse;
 };
 
 WaveformSoundData *waveform_sound_data_alloc(void) {
@@ -23,21 +21,15 @@ WaveformSoundData *waveform_sound_data_alloc(void) {
 Result waveform_sound_data_init(
     WaveformSoundData *const self,
     WaveformType const type,
-    double const frequency,
-    double const amplitude
+    double const frequency
 ) {
     ma_waveform_config const config = ma_waveform_config_init(
-        // self->device.playback.format,
-        // self->device.playback.channels,
-        // self->device.sampleRate,
-        // 0,
-        // 0,
-        // 0,
+        // TODO? maybe needs not to be hardcoded here
         ma_format_f32,
         1,
         48000,
         (ma_waveform_type)type,
-        amplitude,
+        DEFAULT_AMPLITUDE,
         frequency
     );
     if (ma_waveform_init(&config, &self->waveform) != MA_SUCCESS)
@@ -63,29 +55,54 @@ SoundData waveform_sound_data_ww_sound_data(WaveformSoundData *const self)
         }
     );
 
+// noise
+
+struct NoiseSoundData {
+    ma_noise noise;
+};
+
 NoiseSoundData *noise_sound_data_alloc(void) {
     return malloc(sizeof(NoiseSoundData));
 }
 Result noise_sound_data_init(
     NoiseSoundData *const self,
     NoiseType const type,
-    int32_t const seed,
-    double const amplitude
+    int32_t const seed
 ) {
     ma_noise_config const config = ma_noise_config_init(
-        // self->device.playback.format,
-        // self->device.playback.channels,
-        0,
-        0,
+        ma_format_f32,
+        1,
         (ma_noise_type)type,
         seed,
-        amplitude
+        DEFAULT_AMPLITUDE
     );
     if (ma_noise_init(&config, NULL, &self->noise) != MA_SUCCESS)
         return error("failed to initialize noise"), UnknownErr;
 
     return Ok;
 }
+void noise_sound_data_uninit(NoiseSoundData *const self) {
+    ma_noise_uninit(&self->noise, NULL);
+}
+
+ma_data_source *noise_sound_data_get_ds(NoiseSoundData *const self) {
+    return &self->noise;
+}
+
+SoundData noise_sound_data_ww_sound_data(NoiseSoundData *const self) WRAP_BODY(
+    SoundData,
+    SOUND_DATA_INTERFACE(NoiseSoundData),
+    {
+        .get_ds = noise_sound_data_get_ds,
+        .uninit = noise_sound_data_uninit,
+    }
+);
+
+// pulse
+
+struct PulseSoundData {
+    ma_pulsewave pulse;
+};
 
 PulseSoundData *pulse_sound_data_alloc(void) {
     return malloc(sizeof(PulseSoundData));
@@ -93,13 +110,34 @@ PulseSoundData *pulse_sound_data_alloc(void) {
 Result pulse_sound_data_init(
     PulseSoundData *const self,
     double const frequency,
-    double const amplitude,
     double const duty_cycle
 ) {
-    ma_pulsewave_config const config =
-        ma_pulsewave_config_init(0, 0, 0, duty_cycle, amplitude, frequency);
+    ma_pulsewave_config const config = ma_pulsewave_config_init(
+        ma_format_f32,
+        1,
+        48000,
+        duty_cycle,
+        DEFAULT_AMPLITUDE,
+        frequency
+    );
     if (ma_pulsewave_init(&config, &self->pulse) != MA_SUCCESS)
         return error("failed to initialize pulsewave"), UnknownErr;
 
     return Ok;
 }
+void pulse_sound_data_uninit(PulseSoundData *const self) {
+    ma_pulsewave_uninit(&self->pulse);
+}
+
+ma_data_source *pulse_sound_data_get_ds(PulseSoundData *const self) {
+    return &self->pulse;
+}
+
+SoundData pulse_sound_data_ww_sound_data(PulseSoundData *const self) WRAP_BODY(
+    SoundData,
+    SOUND_DATA_INTERFACE(PulseSoundData),
+    {
+        .get_ds = pulse_sound_data_get_ds,
+        .uninit = pulse_sound_data_uninit,
+    }
+);

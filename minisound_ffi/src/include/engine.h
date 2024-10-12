@@ -29,8 +29,19 @@ EXPORT Result engine_generate_waveform(
     Engine *const self,
     Sound *const sound,
     WaveformType const type,
+    double const frequency
+);
+EXPORT Result engine_generate_noise(
+    Engine *const self,
+    Sound *const sound,
+    NoiseType const type,
+    int32_t const seed
+);
+EXPORT Result engine_generate_pulse(
+    Engine *const self,
+    Sound *const sound,
     double const frequency,
-    double const amplitude
+    double const duty_cycle
 );
 
 #endif

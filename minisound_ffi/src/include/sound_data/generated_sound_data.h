@@ -1,3 +1,5 @@
+// TODO allow for modifying generated properties not only on init
+
 #ifndef GENERATED_SOUND_DATA_H
 #define GENERATED_SOUND_DATA_H
 
@@ -21,8 +23,7 @@ WaveformSoundData *waveform_sound_data_alloc(void);
 Result waveform_sound_data_init(
     WaveformSoundData *const self,
     WaveformType const type,
-    double const frequency,
-    double const amplitude
+    double const frequency
 );
 void waveform_sound_data_uninit(WaveformSoundData *const self);
 
@@ -41,9 +42,9 @@ NoiseSoundData *noise_sound_data_alloc(void);
 Result noise_sound_data_init(
     NoiseSoundData *const self,
     NoiseType const type,
-    int32_t const seed,
-    double const amplitude
+    int32_t const seed
 );
+void noise_sound_data_uninit(NoiseSoundData *const self);
 
 SoundData noise_sound_data_ww_sound_data(NoiseSoundData *const self);
 
@@ -55,9 +56,9 @@ PulseSoundData *pulse_sound_data_alloc(void);
 Result pulse_sound_data_init(
     PulseSoundData *const self,
     double const frequency,
-    double const amplitude,
     double const duty_cycle
 );
+void pulse_sound_data_uninit(PulseSoundData *const self);
 
 SoundData pulse_sound_data_ww_sound_data(PulseSoundData *const self);
 

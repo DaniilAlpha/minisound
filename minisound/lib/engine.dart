@@ -53,17 +53,28 @@ final class Engine {
     return loadSound(AudioData(bytes));
   }
 
-  /// Generates a sound of waveform using given parameters.
-  Future<Sound> generateWaveform({
+  /// Generates a waveform sound using given parameters.
+  Sound generateWaveform({
     WaveformType type = WaveformType.sine,
-    double frequency = 440.0,
-    double amplitude = 0.5,
-  }) async {
-    final engineSound = await _engine.generateWaveform(
-      type: type,
-      frequency: frequency,
-      amplitude: amplitude,
-    );
+    double freq = 440.0,
+  }) {
+    final engineSound = _engine.generateWaveform(type: type, freq: freq);
+    final sound = Sound._(engineSound);
+    _soundsFinalizer.attach(this, sound);
+    return sound;
+  }
+
+  /// Generates a noise sound using given parameters.
+  Sound generateNoise({NoiseType type = NoiseType.white, int seed = 0}) {
+    final engineSound = _engine.generateNoise(type: type, seed: seed);
+    final sound = Sound._(engineSound);
+    _soundsFinalizer.attach(this, sound);
+    return sound;
+  }
+
+  /// Generates a pulsewave sound using given parameters.
+  Sound generatePulse({double freq = 440.0, double dutyCycle = 0.5}) {
+    final engineSound = _engine.generatePulse(freq: freq, dutyCycle: dutyCycle);
     final sound = Sound._(engineSound);
     _soundsFinalizer.attach(this, sound);
     return sound;

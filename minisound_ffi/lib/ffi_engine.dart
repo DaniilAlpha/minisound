@@ -53,21 +53,43 @@ final class FfiEngine implements PlatformEngine {
   }
 
   @override
-  Future<FfiSound> generateWaveform({
+  FfiSound generateWaveform({
     required WaveformType type,
-    required double frequency,
-    required double amplitude,
-  }) async {
+    required double freq,
+  }) {
     final sound = _bindings.sound_alloc();
     if (sound == nullptr) throw MinisoundPlatformOutOfMemoryException();
 
-    final r = _bindings.engine_generate_waveform(
-      _self,
-      sound,
-      type.toC(),
-      frequency,
-      amplitude,
-    );
+    final r =
+        _bindings.engine_generate_waveform(_self, sound, type.toC(), freq);
+    if (r != c.Result.Ok) {
+      malloc.free(sound);
+      throw MinisoundPlatformException("Failed to load a sound (code: $r).");
+    }
+
+    return FfiSound._fromPtrs(sound);
+  }
+
+  @override
+  FfiSound generateNoise({required NoiseType type, required int seed}) {
+    final sound = _bindings.sound_alloc();
+    if (sound == nullptr) throw MinisoundPlatformOutOfMemoryException();
+
+    final r = _bindings.engine_generate_noise(_self, sound, type.toC(), seed);
+    if (r != c.Result.Ok) {
+      malloc.free(sound);
+      throw MinisoundPlatformException("Failed to load a sound (code: $r).");
+    }
+
+    return FfiSound._fromPtrs(sound);
+  }
+
+  @override
+  FfiSound generatePulse({required double freq, required double dutyCycle}) {
+    final sound = _bindings.sound_alloc();
+    if (sound == nullptr) throw MinisoundPlatformOutOfMemoryException();
+
+    final r = _bindings.engine_generate_pulse(_self, sound, freq, dutyCycle);
     if (r != c.Result.Ok) {
       malloc.free(sound);
       throw MinisoundPlatformException("Failed to load a sound (code: $r).");
@@ -86,10 +108,10 @@ extension on WaveformType {
       };
 }
 
-// extension on NoiseType {
-//   int toC() => switch (this) {
-//         NoiseType.white => c.WaveformType.NOISE_TYPE_WHITE,
-//         NoiseType.pink => c.NoiseType.NOISE_TYPE_PINK,
-//         NoiseType.brownian => c.NoiseType.NOISE_TYPE_BROWNIAN,
-//       };
-// }
+extension on NoiseType {
+  int toC() => switch (this) {
+        NoiseType.white => c.NoiseType.NOISE_TYPE_WHITE,
+        NoiseType.pink => c.NoiseType.NOISE_TYPE_PINK,
+        NoiseType.brownian => c.NoiseType.NOISE_TYPE_BROWNIAN,
+      };
+}

@@ -21,7 +21,7 @@ class _ExamplePageState extends State<ExamplePage> {
   // late final recorder = Recorder();
   // late final generator = Generator(mainEngine: engine);
 
-  late final initFuture = engine.init().then((_) => print("engine init!"))
+  late final initFuture = engine.init()
       // .then((_) => recorder.initStream(channels: 1))
       // .then((_) => generator.init())
       ;

@@ -23,8 +23,12 @@ long fsize(FILE *const file) {
     return file_last + 1;
 }
 
-int sleep(size_t const s) {
-    return thrd_sleep(&(struct timespec){.tv_sec = s}, NULL);
+int sleep(size_t const ms) {
+    return thrd_sleep(
+        ms >= 1000 ? &(struct timespec){.tv_sec = ms / 1000}
+                   : &(struct timespec){.tv_nsec = ms * 1000000},
+        NULL
+    );
 }
 
 Result load_file(
@@ -91,7 +95,7 @@ MiunteResult test_encoded_sounds() {
 
         MIUNTE_EXPECT(sound_play(sound) == Ok, "sound playing should not fail");
 
-        sleep(1);
+        sleep(600);
 
         sound_unload(sound);
         free(buf);
@@ -101,8 +105,7 @@ MiunteResult test_encoded_sounds() {
     MIUNTE_PASS();
 }
 MiunteResult test_generated_waveform_sounds() {
-    double freqs[] =
-        {261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25};
+    double freqs[] = {261.63, 329.63, 440.00, 523.25};
     for (size_t i = 0; i < lenof(freqs); i++) {
         Sound *const sound = sound_alloc();
         MIUNTE_EXPECT(sound != NULL, "sound should be allocated properly");
@@ -112,14 +115,13 @@ MiunteResult test_generated_waveform_sounds() {
                 engine,
                 sound,
                 WAVEFORM_TYPE_SINE,
-                freqs[i],
-                0.5
+                freqs[i]
             ) == Ok,
             "sound generation should not fail"
         );
         MIUNTE_EXPECT(sound_play(sound) == Ok, "sound playing should not fail");
 
-        sleep(1);
+        sleep(200);
 
         sound_unload(sound);
         free(sound);
@@ -127,14 +129,55 @@ MiunteResult test_generated_waveform_sounds() {
 
     MIUNTE_PASS();
 }
+MiunteResult test_generated_noise_sounds() {
+    Sound *const sound = sound_alloc();
+    MIUNTE_EXPECT(sound != NULL, "sound should be allocated properly");
+
+    MIUNTE_EXPECT(
+        engine_generate_noise(engine, sound, NOISE_TYPE_BROWNIAN, 0) == Ok,
+        "sound generation should not fail"
+    );
+    MIUNTE_EXPECT(sound_play(sound) == Ok, "sound playing should not fail");
+
+    sleep(1000);
+
+    sound_unload(sound);
+    free(sound);
+
+    MIUNTE_PASS();
+}
+MiunteResult test_generated_pulse_sounds() {
+    Sound *const sound = sound_alloc();
+    MIUNTE_EXPECT(sound != NULL, "sound should be allocated properly");
+
+    MIUNTE_EXPECT(
+        engine_generate_pulse(engine, sound, 261.63, 0.1) == Ok,
+        "sound generation should not fail"
+    );
+    MIUNTE_EXPECT(sound_play(sound) == Ok, "sound playing should not fail");
+
+    sleep(600);
+
+    sound_unload(sound);
+    free(sound);
+
+    MIUNTE_PASS();
+}
 
 int main() {
+    engine = engine_alloc();
+
+    engine_init(engine, 33);
+    engine_start(engine);
+
     MIUNTE_RUN(
         setup_test,
         teardown_test,
         {
             test_encoded_sounds,
             test_generated_waveform_sounds,
+            test_generated_noise_sounds,
+            test_generated_pulse_sounds,
         }
     );
 

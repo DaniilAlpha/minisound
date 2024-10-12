@@ -83,25 +83,17 @@ class _GeneratorExampleState extends State<GeneratorExample> {
       },
       ElevatedButton(
         child: const Text("PLAY"),
-        onPressed: () async {
+        onPressed: () {
           sound?.stop();
-          sound = await switch (generatorType) {
+          sound = switch (generatorType) {
             GeneratorType.wave =>
               widget.engine.generateWaveform(type: waveformType),
-            _ => throw UnimplementedError(),
-
-            // case GeneratorType.noise:
-            //   widget.generator.setNoise(type: noiseType);
-            //
-            // case GeneratorType.pulse:
-            //   widget.generator.setPulsewave(
-            //     frequency: pulsewaveFrequency,
-            //     dutyCycle: pulseDelay,
-            //   );
-          };
-          print("generated");
-          sound!.play();
-          setState(() {});
+            GeneratorType.noise => widget.engine.generateNoise(type: noiseType),
+            GeneratorType.pulse =>
+              widget.engine.generatePulse(dutyCycle: pulseDelay),
+          }
+            ..volume = 0.3;
+          widget.engine.start().then((_) => sound!.play());
         },
       ),
       ElevatedButton(

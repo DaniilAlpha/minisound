@@ -40,12 +40,12 @@ class MinisoundFfiBindings {
   int sound_init(
     ffi.Pointer<Sound> self,
     SoundData sound_data,
-    ffi.Pointer<ffi.Void> vengine,
+    ffi.Pointer<ffi.Void> v_engine,
   ) {
     return _sound_init(
       self,
       sound_data,
-      vengine,
+      v_engine,
     );
   }
 
@@ -270,25 +270,64 @@ class MinisoundFfiBindings {
     ffi.Pointer<Sound> sound,
     int type,
     double frequency,
-    double amplitude,
   ) {
     return _engine_generate_waveform(
       self,
       sound,
       type,
       frequency,
-      amplitude,
     );
   }
 
   late final _engine_generate_waveformPtr = _lookup<
       ffi.NativeFunction<
           ffi.Int32 Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>, ffi.Int32,
-              ffi.Double, ffi.Double)>>('engine_generate_waveform');
+              ffi.Double)>>('engine_generate_waveform');
   late final _engine_generate_waveform =
       _engine_generate_waveformPtr.asFunction<
-          int Function(
-              ffi.Pointer<Engine>, ffi.Pointer<Sound>, int, double, double)>();
+          int Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>, int, double)>();
+
+  int engine_generate_noise(
+    ffi.Pointer<Engine> self,
+    ffi.Pointer<Sound> sound,
+    int type,
+    int seed,
+  ) {
+    return _engine_generate_noise(
+      self,
+      sound,
+      type,
+      seed,
+    );
+  }
+
+  late final _engine_generate_noisePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>, ffi.Int32,
+              ffi.Int32)>>('engine_generate_noise');
+  late final _engine_generate_noise = _engine_generate_noisePtr.asFunction<
+      int Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>, int, int)>();
+
+  int engine_generate_pulse(
+    ffi.Pointer<Engine> self,
+    ffi.Pointer<Sound> sound,
+    double frequency,
+    double duty_cycle,
+  ) {
+    return _engine_generate_pulse(
+      self,
+      sound,
+      frequency,
+      duty_cycle,
+    );
+  }
+
+  late final _engine_generate_pulsePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>,
+              ffi.Double, ffi.Double)>>('engine_generate_pulse');
+  late final _engine_generate_pulse = _engine_generate_pulsePtr.asFunction<
+      int Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>, double, double)>();
 }
 
 final class Sound extends ffi.Opaque {}
@@ -323,6 +362,12 @@ abstract class WaveformType {
   static const int WAVEFORM_TYPE_SQUARE = 1;
   static const int WAVEFORM_TYPE_TRIANGLE = 2;
   static const int WAVEFORM_TYPE_SAWTOOTH = 3;
+}
+
+abstract class NoiseType {
+  static const int NOISE_TYPE_WHITE = 0;
+  static const int NOISE_TYPE_PINK = 1;
+  static const int NOISE_TYPE_BROWNIAN = 2;
 }
 
 const int __bool_true_false_are_defined = 1;

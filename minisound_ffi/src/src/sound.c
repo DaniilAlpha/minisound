@@ -9,9 +9,9 @@
 #include "../external/milo/milo.h"
 
 struct Sound {
-    ma_sound sound;
-
     SoundData sound_data;
+
+    ma_sound sound;
 
     ma_engine *engine;
 };
