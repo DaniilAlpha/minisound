@@ -1,4 +1,5 @@
 // TODO allow for modifying generated properties not only on init
+// TODO! seems like pulse's `duty_cylce` has no effect. is it a bug?
 
 #ifndef GENERATED_SOUND_DATA_H
 #define GENERATED_SOUND_DATA_H
