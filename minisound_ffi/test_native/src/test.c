@@ -7,6 +7,8 @@
 #include <threads.h>
 
 #include "engine.h"
+#include "recorder.h"
+#include "recording.h"
 
 #define lenof(arr) (sizeof(arr) / sizeof(arr[0]))
 
@@ -59,15 +61,21 @@ MiunteResult setup_test() {
     engine = engine_alloc();
     MIUNTE_EXPECT(engine != NULL, "engine should be allocated properly");
 
-    engine_init(engine, 33);
-    engine_start(engine);
+    MIUNTE_EXPECT(
+        engine_init(engine, 33) == Ok,
+        "engine initialization should not fail"
+    );
+    MIUNTE_EXPECT(
+        engine_start(engine) == Ok,
+        "engine starting should not fail"
+    );
 
     MIUNTE_PASS();
 }
 
 MiunteResult teardown_test() {
     engine_uninit(engine);
-    free(engine);
+    free(engine), engine = NULL;
 
     MIUNTE_PASS();
 }
@@ -98,7 +106,7 @@ MiunteResult test_encoded_sounds() {
         sleep(600);
 
         sound_unload(sound);
-        free(buf);
+        free(buf), buf = NULL;
         free(sound);
     }
 
@@ -163,13 +171,41 @@ MiunteResult test_generated_pulse_sounds() {
 
     MIUNTE_PASS();
 }
+MiunteResult test_recording() {
+    Recorder *const recorder = recorder_alloc();
+    MIUNTE_EXPECT(recorder != NULL, "recorder should be allocated properly");
+
+    MIUNTE_EXPECT(
+        recorder_init(
+            recorder,
+            RECORDER_ENCODING_WAV,
+            RECORDER_FORMAT_F32,
+            2,
+            48000
+        ) == Ok,
+        "recorder initialization should not fail"
+    );
+    MIUNTE_EXPECT(
+        recorder_start(recorder) == Ok,
+        "recorder starting should not fail"
+    );
+
+    sleep(3000);
+
+    Recording *const rec = recorder_stop(recorder);
+
+    FILE *const file = fopen("recording.wav", "wb");
+    MIUNTE_EXPECT(file != NULL, "file should open properly");
+    fwrite(recording_get_buf(rec), 1, recording_get_size(rec), file);
+    fclose(file);
+
+    recording_uninit(rec), free(rec);
+    recorder_uninit(recorder), free(recorder);
+
+    MIUNTE_PASS();
+}
 
 int main() {
-    engine = engine_alloc();
-
-    engine_init(engine, 33);
-    engine_start(engine);
-
     MIUNTE_RUN(
         setup_test,
         teardown_test,
@@ -178,6 +214,7 @@ int main() {
             test_generated_waveform_sounds,
             test_generated_noise_sounds,
             test_generated_pulse_sounds,
+            test_recording,
         }
     );
 

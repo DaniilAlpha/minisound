@@ -141,3 +141,18 @@ SoundData pulse_sound_data_ww_sound_data(PulseSoundData *const self) WRAP_BODY(
         .uninit = pulse_sound_data_uninit,
     }
 );
+
+// clang-format off
+
+// this ensures safe casting between `WaveformType` and `ma_waveform_type`
+_Static_assert((int)WAVEFORM_TYPE_SINE == (int)ma_waveform_type_sine, "`GENERATOR_WAVEFORM_TYPE_SINE` should match `ma_vaweform_type_sine`.");
+_Static_assert((int)WAVEFORM_TYPE_SQUARE == (int)ma_waveform_type_square, "`GENERATOR_WAVEFORM_TYPE_SQUARE` should match `ma_waveform_type_square`.");
+_Static_assert((int)WAVEFORM_TYPE_TRIANGLE == (int)ma_waveform_type_triangle, "`GENERATOR_WAVEFORM_TYPE_TRIANGLE` should match `ma_waveform_type_triangle`.");
+_Static_assert((int)WAVEFORM_TYPE_SAWTOOTH == (int)ma_waveform_type_sawtooth, "`GENERATOR_WAVEFORM_TYPE_SAWTOOTH` should match `ma_waveform_type_sawtooth`.");
+
+// this ensures safe casting between `NoiseType` and `ma_noise_type`
+_Static_assert((int)NOISE_TYPE_WHITE == (int)ma_noise_type_white, "`GENERATOR_NOISE_TYPE_WHITE` should match `ma_noise_type_white`.");
+_Static_assert((int)NOISE_TYPE_PINK == (int)ma_noise_type_pink, "`GENERATOR_NOISE_TYPE_PINK` should match `ma_noise_type_pink`.");
+_Static_assert((int)NOISE_TYPE_BROWNIAN == (int)ma_noise_type_brownian, "`GENERATOR_NOISE_TYPE_BROWNIAN` should match `ma_noise_type_brownian`.");
+
+// clang-format on

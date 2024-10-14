@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "../external/miniaudio/include/miniaudio.h"
+#include "../include/recording.h"
 
 #define MILO_LVL RECORDER_MILO_LVL
 #include "../external/milo/milo.h"
@@ -12,65 +13,70 @@
  ** private **
  *************/
 
+// recorder
+
 struct Recorder {
     bool is_recording;
 
     ma_device device;
-    ma_encoder encoder;
 
-    uint8_t *buf;
-    size_t buf_len;
+    Recording *recording;
 };
 
 ma_result encoder_on_write(
     ma_encoder *const encoder,
-    void const *buf,
-    size_t const buf_len,
-    size_t *const out_written_len
+    void const *const data,
+    size_t const data_size,
+    size_t *const out_written_data_size
 ) {
     Recorder *const self = encoder->pUserData;
 
-    uint8_t *const new_buf = realloc(self->buf, self->buf_len + buf_len);
-    if (new_buf == NULL) return MA_OUT_OF_MEMORY;
+    if (recording_write(self->recording, data, data_size) != Ok)
+        return MA_ERROR;
 
-    memcpy(new_buf + self->buf_len, buf, buf_len);
-
-    self->buf = new_buf;
-    self->buf_len += buf_len;
-
-    if (out_written_len != NULL) *out_written_len = buf_len;
-
-    return MA_SUCCESS;
+    return *out_written_data_size = data_size, MA_SUCCESS;
 }
 
 ma_result encoder_on_seek(
-    ma_encoder *const self,
-    ma_int64 const offset,
+    ma_encoder *const encoder,
+    long long const off_from_origin,
     ma_seek_origin const origin
 ) {
-    return MA_SUCCESS;
+    Recorder *const self = encoder->pUserData;
+
+    size_t off = 0;
+    switch (origin) {
+    case ma_seek_origin_start: off = off_from_origin; break;
+    case ma_seek_origin_current:
+        off = recording_get_off(self->recording) + off_from_origin;
+        break;
+    case ma_seek_origin_end:
+        off = recording_get_size(self->recording) - 1 - off_from_origin;
+        break;
+    }
+
+    recording_set_off(self->recording, off);
+
+    return recording_get_off(self->recording) == off ? MA_SUCCESS : MA_ERROR;
 }
 
 static void data_callback(
     ma_device *const device,
     void *const _,
-    void const *const in_buf,
-    size_t in_buf_len
+    void const *const data,
+    uint32_t const data_size
 ) {
     (void)_;
 
     Recorder *const self = device->pUserData;
 
-    // size_t const floatsToWrite = in_buf_len * self->channels;
-
-    // // Write raw PCM data directly to the circular buffer
-    // circular_buffer_write(
-    //     &self->circular_buffer,
-    //     (float const *)pInput,
-    //     floatsToWrite
-    // );
-
-    ma_encoder_write_pcm_frames(&self->encoder, in_buf, in_buf_len, NULL);
+    ma_encoder_write_pcm_frames(
+        // TODO! bad
+        (ma_encoder *)self->recording,
+        data,
+        data_size,
+        NULL
+    );
 }
 
 /************
@@ -86,40 +92,48 @@ Result recorder_init(
     uint32_t const sample_rate
 ) {
     self->is_recording = false;
-    self->buf = NULL, self->buf_len = 0;
+    info("%u", sample_rate);
 
-    ma_encoder_config const config = ma_encoder_config_init(
-        (ma_encoding_format)encoding,
-        (ma_format)format,
-        channel_count,
-        sample_rate
-    );
-    ma_result r = ma_encoder_init(
-        encoder_on_write,
-        encoder_on_seek,
-        self,
-        &config,
-        &self->encoder
-    );
-    if (r != MA_SUCCESS)
-        return error(
-                   "miniaudio encoder initialization error! Error code: %d",
-                   r
-               ),
-               UnknownErr;
+    self->recording = recording_alloc();
+    if (self->recording == NULL) return OutOfMemErr;
+
+    UNROLL_CLEANUP(recording_init(self->recording), { free(self->recording); });
 
     ma_device_config device_config =
         ma_device_config_init(ma_device_type_capture);
     device_config.capture.format = (ma_format)format;
     device_config.capture.channels = channel_count;
     device_config.sampleRate = sample_rate;
-    // device_config.dataCallback = data_callback;
-    // device_config.pUserData = self;
-    r = ma_device_init(NULL, &device_config, &self->device);
+    device_config.dataCallback = data_callback;
+    device_config.pUserData = self;
+    ma_result r = ma_device_init(NULL, &device_config, &self->device);
     if (r != MA_SUCCESS) {
-        ma_encoder_uninit(&self->encoder);
+        recording_uninit(self->recording), free(self->recording);
         return error(
                    "minisudio device initialization error! Error code: %d",
+                   r
+               ),
+               UnknownErr;
+    }
+
+    ma_encoder_config const config = ma_encoder_config_init(
+        (ma_encoding_format)encoding,
+        self->device.capture.format,
+        self->device.capture.channels,
+        self->device.sampleRate
+    );
+    r = ma_encoder_init(
+        encoder_on_write,
+        encoder_on_seek,
+        self,
+        &config,
+        (ma_encoder *)self->recording
+    );
+    if (r != MA_SUCCESS) {
+        recording_uninit(self->recording), free(self->recording);
+        ma_device_uninit(&self->device);
+        return error(
+                   "miniaudio encoder initialization error! Error code: %d",
                    r
                ),
                UnknownErr;
@@ -128,12 +142,13 @@ Result recorder_init(
     return Ok;
 }
 void recorder_uninit(Recorder *const self) {
-    ma_encoder_uninit(&self->encoder);
+    ma_encoder_uninit((ma_encoder *)self->recording);
     ma_device_uninit(&self->device);
+    recording_uninit(self->recording), free(self->recording);
 }
 
-bool recorder_get_is_recording(Recorder const *recorder) {
-    return recorder->is_recording;
+bool recorder_get_is_recording(Recorder const *self) {
+    return self->is_recording;
 }
 
 Result recorder_start(Recorder *const self) {
@@ -146,11 +161,51 @@ Result recorder_start(Recorder *const self) {
 
     return Ok;
 }
-Recording recorder_stop(Recorder *const self) {
-    ma_device_stop(&self->device);
-
+Recording *recorder_stop(Recorder *const self) {
     self->is_recording = false;
 
-    // TODO? maybe copy in its own buffer?
-    return (Recording){.buf = self->buf, .buf_len = self->buf_len};
+    ma_device_stop(&self->device);
+
+    Recording *const recording = self->recording;
+    // TODO! very bad
+    ma_encoder_uninit((ma_encoder *)recording);
+
+    self->recording = recording_alloc();
+    recording_init(self->recording);
+
+    ma_encoder_config const config = ma_encoder_config_init(
+        ma_encoding_format_wav,
+        self->device.capture.format,
+        self->device.capture.channels,
+        self->device.sampleRate
+    );
+    ma_result const r = ma_encoder_init(
+        encoder_on_write,
+        encoder_on_seek,
+        self,
+        &config,
+        (ma_encoder *)self->recording
+    );
+    if (r != MA_SUCCESS) {
+        recording_uninit(self->recording), free(self->recording);
+        error("miniaudio encoder initialization error! Error code: %d", r);
+    }
+
+    return recording_fit(recording), recording;
 }
+
+// clang-format off
+
+// this ensures safe casting between `RecorderEncoding` and `ma_encoder_format`
+_Static_assert((int)RECORDER_ENCODING_WAV == (int)ma_encoding_format_wav, "`RECORDER_ENCODING_WAV` should match `ma_encoding_format_wav`.");
+_Static_assert((int)RECORDER_ENCODING_FLAC == (int)ma_encoding_format_flac, "`RECORDER_ENCODING_FLAC` should match `ma_encoding_format_flac`.");
+_Static_assert((int)RECORDER_ENCODING_MP3 == (int)ma_encoding_format_mp3, "`RECORDER_ENCODING_MP3` should match `ma_encoding_format_mp3`.");
+
+// this ensures safe casting between `RecorderFormat` and `ma_format`
+_Static_assert((int)RECORDER_FORMAT_U8 == (int)ma_format_u8, "`RECORDER_FORMAT_U8` should match `ma_format_u8`.");
+_Static_assert((int)RECORDER_FORMAT_S16 == (int)ma_format_s16, "`RECORDER_FORMAT_S16` should match `ma_format_s16`.");
+_Static_assert((int)RECORDER_FORMAT_S24 == (int)ma_format_s24, "`RECORDER_FORMAT_S24` should match `ma_format_s24`.");
+_Static_assert((int)RECORDER_FORMAT_S32 == (int)ma_format_s32, "`RECORDER_FORMAT_S32` should match `ma_format_s32`.");
+_Static_assert((int)RECORDER_FORMAT_F32 == (int)ma_format_f32, "`RECORDER_FORMAT_F32` should match `ma_format_f32`.");
+
+// clang-format on
