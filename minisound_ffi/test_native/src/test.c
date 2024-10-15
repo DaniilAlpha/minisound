@@ -164,7 +164,7 @@ MiunteResult test_generated_pulse_sounds() {
     );
     MIUNTE_EXPECT(sound_play(sound) == Ok, "sound playing should not fail");
 
-    sleep(600);
+    sleep(200);
 
     sound_unload(sound);
     free(sound);
@@ -195,7 +195,7 @@ MiunteResult test_recording_wav() {
 
     Recording *const rec = recorder_stop(recorder);
 
-    FILE *const file = fopen("recording.wav", "wb");
+    FILE *const file = fopen("./minisound_ffi/test_native/recording.wav", "wb");
     MIUNTE_EXPECT(file != NULL, "file should open properly");
     fwrite(recording_get_buf(rec), 1, recording_get_size(rec), file);
     fclose(file);
