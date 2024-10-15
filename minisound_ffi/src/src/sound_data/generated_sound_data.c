@@ -9,11 +9,46 @@
 
 #define DEFAULT_AMPLITUDE (0.5)
 
+/*************
+ ** private **
+ *************/
+
 // waveform
 
 struct WaveformSoundData {
     ma_waveform waveform;
 };
+
+static ma_data_source *waveform_sound_data_get_ds(WaveformSoundData *const self
+) {
+    return &self->waveform;
+}
+
+// noise
+
+struct NoiseSoundData {
+    ma_noise noise;
+};
+
+static ma_data_source *noise_sound_data_get_ds(NoiseSoundData *const self) {
+    return &self->noise;
+}
+
+// pulse
+
+struct PulseSoundData {
+    ma_pulsewave pulse;
+};
+
+ma_data_source *pulse_sound_data_get_ds(PulseSoundData *const self) {
+    return &self->pulse;
+}
+
+/************
+ ** public **
+ ************/
+
+// waveform
 
 WaveformSoundData *waveform_sound_data_alloc(void) {
     return malloc(sizeof(WaveformSoundData));
@@ -41,10 +76,6 @@ void waveform_sound_data_uninit(WaveformSoundData *const self) {
     ma_waveform_uninit(&self->waveform);
 }
 
-ma_data_source *waveform_sound_data_get_ds(WaveformSoundData *const self) {
-    return &self->waveform;
-}
-
 SoundData waveform_sound_data_ww_sound_data(WaveformSoundData *const self)
     WRAP_BODY(
         SoundData,
@@ -56,10 +87,6 @@ SoundData waveform_sound_data_ww_sound_data(WaveformSoundData *const self)
     );
 
 // noise
-
-struct NoiseSoundData {
-    ma_noise noise;
-};
 
 NoiseSoundData *noise_sound_data_alloc(void) {
     return malloc(sizeof(NoiseSoundData));
@@ -85,10 +112,6 @@ void noise_sound_data_uninit(NoiseSoundData *const self) {
     ma_noise_uninit(&self->noise, NULL);
 }
 
-ma_data_source *noise_sound_data_get_ds(NoiseSoundData *const self) {
-    return &self->noise;
-}
-
 SoundData noise_sound_data_ww_sound_data(NoiseSoundData *const self) WRAP_BODY(
     SoundData,
     SOUND_DATA_INTERFACE(NoiseSoundData),
@@ -99,10 +122,6 @@ SoundData noise_sound_data_ww_sound_data(NoiseSoundData *const self) WRAP_BODY(
 );
 
 // pulse
-
-struct PulseSoundData {
-    ma_pulsewave pulse;
-};
 
 PulseSoundData *pulse_sound_data_alloc(void) {
     return malloc(sizeof(PulseSoundData));
@@ -127,10 +146,6 @@ Result pulse_sound_data_init(
 }
 void pulse_sound_data_uninit(PulseSoundData *const self) {
     ma_pulsewave_uninit(&self->pulse);
-}
-
-ma_data_source *pulse_sound_data_get_ds(PulseSoundData *const self) {
-    return &self->pulse;
 }
 
 SoundData pulse_sound_data_ww_sound_data(PulseSoundData *const self) WRAP_BODY(

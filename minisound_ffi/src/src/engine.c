@@ -41,9 +41,7 @@ Result engine_init(Engine *const self, uint32_t const period_ms) {
     //     self->engine.sampleRate
     // );
 
-    info("engine initialized");
-
-    return Ok;
+    return info("engine initialized"), Ok;
 }
 void engine_uninit(Engine *const self) { ma_engine_uninit(&self->engine); }
 
@@ -55,9 +53,7 @@ Result engine_start(Engine *const self) {
 
     self->is_started = true;
 
-    info("engine started");
-
-    return Ok;
+    return info("engine started"), Ok;
 }
 
 Result engine_load_sound(
@@ -68,6 +64,7 @@ Result engine_load_sound(
 ) {
     EncodedSoundData *const encoded = encoded_sound_data_alloc();
     if (encoded == NULL) return OutOfMemErr;
+
     UNROLL_CLEANUP(encoded_sound_data_init(encoded, data, data_size), {
         free(encoded);
     });
@@ -78,13 +75,10 @@ Result engine_load_sound(
             encoded_sound_data_ww_sound_data(encoded),
             &self->engine
         ),
-        {
-            encoded_sound_data_uninit(encoded);
-            free(encoded);
-        }
+        { encoded_sound_data_uninit(encoded), free(encoded); }
     );
 
-    return Ok;
+    return info("sound loaded"), Ok;
 }
 
 Result engine_generate_waveform(
@@ -95,6 +89,7 @@ Result engine_generate_waveform(
 ) {
     WaveformSoundData *const waveform = waveform_sound_data_alloc();
     if (waveform == NULL) return OutOfMemErr;
+
     UNROLL_CLEANUP(waveform_sound_data_init(waveform, type, frequency), {
         free(waveform);
     });
@@ -105,13 +100,10 @@ Result engine_generate_waveform(
             waveform_sound_data_ww_sound_data(waveform),
             &self->engine
         ),
-        {
-            waveform_sound_data_uninit(waveform);
-            free(waveform);
-        }
+        { waveform_sound_data_uninit(waveform), free(waveform); }
     );
 
-    return Ok;
+    return info("waveform generated"), Ok;
 }
 Result engine_generate_noise(
     Engine *const self,
@@ -121,17 +113,15 @@ Result engine_generate_noise(
 ) {
     NoiseSoundData *const noise = noise_sound_data_alloc();
     if (noise == NULL) return OutOfMemErr;
+
     UNROLL_CLEANUP(noise_sound_data_init(noise, type, seed), { free(noise); });
 
     UNROLL_CLEANUP(
         sound_init(sound, noise_sound_data_ww_sound_data(noise), &self->engine),
-        {
-            noise_sound_data_uninit(noise);
-            free(noise);
-        }
+        { noise_sound_data_uninit(noise), free(noise); }
     );
 
-    return Ok;
+    return info("noise generated"), Ok;
 }
 Result engine_generate_pulse(
     Engine *const self,
@@ -141,17 +131,15 @@ Result engine_generate_pulse(
 ) {
     PulseSoundData *const pulse = pulse_sound_data_alloc();
     if (pulse == NULL) return OutOfMemErr;
+
     UNROLL_CLEANUP(pulse_sound_data_init(pulse, frequency, duty_cycle), {
         free(pulse);
     });
 
     UNROLL_CLEANUP(
         sound_init(sound, pulse_sound_data_ww_sound_data(pulse), &self->engine),
-        {
-            pulse_sound_data_uninit(pulse);
-            free(pulse);
-        }
+        { pulse_sound_data_uninit(pulse), free(pulse); }
     );
 
-    return Ok;
+    return info("pulse generated"), Ok;
 }

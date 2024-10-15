@@ -7,12 +7,24 @@
 #define MILO_LVL SOUND_MILO_LVL
 #include "../../external/milo/milo.h"
 
+/*************
+ ** private **
+ *************/
+
 struct EncodedSoundData {
     ma_decoder decoder;
 
     bool is_looped;
     SilenceDataSource loop_delay_ds;
 };
+
+static ma_data_source *encoded_sound_data_get_ds(EncodedSoundData *const self) {
+    return &self->decoder;
+}
+
+/************
+ ** public **
+ ************/
 
 EncodedSoundData *encoded_sound_data_alloc() {
     return malloc(sizeof(EncodedSoundData));
@@ -37,10 +49,6 @@ Result encoded_sound_data_init(
 }
 void encoded_sound_data_uninit(EncodedSoundData *const self) {
     ma_decoder_uninit(&self->decoder);
-}
-
-ma_data_source *encoded_sound_data_get_ds(EncodedSoundData *const self) {
-    return &self->decoder;
 }
 
 bool encoded_sound_data_get_is_looped(EncodedSoundData const *const self) {

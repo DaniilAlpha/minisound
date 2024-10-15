@@ -9,11 +9,6 @@
 #include "recording.h"
 
 typedef struct Recorder Recorder;
-typedef enum RecorderEncoding {
-    RECORDER_ENCODING_WAV = 1,
-    RECORDER_ENCODING_FLAC,
-    RECORDER_ENCODING_MP3,
-} RecorderEncoding;
 typedef enum RecorderFormat {
     RECORDER_FORMAT_U8 = 1,
     RECORDER_FORMAT_S16,
@@ -25,7 +20,6 @@ typedef enum RecorderFormat {
 EXPORT Recorder *recorder_alloc(void);
 EXPORT Result recorder_init(
     Recorder *const self,
-    RecorderEncoding const encoding,
     RecorderFormat const format,
     uint32_t const channel_count,
     uint32_t const sample_rate
@@ -34,7 +28,8 @@ EXPORT void recorder_uninit(Recorder *const self);
 
 EXPORT bool recorder_get_is_recording(Recorder const *recorder);
 
-EXPORT Result recorder_start(Recorder *const self);
+EXPORT Result
+recorder_start(Recorder *const self, RecordingEncoding const encoding);
 EXPORT Recording *recorder_stop(Recorder *const self);
 
 #endif  // RECORD_H

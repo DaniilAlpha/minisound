@@ -36,59 +36,8 @@ Result sound_init(
         return error("miniaudio sound initialization error! Error code: %d", r),
                UnknownErr;
 
-    return Ok;
+    return info("sound initialized"), Ok;
 }
-
-// Result sound_init_raw(
-//     Sound *const self,
-//     float const *const data,
-//     size_t const data_size,
-//     SoundFormat const sound_format,
-//     uint32_t const channels,
-//     // uint32_t const sample_rate,  // TODO! unused, maybe by mistake
-//     void *const vengine
-// ) {
-//     self->is_raw = true;
-//
-//     ma_format const format = (ma_format)sound_format;
-//
-//     size_t const frame_count =
-//         data_size / (channels * ma_get_bytes_per_sample(format));
-//
-//     ma_audio_buffer_config const buffer_config =
-//         ma_audio_buffer_config_init(format, channels, frame_count, data,
-//         NULL);
-//
-//     ma_result r = ma_audio_buffer_init(&buffer_config, &self->data.raw_buf);
-//     if (r != MA_SUCCESS) {
-//         return error(
-//                    "miniaudio audio buffer initialization error! Error code:
-//                    %d",
-//                    r
-//                ),
-//                UnknownErr;
-//     }
-//
-//     r = ma_sound_init_from_data_source(
-//         vengine,
-//         &self->data.raw_buf,
-//         MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION,
-//         NULL,
-//         &self->sound
-//     );
-//     if (r != MA_SUCCESS) {
-//         ma_audio_buffer_uninit(&self->data.raw_buf);
-//         return error(
-//                    "miniaudio raw sound initialization error! Error code:
-//                    %d",
-//                    r
-//                ),
-//                UnknownErr;
-//     }
-//
-//     return Ok;
-// }
-
 void sound_unload(Sound *const self) {
     ma_sound_uninit(&self->sound);
     sound_data_uninit(&self->sound_data);
@@ -100,35 +49,33 @@ Result sound_play(Sound *const self) {
     if (ma_sound_start(sound) != MA_SUCCESS)
         return error("miniaudio sound starting error!"), UnknownErr;
 
-    info("sound played");
-    return Ok;
+    return info("sound played"), Ok;
 }
-
 Result sound_replay(Sound *const self) {
     sound_stop(self);
     return sound_play(self);
 }
 
 void sound_pause(Sound *const self) {
-    ma_sound *sound = &self->sound;
-    ma_sound_stop(sound);
-}
+    ma_sound_stop(&self->sound);
 
+    info("sound paused");
+}
 void sound_stop(Sound *const self) {
-    ma_sound *sound = &self->sound;
-    ma_sound_stop(sound);
-    ma_sound_seek_to_pcm_frame(sound, 0);
+    ma_sound_stop(&self->sound);
+    ma_sound_seek_to_pcm_frame(&self->sound, 0);
+
+    info("sound stopped");
 }
 
 float sound_get_volume(Sound const *const self) {
     return ma_sound_get_volume(&self->sound);
 }
-
 void sound_set_volume(Sound *const self, float const value) {
     ma_sound_set_volume(&self->sound, value);
 }
 
-float sound_get_duration(Sound *const self) {
+double sound_get_duration(Sound *const self) {
     ma_uint64 length_in_frames;
     ma_sound_get_length_in_pcm_frames(&self->sound, &length_in_frames);
     return (float)length_in_frames / ma_engine_get_sample_rate(self->engine);

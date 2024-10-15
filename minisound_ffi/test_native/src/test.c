@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <miunte.h>
 #include <threads.h>
@@ -69,6 +70,7 @@ MiunteResult setup_test() {
         engine_start(engine) == Ok,
         "engine starting should not fail"
     );
+    sleep(200);
 
     MIUNTE_PASS();
 }
@@ -177,30 +179,41 @@ MiunteResult test_recording_wav() {
     MIUNTE_EXPECT(recorder != NULL, "recorder should be allocated properly");
 
     MIUNTE_EXPECT(
-        recorder_init(
-            recorder,
-            RECORDER_ENCODING_WAV,
-            RECORDER_FORMAT_S16,
-            2,
-            44100
-        ) == Ok,
+        recorder_init(recorder, RECORDER_FORMAT_S16, 2, 44100) == Ok,
         "recorder initialization should not fail"
     );
-    MIUNTE_EXPECT(
-        recorder_start(recorder) == Ok,
-        "recorder starting should not fail"
-    );
 
-    sleep(3000);
+    Recording *recs[2] = {0};
 
-    Recording *const rec = recorder_stop(recorder);
+    for (size_t i = 0; i < lenof(recs); i++) {
+        MIUNTE_EXPECT(
+            recorder_start(recorder, RECORDING_ENCODING_WAV) == Ok,
+            "recorder starting should not fail"
+        );
+        sleep(3000);
+        recs[i] = recorder_stop(recorder);
+    }
 
-    FILE *const file = fopen("./minisound_ffi/test_native/recording.wav", "wb");
-    MIUNTE_EXPECT(file != NULL, "file should open properly");
-    fwrite(recording_get_buf(rec), 1, recording_get_size(rec), file);
-    fclose(file);
+    // separated to test that recording are not overriding each other
 
-    recording_uninit(rec), free(rec);
+    for (size_t i = 0; i < lenof(recs); i++) {
+        char filename[] = "./minisound_ffi/test_native/rec#.wav";
+        char *idx = strchr(filename, '#');
+        idx[0] = '0' + i;
+
+        FILE *const file = fopen(filename, "wb");
+        MIUNTE_EXPECT(file != NULL, "file should open properly");
+        fwrite(
+            recording_get_buf(recs[i]),
+            1,
+            recording_get_size(recs[i]),
+            file
+        );
+        fclose(file);
+
+        recording_uninit(recs[i]), free(recs[i]);
+    }
+
     recorder_uninit(recorder), free(recorder);
 
     MIUNTE_PASS();
