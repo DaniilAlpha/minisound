@@ -29,18 +29,18 @@ final class FfiEngine implements PlatformEngine {
   }
 
   @override
-  Future<FfiSound> loadSound(AudioData audioData) async {
+  Future<FfiSound> loadSound(TypedData data) async {
     final sound = _bindings.sound_alloc();
     if (sound == nullptr) throw MinisoundPlatformOutOfMemoryException();
 
-    final dataLength = audioData.buffer.lengthInBytes;
+    final dataLength = data.lengthInBytes;
     final dataPtr = malloc.allocate<Uint8>(dataLength);
     if (dataPtr == nullptr) {
       malloc.free(sound);
       throw MinisoundPlatformOutOfMemoryException();
     }
 
-    dataPtr.copy(audioData.buffer);
+    dataPtr.copy(data);
 
     final r = _bindings.engine_load_sound(_self, sound, dataPtr, dataLength);
     if (r != c.Result.Ok) {
@@ -49,7 +49,7 @@ final class FfiEngine implements PlatformEngine {
       throw MinisoundPlatformException("Failed to load a sound (code: $r).");
     }
 
-    return FfiSound._fromPtrs(sound, dataPtr);
+    return FfiSound._(sound, dataPtr);
   }
 
   @override
@@ -67,7 +67,7 @@ final class FfiEngine implements PlatformEngine {
       throw MinisoundPlatformException("Failed to load a sound (code: $r).");
     }
 
-    return FfiSound._fromPtrs(sound);
+    return FfiSound._(sound);
   }
 
   @override
@@ -81,7 +81,7 @@ final class FfiEngine implements PlatformEngine {
       throw MinisoundPlatformException("Failed to load a sound (code: $r).");
     }
 
-    return FfiSound._fromPtrs(sound);
+    return FfiSound._(sound);
   }
 
   @override
@@ -95,7 +95,7 @@ final class FfiEngine implements PlatformEngine {
       throw MinisoundPlatformException("Failed to load a sound (code: $r).");
     }
 
-    return FfiSound._fromPtrs(sound);
+    return FfiSound._(sound);
   }
 }
 

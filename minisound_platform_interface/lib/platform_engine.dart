@@ -1,10 +1,8 @@
 part of "minisound_platform_interface.dart";
 
-class AudioData {
-  AudioData(this.buffer);
+enum WaveformType { sine, square, triangle, sawtooth }
 
-  final TypedData buffer;
-}
+enum NoiseType { white, pink, brownian }
 
 abstract interface class PlatformEngine {
   factory PlatformEngine() => MinisoundPlatform.instance.createEngine();
@@ -14,7 +12,7 @@ abstract interface class PlatformEngine {
 
   void start();
 
-  Future<PlatformSound> loadSound(AudioData audioData);
+  Future<PlatformSound> loadSound(TypedData data);
   PlatformSound generateWaveform(
       {required WaveformType type, required double freq});
   PlatformSound generateNoise({required NoiseType type, required int seed});

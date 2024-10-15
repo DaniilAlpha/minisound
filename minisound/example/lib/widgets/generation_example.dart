@@ -1,19 +1,18 @@
 import "package:flutter/material.dart";
 import "package:minisound/engine.dart";
-import "package:minisound/generator.dart";
 
 enum GeneratorType { wave, noise, pulse }
 
-class GeneratorExample extends StatefulWidget {
-  const GeneratorExample(this.engine, {super.key});
+class GenerationExample extends StatefulWidget {
+  const GenerationExample(this.engine, {super.key});
 
   final Engine engine;
 
   @override
-  State<GeneratorExample> createState() => _GeneratorExampleState();
+  State<GenerationExample> createState() => _GenerationExampleState();
 }
 
-class _GeneratorExampleState extends State<GeneratorExample> {
+class _GenerationExampleState extends State<GenerationExample> {
   // static const pulsewaveFrequency = 432.0;
 
   var generatorType = GeneratorType.wave;
@@ -29,7 +28,7 @@ class _GeneratorExampleState extends State<GeneratorExample> {
     final headline = Theme.of(context).textTheme.headlineMedium;
     return Column(children: [
       Row(mainAxisSize: MainAxisSize.min, children: [
-        Text("Generator: ", style: headline),
+        Text("Generation: ", style: headline),
         DropdownButton(
           style: headline,
           items: GeneratorType.values

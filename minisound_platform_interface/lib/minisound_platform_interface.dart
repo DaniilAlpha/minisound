@@ -4,7 +4,6 @@ import "package:plugin_platform_interface/plugin_platform_interface.dart";
 
 part "platform_engine.dart";
 part "platform_sound.dart";
-part "platform_generator.dart";
 part "platform_recorder.dart";
 
 abstract class MinisoundPlatform extends PlatformInterface {
@@ -20,8 +19,7 @@ abstract class MinisoundPlatform extends PlatformInterface {
   }
 
   PlatformEngine createEngine();
-  // PlatformRecorder createRecorder();
-  // PlatformGenerator createGenerator();
+  PlatformRecorder createRecorder();
 }
 
 base class MinisoundPlatformException implements Exception {

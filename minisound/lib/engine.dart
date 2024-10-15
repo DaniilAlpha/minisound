@@ -1,13 +1,15 @@
 import "dart:io";
+import "dart:typed_data";
 
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
 export "package:minisound_platform_interface/minisound_platform_interface.dart"
     show
-        AudioData,
         MinisoundPlatformException,
-        MinisoundPlatformOutOfMemoryException;
+        MinisoundPlatformOutOfMemoryException,
+        NoiseType,
+        WaveformType;
 
-/// Controls the loading and unloading of `Sound`s.
+/// Controls loading, unloading and generating of `Sound`s.
 ///
 /// Should be initialized before doing anything.
 /// Should be started to hear any sound.
@@ -27,8 +29,10 @@ final class Engine {
 
   /// Initializes the engine.
   ///
-  /// Change an update period (affects the sound latency).
+  /// `periodMs` - affects sounds latency (lower period means lower latency but possibly jittering). Must be greater than zero.
   Future<void> init([int periodMs = 10]) async {
+    assert(periodMs > 0);
+
     if (_isInit) return;
 
     await _engine.init(periodMs);
@@ -39,19 +43,16 @@ final class Engine {
   Future<void> start() async => _engine.start();
 
   /// Copies `data` to the internal memory location and creates a `Sound` from it.
-  Future<Sound> loadSound(AudioData audioData) async {
-    final engineSound = await _engine.loadSound(audioData);
-    final sound = Sound._(engineSound);
+  Future<Sound> loadSound(TypedData audioData) async {
+    final platformSound = await _engine.loadSound(audioData);
+    final sound = Sound._(platformSound);
     _soundsFinalizer.attach(this, sound);
     return sound;
   }
 
-  /// Loads a sound file and creates a `Sound` from it.
-  Future<Sound> loadSoundFile(String filePath) async {
-    final file = File(filePath);
-    final bytes = await file.readAsBytes();
-    return loadSound(AudioData(bytes));
-  }
+  /// Loads a file and creates a `Sound` from it.
+  Future<Sound> loadSoundFile(String filePath) async =>
+      loadSound(await File(filePath).readAsBytes());
 
   /// Generates a waveform sound using given parameters.
   Sound generateWaveform({
@@ -81,16 +82,16 @@ final class Engine {
   }
 }
 
-/// A sound.
 final class Sound {
   Sound._(PlatformSound sound) : _sound = sound;
 
   final PlatformSound _sound;
 
-  /// a `double` greater than `0` (values greater than `1` may behave differently from platform to platform)
+  /// greater than `0` (values greater than `1` may behave differently from platform to platform)
   double get volume => _sound.volume;
   set volume(double value) => _sound.volume = value < 0 ? 0 : value;
 
+  /// zero on sounds that have no defined length
   Duration get duration =>
       Duration(milliseconds: (_sound.duration * 1000).toInt());
 

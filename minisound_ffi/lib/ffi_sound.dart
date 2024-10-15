@@ -1,7 +1,7 @@
 part of "minisound_ffi.dart";
 
 final class FfiSound implements PlatformSound {
-  FfiSound._fromPtrs(Pointer<c.Sound> self, [Pointer? data])
+  FfiSound._(Pointer<c.Sound> self, [Pointer? data])
       : _self = self,
         _data = data;
 

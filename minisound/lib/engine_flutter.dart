@@ -5,8 +5,6 @@ export "package:minisound/engine.dart";
 
 extension EngineLoadSoundAsset on Engine {
   /// Loads a sound asset and creates a `Sound` from it.
-  Future<Sound> loadSoundAsset(String assetPath) async {
-    final data = await rootBundle.load(assetPath);
-    return loadSound(AudioData(data));
-  }
+  Future<Sound> loadSoundAsset(String assetPath) async =>
+      loadSound(await rootBundle.load(assetPath));
 }

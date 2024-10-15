@@ -1,27 +1,25 @@
 part of "minisound_platform_interface.dart";
 
-/* abstract interface class PlatformRecorder {
+enum RecorderFormat { u8, s16, s24, s32, f32 }
+
+abstract interface class PlatformRecorder {
   factory PlatformRecorder() => MinisoundPlatform.instance.createRecorder();
 
   bool get isRecording;
 
-  Future<void> initFile(
-    String filename, {
+  Future<void> init({
+    required RecorderFormat format,
+    required int channelCount,
     required int sampleRate,
-    required int channels,
-    required SoundFormat format,
-  });
-  Future<void> initStream({
-    required int sampleRate,
-    required int channels,
-    required SoundFormat format,
-    required double bufferLenS,
   });
   void dispose();
 
   void start();
-  void stop();
+  PlatformRecording stop();
+}
 
-  int get availableFloatCount;
-  Float32List getBuffer(int floatsToRead);
-} */
+abstract interface class PlatformRecording {
+  Uint8List get buffer;
+
+  void dispose();
+}
