@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "../../external/result/result.h"
+#include "../export.h"
 #include "sound_data.h"
 
 typedef struct EncodedSoundData EncodedSoundData;
@@ -16,8 +17,9 @@ Result encoded_sound_data_init(
 );
 void encoded_sound_data_uninit(EncodedSoundData *const self);
 
-bool encoded_sound_data_get_is_looped(EncodedSoundData const *const self);
-void encoded_sound_data_set_looped(
+EXPORT bool encoded_sound_data_get_is_looped(EncodedSoundData const *const self
+);
+EXPORT void encoded_sound_data_set_looped(
     EncodedSoundData *const self,
     bool const value,
     size_t const delay_ms

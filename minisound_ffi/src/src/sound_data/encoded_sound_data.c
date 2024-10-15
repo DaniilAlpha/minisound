@@ -45,7 +45,7 @@ Result encoded_sound_data_init(
                ),
                UnknownErr;
 
-    return Ok;
+    return info("encoded sound data initialized"), Ok;
 }
 void encoded_sound_data_uninit(EncodedSoundData *const self) {
     ma_decoder_uninit(&self->decoder);
@@ -81,6 +81,12 @@ void encoded_sound_data_set_looped(
         ma_data_source_set_looping(&self->decoder, false);
         ma_data_source_set_next(&self->decoder, NULL);
     }
+
+    info(
+        "encoded sound data looping set : %s (%zu ms delay)",
+        value ? "true" : "false",
+        delay_ms
+    );
 }
 
 SoundData encoded_sound_data_ww_sound_data(EncodedSoundData *const self)
