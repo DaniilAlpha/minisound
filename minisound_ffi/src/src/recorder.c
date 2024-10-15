@@ -91,9 +91,10 @@ Result recorder_start(Recorder *const self, RecordingEncoding const encoding) {
 Recording *recorder_stop(Recorder *const self) {
     ma_device_stop(&self->device);
 
+    recording_end(self->rec);
+
     Recording *const rec = self->rec;
     self->rec = NULL;
-    recording_fit(rec);
 
     return info("recorder stopped"), rec;
 }

@@ -31,6 +31,6 @@ Result recording_write(
     size_t const data_size
 );
 
-Result recording_fit(Recording *const self);
+void recording_end(Recording *const self);
 
 #endif

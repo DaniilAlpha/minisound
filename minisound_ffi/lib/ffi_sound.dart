@@ -25,7 +25,10 @@ final class FfiSound implements PlatformSound {
   PlatformSoundLooping get looping => _looping;
   @override
   set looping(PlatformSoundLooping value) {
-    _bindings.sound_set_looped(_self, value.$1, value.$2);
+    // TODO!!! unsafe and crappy and fix later
+    final data = _bindings.sound_get_data(_self).cast<Pointer<Void>>();
+    _bindings.encoded_sound_data_set_looped(
+        (data + 1).value.cast(), value.$1, value.$2);
     _looping = value;
   }
 

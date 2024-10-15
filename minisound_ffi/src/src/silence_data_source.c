@@ -1,3 +1,5 @@
+// TODO! there are some garbage data playing at the beginning of every loop
+// delay
 #include "../include/silence_data_source.h"
 
 #include <string.h>

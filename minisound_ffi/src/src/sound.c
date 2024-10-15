@@ -80,3 +80,7 @@ double sound_get_duration(Sound *const self) {
     ma_sound_get_length_in_pcm_frames(&self->sound, &length_in_frames);
     return (float)length_in_frames / ma_engine_get_sample_rate(self->engine);
 }
+
+SoundData const *sound_get_data(Sound const *const self) {
+    return &self->sound_data;
+}

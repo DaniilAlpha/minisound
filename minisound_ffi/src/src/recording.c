@@ -1,5 +1,6 @@
 #include "../include/recording.h"
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,6 +18,8 @@
 typedef struct Recording {
     uint8_t *buf;
     size_t size, off, cap;
+
+    bool wasEnded;
 
     ma_encoder encoder;
 } Recording;
@@ -57,10 +60,10 @@ static ma_result encoder_on_seek(
 ) {
     Recording *const self = encoder->pUserData;
 
-    size_t off;
+    size_t off = self->off;
     switch (origin) {
     case ma_seek_origin_start: off = off_from_origin; break;
-    case ma_seek_origin_current: off = self->off + off_from_origin; break;
+    case ma_seek_origin_current: off += off_from_origin; break;
     case ma_seek_origin_end: off = self->size - 1 - off_from_origin; break;
     }
 
@@ -89,6 +92,8 @@ Result recording_init(
     self->size = self->off = 0;
     self->cap = RECORDING_MIN_CAP;
 
+    self->wasEnded = false;
+
     ma_encoder_config const config = ma_encoder_config_init(
         (ma_encoding_format)encoding,
         device->capture.format,
@@ -114,7 +119,7 @@ Result recording_init(
     return info("recording initialized"), Ok;
 }
 void recording_uninit(Recording *const self) {
-    ma_encoder_uninit(&self->encoder);
+    if (!self->wasEnded) ma_encoder_uninit(&self->encoder);
 
     free(self->buf), self->buf = NULL;
     self->size = self->off = self->cap = 0;
@@ -137,13 +142,17 @@ Result recording_write(
     return trace("wrote to recording"), Ok;
 }
 
-Result recording_fit(Recording *const self) {
+void recording_end(Recording *const self) {
     size_t const new_cap = self->size;
     uint8_t *const new_buf = realloc(self->buf, new_cap);
-    if (new_buf == NULL) return OutOfMemErr;
+    if (new_buf != NULL) {
+        self->cap = new_cap;
+        self->buf = new_buf;
+    }
 
-    self->cap = new_cap;
-    self->buf = new_buf;
+    ma_encoder_uninit(&self->encoder);
 
-    return info("recording fitted"), Ok;
+    self->wasEnded = true;
+
+    info("recording fitted");
 }

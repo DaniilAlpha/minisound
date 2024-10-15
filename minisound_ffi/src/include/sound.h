@@ -26,7 +26,6 @@ EXPORT void sound_set_volume(Sound *const self, float const value);
 
 EXPORT double sound_get_duration(Sound *const self);
 
-EXPORT void
-sound_set_looped(Sound *const self, bool const value, size_t const delay_ms);
+EXPORT SoundData const *sound_get_data(Sound const *const self);
 
 #endif
