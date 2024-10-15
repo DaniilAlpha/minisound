@@ -171,7 +171,8 @@ MiunteResult test_generated_pulse_sounds() {
 
     MIUNTE_PASS();
 }
-MiunteResult test_recording() {
+// others format are not supported at the moment
+MiunteResult test_recording_wav() {
     Recorder *const recorder = recorder_alloc();
     MIUNTE_EXPECT(recorder != NULL, "recorder should be allocated properly");
 
@@ -179,9 +180,9 @@ MiunteResult test_recording() {
         recorder_init(
             recorder,
             RECORDER_ENCODING_WAV,
-            RECORDER_FORMAT_F32,
+            RECORDER_FORMAT_S16,
             2,
-            48000
+            44100
         ) == Ok,
         "recorder initialization should not fail"
     );
@@ -214,7 +215,7 @@ int main() {
             test_generated_waveform_sounds,
             test_generated_noise_sounds,
             test_generated_pulse_sounds,
-            test_recording,
+            test_recording_wav,
         }
     );
 

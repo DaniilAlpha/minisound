@@ -16,7 +16,6 @@ typedef struct Recording {
 
     uint8_t *_buf;
     size_t _size, _off, _cap;
-
 } Recording;
 
 Recording *recording_alloc(void) { return malloc(sizeof(Recording)); }

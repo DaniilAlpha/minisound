@@ -92,7 +92,6 @@ Result recorder_init(
     uint32_t const sample_rate
 ) {
     self->is_recording = false;
-    info("%u", sample_rate);
 
     self->recording = recording_alloc();
     if (self->recording == NULL) return OutOfMemErr;
