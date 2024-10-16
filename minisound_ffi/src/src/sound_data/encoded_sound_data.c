@@ -63,13 +63,19 @@ void encoded_sound_data_set_looped(
         if (delay_ms == 0) {
             ma_data_source_set_looping(&self->decoder, true);
         } else {
+            // TODO! initialized but not uninitialized before
             SilenceDataSourceConfig const config = silence_data_source_config(
                 self->decoder.outputFormat,
-                self->decoder.outputChannels,
                 self->decoder.outputSampleRate,
                 (delay_ms * self->decoder.outputSampleRate) / 1000
             );
             silence_data_source_init(&self->loop_delay_ds, &config);
+
+            trace(
+                "silence data source initialized (format: %i; sample rate: %i)",
+                self->decoder.outputFormat,
+                self->decoder.outputSampleRate
+            );
 
             ma_data_source_set_next(&self->decoder, &self->loop_delay_ds);
             ma_data_source_set_next(&self->loop_delay_ds, &self->decoder);

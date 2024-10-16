@@ -4,12 +4,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MIUNTE_STOP_ON_FAILURE (1)
 #include <miunte.h>
 #include <threads.h>
 
 #include "engine.h"
 #include "recorder.h"
 #include "recording.h"
+#include "sound_data/encoded_sound_data.h"
 
 #define lenof(arr) (sizeof(arr) / sizeof(arr[0]))
 
@@ -83,8 +85,9 @@ MiunteResult teardown_test() {
 }
 
 MiunteResult test_encoded_sounds() {
-    char const *const paths[] = {
+    static char const *const paths[] = {
         "./minisound/example/assets/laser_shoot.wav",
+        "./minisound/example/assets/laser_shoot_16bit.wav",
         "./minisound/example/assets/laser_shoot.mp3",
     };
     for (size_t i = 0; i < lenof(paths); i++) {
@@ -111,6 +114,44 @@ MiunteResult test_encoded_sounds() {
         free(buf), buf = NULL;
         free(sound);
     }
+
+    MIUNTE_PASS();
+}
+MiunteResult test_looping() {
+    static size_t const loop_delay_ms = 250;
+    static char const *const path =
+        "./minisound/example/assets/laser_shoot_16bit.wav";
+
+    Sound *const sound = sound_alloc();
+    MIUNTE_EXPECT(sound != NULL, "sound should be allocated properly");
+
+    uint8_t *buf;
+    size_t buf_len;
+    MIUNTE_EXPECT(
+        load_file(path, &buf, &buf_len) == Ok,
+        "file loading should not fail"
+    );
+
+    MIUNTE_EXPECT(
+        engine_load_sound(engine, sound, buf, buf_len) == Ok,
+        "sound loading should not fail"
+    );
+
+    encoded_sound_data_set_looped(
+        sound_get_data(sound)->_self,
+        true,
+        loop_delay_ms
+    );
+    MIUNTE_EXPECT(
+        sound_play(sound) == Ok,
+        "sound looped playing should not fail"
+    );
+
+    sleep((600 + loop_delay_ms) * 3);
+
+    sound_unload(sound);
+    free(buf), buf = NULL;
+    free(sound);
 
     MIUNTE_PASS();
 }
@@ -225,6 +266,7 @@ int main() {
         teardown_test,
         {
             test_encoded_sounds,
+            test_looping,
             test_generated_waveform_sounds,
             test_generated_noise_sounds,
             test_generated_pulse_sounds,

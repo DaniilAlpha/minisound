@@ -1,5 +1,3 @@
-// TODO fix sometimes hang on recording or generating on web
-
 import "dart:typed_data";
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
 import "package:minisound_web/bindings/minisound_web_bindings.dart" as c;

@@ -21,6 +21,7 @@ class _PlaybackExampleState extends State<PlaybackExample> {
   Future<Map<String, Sound>> _initSounds() async {
     const soundNames = [
       "assets/laser_shoot.wav",
+      "assets/laser_shoot_16bit.wav",
       "assets/laser_shoot.mp3",
     ];
     return Future.wait(soundNames.map(widget.engine.loadSoundAsset))

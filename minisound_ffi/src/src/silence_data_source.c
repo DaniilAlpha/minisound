@@ -1,82 +1,91 @@
 // TODO! there are some garbage data playing at the beginning of every loop
-// delay
+// delay for U8 sounds only
 #include "../include/silence_data_source.h"
 
 #include <string.h>
 
 #include "../external/result/result.h"
 
+#define SILENCE_DATA_SOURCE_CHANNEL_COUNT (1)
+
 /*************
  ** private **
  *************/
 
 static ma_result silence_data_source_on_read(
-    ma_data_source *const vself,
-    void *const out_frames,
-    ma_uint64 const frames,
-    ma_uint64 *const out_read_frames
+    ma_data_source *const v_self,
+    void *const data,
+    ma_uint64 data_len_frames,
+    ma_uint64 *const out_read_data_len_frames
 ) {
-    SilenceDataSource *const self = vself;
+    SilenceDataSource *const self = v_self;
 
-    ma_uint64 const remaining_frames =
-        self->_config.len_frames > self->pos_frames
-            ? self->_config.len_frames - self->pos_frames
+    ma_uint64 const remain_len_frames =
+        self->pos_frames <= self->_config.len_frames
+            ? self->_config.len_frames - 1 - self->pos_frames
             : 0;
-    ma_uint64 const read_frames =
-        remaining_frames > frames ? frames : remaining_frames;
+    if (data_len_frames > remain_len_frames)
+        data_len_frames = remain_len_frames;
 
-    self->pos_frames += read_frames;
+    self->pos_frames += data_len_frames;
 
-    return *out_read_frames = read_frames, memset(out_frames, 0, read_frames),
-           MA_SUCCESS;
+    size_t const data_size =
+        data_len_frames * ma_get_bytes_per_frame(
+                              self->_config.format,
+                              SILENCE_DATA_SOURCE_CHANNEL_COUNT
+                          );
+    memset(data, 0, data_size);
+
+    return *out_read_data_len_frames = data_len_frames, MA_SUCCESS;
 }
 
 static ma_result silence_data_source_on_seek(
-    ma_data_source *const vself,
+    ma_data_source *const v_self,
     ma_uint64 const new_pos_frames
 ) {
-    SilenceDataSource *const self = vself;
+    SilenceDataSource *const self = v_self;
 
     self->pos_frames = new_pos_frames;
+
     return MA_SUCCESS;
 }
 
 static ma_result silence_data_source_on_get_data_format(
-    ma_data_source *const vself,
+    ma_data_source *const v_self,
     ma_format *const out_format,
     ma_uint32 *const out_channels,
     ma_uint32 *const out_sample_rate,
     ma_channel *const out_channel_map,
     size_t const channel_map_cap
 ) {
-    SilenceDataSource const *const self = vself;
+    SilenceDataSource const *const self = v_self;
 
     return *out_format = self->_config.format,
-           *out_channels = self->_config.channel_count,
+           *out_channels = SILENCE_DATA_SOURCE_CHANNEL_COUNT,
            *out_sample_rate = self->_config.sample_rate,
            ma_channel_map_init_standard(
                ma_standard_channel_map_default,
                out_channel_map,
                channel_map_cap,
-               self->_config.channel_count
+               SILENCE_DATA_SOURCE_CHANNEL_COUNT
            ),
            MA_SUCCESS;
 }
 
 static ma_result silence_data_source_on_get_cursor(
-    ma_data_source *const vself,
+    ma_data_source *const v_self,
     ma_uint64 *const out_cursor
 ) {
-    SilenceDataSource const *const self = vself;
+    SilenceDataSource const *const self = v_self;
 
     return *out_cursor = self->pos_frames, MA_SUCCESS;
 }
 
 static ma_result silence_data_source_on_get_len(
-    ma_data_source *const vself,
+    ma_data_source *const v_self,
     ma_uint64 *const out_len
 ) {
-    SilenceDataSource const *const self = vself;
+    SilenceDataSource const *const self = v_self;
 
     return *out_len = self->_config.len_frames, MA_SUCCESS;
 }
@@ -87,14 +96,12 @@ static ma_result silence_data_source_on_get_len(
 
 SilenceDataSourceConfig silence_data_source_config(
     ma_format const format,
-    ma_uint32 const channel_count,
     ma_uint32 const sample_rate,
 
     ma_uint64 const len_frames
 ) {
     return (SilenceDataSourceConfig){
         .format = format,
-        .channel_count = channel_count,
         .sample_rate = sample_rate,
 
         .len_frames = len_frames,
