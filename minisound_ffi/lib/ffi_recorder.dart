@@ -58,7 +58,13 @@ class FfiRecorder implements PlatformRecorder {
   }
 
   @override
-  FfiRecording stop() => FfiRecording._(_bindings.recorder_stop(_self));
+  FfiRecording stop() {
+    final recording = _bindings.recorder_stop(_self);
+    if (recording == nullptr) {
+      throw MinisoundPlatformException("Recorder has no data.");
+    }
+    return FfiRecording._(recording);
+  }
 }
 
 extension on RecorderFormat {

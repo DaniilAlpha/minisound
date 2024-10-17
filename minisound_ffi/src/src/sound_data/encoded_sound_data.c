@@ -15,6 +15,8 @@ struct EncodedSoundData {
     ma_decoder decoder;
 
     bool is_looped;
+    // TODO? maybe temporary, but who really knows
+    bool is_using_loop_delay;
     SilenceDataSource loop_delay_ds;
 };
 
@@ -35,6 +37,7 @@ Result encoded_sound_data_init(
     size_t const data_size
 ) {
     self->is_looped = false;
+    self->is_using_loop_delay = false;
 
     ma_result const r =
         ma_decoder_init_memory(data, data_size, NULL, &self->decoder);
@@ -63,7 +66,9 @@ void encoded_sound_data_set_looped(
         if (delay_ms == 0) {
             ma_data_source_set_looping(&self->decoder, true);
         } else {
-            // TODO! initialized but not uninitialized before
+            if (self->is_using_loop_delay)
+                silence_data_source_uninit(&self->loop_delay_ds);
+
             SilenceDataSourceConfig const config = silence_data_source_config(
                 self->decoder.outputFormat,
                 self->decoder.outputSampleRate,
@@ -71,18 +76,12 @@ void encoded_sound_data_set_looped(
             );
             silence_data_source_init(&self->loop_delay_ds, &config);
 
-            trace(
-                "silence data source initialized (format: %i; sample rate: %i)",
-                self->decoder.outputFormat,
-                self->decoder.outputSampleRate
-            );
+            self->is_using_loop_delay = true;
 
             ma_data_source_set_next(&self->decoder, &self->loop_delay_ds);
             ma_data_source_set_next(&self->loop_delay_ds, &self->decoder);
         }
     } else {
-        // TODO? maybe refactor this
-
         ma_data_source_set_current(&self->decoder, &self->decoder);
         ma_data_source_set_looping(&self->decoder, false);
         ma_data_source_set_next(&self->decoder, NULL);

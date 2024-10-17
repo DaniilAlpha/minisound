@@ -91,7 +91,7 @@ if(NOT EMSCRIPTEN)
         OUTPUT_NAME ${MAIN_LIB}
     )
 
-    set(COMPILE_AND_LINK_OPTS -O3)
+    set(COMPILE_AND_LINK_OPTS -Og -g)
     target_compile_options(${MAIN_LIB} PRIVATE ${COMPILE_AND_LINK_OPTS})
     target_link_options(${MAIN_LIB} PRIVATE ${COMPILE_AND_LINK_OPTS})
     unset(COMMON_OPTIONS)

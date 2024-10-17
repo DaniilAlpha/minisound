@@ -220,6 +220,6 @@ To manually build the project, follow these steps:
 ## TODO
 
 - [ ] Fix non-intuitiveness of pausing and stopping, then playing again looped sounds
-- [ ] Stop crash when no devices found for playback or capture
-- [ ] Extract buffer stuff to unified AV Buffer packages dart and C.
+<!-- - [ ] Stop crash when no devices found for playback or capture -->
+<!-- - [ ] Extract buffer stuff to unified AV Buffer packages dart and C. -->
 <!-- - [ ] Switch engine init to state machine. -->

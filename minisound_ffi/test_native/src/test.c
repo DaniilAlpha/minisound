@@ -120,7 +120,7 @@ MiunteResult test_encoded_sounds() {
 MiunteResult test_looping() {
     static size_t const loop_delay_ms = 250;
     static char const *const path =
-        "./minisound/example/assets/laser_shoot_16bit.wav";
+        "./minisound/example/assets/laser_shoot.wav";
 
     Sound *const sound = sound_alloc();
     MIUNTE_EXPECT(sound != NULL, "sound should be allocated properly");
@@ -201,15 +201,18 @@ MiunteResult test_generated_pulse_sounds() {
     Sound *const sound = sound_alloc();
     MIUNTE_EXPECT(sound != NULL, "sound should be allocated properly");
 
-    MIUNTE_EXPECT(
-        engine_generate_pulse(engine, sound, 261.63, 0.1) == Ok,
-        "sound generation should not fail"
-    );
-    MIUNTE_EXPECT(sound_play(sound) == Ok, "sound playing should not fail");
+    for (double i = 0.01; i < 1.0; i += 0.16) {
+        MIUNTE_EXPECT(
+            engine_generate_pulse(engine, sound, 261.63, i) == Ok,
+            "sound generation should not fail"
+        );
+        MIUNTE_EXPECT(sound_play(sound) == Ok, "sound playing should not fail");
 
-    sleep(200);
+        sleep(250);
 
-    sound_unload(sound);
+        sound_unload(sound);
+    }
+
     free(sound);
 
     MIUNTE_PASS();

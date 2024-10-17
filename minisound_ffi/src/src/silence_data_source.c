@@ -1,5 +1,3 @@
-// TODO! there are some garbage data playing at the beginning of every loop
-// delay for U8 sounds only
 #include "../include/silence_data_source.h"
 
 #include <string.h>
@@ -29,12 +27,12 @@ static ma_result silence_data_source_on_read(
 
     self->pos_frames += data_len_frames;
 
-    size_t const data_size =
-        data_len_frames * ma_get_bytes_per_frame(
-                              self->_config.format,
-                              SILENCE_DATA_SOURCE_CHANNEL_COUNT
-                          );
-    memset(data, 0, data_size);
+    ma_silence_pcm_frames(
+        data,
+        data_len_frames,
+        self->_config.format,
+        SILENCE_DATA_SOURCE_CHANNEL_COUNT
+    );
 
     return *out_read_data_len_frames = data_len_frames, MA_SUCCESS;
 }
@@ -112,7 +110,7 @@ Result silence_data_source_init(
     SilenceDataSource *const self,
     SilenceDataSourceConfig const *const config
 ) {
-    static ma_data_source_vtable vtbl = {
+    static ma_data_source_vtable const vtbl = {
         .onRead = silence_data_source_on_read,
         .onSeek = silence_data_source_on_seek,
         .onGetDataFormat = silence_data_source_on_get_data_format,
@@ -124,7 +122,8 @@ Result silence_data_source_init(
 
     ma_data_source_config ds_config = ma_data_source_config_init();
     ds_config.vtable = &vtbl;
-    ma_data_source_init(&ds_config, &self->ds);
+    if (ma_data_source_init(&ds_config, &self->ds) != MA_SUCCESS)
+        return UnknownErr;
 
     self->_config = *config;
     self->pos_frames = 0;

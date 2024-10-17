@@ -19,7 +19,7 @@ class _GenerationExampleState extends State<GenerationExample> {
 
   var waveformType = WaveformType.sine;
   var noiseType = NoiseType.white;
-  var pulseDelay = 0.25;
+  var dutyCycle = 0.25;
 
   Sound? sound;
 
@@ -70,11 +70,13 @@ class _GenerationExampleState extends State<GenerationExample> {
             SizedBox(
               width: 200,
               child: Slider(
-                value: pulseDelay,
+                min: 0,
+                max: 1,
+                value: dutyCycle,
                 divisions: 100,
-                label: pulseDelay.toStringAsFixed(2),
+                label: dutyCycle.toStringAsFixed(2),
                 onChanged: (value) => setState(() {
-                  pulseDelay = value;
+                  dutyCycle = value;
                 }),
               ),
             ),
@@ -89,7 +91,7 @@ class _GenerationExampleState extends State<GenerationExample> {
               widget.engine.generateWaveform(type: waveformType),
             GeneratorType.noise => widget.engine.generateNoise(type: noiseType),
             GeneratorType.pulse =>
-              widget.engine.generatePulse(dutyCycle: pulseDelay),
+              widget.engine.generatePulse(dutyCycle: dutyCycle),
           }
             ..volume = 0.3;
           widget.engine.start().then((_) => sound!.play());

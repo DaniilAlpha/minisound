@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "../../external/miniaudio/include/miniaudio.h"
+#include "../../include/sound_data/pulsewave_data_source.h"
 
 #define MILO_LVL SOUND_MILO_LVL
 #include "../../external/milo/milo.h"
@@ -37,7 +38,7 @@ static ma_data_source *noise_sound_data_get_ds(NoiseSoundData *const self) {
 // pulse
 
 struct PulseSoundData {
-    ma_pulsewave pulse;
+    PulsewaveDataSource pulse;
 };
 
 ma_data_source *pulse_sound_data_get_ds(PulseSoundData *const self) {
@@ -139,13 +140,13 @@ Result pulse_sound_data_init(
         DEFAULT_AMPLITUDE,
         frequency
     );
-    if (ma_pulsewave_init(&config, &self->pulse) != MA_SUCCESS)
+    if (pulsewave_data_source_init(&self->pulse, &config) != Ok)
         return error("failed to initialize pulsewave"), UnknownErr;
 
     return Ok;
 }
 void pulse_sound_data_uninit(PulseSoundData *const self) {
-    ma_pulsewave_uninit(&self->pulse);
+    pulsewave_data_source_uninit(&self->pulse);
 }
 
 SoundData pulse_sound_data_ww_sound_data(PulseSoundData *const self) WRAP_BODY(
