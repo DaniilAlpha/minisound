@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-#include "../../include/silence_data_source.h"
+#include "../../include/sound_data/silence_data_source.h"
 
 #define MILO_LVL SOUND_MILO_LVL
 #include "../../external/milo/milo.h"

@@ -89,6 +89,7 @@ MiunteResult test_encoded_sounds() {
         "./minisound/example/assets/laser_shoot.wav",
         "./minisound/example/assets/laser_shoot_16bit.wav",
         "./minisound/example/assets/laser_shoot.mp3",
+        "./minisound/example/assets/laser_shoot.flac",
     };
     for (size_t i = 0; i < lenof(paths); i++) {
         Sound *const sound = sound_alloc();
@@ -185,7 +186,7 @@ MiunteResult test_generated_noise_sounds() {
     MIUNTE_EXPECT(sound != NULL, "sound should be allocated properly");
 
     MIUNTE_EXPECT(
-        engine_generate_noise(engine, sound, NOISE_TYPE_BROWNIAN, 0) == Ok,
+        engine_generate_noise(engine, sound, NOISE_TYPE_WHITE, 0) == Ok,
         "sound generation should not fail"
     );
     MIUNTE_EXPECT(sound_play(sound) == Ok, "sound playing should not fail");
@@ -203,7 +204,7 @@ MiunteResult test_generated_pulse_sounds() {
 
     for (double i = 0.01; i < 1.0; i += 0.16) {
         MIUNTE_EXPECT(
-            engine_generate_pulse(engine, sound, 261.63, i) == Ok,
+            engine_generate_pulse(engine, sound, 440.0, i) == Ok,
             "sound generation should not fail"
         );
         MIUNTE_EXPECT(sound_play(sound) == Ok, "sound playing should not fail");

@@ -10,6 +10,8 @@
 #define MILO_LVL ENGINE_MILO_LVL
 #include "../external/milo/milo.h"
 
+#define SOUND_STREAMING_MIN_SIZE (64 * 1024 * 1024)
+
 /*************
  ** private **
  *************/

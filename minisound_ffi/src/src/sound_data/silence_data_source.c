@@ -1,8 +1,8 @@
-#include "../include/silence_data_source.h"
+#include "../../include/sound_data/silence_data_source.h"
 
 #include <string.h>
 
-#include "../external/result/result.h"
+#include "../../external/result/result.h"
 
 #define SILENCE_DATA_SOURCE_CHANNEL_COUNT (1)
 
