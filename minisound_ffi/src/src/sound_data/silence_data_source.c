@@ -19,13 +19,13 @@ static ma_result silence_data_source_on_read(
     SilenceDataSource *const self = v_self;
 
     ma_uint64 const remain_len_frames =
-        self->pos_frames <= self->_config.len_frames
-            ? self->_config.len_frames - 1 - self->pos_frames
+        self->_pos_frames <= self->_config.len_frames
+            ? self->_config.len_frames - 1 - self->_pos_frames
             : 0;
     if (data_len_frames > remain_len_frames)
         data_len_frames = remain_len_frames;
 
-    self->pos_frames += data_len_frames;
+    self->_pos_frames += data_len_frames;
 
     ma_silence_pcm_frames(
         data,
@@ -43,7 +43,7 @@ static ma_result silence_data_source_on_seek(
 ) {
     SilenceDataSource *const self = v_self;
 
-    self->pos_frames = new_pos_frames;
+    self->_pos_frames = new_pos_frames;
 
     return MA_SUCCESS;
 }
@@ -76,7 +76,7 @@ static ma_result silence_data_source_on_get_cursor(
 ) {
     SilenceDataSource const *const self = v_self;
 
-    return *out_cursor = self->pos_frames, MA_SUCCESS;
+    return *out_cursor = self->_pos_frames, MA_SUCCESS;
 }
 
 static ma_result silence_data_source_on_get_len(
@@ -122,14 +122,14 @@ Result silence_data_source_init(
 
     ma_data_source_config ds_config = ma_data_source_config_init();
     ds_config.vtable = &vtbl;
-    if (ma_data_source_init(&ds_config, &self->ds) != MA_SUCCESS)
+    if (ma_data_source_init(&ds_config, &self->_ds) != MA_SUCCESS)
         return UnknownErr;
 
     self->_config = *config;
-    self->pos_frames = 0;
+    self->_pos_frames = 0;
 
     return Ok;
 }
 void silence_data_source_uninit(SilenceDataSource *const self) {
-    ma_data_source_uninit(&self->ds);
+    ma_data_source_uninit(&self->_ds);
 }

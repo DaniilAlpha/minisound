@@ -35,6 +35,7 @@ ffigen:
       - "src/include/recorder.h"
       - "src/include/recording.h"
       - "src/include/sound_data/encoded_sound_data.h"
+      - "src/include/sound_data/generated_sound_data.h"
       - "/usr/lib/clang/18/include/stdbool.h"
   structs:
     dependency-only: opaque

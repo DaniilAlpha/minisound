@@ -1,3 +1,5 @@
+import "dart:math";
+
 import "package:flutter/material.dart";
 import "package:minisound/engine.dart";
 
@@ -13,15 +15,13 @@ class GenerationExample extends StatefulWidget {
 }
 
 class _GenerationExampleState extends State<GenerationExample> {
-  // static const pulsewaveFrequency = 432.0;
-
   var generatorType = GeneratorType.wave;
 
   var waveformType = WaveformType.sine;
+  var freq = 8.78, dutyCycle = 0.5;
   var noiseType = NoiseType.white;
-  var dutyCycle = 0.25;
 
-  Sound? sound;
+  GeneratedSound? sound;
 
   @override
   Widget build(BuildContext context) {
@@ -37,49 +37,96 @@ class _GenerationExampleState extends State<GenerationExample> {
           value: generatorType,
           onChanged: (type) => setState(() {
             generatorType = type!;
+
+            sound?.unload();
+            sound = null;
           }),
         ),
       ]),
       switch (generatorType) {
-        GeneratorType.wave => Row(mainAxisSize: MainAxisSize.min, children: [
-            const Text("Waveform Type: "),
-            DropdownButton(
-              value: waveformType,
-              items: WaveformType.values
-                  .map((t) => DropdownMenuItem(value: t, child: Text(t.name)))
-                  .toList(),
-              onChanged: (value) => setState(() {
-                waveformType = value!;
-              }),
-            ),
-          ]),
-        GeneratorType.noise => Row(mainAxisSize: MainAxisSize.min, children: [
-            const Text("Noise Type: "),
-            DropdownButton(
-              value: noiseType,
-              items: NoiseType.values
-                  .map((t) => DropdownMenuItem(value: t, child: Text(t.name)))
-                  .toList(),
-              onChanged: (value) => setState(() {
-                noiseType = value!;
-              }),
-            ),
-          ]),
-        GeneratorType.pulse => Row(mainAxisSize: MainAxisSize.min, children: [
-            const Text("Pulse Delay: "),
-            SizedBox(
-              width: 200,
-              child: Slider(
-                min: 0,
-                max: 1,
-                value: dutyCycle,
-                divisions: 100,
-                label: dutyCycle.toStringAsFixed(2),
+        GeneratorType.wave => Column(children: [
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              const Text("Waveform Type: "),
+              DropdownButton(
+                value: waveformType,
+                items: WaveformType.values
+                    .map((t) => DropdownMenuItem(value: t, child: Text(t.name)))
+                    .toList(),
                 onChanged: (value) => setState(() {
-                  dutyCycle = value;
+                  value!;
+
+                  waveformType = value;
+                  (sound as WaveformSound?)?.type = value;
                 }),
               ),
-            ),
+            ]),
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              const Text("Frequency\n(changes immediately): "),
+              SizedBox(
+                width: 200,
+                child: Slider(
+                  value: freq,
+                  min: 4,
+                  max: 14,
+                  divisions: (14 - 4) * 12,
+                  label: pow(2, freq).toStringAsFixed(2),
+                  onChanged: (value) => setState(() {
+                    freq = value;
+                    (sound as WaveformSound?)?.freq = pow(2, value).toDouble();
+                  }),
+                ),
+              ),
+            ]),
+          ]),
+        GeneratorType.noise => Column(children: [
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              const Text("Noise Type\n(changes after regen): "),
+              DropdownButton(
+                value: noiseType,
+                items: NoiseType.values
+                    .map((t) => DropdownMenuItem(value: t, child: Text(t.name)))
+                    .toList(),
+                onChanged: (value) => setState(() {
+                  noiseType = value!;
+                }),
+              ),
+            ]),
+          ]),
+        GeneratorType.pulse => Column(children: [
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              const Text("Frequency\n(changes immediately): "),
+              SizedBox(
+                width: 200,
+                child: Slider(
+                  value: freq,
+                  min: 4,
+                  max: 14,
+                  divisions: (14 - 4) * 12,
+                  label: pow(2, freq).toStringAsFixed(2),
+                  onChanged: (value) => setState(() {
+                    freq = value;
+                    (sound as PulseSound?)?.freq = pow(2, value).toDouble();
+                  }),
+                ),
+              ),
+            ]),
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              const Text("Duty Cycle\n(changes immediately): "),
+              SizedBox(
+                width: 200,
+                child: Slider(
+                  min: 0,
+                  max: 1,
+                  value: dutyCycle,
+                  divisions: 100,
+                  label: dutyCycle.toStringAsFixed(2),
+                  onChanged: (value) => setState(() {
+                    dutyCycle = value;
+                    (sound as PulseSound?)?.dutyCycle = value.clamp(0.01, 0.99);
+                  }),
+                ),
+              ),
+            ]),
           ]),
       },
       ElevatedButton(
@@ -87,11 +134,15 @@ class _GenerationExampleState extends State<GenerationExample> {
         onPressed: () {
           sound?.stop();
           sound = switch (generatorType) {
-            GeneratorType.wave =>
-              widget.engine.generateWaveform(type: waveformType),
+            GeneratorType.wave => widget.engine.generateWaveform(
+                type: waveformType,
+                freq: pow(2, freq).toDouble(),
+              ),
             GeneratorType.noise => widget.engine.generateNoise(type: noiseType),
-            GeneratorType.pulse =>
-              widget.engine.generatePulse(dutyCycle: dutyCycle),
+            GeneratorType.pulse => widget.engine.generatePulse(
+                dutyCycle: dutyCycle,
+                freq: pow(2, freq).toDouble(),
+              ),
           }
             ..volume = 0.3;
           widget.engine.start().then((_) => sound!.play());
@@ -100,7 +151,7 @@ class _GenerationExampleState extends State<GenerationExample> {
       ElevatedButton(
           child: const Text("STOP"),
           onPressed: () {
-            sound?.stop();
+            sound?.unload();
             sound = null;
           }),
     ]);

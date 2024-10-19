@@ -139,7 +139,7 @@ MiunteResult test_looping() {
     );
 
     encoded_sound_data_set_looped(
-        sound_get_data(sound)->_self,
+        sound_get_encoded_data(sound),
         true,
         loop_delay_ms
     );

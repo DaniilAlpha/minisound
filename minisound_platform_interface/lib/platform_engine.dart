@@ -12,11 +12,16 @@ abstract interface class PlatformEngine {
 
   void start();
 
-  Future<PlatformSound> loadSound(TypedData data);
-  PlatformSound generateWaveform(
-      {required WaveformType type, required double freq});
-  PlatformSound generateNoise({required NoiseType type, required int seed});
-  PlatformSound generatePulse({
+  Future<PlatformEncodedSound> loadSound(TypedData data);
+  PlatformWaveformSound generateWaveform({
+    required WaveformType type,
+    required double freq,
+  });
+  PlatformNoiseSound generateNoise({
+    required NoiseType type,
+    required int seed,
+  });
+  PlatformPulseSound generatePulse({
     required double freq,
     required double dutyCycle,
   });

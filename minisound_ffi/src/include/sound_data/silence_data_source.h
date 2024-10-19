@@ -19,10 +19,10 @@ SilenceDataSourceConfig silence_data_source_config(
 );
 
 typedef struct SilenceDataSource {
-    ma_data_source_base ds;
+    ma_data_source_base _ds;
 
     SilenceDataSourceConfig _config;
-    ma_uint64 pos_frames;
+    ma_uint64 _pos_frames;
 } SilenceDataSource;
 
 Result silence_data_source_init(

@@ -13,12 +13,12 @@ class PlaybackExample extends StatefulWidget {
 }
 
 class _PlaybackExampleState extends State<PlaybackExample> {
-  Sound? currentSound;
+  LoadedSound? currentSound;
   var loopDelay = 0.0;
 
-  late Future<Map<String, Sound>> soundsFuture = _initSounds();
+  late Future<Map<String, LoadedSound>> soundsFuture = _initSounds();
 
-  Future<Map<String, Sound>> _initSounds() async {
+  Future<Map<String, LoadedSound>> _initSounds() async {
     const soundNames = [
       "assets/laser_shoot.wav",
       "assets/laser_shoot_16bit.wav",

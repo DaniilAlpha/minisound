@@ -99,6 +99,8 @@ SoundData encoded_sound_data_ww_sound_data(EncodedSoundData *const self)
         SoundData,
         SOUND_DATA_INTERFACE(EncodedSoundData),
         {
+            .type = SOUND_DATA_TYPE_ENCODED,
+
             .get_ds = encoded_sound_data_get_ds,
             .uninit = encoded_sound_data_uninit,
         }

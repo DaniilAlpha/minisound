@@ -29,7 +29,7 @@ final class FfiEngine implements PlatformEngine {
   }
 
   @override
-  Future<FfiSound> loadSound(TypedData data) async {
+  Future<FfiEncodedSound> loadSound(TypedData data) async {
     final sound = _bindings.sound_alloc();
     if (sound == nullptr) throw MinisoundPlatformOutOfMemoryException();
 
@@ -49,11 +49,11 @@ final class FfiEngine implements PlatformEngine {
       throw MinisoundPlatformException("Failed to load a sound (code: $r).");
     }
 
-    return FfiSound._(sound, dataPtr);
+    return FfiEncodedSound._(sound, data: dataPtr);
   }
 
   @override
-  FfiSound generateWaveform({
+  FfiWaveformSound generateWaveform({
     required WaveformType type,
     required double freq,
   }) {
@@ -67,11 +67,11 @@ final class FfiEngine implements PlatformEngine {
       throw MinisoundPlatformException("Failed to load a sound (code: $r).");
     }
 
-    return FfiSound._(sound);
+    return FfiWaveformSound._(sound, type: type, freq: freq);
   }
 
   @override
-  FfiSound generateNoise({required NoiseType type, required int seed}) {
+  FfiNoiseSound generateNoise({required NoiseType type, required int seed}) {
     final sound = _bindings.sound_alloc();
     if (sound == nullptr) throw MinisoundPlatformOutOfMemoryException();
 
@@ -81,11 +81,14 @@ final class FfiEngine implements PlatformEngine {
       throw MinisoundPlatformException("Failed to load a sound (code: $r).");
     }
 
-    return FfiSound._(sound);
+    return FfiNoiseSound._(sound, type: type, seed: seed);
   }
 
   @override
-  FfiSound generatePulse({required double freq, required double dutyCycle}) {
+  FfiPulseSound generatePulse({
+    required double freq,
+    required double dutyCycle,
+  }) {
     final sound = _bindings.sound_alloc();
     if (sound == nullptr) throw MinisoundPlatformOutOfMemoryException();
 
@@ -95,7 +98,7 @@ final class FfiEngine implements PlatformEngine {
       throw MinisoundPlatformException("Failed to load a sound (code: $r).");
     }
 
-    return FfiSound._(sound);
+    return FfiPulseSound._(sound, freq: freq, dutyCycle: dutyCycle);
   }
 }
 

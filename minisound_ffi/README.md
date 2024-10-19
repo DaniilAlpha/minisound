@@ -10,38 +10,32 @@ However, if you import this package to use any of its APIs directly, you should 
 
 ## Building the project
 
-To build the project, follow these steps:
+To manually build the project, follow these steps:
 
 1. Initialize the submodules:
 
-   ```bash
-   git submodule update --init --recursive
-   ```
+    ```bash
+    git submodule update --init --recursive
+    ```
 
-2. Make and/or Navigate to the `minisound_ffi/src/build` directory:
+2. Run the following commands to build the project using emcmake:
 
-   ```bash
-   cd minisound_ffi/src/build
-   ```
+    ```bash
+    emcmake cmake -S ./minisound_ffi/src/ -B ./minisound_web/lib/build/cmake_stuff 
+    cmake --build ./minisound_web/lib/build/cmake_stuff 
+    ```
 
-3. Run the following commands to build the project using emcmake and cmake:
-
-   ```bash
-   emcmake cmake ..
-   cmake --build .
-   ```
-
-   If you want to build the native version, encounter issues or want to start fresh, clean the `build` folder and rerun the cmake commands:
+    If you encounter issues or want to start fresh, clean the `build` folder and rerun the cmake commands:
 
     ```bash
     rm -rf *
-    cmake ..
-    cmake --build .
+    emcmake cmake -S ./minisound_ffi/src/ -B ./minisound_web/lib/build/cmake_stuff 
+    cmake --build ./minisound_web/lib/build/cmake_stuff 
     ```
 
 4. For development work, it's useful to run `ffigen` from the `minisound_ffi` directory:
 
-   ```bash
-   cd minisound_ffi
-   dart run ffigen
-   ```
+    ```bash
+    cd ./minisound_ffi/
+    dart run ffigen
+    ```

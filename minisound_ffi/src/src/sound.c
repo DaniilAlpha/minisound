@@ -51,11 +51,6 @@ Result sound_play(Sound *const self) {
 
     return info("sound played"), Ok;
 }
-Result sound_replay(Sound *const self) {
-    sound_stop(self);
-    return sound_play(self);
-}
-
 void sound_pause(Sound *const self) {
     ma_sound_stop(&self->sound);
 
@@ -81,6 +76,23 @@ double sound_get_duration(Sound *const self) {
     return (float)length_in_frames / ma_engine_get_sample_rate(self->engine);
 }
 
-SoundData const *sound_get_data(Sound const *const self) {
-    return &self->sound_data;
+EncodedSoundData *sound_get_encoded_data(Sound const *const self) {
+    return sound_data_get_type(&self->sound_data) == SOUND_DATA_TYPE_ENCODED
+             ? self->sound_data._self
+             : NULL;
+}
+WaveformSoundData *sound_get_waveform_data(Sound const *const self) {
+    return sound_data_get_type(&self->sound_data) == SOUND_DATA_TYPE_WAVEFORM
+             ? self->sound_data._self
+             : NULL;
+}
+NoiseSoundData *sound_get_noise_data(Sound const *const self) {
+    return sound_data_get_type(&self->sound_data) == SOUND_DATA_TYPE_NOISE
+             ? self->sound_data._self
+             : NULL;
+}
+PulseSoundData *sound_get_pulse_data(Sound const *const self) {
+    return sound_data_get_type(&self->sound_data) == SOUND_DATA_TYPE_PULSE
+             ? self->sound_data._self
+             : NULL;
 }

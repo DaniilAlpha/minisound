@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include "../../external/miniaudio/include/miniaudio.h"
-#include "../../include/sound_data/pulsewave_data_source.h"
+#include "../../include/sound_data/pulse_data_source.h"
 
 #define MILO_LVL SOUND_MILO_LVL
 #include "../../external/milo/milo.h"
@@ -38,7 +38,7 @@ static ma_data_source *noise_sound_data_get_ds(NoiseSoundData *const self) {
 // pulse
 
 struct PulseSoundData {
-    PulsewaveDataSource pulse;
+    PulseDataSource pulse;
 };
 
 ma_data_source *pulse_sound_data_get_ds(PulseSoundData *const self) {
@@ -77,11 +77,26 @@ void waveform_sound_data_uninit(WaveformSoundData *const self) {
     ma_waveform_uninit(&self->waveform);
 }
 
+void waveform_sound_data_set_type(
+    WaveformSoundData *const self,
+    WaveformType const value
+) {
+    ma_waveform_set_type(&self->waveform, (ma_waveform_type)value);
+}
+void waveform_sound_data_set_freq(
+    WaveformSoundData *const self,
+    double const value
+) {
+    ma_waveform_set_frequency(&self->waveform, value);
+}
+
 SoundData waveform_sound_data_ww_sound_data(WaveformSoundData *const self)
     WRAP_BODY(
         SoundData,
         SOUND_DATA_INTERFACE(WaveformSoundData),
         {
+            .type = SOUND_DATA_TYPE_WAVEFORM,
+
             .get_ds = waveform_sound_data_get_ds,
             .uninit = waveform_sound_data_uninit,
         }
@@ -113,10 +128,16 @@ void noise_sound_data_uninit(NoiseSoundData *const self) {
     ma_noise_uninit(&self->noise, NULL);
 }
 
+void noise_sound_data_set_seed(NoiseSoundData *const self, int32_t const seed) {
+    ma_noise_set_seed(&self->noise, seed);
+}
+
 SoundData noise_sound_data_ww_sound_data(NoiseSoundData *const self) WRAP_BODY(
     SoundData,
     SOUND_DATA_INTERFACE(NoiseSoundData),
     {
+        .type = SOUND_DATA_TYPE_NOISE,
+
         .get_ds = noise_sound_data_get_ds,
         .uninit = noise_sound_data_uninit,
     }
@@ -140,19 +161,31 @@ Result pulse_sound_data_init(
         DEFAULT_AMPLITUDE,
         frequency
     );
-    if (pulsewave_data_source_init(&self->pulse, &config) != Ok)
-        return error("failed to initialize pulsewave"), UnknownErr;
+    if (pulse_data_source_init(&self->pulse, &config) != Ok)
+        return error("failed to initialize pulse"), UnknownErr;
 
     return Ok;
 }
 void pulse_sound_data_uninit(PulseSoundData *const self) {
-    pulsewave_data_source_uninit(&self->pulse);
+    pulse_data_source_uninit(&self->pulse);
+}
+
+void pulse_sound_data_set_freq(PulseSoundData *const self, double const value) {
+    ma_pulsewave_set_frequency(&self->pulse.pulsewave, value);
+}
+void pulse_sound_data_set_duty_cycle(
+    PulseSoundData *const self,
+    double const value
+) {
+    ma_pulsewave_set_duty_cycle(&self->pulse.pulsewave, value);
 }
 
 SoundData pulse_sound_data_ww_sound_data(PulseSoundData *const self) WRAP_BODY(
     SoundData,
     SOUND_DATA_INTERFACE(PulseSoundData),
     {
+        .type = SOUND_DATA_TYPE_PULSE,
+
         .get_ds = pulse_sound_data_get_ds,
         .uninit = pulse_sound_data_uninit,
     }

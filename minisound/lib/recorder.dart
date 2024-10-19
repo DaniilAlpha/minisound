@@ -8,6 +8,7 @@ export "package:minisound_platform_interface/minisound_platform_interface.dart"
         MinisoundPlatformOutOfMemoryException,
         RecorderFormat;
 
+/// Controls audio recodfing.
 final class Recorder {
   Recorder() {
     _finalizer.attach(this, _recorder);
@@ -25,10 +26,10 @@ final class Recorder {
 
   bool get isRecording => _recorder.isRecording;
 
-  /// Initializes the recorder.
+  /// Initializes the recorder. All parameters directly influence the amount of memory that recording will take.
   ///
-  /// `channelCount` - must be in range 1..254 inclusive.
-  /// `sampleRate` - must be in range 8000..384000 inclusive.
+  /// `channelCount` must be in range 1..254 inclusive.
+  /// `sampleRate` must be in range 8000..384000 inclusive.
   Future<void> init({
     RecorderFormat format = RecorderFormat.s16,
     int channelCount = 2,

@@ -6,14 +6,14 @@ Run `make help` from the root project directory to get started.
 
 ## Platform support
 
-| Platform | Tested     | Supposed to work | Unsupported |
-| -------- | -----------| -----------------| ------------|
-| Android | SDK 31, 19  | SDK 16+          | SDK 15-     |
-| iOS     | None        | Unknown          | Unknown     |
-| Windows | 11, 7 (x64) | Vista+           | XP-         |
-| macOS   | None        | Unknown          | Unknown     |
-| Linux   | Fedora 39-40, Mint 22 | Any    | None        |
-| Web     | Chrome 93+, Firefox 79+, Safari 16+ | Browsers with an `AudioWorklet` support | Browsers without an `AudioWorklet` support |
+|Platform|Tested     |Supposed to work|Unsupported|
+|--------|-----------|----------------|-----------|
+|Android |SDK 31, 19 |SDK 16+         |SDK 15-    |
+|iOS     |None       |Unknown         |Unknown    |
+|Windows |11, 7 (x64)|Vista+          |XP-        |
+|macOS   |None       |Unknown         |Unknown    |
+|Linux   |Fedora 39-40, Mint 22|Any   |None       |
+|Web     |Chrome 93+, Firefox 79+, Safari 16+|Browsers with an `AudioWorklet` support|Browsers without an `AudioWorklet` support|
 
 ## Getting started on the web
 
@@ -101,6 +101,8 @@ void main() {
 ### Recorder Example
 
 ```dart
+// TODO update an example 
+
 import "package:minisound/recorder.dart" as minisound;
 
 void main() async {
@@ -140,6 +142,8 @@ void main() async {
 ### Generator Example
 
 ```dart
+// TODO update an example 
+
 import "package:minisound/generator.dart" as minisound;
 
 void main() async {

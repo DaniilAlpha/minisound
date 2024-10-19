@@ -1,11 +1,10 @@
-// TODO allow for modifying generated properties not only on init
-
 #ifndef GENERATED_SOUND_DATA_H
 #define GENERATED_SOUND_DATA_H
 
 #include <stdint.h>
 
 #include "../../external/result/result.h"
+#include "../../include/export.h"
 #include "sound_data.h"
 
 // waveform
@@ -26,6 +25,13 @@ Result waveform_sound_data_init(
 );
 void waveform_sound_data_uninit(WaveformSoundData *const self);
 
+EXPORT void waveform_sound_data_set_type(
+    WaveformSoundData *const self,
+    WaveformType const value
+);
+EXPORT void
+waveform_sound_data_set_freq(WaveformSoundData *const self, double const value);
+
 SoundData waveform_sound_data_ww_sound_data(WaveformSoundData *const self);
 
 // noise
@@ -45,6 +51,9 @@ Result noise_sound_data_init(
 );
 void noise_sound_data_uninit(NoiseSoundData *const self);
 
+EXPORT void
+noise_sound_data_set_seed(NoiseSoundData *const self, int32_t const seed);
+
 SoundData noise_sound_data_ww_sound_data(NoiseSoundData *const self);
 
 // pulse
@@ -58,6 +67,11 @@ Result pulse_sound_data_init(
     double const duty_cycle
 );
 void pulse_sound_data_uninit(PulseSoundData *const self);
+
+EXPORT void
+pulse_sound_data_set_freq(PulseSoundData *const self, double const value);
+EXPORT void
+pulse_sound_data_set_duty_cycle(PulseSoundData *const self, double const value);
 
 SoundData pulse_sound_data_ww_sound_data(PulseSoundData *const self);
 
