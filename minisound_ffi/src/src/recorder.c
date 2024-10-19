@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "../external/miniaudio/include/miniaudio.h"
-#include "../include/recording.h"
+#include "../include/recorder_buffer.h"
 
 #define MILO_LVL RECORDER_MILO_LVL
 #include "../external/milo/milo.h"
@@ -16,7 +16,7 @@
 struct Recorder {
     ma_device device;
 
-    Recording *rec;
+    RecorderBuffer *rec_buf;
 };
 
 static void data_callback(
@@ -29,7 +29,7 @@ static void data_callback(
 
     Recorder *const self = device->pUserData;
 
-    recording_write(self->rec, data, data_size);
+    recorder_buffer_write(self->rec_buf, data, data_size);
 }
 
 /************
@@ -58,45 +58,50 @@ Result recorder_init(
                ),
                UnknownErr;
 
-    self->rec = NULL;
+    self->rec_buf = NULL;
 
     return info("recorder initialized"), Ok;
 }
 void recorder_uninit(Recorder *const self) {
     ma_device_uninit(&self->device);
-    if (self->rec != NULL) recording_uninit(self->rec), free(self->rec);
+    if (self->rec_buf != NULL)
+        recorder_buffer_uninit(self->rec_buf), free(self->rec_buf);
 }
 
 bool recorder_get_is_recording(Recorder const *self) {
-    return self->rec != NULL;
+    return self->rec_buf != NULL;
 }
 
 Result recorder_start(Recorder *const self, RecordingEncoding const encoding) {
-    if (self->rec != NULL) return Ok;
+    if (self->rec_buf != NULL) return Ok;
 
-    self->rec = recording_alloc();
-    if (self->rec == NULL) return OutOfMemErr;
+    self->rec_buf = recorder_buffer_alloc();
+    if (self->rec_buf == NULL) return OutOfMemErr;
 
-    UNROLL_CLEANUP(recording_init(self->rec, encoding, &self->device), {
-        free(self->rec);
-    });
+    UNROLL_CLEANUP(
+        recorder_buffer_init(self->rec_buf, encoding, &self->device),
+        { free(self->rec_buf); }
+    );
 
     if (ma_device_start(&self->device) != MA_SUCCESS) {
-        recording_uninit(self->rec), free(self->rec);
+        recorder_buffer_uninit(self->rec_buf), free(self->rec_buf);
         return error("miniaudio device starting error!"), UnknownErr;
     }
 
     return info("recorder started"), Ok;
 }
-Recording *recorder_stop(Recorder *const self) {
+RecorderBufferFlush recorder_flush(Recorder *const self) {
+    RecorderBufferFlush const flush = recorder_buffer_flush(self->rec_buf);
+    return info("recorder flushed"), flush;
+}
+RecorderBufferFlush recorder_stop(Recorder *const self) {
     ma_device_stop(&self->device);
 
-    recording_end(self->rec);
+    RecorderBufferFlush const flush = recorder_buffer_consume(self->rec_buf);
 
-    Recording *const rec = self->rec;
-    self->rec = NULL;
+    free(self->rec_buf), self->rec_buf = NULL;
 
-    return info("recorder stopped"), rec;
+    return info("recorder stopped"), flush;
 }
 
 // clang-format off

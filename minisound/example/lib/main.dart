@@ -26,7 +26,7 @@ class _ExamplePageState extends State<ExamplePage> {
 
   @override
   Widget build(BuildContext context) {
-    const space = SizedBox(height: 20);
+    const space = SizedBox.square(dimension: 20);
     return Scaffold(
       appBar: AppBar(title: const Text("Minisound Example")),
       body: Center(

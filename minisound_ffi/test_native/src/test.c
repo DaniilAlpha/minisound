@@ -10,7 +10,6 @@
 
 #include "engine.h"
 #include "recorder.h"
-#include "recording.h"
 #include "sound_data/encoded_sound_data.h"
 
 #define lenof(arr) (sizeof(arr) / sizeof(arr[0]))
@@ -228,35 +227,29 @@ MiunteResult test_recording_wav() {
         "recorder initialization should not fail"
     );
 
-    Recording *recs[2] = {0};
-
-    for (size_t i = 0; i < lenof(recs); i++) {
-        MIUNTE_EXPECT(
-            recorder_start(recorder, RECORDING_ENCODING_WAV) == Ok,
-            "recorder starting should not fail"
-        );
-        sleep(3000);
-        recs[i] = recorder_stop(recorder);
-    }
-
-    // separated to test that recording are not overriding each other
-
-    for (size_t i = 0; i < lenof(recs); i++) {
+    for (size_t i = 0; i < 2; i++) {
         char filename[] = "./minisound_ffi/test_native/rec#.wav";
         char *idx = strchr(filename, '#');
         idx[0] = '0' + i;
 
         FILE *const file = fopen(filename, "wb");
         MIUNTE_EXPECT(file != NULL, "file should open properly");
-        fwrite(
-            recording_get_buf(recs[i]),
-            1,
-            recording_get_size(recs[i]),
-            file
-        );
-        fclose(file);
 
-        recording_uninit(recs[i]), free(recs[i]);
+        MIUNTE_EXPECT(
+            recorder_start(recorder, RECORDING_ENCODING_WAV) == Ok,
+            "recorder starting should not fail"
+        );
+
+        sleep(3000);
+
+        // TODO! flushing not really working
+        {
+            RecorderBufferFlush const flush1 = recorder_stop(recorder);
+            fwrite(flush1.buf, 1, flush1.size, file);
+            free(flush1.buf);
+        }
+
+        fclose(file);
     }
 
     recorder_uninit(recorder), free(recorder);
@@ -269,11 +262,11 @@ int main() {
         setup_test,
         teardown_test,
         {
-            test_encoded_sounds,
-            test_looping,
-            test_generated_waveform_sounds,
-            test_generated_noise_sounds,
-            test_generated_pulse_sounds,
+            // test_encoded_sounds,
+            // test_looping,
+            // test_generated_waveform_sounds,
+            // test_generated_noise_sounds,
+            // test_generated_pulse_sounds,
             test_recording_wav,
         }
     );

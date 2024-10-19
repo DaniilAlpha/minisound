@@ -1,4 +1,4 @@
-#include "../include/recording.h"
+#include "../include/recorder_buffer.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -15,14 +15,13 @@
  ** private **
  *************/
 
-typedef struct Recording {
+struct RecorderBuffer {
     uint8_t *buf;
-    size_t size, off, cap;
-
-    bool wasEnded;
+    size_t buf_size, buf_cap;
+    size_t buf_off, local_off;
 
     ma_encoder encoder;
-} Recording;
+};
 
 static inline size_t grow_cap(size_t const old_cap) { return old_cap << 1; }
 
@@ -32,23 +31,23 @@ static ma_result encoder_on_write(
     size_t const data_size,
     size_t *const out_written_data_size
 ) {
-    Recording *const self = encoder->pUserData;
+    RecorderBuffer *const self = encoder->pUserData;
 
-    size_t const min_target_size = self->off + data_size;
-    size_t new_cap = self->cap;
+    size_t const min_target_size = self->local_off + data_size;
+    size_t new_cap = self->buf_cap;
     while (new_cap < min_target_size) new_cap = grow_cap(new_cap);
 
-    if (new_cap != self->cap) {
+    if (new_cap != self->buf_cap) {
         uint8_t *const new_buf = realloc(self->buf, new_cap);
         if (new_buf == NULL) return MA_ERROR;
 
         self->buf = new_buf;
-        self->cap = new_cap;
+        self->buf_cap = new_cap;
     }
 
-    memcpy(self->buf + self->off, data, data_size);
-    if (self->size < min_target_size) self->size = min_target_size;
-    self->off += data_size;
+    memcpy(self->buf + self->local_off, data, data_size);
+    if (self->buf_size < min_target_size) self->buf_size = min_target_size;
+    self->local_off += data_size;
 
     return *out_written_data_size = data_size, MA_SUCCESS;
 }
@@ -58,18 +57,17 @@ static ma_result encoder_on_seek(
     long long const off_from_origin,
     ma_seek_origin const origin
 ) {
-    Recording *const self = encoder->pUserData;
+    RecorderBuffer *const self = encoder->pUserData;
 
-    size_t off = self->off;
+    size_t off = 0;
     switch (origin) {
-    case ma_seek_origin_start: off = off_from_origin; break;
-    case ma_seek_origin_current: off += off_from_origin; break;
-    case ma_seek_origin_end: off = self->size - 1 - off_from_origin; break;
+    case ma_seek_origin_start: off = -self->buf_off + off_from_origin; break;
+    case ma_seek_origin_current: off = self->local_off + off_from_origin; break;
+    case ma_seek_origin_end: off = self->buf_size - 1 - off_from_origin; break;
     }
+    if (off >= self->buf_size) return MA_OUT_OF_RANGE;
 
-    if (off >= self->size) return MA_OUT_OF_RANGE;
-
-    self->off = off;
+    self->local_off = off;
 
     return MA_SUCCESS;
 }
@@ -78,9 +76,11 @@ static ma_result encoder_on_seek(
  ** public **
  ************/
 
-Recording *recording_alloc(void) { return malloc(sizeof(Recording)); }
-Result recording_init(
-    Recording *const self,
+RecorderBuffer *recorder_buffer_alloc(void) {
+    return malloc(sizeof(RecorderBuffer));
+}
+Result recorder_buffer_init(
+    RecorderBuffer *const self,
     RecordingEncoding const encoding,
     void *const v_device
 ) {
@@ -89,10 +89,8 @@ Result recording_init(
     self->buf = malloc(RECORDING_MIN_CAP);
     if (self->buf == NULL) return OutOfMemErr;
 
-    self->size = self->off = 0;
-    self->cap = RECORDING_MIN_CAP;
-
-    self->wasEnded = false;
+    self->local_off = self->buf_off = 0;
+    self->buf_size = 0, self->buf_cap = RECORDING_MIN_CAP;
 
     ma_encoder_config const config = ma_encoder_config_init(
         (ma_encoding_format)encoding,
@@ -118,20 +116,15 @@ Result recording_init(
 
     return info("recording initialized"), Ok;
 }
-void recording_uninit(Recording *const self) {
-    if (!self->wasEnded) ma_encoder_uninit(&self->encoder);
+void recorder_buffer_uninit(RecorderBuffer *const self) {
+    ma_encoder_uninit(&self->encoder);
 
     free(self->buf), self->buf = NULL;
-    self->size = self->off = self->cap = 0;
+    self->buf_cap = self->buf_size = self->local_off = self->buf_off = 0;
 }
 
-uint8_t const *recording_get_buf(Recording const *const self) {
-    return self->buf;
-}
-size_t recording_get_size(Recording const *const self) { return self->size; }
-
-Result recording_write(
-    Recording *const self,
+Result recorder_buffer_write(
+    RecorderBuffer *const self,
     uint8_t const *const data,
     size_t const data_size
 ) {
@@ -142,17 +135,26 @@ Result recording_write(
     return trace("wrote to recording"), Ok;
 }
 
-void recording_end(Recording *const self) {
-    size_t const new_cap = self->size;
-    uint8_t *const new_buf = realloc(self->buf, new_cap);
-    if (new_buf != NULL) {
-        self->cap = new_cap;
-        self->buf = new_buf;
-    }
-
+RecorderBufferFlush recorder_buffer_flush(RecorderBuffer *const self) {
+    RecorderBufferFlush const flush = {
+        .buf = self->buf,
+        .size = self->local_off
+    };
+    self->buf_off += self->local_off;
+    self->buf_size -= self->local_off;
+    self->local_off = 0;
+    return flush;
+}
+RecorderBufferFlush recorder_buffer_consume(RecorderBuffer *const self) {
     ma_encoder_uninit(&self->encoder);
 
-    self->wasEnded = true;
+    uint8_t *const new_buf = realloc(self->buf, self->buf_size);
 
-    info("recording fitted");
+    RecorderBufferFlush const flush = {
+        .buf = new_buf == NULL ? self->buf : new_buf,
+        .size = self->buf_size
+    };
+    self->buf = NULL;
+    self->buf_cap = self->buf_size = self->local_off = self->buf_off = 0;
+    return flush;
 }

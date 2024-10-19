@@ -13,45 +13,51 @@ class RecordingExample extends StatefulWidget {
 }
 
 class _RecordingExampleState extends State<RecordingExample> {
-  final sounds = <(DateTime, Sound)>[];
+  final sounds = <(DateTime, LoadedSound)>[];
 
   @override
-  Widget build(BuildContext context) => Column(children: [
-        Text("Recording", style: Theme.of(context).textTheme.headlineMedium),
-        !widget.recorder.isRecording
-            ? ElevatedButton(
-                child: const Text("START RECORDING"),
-                onPressed: () {
-                  widget.recorder.start();
-                  setState(() {});
-                },
-              )
-            : ElevatedButton(
-                child: const Text("STOP RECORDING"),
-                onPressed: () async {
-                  final recording = await widget.recorder.stop();
-                  sounds.add((
-                    DateTime.now(),
-                    await widget.engine.loadSound(recording.buffer)
-                  ));
-                  setState(() {});
-                },
-              ),
-        Column(
-            children: sounds.reversed
-                .map((t) => Row(mainAxisSize: MainAxisSize.min, children: [
-                      Text(t.$1.toString()),
-                      ElevatedButton(
-                        child: const Text("PLAY"),
-                        onPressed: () =>
-                            widget.engine.start().then((_) => t.$2.play()),
-                      ),
-                      ElevatedButton(
-                        child: const Text("STOP"),
-                        onPressed: () =>
-                            widget.engine.start().then((_) => t.$2.stop()),
-                      ),
-                    ]))
-                .toList()),
-      ]);
+  Widget build(BuildContext context) {
+    const space = SizedBox.square(dimension: 20);
+    return Column(children: [
+      Text("Recording", style: Theme.of(context).textTheme.headlineMedium),
+      !widget.recorder.isRecording
+          ? ElevatedButton(
+              child: const Text("START RECORDING"),
+              onPressed: () {
+                widget.recorder.start();
+                setState(() {});
+              },
+            )
+          : ElevatedButton(
+              child: const Text("STOP RECORDING"),
+              onPressed: () async {
+                final recording = await widget.recorder.stop();
+                sounds.add((
+                  DateTime.now(),
+                  await widget.engine.loadSound(recording.buffer)
+                ));
+                setState(() {});
+              },
+            ),
+      Column(
+          children: sounds.reversed
+              .map((t) => Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text(t.$1.toString()),
+                    space,
+                    Text("${t.$2.duration}s"),
+                    space,
+                    ElevatedButton(
+                      child: const Text("PLAY"),
+                      onPressed: () =>
+                          widget.engine.start().then((_) => t.$2.play()),
+                    ),
+                    ElevatedButton(
+                      child: const Text("STOP"),
+                      onPressed: () =>
+                          widget.engine.start().then((_) => t.$2.stop()),
+                    ),
+                  ]))
+              .toList()),
+    ]);
+  }
 }

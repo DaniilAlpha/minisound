@@ -1,3 +1,4 @@
+import "dart:async";
 import "dart:typed_data";
 
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
@@ -48,25 +49,40 @@ final class Recorder {
     _isInit = true;
   }
 
+  Timer? timer;
+  final bytes = <int>[];
+
   /// Starts the recorder.
-  Future<void> start() async => _recorder.start();
+  Future<void> start() async {
+    _recorder.start();
+    timer = Timer.periodic(const Duration(seconds: 2), (_) {
+      try {
+        bytes.addAll(_recorder.flush().buffer);
+        print("flushed");
+      } on MinisoundPlatformException {
+        print("nothing to flush");
+      }
+    });
+  }
 
   /// Stops the recorder and returns what have been recorded.
   Future<Recording> stop() async {
+    timer?.cancel();
     final platformRecording = _recorder.stop();
-    final recording = Recording._(platformRecording);
+    bytes.addAll(platformRecording.buffer);
+    platformRecording.dispose();
+    final recording = Recording._(Uint8List.fromList(bytes));
+    bytes.clear();
     _recordingsFinalizer.attach(this, recording);
     return recording;
   }
 }
 
 final class Recording {
-  Recording._(PlatformRecording rec) : _rec = rec;
-
-  final PlatformRecording _rec;
+  Recording._(this.buffer);
 
   /// Buffer that contains recorded data in a WAV format. Can be used to load sounds from.
-  Uint8List get buffer => _rec.buffer;
+  final Uint8List buffer;
 
-  void dispose() => _rec.dispose();
+  void dispose() {}
 }

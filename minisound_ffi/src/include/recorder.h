@@ -6,7 +6,7 @@
 
 #include "../external/result/result.h"
 #include "export.h"
-#include "recording.h"
+#include "recorder_buffer.h"
 
 typedef struct Recorder Recorder;
 typedef enum RecorderFormat {
@@ -30,6 +30,7 @@ EXPORT bool recorder_get_is_recording(Recorder const *recorder);
 
 EXPORT Result
 recorder_start(Recorder *const self, RecordingEncoding const encoding);
-EXPORT Recording *recorder_stop(Recorder *const self);
+EXPORT RecorderBufferFlush recorder_flush(Recorder *const self);
+EXPORT RecorderBufferFlush recorder_stop(Recorder *const self);
 
 #endif  // RECORD_H

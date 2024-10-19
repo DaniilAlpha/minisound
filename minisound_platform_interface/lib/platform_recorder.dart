@@ -15,6 +15,7 @@ abstract interface class PlatformRecorder {
   void dispose();
 
   void start();
+  PlatformRecording flush();
   PlatformRecording stop();
 }
 
