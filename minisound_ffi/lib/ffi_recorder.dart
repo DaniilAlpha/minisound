@@ -1,9 +1,9 @@
 part of "minisound_ffi.dart";
 
 class FfiRecording implements PlatformRecording {
-  FfiRecording._(c.RecorderBufferFlush self) : _self = self;
+  FfiRecording._(c.Recording self) : _self = self;
 
-  final c.RecorderBufferFlush _self;
+  final c.Recording _self;
 
   @override
   Uint8List get buffer => _self.buf.asTypedList(_self.size);
@@ -53,18 +53,9 @@ class FfiRecorder implements PlatformRecorder {
   }
 
   @override
-  FfiRecording flush() {
-    if (!_bindings.recorder_get_is_recording(_self)) {
-      throw MinisoundPlatformException("Recorder has no data.");
-    }
-    final recording = _bindings.recorder_flush(_self);
-    return FfiRecording._(recording);
-  }
-
-  @override
   FfiRecording stop() {
     if (!_bindings.recorder_get_is_recording(_self)) {
-      throw MinisoundPlatformException("Recorder has no data.");
+      throw MinisoundPlatformException("Recording has no data.");
     }
     final recording = _bindings.recorder_stop(_self);
     return FfiRecording._(recording);

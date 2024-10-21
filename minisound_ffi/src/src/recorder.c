@@ -90,15 +90,12 @@ Result recorder_start(Recorder *const self, RecordingEncoding const encoding) {
 
     return info("recorder started"), Ok;
 }
-RecorderBufferFlush recorder_flush(Recorder *const self) {
-    RecorderBufferFlush const flush = recorder_buffer_flush(self->rec_buf);
-    return info("recorder flushed"), flush;
-}
-RecorderBufferFlush recorder_stop(Recorder *const self) {
+Recording recorder_stop(Recorder *const self) {
+    if (self->rec_buf == NULL) return (Recording){.buf = NULL, .size = 0};
+
     ma_device_stop(&self->device);
 
-    RecorderBufferFlush const flush = recorder_buffer_consume(self->rec_buf);
-
+    Recording const flush = recorder_buffer_consume(self->rec_buf);
     free(self->rec_buf), self->rec_buf = NULL;
 
     return info("recorder stopped"), flush;

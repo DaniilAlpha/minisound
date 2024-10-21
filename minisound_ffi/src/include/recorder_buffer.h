@@ -6,13 +6,15 @@
 #include <stdint.h>
 
 #include "../external/result/result.h"
-
-typedef struct RecorderBufferFlush {
-    uint8_t *buf;
-    size_t size;
-} RecorderBufferFlush;
+#include "export.h"
 
 typedef struct RecorderBuffer RecorderBuffer;
+
+typedef struct Recording {
+    uint8_t *buf;
+    size_t size;
+} Recording;
+
 typedef enum RecordingEncoding {
     RECORDING_ENCODING_WAV = 1,
     // RECORDING_ENCODING_FLAC,
@@ -33,7 +35,6 @@ Result recorder_buffer_write(
     size_t const data_size
 );
 
-RecorderBufferFlush recorder_buffer_flush(RecorderBuffer *const self);
-RecorderBufferFlush recorder_buffer_consume(RecorderBuffer *const self);
+Recording recorder_buffer_consume(RecorderBuffer *const self);
 
 #endif

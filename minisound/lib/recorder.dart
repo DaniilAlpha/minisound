@@ -49,40 +49,25 @@ final class Recorder {
     _isInit = true;
   }
 
-  Timer? timer;
-  final bytes = <int>[];
-
   /// Starts the recorder.
-  Future<void> start() async {
-    _recorder.start();
-    timer = Timer.periodic(const Duration(seconds: 2), (_) {
-      try {
-        bytes.addAll(_recorder.flush().buffer);
-        print("flushed");
-      } on MinisoundPlatformException {
-        print("nothing to flush");
-      }
-    });
-  }
+  Future<void> start() async => _recorder.start();
 
   /// Stops the recorder and returns what have been recorded.
   Future<Recording> stop() async {
-    timer?.cancel();
     final platformRecording = _recorder.stop();
-    bytes.addAll(platformRecording.buffer);
-    platformRecording.dispose();
-    final recording = Recording._(Uint8List.fromList(bytes));
-    bytes.clear();
+    final recording = Recording._(platformRecording);
     _recordingsFinalizer.attach(this, recording);
     return recording;
   }
 }
 
 final class Recording {
-  Recording._(this.buffer);
+  Recording._(PlatformRecording recording) : _recording = recording;
 
-  /// Buffer that contains recorded data in a WAV format. Can be used to load sounds from.
-  final Uint8List buffer;
+  final PlatformRecording _recording;
 
-  void dispose() {}
+  /// Buffer that contains recorded data in a WAV format. Can be directly used to load `Sound`s from.
+  Uint8List get buffer => _recording.buffer;
+
+  void dispose() => _recording.dispose();
 }

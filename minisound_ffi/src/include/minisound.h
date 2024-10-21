@@ -3,7 +3,6 @@
 
 #include "engine.h"
 #include "recorder.h"
-#include "recording.h"
 #include "sound_data/encoded_sound_data.h"
 #include "sound_data/generated_sound_data.h"
 

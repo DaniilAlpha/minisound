@@ -30,7 +30,6 @@ EXPORT bool recorder_get_is_recording(Recorder const *recorder);
 
 EXPORT Result
 recorder_start(Recorder *const self, RecordingEncoding const encoding);
-EXPORT RecorderBufferFlush recorder_flush(Recorder *const self);
-EXPORT RecorderBufferFlush recorder_stop(Recorder *const self);
+EXPORT Recording recorder_stop(Recorder *const self);
 
-#endif  // RECORD_H
+#endif

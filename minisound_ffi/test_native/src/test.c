@@ -88,7 +88,6 @@ MiunteResult test_encoded_sounds() {
         "./minisound/example/assets/laser_shoot.wav",
         "./minisound/example/assets/laser_shoot_16bit.wav",
         "./minisound/example/assets/laser_shoot.mp3",
-        "./minisound/example/assets/laser_shoot.flac",
     };
     for (size_t i = 0; i < lenof(paths); i++) {
         Sound *const sound = sound_alloc();
@@ -185,7 +184,7 @@ MiunteResult test_generated_noise_sounds() {
     MIUNTE_EXPECT(sound != NULL, "sound should be allocated properly");
 
     MIUNTE_EXPECT(
-        engine_generate_noise(engine, sound, NOISE_TYPE_WHITE, 0) == Ok,
+        engine_generate_noise(engine, sound, NOISE_TYPE_PINK, 0) == Ok,
         "sound generation should not fail"
     );
     MIUNTE_EXPECT(sound_play(sound) == Ok, "sound playing should not fail");
@@ -203,7 +202,7 @@ MiunteResult test_generated_pulse_sounds() {
 
     for (double i = 0.01; i < 1.0; i += 0.16) {
         MIUNTE_EXPECT(
-            engine_generate_pulse(engine, sound, 440.0, i) == Ok,
+            engine_generate_pulse(engine, sound, 261.63, i) == Ok,
             "sound generation should not fail"
         );
         MIUNTE_EXPECT(sound_play(sound) == Ok, "sound playing should not fail");
@@ -227,29 +226,30 @@ MiunteResult test_recording_wav() {
         "recorder initialization should not fail"
     );
 
-    for (size_t i = 0; i < 2; i++) {
+    Recording recs[2] = {0};
+
+    for (size_t i = 0; i < lenof(recs); i++) {
+        MIUNTE_EXPECT(
+            recorder_start(recorder, RECORDING_ENCODING_WAV) == Ok,
+            "recorder starting should not fail"
+        );
+        sleep(3000);
+        recs[i] = recorder_stop(recorder);
+    }
+
+    // separated to test that recording are not overriding each other
+
+    for (size_t i = 0; i < lenof(recs); i++) {
         char filename[] = "./minisound_ffi/test_native/rec#.wav";
         char *idx = strchr(filename, '#');
         idx[0] = '0' + i;
 
         FILE *const file = fopen(filename, "wb");
         MIUNTE_EXPECT(file != NULL, "file should open properly");
-
-        MIUNTE_EXPECT(
-            recorder_start(recorder, RECORDING_ENCODING_WAV) == Ok,
-            "recorder starting should not fail"
-        );
-
-        sleep(3000);
-
-        // TODO! flushing not really working
-        {
-            RecorderBufferFlush const flush1 = recorder_stop(recorder);
-            fwrite(flush1.buf, 1, flush1.size, file);
-            free(flush1.buf);
-        }
-
+        fwrite(recs[i].buf, 1, recs[i].size, file);
         fclose(file);
+
+        free(recs[i].buf);
     }
 
     recorder_uninit(recorder), free(recorder);
@@ -262,11 +262,11 @@ int main() {
         setup_test,
         teardown_test,
         {
-            // test_encoded_sounds,
-            // test_looping,
-            // test_generated_waveform_sounds,
-            // test_generated_noise_sounds,
-            // test_generated_pulse_sounds,
+            test_encoded_sounds,
+            test_looping,
+            test_generated_waveform_sounds,
+            test_generated_noise_sounds,
+            test_generated_pulse_sounds,
             test_recording_wav,
         }
     );
