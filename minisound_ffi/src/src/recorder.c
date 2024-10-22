@@ -23,13 +23,13 @@ static void data_callback(
     ma_device *const device,
     void *const _,
     void const *const data,
-    uint32_t const data_size
+    uint32_t const data_len_pcm
 ) {
     (void)_;
 
     Recorder *const self = device->pUserData;
 
-    recorder_buffer_write(self->rec_buf, data, data_size);
+    recorder_buffer_write(self->rec_buf, data, data_len_pcm);
 }
 
 /************

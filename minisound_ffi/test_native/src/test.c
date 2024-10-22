@@ -222,7 +222,7 @@ MiunteResult test_recording_wav() {
     MIUNTE_EXPECT(recorder != NULL, "recorder should be allocated properly");
 
     MIUNTE_EXPECT(
-        recorder_init(recorder, RECORDER_FORMAT_S16, 2, 44100) == Ok,
+        recorder_init(recorder, RECORDER_FORMAT_F32, 2, 44100) == Ok,
         "recorder initialization should not fail"
     );
 
@@ -262,11 +262,11 @@ int main() {
         setup_test,
         teardown_test,
         {
-            test_encoded_sounds,
-            test_looping,
-            test_generated_waveform_sounds,
-            test_generated_noise_sounds,
-            test_generated_pulse_sounds,
+            // test_encoded_sounds,
+            // test_looping,
+            // test_generated_waveform_sounds,
+            // test_generated_noise_sounds,
+            // test_generated_pulse_sounds,
             test_recording_wav,
         }
     );

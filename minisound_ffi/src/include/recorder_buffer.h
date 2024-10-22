@@ -32,7 +32,7 @@ void recorder_buffer_uninit(RecorderBuffer *const self);
 Result recorder_buffer_write(
     RecorderBuffer *const self,
     uint8_t const *const data,
-    size_t const data_size
+    size_t const data_len_pcm
 );
 
 Recording recorder_buffer_consume(RecorderBuffer *const self);

@@ -1,3 +1,5 @@
+import "dart:async";
+
 import "package:flutter/material.dart";
 import "package:minisound/engine.dart";
 import "package:minisound/recorder.dart";
@@ -48,15 +50,8 @@ class _RecordingExampleState extends State<RecordingExample> {
                     space,
                     ElevatedButton(
                       child: const Text("PLAY"),
-                      onPressed: () => widget.engine.start().then((_) async {
-                        final sound = t.$2;
-
-                        sound.play();
-
-                        sound.volume = 0;
-                        await Future.delayed(const Duration(milliseconds: 30));
-                        sound.volume = 1;
-                      }),
+                      onPressed: () =>
+                          widget.engine.start().then((_) => t.$2.play()),
                     ),
                     ElevatedButton(
                       child: const Text("STOP"),

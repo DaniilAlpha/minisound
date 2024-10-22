@@ -50,9 +50,17 @@ final class Recorder {
   }
 
   /// Starts the recorder.
+  ///
+  /// Records into memory.
+  /// This'll be fine for under an hour for sure, but if you are recording larger sounds it is recommended to process (save, send, etc.) recording by splitting it into multiple smaller ones. Delay for stopping and starting again is unnoticeable in general and is smaller for smaller recordings.
+  ///
+  /// Formula for calculating the exact size in case you needed:
+  /// `s = l * f * n * s0`,
+  ///   where `l` - length in seconds, `f` - sample rate, `n` - channel count, `s0` - format size (`1` for `u8`, `2` for `s16`, `3` for `s24`, `4` for `s32` and `f32`).
   Future<void> start() async => _recorder.start();
 
   /// Stops the recorder and returns what have been recorded.
+  /// Each recording should be disposed when not needed anymore.
   Future<Recording> stop() async {
     final platformRecording = _recorder.stop();
     final recording = Recording._(platformRecording);
