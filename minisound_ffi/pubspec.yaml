@@ -7,7 +7,7 @@ repository: https://github.com/DaniilAlpha/minisound/tree/master/minisound_ffi
 #####
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=3.1.0 <4.0.0"
   flutter: ">=3.3.0"
 
 dependencies:

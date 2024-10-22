@@ -222,7 +222,7 @@ MiunteResult test_recording_wav() {
     MIUNTE_EXPECT(recorder != NULL, "recorder should be allocated properly");
 
     MIUNTE_EXPECT(
-        recorder_init(recorder, RECORDER_FORMAT_F32, 2, 44100) == Ok,
+        recorder_init(recorder, RECORDER_FORMAT_S16, 2, 44100) == Ok,
         "recorder initialization should not fail"
     );
 

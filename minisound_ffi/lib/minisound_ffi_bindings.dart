@@ -572,6 +572,18 @@ class MinisoundFfiBindings {
   late final _sound_get_pulse_data = _sound_get_pulse_dataPtr
       .asFunction<ffi.Pointer<PulseSoundData> Function(ffi.Pointer<Sound>)>();
 
+  int foo(
+    FooFn fn,
+  ) {
+    return _foo(
+      fn,
+    );
+  }
+
+  late final _fooPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(FooFn)>>('foo');
+  late final _foo = _fooPtr.asFunction<int Function(FooFn)>();
+
   ffi.Pointer<Engine> engine_alloc() {
     return _engine_alloc();
   }
@@ -848,6 +860,10 @@ abstract class NoiseType {
 final class PulseSoundData extends ffi.Opaque {}
 
 final class Sound extends ffi.Opaque {}
+
+typedef FooFn = ffi.Pointer<
+    ffi.NativeFunction<
+        ffi.Bool Function(ffi.Pointer<ffi.Char> buf, ffi.Size buf_len)>>;
 
 final class Engine extends ffi.Opaque {}
 

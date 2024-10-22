@@ -96,3 +96,10 @@ PulseSoundData *sound_get_pulse_data(Sound const *const self) {
              ? self->sound_data._self
              : NULL;
 }
+
+Result foo(FooFn fn) {
+    char buf[64] = {0};
+    bool r = fn(buf, 63);
+    info("%s", buf);
+    return r ? Ok : UnknownErr;
+}

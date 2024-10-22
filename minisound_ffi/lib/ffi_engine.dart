@@ -26,6 +26,18 @@ final class FfiEngine implements PlatformEngine {
       throw MinisoundPlatformException(
           "Failed to start the engine (code: $r).");
     }
+
+    final callback =
+        NativeCallable<Bool Function(Pointer<Char>, Size)>.isolateLocal(
+      (Pointer<Char> buf, int bufSize) {
+        final list = Uint8List.fromList("hello, $r".codeUnits);
+        if (list.length >= bufSize) return false;
+        buf.copy(list);
+        return true;
+      },
+      exceptionalReturn: false,
+    ).nativeFunction;
+    _bindings.foo(callback);
   }
 
   @override

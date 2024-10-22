@@ -12,6 +12,8 @@
  *************/
 
 struct EncodedSoundData {
+    // it would be great to supply custom streaming data source that will take a
+    // dart callback
     ma_decoder decoder;
 
     bool is_looped;
