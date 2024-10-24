@@ -24,11 +24,9 @@ class _RecordingExampleState extends State<RecordingExample> {
       Text("Recording", style: Theme.of(context).textTheme.headlineMedium),
       !widget.recorder.isRecording
           ? ElevatedButton(
+              onPressed: () =>
+                  widget.recorder.start().then((_) => setState(() {})),
               child: const Text("START RECORDING"),
-              onPressed: () {
-                widget.recorder.start();
-                setState(() {});
-              },
             )
           : ElevatedButton(
               child: const Text("STOP RECORDING"),

@@ -64,6 +64,10 @@ void encoded_sound_data_set_looped(
     bool const value,
     size_t const delay_ms
 ) {
+    ma_data_source_set_current(&self->decoder, &self->decoder);
+    ma_data_source_set_looping(&self->decoder, false);
+    ma_data_source_set_next(&self->decoder, NULL);
+
     if (value) {
         if (delay_ms == 0) {
             ma_data_source_set_looping(&self->decoder, true);
@@ -83,10 +87,6 @@ void encoded_sound_data_set_looped(
             ma_data_source_set_next(&self->decoder, &self->loop_delay_ds);
             ma_data_source_set_next(&self->loop_delay_ds, &self->decoder);
         }
-    } else {
-        ma_data_source_set_current(&self->decoder, &self->decoder);
-        ma_data_source_set_looping(&self->decoder, false);
-        ma_data_source_set_next(&self->decoder, NULL);
     }
 
     info(

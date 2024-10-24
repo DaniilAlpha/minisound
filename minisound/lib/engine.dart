@@ -59,8 +59,8 @@ final class Engine {
       loadSound(await File(filePath).readAsBytes());
 
   /// Generates a waveform sound using given parameters.
-  WaveformSound generateWaveform({
-    WaveformType type = WaveformType.sine,
+  WaveformSound genWaveform(
+    WaveformType type, {
     double freq = 440.0,
   }) {
     final engineSound = _engine.generateWaveform(type: type, freq: freq);
@@ -70,7 +70,7 @@ final class Engine {
   }
 
   /// Generates a noise sound using given parameters.
-  NoiseSound generateNoise({NoiseType type = NoiseType.white, int seed = 0}) {
+  NoiseSound genNoise(NoiseType type, {int seed = 0}) {
     final engineSound = _engine.generateNoise(type: type, seed: seed);
     final sound = NoiseSound._(engineSound);
     _soundsFinalizer.attach(this, sound);
@@ -78,7 +78,7 @@ final class Engine {
   }
 
   /// Generates a pulsewave sound using given parameters.
-  PulseSound generatePulse({double freq = 440.0, double dutyCycle = 0.5}) {
+  PulseSound genPulse({double freq = 440.0, double dutyCycle = 0.5}) {
     final engineSound = _engine.generatePulse(freq: freq, dutyCycle: dutyCycle);
     final sound = PulseSound._(engineSound);
     _soundsFinalizer.attach(this, sound);

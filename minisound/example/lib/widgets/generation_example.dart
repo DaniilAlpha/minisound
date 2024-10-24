@@ -134,12 +134,12 @@ class _GenerationExampleState extends State<GenerationExample> {
         onPressed: () {
           sound?.stop();
           sound = switch (generatorType) {
-            GeneratorType.wave => widget.engine.generateWaveform(
-                type: waveformType,
+            GeneratorType.wave => widget.engine.genWaveform(
+                waveformType,
                 freq: pow(2, freq).toDouble(),
               ),
-            GeneratorType.noise => widget.engine.generateNoise(type: noiseType),
-            GeneratorType.pulse => widget.engine.generatePulse(
+            GeneratorType.noise => widget.engine.genNoise(noiseType),
+            GeneratorType.pulse => widget.engine.genPulse(
                 dutyCycle: dutyCycle,
                 freq: pow(2, freq).toDouble(),
               ),

@@ -30,8 +30,6 @@ sealed class Sound {
   void unload() => _sound.unload();
 }
 
-sealed class GeneratedSound extends Sound {}
-
 /// A sound loaded from some kind of source.
 final class LoadedSound extends Sound {
   LoadedSound._(PlatformEncodedSound sound) : _sound = sound;
@@ -49,6 +47,7 @@ final class LoadedSound extends Sound {
   ///
   /// `delay` - delay before sound will be played again. Clamped positive.
   void playLooped({Duration delay = Duration.zero}) {
+    super.stop();
     final delayMs = delay < Duration.zero ? 0 : delay.inMilliseconds;
     if (!_sound.looping.$1 || _sound.looping.$2 != delayMs) {
       _sound.looping = (true, delayMs);
@@ -57,23 +56,13 @@ final class LoadedSound extends Sound {
   }
 
   @override
-  void resume() {
-    if (_sound.looping.$1) _sound.looping = (false, 0);
-    super.resume();
-  }
-
-  @override
-  void pause() {
-    if (_sound.looping.$1) _sound.looping = (false, 0);
-    super.pause();
-  }
-
-  @override
   void stop() {
     if (_sound.looping.$1) _sound.looping = (false, 0);
     super.stop();
   }
 }
+
+sealed class GeneratedSound extends Sound {}
 
 final class WaveformSound extends GeneratedSound {
   WaveformSound._(PlatformWaveformSound sound) : _sound = sound;

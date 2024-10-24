@@ -32,7 +32,4 @@ EXPORT WaveformSoundData *sound_get_waveform_data(Sound const *const self);
 EXPORT NoiseSoundData *sound_get_noise_data(Sound const *const self);
 EXPORT PulseSoundData *sound_get_pulse_data(Sound const *const self);
 
-typedef bool (*FooFn)(char *const buf, size_t const buf_len);
-EXPORT Result foo(FooFn fn);
-
 #endif

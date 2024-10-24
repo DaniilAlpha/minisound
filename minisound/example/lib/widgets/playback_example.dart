@@ -61,6 +61,8 @@ class _PlaybackExampleState extends State<PlaybackExample> {
               ElevatedButton(
                   onPressed: currentSound?.pause, child: const Text("PAUSE")),
               ElevatedButton(
+                  onPressed: currentSound?.resume, child: const Text("RESUME")),
+              ElevatedButton(
                   onPressed: currentSound?.stop, child: const Text("STOP")),
               Row(mainAxisSize: MainAxisSize.min, children: [
                 const Text("Volume: "),
