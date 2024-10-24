@@ -27,6 +27,7 @@ sealed class Sound {
     resume();
   }
 
+  @Deprecated("Only use if loading sound WITHOUT auto management.")
   void unload() => _sound.unload();
 }
 

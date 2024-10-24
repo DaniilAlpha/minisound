@@ -24,7 +24,8 @@ final class Engine {
 
   static final _finalizer =
       Finalizer<PlatformEngine>((engine) => engine.dispose());
-  static final _soundsFinalizer = Finalizer<Sound>((sound) => sound.unload());
+  static final _soundsFinalizer =
+      Finalizer<PlatformSound>((sound) => sound.unload());
 
   final _engine = PlatformEngine();
 
@@ -47,10 +48,14 @@ final class Engine {
   Future<void> start() async => _engine.start();
 
   /// Copies `data` to the internal memory location and creates a `LoadedSound` from it.
-  Future<LoadedSound> loadSound(TypedData audioData) async {
+  Future<LoadedSound> loadSound(
+    TypedData audioData, {
+    @Deprecated("Should be used only in case something is not working.")
+    bool doAddToFinalizer = true,
+  }) async {
     final platformSound = await _engine.loadSound(audioData);
     final sound = LoadedSound._(platformSound);
-    _soundsFinalizer.attach(this, sound);
+    if (doAddToFinalizer) _soundsFinalizer.attach(sound, platformSound);
     return sound;
   }
 
@@ -62,26 +67,42 @@ final class Engine {
   WaveformSound genWaveform(
     WaveformType type, {
     double freq = 440.0,
+    @Deprecated(
+        "Should be used only in special cases (see the migration guide in README).")
+    bool doAddToFinalizer = true,
   }) {
-    final engineSound = _engine.generateWaveform(type: type, freq: freq);
-    final sound = WaveformSound._(engineSound);
-    _soundsFinalizer.attach(this, sound);
+    final platformSound = _engine.generateWaveform(type: type, freq: freq);
+    final sound = WaveformSound._(platformSound);
+    if (doAddToFinalizer) _soundsFinalizer.attach(sound, platformSound);
     return sound;
   }
 
   /// Generates a noise sound using given parameters.
-  NoiseSound genNoise(NoiseType type, {int seed = 0}) {
-    final engineSound = _engine.generateNoise(type: type, seed: seed);
-    final sound = NoiseSound._(engineSound);
-    _soundsFinalizer.attach(this, sound);
+  NoiseSound genNoise(
+    NoiseType type, {
+    int seed = 0,
+    @Deprecated(
+        "Should be used only in special cases (see the migration guide in README).")
+    bool doAddToFinalizer = true,
+  }) {
+    final platformSound = _engine.generateNoise(type: type, seed: seed);
+    final sound = NoiseSound._(platformSound);
+    if (doAddToFinalizer) _soundsFinalizer.attach(sound, platformSound);
     return sound;
   }
 
   /// Generates a pulsewave sound using given parameters.
-  PulseSound genPulse({double freq = 440.0, double dutyCycle = 0.5}) {
-    final engineSound = _engine.generatePulse(freq: freq, dutyCycle: dutyCycle);
-    final sound = PulseSound._(engineSound);
-    _soundsFinalizer.attach(this, sound);
+  PulseSound genPulse({
+    double freq = 440.0,
+    double dutyCycle = 0.5,
+    @Deprecated(
+        "Should be used only in special cases (see the migration guide in README).")
+    bool doAddToFinalizer = true,
+  }) {
+    final platformSound =
+        _engine.generatePulse(freq: freq, dutyCycle: dutyCycle);
+    final sound = PulseSound._(platformSound);
+    if (doAddToFinalizer) _soundsFinalizer.attach(sound, platformSound);
     return sound;
   }
 }

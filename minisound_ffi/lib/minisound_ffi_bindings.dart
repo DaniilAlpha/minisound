@@ -122,100 +122,6 @@ class MinisoundFfiBindings {
       _encoded_sound_data_ww_sound_dataPtr
           .asFunction<SoundData Function(ffi.Pointer<EncodedSoundData>)>();
 
-  ffi.Pointer<WaveformSoundData> waveform_sound_data_alloc() {
-    return _waveform_sound_data_alloc();
-  }
-
-  late final _waveform_sound_data_allocPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<WaveformSoundData> Function()>>(
-          'waveform_sound_data_alloc');
-  late final _waveform_sound_data_alloc = _waveform_sound_data_allocPtr
-      .asFunction<ffi.Pointer<WaveformSoundData> Function()>();
-
-  int waveform_sound_data_init(
-    ffi.Pointer<WaveformSoundData> self,
-    int type,
-    double frequency,
-  ) {
-    return _waveform_sound_data_init(
-      self,
-      type,
-      frequency,
-    );
-  }
-
-  late final _waveform_sound_data_initPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<WaveformSoundData>, ffi.Int32,
-              ffi.Double)>>('waveform_sound_data_init');
-  late final _waveform_sound_data_init = _waveform_sound_data_initPtr
-      .asFunction<int Function(ffi.Pointer<WaveformSoundData>, int, double)>();
-
-  void waveform_sound_data_uninit(
-    ffi.Pointer<WaveformSoundData> self,
-  ) {
-    return _waveform_sound_data_uninit(
-      self,
-    );
-  }
-
-  late final _waveform_sound_data_uninitPtr = _lookup<
-          ffi
-          .NativeFunction<ffi.Void Function(ffi.Pointer<WaveformSoundData>)>>(
-      'waveform_sound_data_uninit');
-  late final _waveform_sound_data_uninit = _waveform_sound_data_uninitPtr
-      .asFunction<void Function(ffi.Pointer<WaveformSoundData>)>();
-
-  void waveform_sound_data_set_type(
-    ffi.Pointer<WaveformSoundData> self,
-    int value,
-  ) {
-    return _waveform_sound_data_set_type(
-      self,
-      value,
-    );
-  }
-
-  late final _waveform_sound_data_set_typePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(ffi.Pointer<WaveformSoundData>,
-              ffi.Int32)>>('waveform_sound_data_set_type');
-  late final _waveform_sound_data_set_type = _waveform_sound_data_set_typePtr
-      .asFunction<void Function(ffi.Pointer<WaveformSoundData>, int)>();
-
-  void waveform_sound_data_set_freq(
-    ffi.Pointer<WaveformSoundData> self,
-    double value,
-  ) {
-    return _waveform_sound_data_set_freq(
-      self,
-      value,
-    );
-  }
-
-  late final _waveform_sound_data_set_freqPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(ffi.Pointer<WaveformSoundData>,
-              ffi.Double)>>('waveform_sound_data_set_freq');
-  late final _waveform_sound_data_set_freq = _waveform_sound_data_set_freqPtr
-      .asFunction<void Function(ffi.Pointer<WaveformSoundData>, double)>();
-
-  SoundData waveform_sound_data_ww_sound_data(
-    ffi.Pointer<WaveformSoundData> self,
-  ) {
-    return _waveform_sound_data_ww_sound_data(
-      self,
-    );
-  }
-
-  late final _waveform_sound_data_ww_sound_dataPtr = _lookup<
-          ffi
-          .NativeFunction<SoundData Function(ffi.Pointer<WaveformSoundData>)>>(
-      'waveform_sound_data_ww_sound_data');
-  late final _waveform_sound_data_ww_sound_data =
-      _waveform_sound_data_ww_sound_dataPtr
-          .asFunction<SoundData Function(ffi.Pointer<WaveformSoundData>)>();
-
   ffi.Pointer<NoiseSoundData> noise_sound_data_alloc() {
     return _noise_sound_data_alloc();
   }
@@ -383,6 +289,100 @@ class MinisoundFfiBindings {
   late final _pulse_sound_data_ww_sound_data =
       _pulse_sound_data_ww_sound_dataPtr
           .asFunction<SoundData Function(ffi.Pointer<PulseSoundData>)>();
+
+  ffi.Pointer<WaveformSoundData> waveform_sound_data_alloc() {
+    return _waveform_sound_data_alloc();
+  }
+
+  late final _waveform_sound_data_allocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<WaveformSoundData> Function()>>(
+          'waveform_sound_data_alloc');
+  late final _waveform_sound_data_alloc = _waveform_sound_data_allocPtr
+      .asFunction<ffi.Pointer<WaveformSoundData> Function()>();
+
+  int waveform_sound_data_init(
+    ffi.Pointer<WaveformSoundData> self,
+    int type,
+    double frequency,
+  ) {
+    return _waveform_sound_data_init(
+      self,
+      type,
+      frequency,
+    );
+  }
+
+  late final _waveform_sound_data_initPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<WaveformSoundData>, ffi.Int32,
+              ffi.Double)>>('waveform_sound_data_init');
+  late final _waveform_sound_data_init = _waveform_sound_data_initPtr
+      .asFunction<int Function(ffi.Pointer<WaveformSoundData>, int, double)>();
+
+  void waveform_sound_data_uninit(
+    ffi.Pointer<WaveformSoundData> self,
+  ) {
+    return _waveform_sound_data_uninit(
+      self,
+    );
+  }
+
+  late final _waveform_sound_data_uninitPtr = _lookup<
+          ffi
+          .NativeFunction<ffi.Void Function(ffi.Pointer<WaveformSoundData>)>>(
+      'waveform_sound_data_uninit');
+  late final _waveform_sound_data_uninit = _waveform_sound_data_uninitPtr
+      .asFunction<void Function(ffi.Pointer<WaveformSoundData>)>();
+
+  void waveform_sound_data_set_type(
+    ffi.Pointer<WaveformSoundData> self,
+    int value,
+  ) {
+    return _waveform_sound_data_set_type(
+      self,
+      value,
+    );
+  }
+
+  late final _waveform_sound_data_set_typePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<WaveformSoundData>,
+              ffi.Int32)>>('waveform_sound_data_set_type');
+  late final _waveform_sound_data_set_type = _waveform_sound_data_set_typePtr
+      .asFunction<void Function(ffi.Pointer<WaveformSoundData>, int)>();
+
+  void waveform_sound_data_set_freq(
+    ffi.Pointer<WaveformSoundData> self,
+    double value,
+  ) {
+    return _waveform_sound_data_set_freq(
+      self,
+      value,
+    );
+  }
+
+  late final _waveform_sound_data_set_freqPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<WaveformSoundData>,
+              ffi.Double)>>('waveform_sound_data_set_freq');
+  late final _waveform_sound_data_set_freq = _waveform_sound_data_set_freqPtr
+      .asFunction<void Function(ffi.Pointer<WaveformSoundData>, double)>();
+
+  SoundData waveform_sound_data_ww_sound_data(
+    ffi.Pointer<WaveformSoundData> self,
+  ) {
+    return _waveform_sound_data_ww_sound_data(
+      self,
+    );
+  }
+
+  late final _waveform_sound_data_ww_sound_dataPtr = _lookup<
+          ffi
+          .NativeFunction<SoundData Function(ffi.Pointer<WaveformSoundData>)>>(
+      'waveform_sound_data_ww_sound_data');
+  late final _waveform_sound_data_ww_sound_data =
+      _waveform_sound_data_ww_sound_dataPtr
+          .asFunction<SoundData Function(ffi.Pointer<WaveformSoundData>)>();
 
   ffi.Pointer<Sound> sound_alloc() {
     return _sound_alloc();
@@ -828,15 +828,6 @@ final class SoundData extends ffi.Struct {
 
 final class PrivateSoundDataImpl extends ffi.Opaque {}
 
-final class WaveformSoundData extends ffi.Opaque {}
-
-abstract class WaveformType {
-  static const int WAVEFORM_TYPE_SINE = 0;
-  static const int WAVEFORM_TYPE_SQUARE = 1;
-  static const int WAVEFORM_TYPE_TRIANGLE = 2;
-  static const int WAVEFORM_TYPE_SAWTOOTH = 3;
-}
-
 final class NoiseSoundData extends ffi.Opaque {}
 
 abstract class NoiseType {
@@ -846,6 +837,15 @@ abstract class NoiseType {
 }
 
 final class PulseSoundData extends ffi.Opaque {}
+
+final class WaveformSoundData extends ffi.Opaque {}
+
+abstract class WaveformType {
+  static const int WAVEFORM_TYPE_SINE = 0;
+  static const int WAVEFORM_TYPE_SQUARE = 1;
+  static const int WAVEFORM_TYPE_TRIANGLE = 2;
+  static const int WAVEFORM_TYPE_SAWTOOTH = 3;
+}
 
 final class Sound extends ffi.Opaque {}
 
@@ -871,9 +871,3 @@ final class Recording extends ffi.Struct {
   @ffi.Size()
   external int size;
 }
-
-const int __bool_true_false_are_defined = 1;
-
-const int true1 = 1;
-
-const int false1 = 0;

@@ -15,6 +15,10 @@ Run `make help` from the root project directory to get started.
 |Linux   |Fedora 39-40, Mint 22|Any   |None       |
 |Web     |Chrome 93+, Firefox 79+, Safari 16+|Browsers with an `AudioWorklet` support|Browsers without an `AudioWorklet` support|
 
+## Migration
+
+There was some breaking changes in 2.0.0 version, see the [migration guide](#migration-guide) down below.
+
 ## Getting started on the web
 
 While the main script is quite large, there are a loader script provided. Include it in the `web/index.html` file like this
@@ -185,6 +189,28 @@ void main() async {
   // all data is provided via buffer; sound can be used from it via `engine.loadSound(recording.buffer)`
   print(recording.buffer);
 }
+```
+
+## Migration guide
+
+### 1.6.0 -> 2.0.0
+
+- Recording and generation APIs got heavily changed. See examples for new usage.
+
+- Sound autounloading logic got changed, now they depend on the sound object itself, rather than the engine.
+```dart
+  // remove
+  // sound.unload();
+```
+Due to this, when sound objects got garbage collected (may be immediately after or not the moment it goes out of scope), sound stops and unloads. If this happens, you are probably doing it wrong, as there no any reference to it left for you to stop it later. If it was a prior version, you would've beed successfully creating an indefenetely played sound that stops only when the engine goes out of scope. There is a possiblity to revert this behaviour via the `doAddToFinalizer` parameter to engine functions that return `Sound`s, but it is already deprecated. It you are sure that your usecase is valid, create a github issue, providing the code. Maybe this will change my mind.
+
+### 1.4.0 -> 1.6.0
+
+- The main file (`minisound.dart`) became `engine_flutter.dart`.
+```dart
+// import "package:minisound/minisound.dart";
+// becomes
+import "package:minisound/engine_flutter.dart";
 ```
 
 ## Building the project

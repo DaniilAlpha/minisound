@@ -734,7 +734,7 @@ var tempI64;
 // end include: runtime_debug.js
 // === Body ===
 var ASM_CONSTS = {
-  39388: ($0, $1, $2, $3, $4) => {
+  39380: ($0, $1, $2, $3, $4) => {
     if (typeof window === "undefined" || (window.AudioContext || window.webkitAudioContext) === undefined) {
       return 0;
     }
@@ -805,7 +805,7 @@ var ASM_CONSTS = {
     window.miniaudio.referenceCount += 1;
     return 1;
   },
-  41546: () => {
+  41538: () => {
     if (typeof (window.miniaudio) !== "undefined") {
       window.miniaudio.referenceCount -= 1;
       if (window.miniaudio.referenceCount === 0) {
@@ -813,8 +813,8 @@ var ASM_CONSTS = {
       }
     }
   },
-  41710: () => (navigator.mediaDevices !== undefined && navigator.mediaDevices.getUserMedia !== undefined),
-  41814: () => {
+  41702: () => (navigator.mediaDevices !== undefined && navigator.mediaDevices.getUserMedia !== undefined),
+  41806: () => {
     try {
       var temp = new (window.AudioContext || window.webkitAudioContext);
       var sampleRate = temp.sampleRate;
@@ -824,12 +824,12 @@ var ASM_CONSTS = {
       return 0;
     }
   },
-  41985: ($0, $1) => miniaudio.track_device({
+  41977: ($0, $1) => miniaudio.track_device({
     webaudio: emscriptenGetAudioObject($0),
     state: 1,
     pDevice: $1
   }),
-  42087: ($0, $1) => {
+  42079: ($0, $1) => {
     var getUserMediaResult = 0;
     var audioWorklet = emscriptenGetAudioObject($0);
     var audioContext = emscriptenGetAudioObject($1);
@@ -847,14 +847,14 @@ var ASM_CONSTS = {
     });
     return getUserMediaResult;
   },
-  42649: ($0, $1) => {
+  42641: ($0, $1) => {
     var audioWorklet = emscriptenGetAudioObject($0);
     var audioContext = emscriptenGetAudioObject($1);
     audioWorklet.connect(audioContext.destination);
     return 0;
   },
-  42809: $0 => emscriptenGetAudioObject($0).sampleRate,
-  42861: $0 => {
+  42801: $0 => emscriptenGetAudioObject($0).sampleRate,
+  42853: $0 => {
     var device = miniaudio.get_device_by_index($0);
     if (device.streamNode !== undefined) {
       device.streamNode.disconnect();
@@ -862,15 +862,15 @@ var ASM_CONSTS = {
     }
     device.pDevice = undefined;
   },
-  43045: $0 => {
+  43037: $0 => {
     miniaudio.untrack_device_by_index($0);
   },
-  43088: $0 => {
+  43080: $0 => {
     var device = miniaudio.get_device_by_index($0);
     device.webaudio.resume();
     device.state = miniaudio.device_state.started;
   },
-  43213: $0 => {
+  43205: $0 => {
     var device = miniaudio.get_device_by_index($0);
     device.webaudio.suspend();
     device.state = miniaudio.device_state.stopped;
@@ -2047,17 +2047,11 @@ var _recorder_init = Module["_recorder_init"] = (a0, a1, a2, a3) => (_recorder_i
 
 var _recorder_uninit = Module["_recorder_uninit"] = a0 => (_recorder_uninit = Module["_recorder_uninit"] = wasmExports["recorder_uninit"])(a0);
 
-var _recording_uninit = Module["_recording_uninit"] = a0 => (_recording_uninit = Module["_recording_uninit"] = wasmExports["recording_uninit"])(a0);
-
 var _recorder_get_is_recording = Module["_recorder_get_is_recording"] = a0 => (_recorder_get_is_recording = Module["_recorder_get_is_recording"] = wasmExports["recorder_get_is_recording"])(a0);
 
 var _recorder_start = Module["_recorder_start"] = (a0, a1) => (_recorder_start = Module["_recorder_start"] = wasmExports["recorder_start"])(a0, a1);
 
-var _recorder_stop = Module["_recorder_stop"] = a0 => (_recorder_stop = Module["_recorder_stop"] = wasmExports["recorder_stop"])(a0);
-
-var _recording_get_buf = Module["_recording_get_buf"] = a0 => (_recording_get_buf = Module["_recording_get_buf"] = wasmExports["recording_get_buf"])(a0);
-
-var _recording_get_size = Module["_recording_get_size"] = a0 => (_recording_get_size = Module["_recording_get_size"] = wasmExports["recording_get_size"])(a0);
+var _recorder_stop = Module["_recorder_stop"] = (a0, a1) => (_recorder_stop = Module["_recorder_stop"] = wasmExports["recorder_stop"])(a0, a1);
 
 var _sound_alloc = Module["_sound_alloc"] = () => (_sound_alloc = Module["_sound_alloc"] = wasmExports["sound_alloc"])();
 
@@ -2065,11 +2059,9 @@ var _sound_unload = Module["_sound_unload"] = a0 => (_sound_unload = Module["_so
 
 var _sound_play = Module["_sound_play"] = a0 => (_sound_play = Module["_sound_play"] = wasmExports["sound_play"])(a0);
 
-var _sound_replay = Module["_sound_replay"] = a0 => (_sound_replay = Module["_sound_replay"] = wasmExports["sound_replay"])(a0);
+var _sound_pause = Module["_sound_pause"] = a0 => (_sound_pause = Module["_sound_pause"] = wasmExports["sound_pause"])(a0);
 
 var _sound_stop = Module["_sound_stop"] = a0 => (_sound_stop = Module["_sound_stop"] = wasmExports["sound_stop"])(a0);
-
-var _sound_pause = Module["_sound_pause"] = a0 => (_sound_pause = Module["_sound_pause"] = wasmExports["sound_pause"])(a0);
 
 var _sound_get_volume = Module["_sound_get_volume"] = a0 => (_sound_get_volume = Module["_sound_get_volume"] = wasmExports["sound_get_volume"])(a0);
 
@@ -2077,9 +2069,27 @@ var _sound_set_volume = Module["_sound_set_volume"] = (a0, a1) => (_sound_set_vo
 
 var _sound_get_duration = Module["_sound_get_duration"] = a0 => (_sound_get_duration = Module["_sound_get_duration"] = wasmExports["sound_get_duration"])(a0);
 
+var _sound_get_encoded_data = Module["_sound_get_encoded_data"] = a0 => (_sound_get_encoded_data = Module["_sound_get_encoded_data"] = wasmExports["sound_get_encoded_data"])(a0);
+
+var _sound_get_waveform_data = Module["_sound_get_waveform_data"] = a0 => (_sound_get_waveform_data = Module["_sound_get_waveform_data"] = wasmExports["sound_get_waveform_data"])(a0);
+
+var _sound_get_noise_data = Module["_sound_get_noise_data"] = a0 => (_sound_get_noise_data = Module["_sound_get_noise_data"] = wasmExports["sound_get_noise_data"])(a0);
+
+var _sound_get_pulse_data = Module["_sound_get_pulse_data"] = a0 => (_sound_get_pulse_data = Module["_sound_get_pulse_data"] = wasmExports["sound_get_pulse_data"])(a0);
+
 var _encoded_sound_data_get_is_looped = Module["_encoded_sound_data_get_is_looped"] = a0 => (_encoded_sound_data_get_is_looped = Module["_encoded_sound_data_get_is_looped"] = wasmExports["encoded_sound_data_get_is_looped"])(a0);
 
 var _encoded_sound_data_set_looped = Module["_encoded_sound_data_set_looped"] = (a0, a1, a2) => (_encoded_sound_data_set_looped = Module["_encoded_sound_data_set_looped"] = wasmExports["encoded_sound_data_set_looped"])(a0, a1, a2);
+
+var _noise_sound_data_set_seed = Module["_noise_sound_data_set_seed"] = (a0, a1) => (_noise_sound_data_set_seed = Module["_noise_sound_data_set_seed"] = wasmExports["noise_sound_data_set_seed"])(a0, a1);
+
+var _pulse_sound_data_set_freq = Module["_pulse_sound_data_set_freq"] = (a0, a1) => (_pulse_sound_data_set_freq = Module["_pulse_sound_data_set_freq"] = wasmExports["pulse_sound_data_set_freq"])(a0, a1);
+
+var _pulse_sound_data_set_duty_cycle = Module["_pulse_sound_data_set_duty_cycle"] = (a0, a1) => (_pulse_sound_data_set_duty_cycle = Module["_pulse_sound_data_set_duty_cycle"] = wasmExports["pulse_sound_data_set_duty_cycle"])(a0, a1);
+
+var _waveform_sound_data_set_type = Module["_waveform_sound_data_set_type"] = (a0, a1) => (_waveform_sound_data_set_type = Module["_waveform_sound_data_set_type"] = wasmExports["waveform_sound_data_set_type"])(a0, a1);
+
+var _waveform_sound_data_set_freq = Module["_waveform_sound_data_set_freq"] = (a0, a1) => (_waveform_sound_data_set_freq = Module["_waveform_sound_data_set_freq"] = wasmExports["waveform_sound_data_set_freq"])(a0, a1);
 
 var _emscripten_get_sbrk_ptr = () => (_emscripten_get_sbrk_ptr = wasmExports["emscripten_get_sbrk_ptr"])();
 

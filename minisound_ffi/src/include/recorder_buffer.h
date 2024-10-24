@@ -6,7 +6,6 @@
 #include <stdint.h>
 
 #include "../external/result/result.h"
-#include "export.h"
 
 typedef struct RecorderBuffer RecorderBuffer;
 

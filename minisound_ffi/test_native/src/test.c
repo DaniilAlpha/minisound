@@ -262,11 +262,11 @@ int main() {
         setup_test,
         teardown_test,
         {
-            // test_encoded_sounds,
-            // test_looping,
-            // test_generated_waveform_sounds,
-            // test_generated_noise_sounds,
-            // test_generated_pulse_sounds,
+            test_encoded_sounds,
+            test_looping,
+            test_generated_waveform_sounds,
+            test_generated_noise_sounds,
+            test_generated_pulse_sounds,
             test_recording_wav,
         }
     );

@@ -38,7 +38,6 @@ class _GenerationExampleState extends State<GenerationExample> {
           onChanged: (type) => setState(() {
             generatorType = type!;
 
-            sound?.unload();
             sound = null;
           }),
         ),
@@ -151,7 +150,7 @@ class _GenerationExampleState extends State<GenerationExample> {
       ElevatedButton(
           child: const Text("STOP"),
           onPressed: () {
-            sound?.unload();
+            sound?.stop();
             sound = null;
           }),
     ]);

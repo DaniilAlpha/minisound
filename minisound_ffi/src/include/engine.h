@@ -6,7 +6,8 @@
 #include "../external/result/result.h"
 #include "export.h"
 #include "sound.h"
-#include "sound_data/generated_sound_data.h"
+#include "sound_data/noise_sound_data.h"
+#include "sound_data/waveform_sound_data.h"
 
 typedef struct Engine Engine;
 

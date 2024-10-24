@@ -29,7 +29,7 @@ final class WebEngine implements PlatformEngine {
   }
 
   @override
-  Future<PlatformSound> loadSound(AudioData audioData) async {
+  Future<PlatformSound> loadSound(TypedData audioData) async {
     final dataPtr =
         malloc.allocate<Float>(audioData.buffer.length * sizeOf<Float>());
     if (dataPtr == nullptr) {

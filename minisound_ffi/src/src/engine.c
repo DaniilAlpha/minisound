@@ -5,7 +5,7 @@
 
 #include "../external/miniaudio/include/miniaudio.h"
 #include "../include/sound_data/encoded_sound_data.h"
-#include "../include/sound_data/generated_sound_data.h"
+#include "../include/sound_data/pulse_sound_data.h"
 
 #define MILO_LVL ENGINE_MILO_LVL
 #include "../external/milo/milo.h"

@@ -34,8 +34,10 @@ ffigen:
       - "src/include/engine.h"
       - "src/include/recorder.h"
       - "src/include/sound_data/encoded_sound_data.h"
-      - "src/include/sound_data/generated_sound_data.h"
-      - "/usr/lib/clang/18/include/stdbool.h"
+      - "src/include/sound_data/waveform_sound_data.h"
+      - "src/include/sound_data/noise_sound_data.h"
+      - "src/include/sound_data/pulse_sound_data.h"
+      # - "/usr/lib/clang/18/include/stdbool.h"
   structs:
     dependency-only: opaque
   preamble: |
