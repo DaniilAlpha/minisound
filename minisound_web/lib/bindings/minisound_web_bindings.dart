@@ -122,8 +122,8 @@ Pointer<PulseSoundData> sound_get_pulse_data(Pointer<Sound> self) =>
 bool encoded_sound_data_get_is_looped(Pointer<EncodedSoundData> self) =>
     _encoded_sound_data_get_is_looped(self.addr) != 0;
 int encoded_sound_data_set_looped(
-        Pointer<EncodedSoundData> self, int value, int delay_ms) =>
-    _encoded_sound_data_set_looped(self.addr, value, delay_ms);
+        Pointer<EncodedSoundData> self, bool value, int delay_ms) =>
+    _encoded_sound_data_set_looped(self.addr, value ? 1 : 0, delay_ms);
 
 void waveform_sound_data_set_type(Pointer<WaveformSoundData> self, int value) =>
     _waveform_sound_data_set_type(self.addr, value);
@@ -146,6 +146,12 @@ void pulse_sound_data_set_duty_cycle(
 
 final class Recorder extends Opaque {}
 
+final class Recording extends Opaque {
+  // TODO!!!
+  Pointer<Uint8> get buf => const Pointer(0);
+  int get size => 0;
+}
+
 abstract class RecorderFormat {
   static const int RECORDER_FORMAT_U8 = 1;
   static const int RECORDER_FORMAT_S16 = 2;
@@ -158,7 +164,7 @@ abstract class RecordingEncoding {
   static const int RECORDING_ENCODING_WAV = 1;
 }
 
-Pointer<Recorder> recorder_create() => Pointer(_recorder_alloc());
+Pointer<Recorder> recorder_alloc() => Pointer(_recorder_alloc());
 Future<int> recorder_init(
   Pointer<Recorder> self,
   int format,
@@ -173,7 +179,7 @@ bool recorder_get_is_recording(Pointer<Recorder> self) =>
 
 int recorder_start(Pointer<Recorder> self, int encoding) =>
     _recorder_start(self.addr, encoding);
-int recorder_stop(Pointer<Recorder> self) => _recorder_stop(self.addr);
+Recording recorder_stop(Pointer<Recorder> self) => _recorder_stop(self.addr);
 
 // *************
 // ** JS part **
@@ -312,5 +318,4 @@ external int _recorder_get_is_recording(int self);
 @JS()
 external int _recorder_start(int self, int encoding);
 @JS()
-// TODO!!!
-external int _recorder_stop(int self);
+external Recording _recorder_stop(int self);

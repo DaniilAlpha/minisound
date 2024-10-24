@@ -6,7 +6,6 @@ import "package:minisound_web/bindings/wasm/wasm.dart";
 part "web_engine.dart";
 part "web_sound.dart";
 part "web_recorder.dart";
-part "web_generator.dart";
 
 class MinisoundWeb extends MinisoundPlatform {
   MinisoundWeb._();
@@ -26,12 +25,5 @@ class MinisoundWeb extends MinisoundPlatform {
     final self = c.recorder_create();
     if (self == nullptr) throw MinisoundPlatformOutOfMemoryException();
     return WebRecorder._(self);
-  }
-
-  @override
-  PlatformGenerator createGenerator() {
-    final self = c.generator_create();
-    if (self == nullptr) throw MinisoundPlatformOutOfMemoryException();
-    return WebGenerator._(self);
   }
 }

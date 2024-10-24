@@ -22,7 +22,10 @@ class _ExamplePageState extends State<ExamplePage> {
   final engine = Engine();
   final recorder = Recorder();
 
-  late final initFuture = Future.wait([engine.init(), recorder.init()]);
+  late final initFuture = Future.wait([
+    engine.init(),
+    // recorder.init(),
+  ]);
 
   @override
   Widget build(BuildContext context) {
