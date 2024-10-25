@@ -1,3 +1,6 @@
+// web bugs:
+// - out of bounds in generateWaveform : segfault in miniaudio.c:28499
+
 #include "../include/engine.h"
 
 #include <stdbool.h>

@@ -28442,7 +28442,6 @@ static ma_uint32 ma_calculate_period_size_in_frames_from_descriptor__webaudio(co
 }
 #endif
 
-
 #if defined(MA_USE_AUDIO_WORKLETS)
 typedef struct
 {

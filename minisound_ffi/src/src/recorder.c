@@ -1,3 +1,7 @@
+// TODO! crashes if no device; maybe can use NULL backend?
+// web bugs:
+// - on recorder_start() : divide by zero in minisound.c:7539
+
 #include "../include/recorder.h"
 
 #include <stdlib.h>

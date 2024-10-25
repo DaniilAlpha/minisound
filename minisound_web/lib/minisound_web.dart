@@ -22,7 +22,7 @@ class MinisoundWeb extends MinisoundPlatform {
 
   @override
   PlatformRecorder createRecorder() {
-    final self = c.recorder_create();
+    final self = c.recorder_alloc();
     if (self == nullptr) throw MinisoundPlatformOutOfMemoryException();
     return WebRecorder._(self);
   }

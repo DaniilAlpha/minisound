@@ -100,18 +100,19 @@ else()
         RUNTIME_OUTPUT_DIRECTORY ${WEB_OUT_DIR}
     )
 
-    target_compile_options(${MAIN_LIB} PRIVATE -Og -g -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
+    # TODO!!! leak sanitizer to prevent out of bounds memory access; fix later
+    target_compile_options(${MAIN_LIB} PRIVATE -Og -g3 -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1 -fsanitize=leak)
     set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
-        -Og -g -gsource-map \
+        -Og -g3 -gsource-map -gsplit-dwarf \
         -flto -fno-rtti -fno-exceptions \
         -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall \
-        -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1048576 -sMAXIMUM_MEMORY=1gb \
+        -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=4mb -sMAXIMUM_MEMORY=1gb \
         -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB \
         -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=524288 \
-        -sSTACK_OVERFLOW_CHECK=1 -sSAFE_HEAP \
+        -sSTACK_OVERFLOW_CHECK=1  \
+        \
+        -fsanitize=leak \
     ")
-    # \
-    # -fsanitize=address \
 endif()
 
 
