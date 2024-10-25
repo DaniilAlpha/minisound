@@ -1,5 +1,6 @@
-// web bugs:
-// - out of bounds in generateWaveform : segfault in miniaudio.c:28499
+/* TODO!!!
+For some reason using generated audio as data source works only
+with U8 format (i assume an incorrect buffer length computation). */
 
 #include "../include/engine.h"
 

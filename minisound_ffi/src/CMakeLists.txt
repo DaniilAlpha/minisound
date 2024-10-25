@@ -101,7 +101,7 @@ else()
     )
 
     # TODO!!! leak sanitizer to prevent out of bounds memory access; fix later
-    target_compile_options(${MAIN_LIB} PRIVATE -Og -g3 -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1 -fsanitize=leak)
+    target_compile_options(${MAIN_LIB} PRIVATE -Og -g3 -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
     set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
         -Og -g3 -gsource-map -gsplit-dwarf \
         -flto -fno-rtti -fno-exceptions \
@@ -109,9 +109,7 @@ else()
         -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=4mb -sMAXIMUM_MEMORY=1gb \
         -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB \
         -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=524288 \
-        -sSTACK_OVERFLOW_CHECK=1  \
-        \
-        -fsanitize=leak \
+        -sSTACK_OVERFLOW_CHECK=1 -sSAFE_HEAP=1 \
     ")
 endif()
 

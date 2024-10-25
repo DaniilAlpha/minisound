@@ -34,7 +34,7 @@ Result waveform_sound_data_init(
 ) {
     ma_waveform_config const config = ma_waveform_config_init(
         // TODO? maybe needs not to be hardcoded here
-        ma_format_f32,
+        ma_format_u8,
         1,
         48000,
         (ma_waveform_type)type,

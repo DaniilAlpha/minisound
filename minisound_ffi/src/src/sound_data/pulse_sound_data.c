@@ -87,7 +87,7 @@ Result pulse_sound_data_init(
     double const duty_cycle
 ) {
     ma_pulsewave_config const config = ma_pulsewave_config_init(
-        ma_format_f32,
+        ma_format_u8,
         1,
         48000,
         duty_cycle,
