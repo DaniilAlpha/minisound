@@ -1,6 +1,9 @@
 /* TODO!!!
 For some reason using generated audio as data source works only
-with U8 format (i assume an incorrect buffer length computation). */
+with U8 format (i assume an incorrect buffer length computation).
+
+Some MP3 encoded sounds do this too. This is the only freaking thing
+preventing 2.0.0 from release. */
 
 #include "../include/engine.h"
 
