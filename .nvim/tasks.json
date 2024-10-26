@@ -1,4 +1,9 @@
 {
+    "init": {
+        "cmds": [
+            "export CMAKE_LOG_LEVEL=NOTICE"
+        ]
+    },
     "tasks": {
         "get": {
             "icon": "󰇚",
@@ -30,22 +35,36 @@
                 "flutter run -d linux"
             ]
         },
+        "test": {
+            "icon": "󰙨",
+            "cmd": [
+                "make clean_native_test",
+                "export CMAKE_EXPORT_COMPILE_COMMANDS=1; make build_native_test",
+                "echo; ./minisound_ffi/test_native/build/minisound_test"
+            ]
+        },
+        "test w/ gdb": {
+            "icon": "󰙨",
+            "cmd": [
+                "make clean_native_test",
+                "export CMAKE_EXPORT_COMPILE_COMMANDS=1; make build_native_test",
+                "echo; gdb ./minisound_ffi/test_native/build/minisound_test"
+            ]
+        },
         "ffigen": {
             "desc": "generate dart ffi bindings",
             "cmd": [
-                "cd ./minisound_ffi",
+                "cd ./minisound_ffi/",
                 "dart run ffigen"
             ]
         },
-        "build web lib": {
+        "rebuild web lib": {
             "desc": "build ffi lib to web via emscripten",
             "cmd": [
+                "make clean_web_lib",
                 "export EMSDK_QUIET=1; . ~/emsdk/emsdk_env.sh",
                 "make build_web_lib"
             ]
-        },
-        "clean web lib": {
-            "cmd": "make clean_web_lib"
         },
         "run web": {
             "icon": "󰐊",

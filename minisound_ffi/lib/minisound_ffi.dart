@@ -8,7 +8,6 @@ import "package:minisound_platform_interface/minisound_platform_interface.dart";
 
 part "ffi_engine.dart";
 part "ffi_sound.dart";
-part "ffi_generator.dart";
 part "ffi_recorder.dart";
 
 // dynamic lib
@@ -24,18 +23,6 @@ final _bindings = c.MinisoundFfiBindings(() {
   }
   throw UnsupportedError("Unsupported platform: ${Platform.operatingSystem}");
 }());
-
-extension PointerFloatCopy on Pointer<Float> {
-  void copy(Float32List data) => asTypedList(data.length).setAll(0, data);
-}
-
-extension PointerInt32Copy on Pointer<Int32> {
-  void copy(Int32List data) => asTypedList(data.length).setAll(0, data);
-}
-
-extension PointerInt16Copy on Pointer<Int16> {
-  void copy(Int16List data) => asTypedList(data.length).setAll(0, data);
-}
 
 extension PointerCopy on Pointer {
   void copy(TypedData typedData) {
@@ -60,15 +47,8 @@ class MinisoundFfi extends MinisoundPlatform {
 
   @override
   PlatformRecorder createRecorder() {
-    final self = _bindings.recorder_create();
+    final self = _bindings.recorder_alloc();
     if (self == nullptr) throw MinisoundPlatformOutOfMemoryException();
     return FfiRecorder._(self);
-  }
-
-  @override
-  PlatformGenerator createGenerator() {
-    final self = _bindings.generator_create();
-    if (self == nullptr) throw MinisoundPlatformOutOfMemoryException();
-    return FfiGenerator._(self);
   }
 }

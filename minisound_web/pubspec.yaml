@@ -1,7 +1,7 @@
 
 name: minisound_web
 description: Web implementation of the Minisound package.
-version: 1.6.0
+version: 2.0.0
 repository: https://github.com/DaniilAlpha/minisound/tree/master/minisound_web
 
 #####
@@ -30,6 +30,7 @@ flutter:
   assets:
     - packages/minisound_web/build/minisound_web.loader.js
     - packages/minisound_web/build/minisound_web.wasm
+    # - packages/minisound_web/build/minisound_web.wasm.map
     - packages/minisound_web/build/minisound_web.js
     - packages/minisound_web/build/minisound_web.aw.js
     - packages/minisound_web/build/minisound_web.ww.js

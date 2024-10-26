@@ -17,7 +17,10 @@ class Malloc implements Allocator {
 
 const malloc = Malloc();
 
-//js
+// *************
+// ** JS part **
+// *************
+
 @JS()
 external int _malloc(int size);
 @JS()

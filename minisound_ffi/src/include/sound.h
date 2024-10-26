@@ -7,47 +7,31 @@
 
 #include "../external/result/result.h"
 #include "export.h"
-
-// this is just a redirection to exclude miniaudio.h from generated bindings
-typedef enum SoundFormat {
-    SOUND_FORMAT_UNKNOWN = 0,
-    SOUND_FORMAT_U8 = 1,
-    SOUND_FORMAT_S16 = 2,
-    SOUND_FORMAT_S24 = 3,
-    SOUND_FORMAT_S32 = 4,
-    SOUND_FORMAT_F32 = 5,
-
-    SOUND_FORMAT_COUNT
-} SoundFormat;
+#include "sound_data/encoded_sound_data.h"
+#include "sound_data/noise_sound_data.h"
+#include "sound_data/pulse_sound_data.h"
+#include "sound_data/sound_data.h"
+#include "sound_data/waveform_sound_data.h"
 
 typedef struct Sound Sound;
 
 EXPORT Sound *sound_alloc(void);
-
-Result sound_init(
-    Sound *const self,
-
-    float const *const data,
-    size_t const data_size,
-
-    SoundFormat const sound_format,
-    uint32_t const channels,
-    uint32_t const sample_rate,
-    void *const vengine
-);
+Result
+sound_init(Sound *const self, SoundData const sound_data, void *const v_engine);
 EXPORT void sound_unload(Sound *const self);
 
 EXPORT Result sound_play(Sound *const self);
-EXPORT Result sound_replay(Sound *const self);
 EXPORT void sound_pause(Sound *const self);
 EXPORT void sound_stop(Sound *const self);
 
 EXPORT float sound_get_volume(Sound const *const self);
 EXPORT void sound_set_volume(Sound *const self, float const value);
 
-EXPORT float sound_get_duration(Sound *const self);
+EXPORT double sound_get_duration(Sound *const self);
 
-EXPORT void
-sound_set_looped(Sound *const self, bool const value, size_t const delay_ms);
+EXPORT EncodedSoundData *sound_get_encoded_data(Sound const *const self);
+EXPORT WaveformSoundData *sound_get_waveform_data(Sound const *const self);
+EXPORT NoiseSoundData *sound_get_noise_data(Sound const *const self);
+EXPORT PulseSoundData *sound_get_pulse_data(Sound const *const self);
 
 #endif

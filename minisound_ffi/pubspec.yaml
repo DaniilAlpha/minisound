@@ -1,7 +1,7 @@
 
 name: minisound_ffi
 description: FFI implementation of the Minisound package.
-version: 1.6.0
+version: 2.0.0
 repository: https://github.com/DaniilAlpha/minisound/tree/master/minisound_ffi
 
 #####
@@ -31,9 +31,14 @@ ffigen:
       # to generate only what is needed, specified only headers directly used in bindings
       - "src/include/sound.h"
       - "src/include/engine.h"
-      - "src/include/generator.h"
-      - "src/include/recorder.h"
-      - "/usr/lib/clang/18/include/stdbool.h"
+      - "src/include/recorder/recorder.h"
+      - "src/include/recorder/recorder_buffer.h"
+      - "src/include/recorder/recording.h"
+      - "src/include/sound_data/encoded_sound_data.h"
+      - "src/include/sound_data/waveform_sound_data.h"
+      - "src/include/sound_data/noise_sound_data.h"
+      - "src/include/sound_data/pulse_sound_data.h"
+      # - "/usr/lib/clang/18/include/stdbool.h"
   structs:
     dependency-only: opaque
   preamble: |
@@ -43,7 +48,7 @@ ffigen:
     // ignore_for_file: constant_identifier_names
     // ignore_for_file: prefer_expression_function_bodies
     // ignore_for_file: sort_constructors_first
-    // ignore_for_file: unused_element 
+    // ignore_for_file: unused_element, unused_field
   llvm-path:
     - /usr/lib64/libclang.so
   compiler-opts:

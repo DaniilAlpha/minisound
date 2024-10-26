@@ -25,5 +25,4 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/laser_shoot.wav
-    - assets/laser_shoot.mp3
+    - assets/

@@ -1,14 +1,19 @@
 import "dart:io";
+import "dart:typed_data";
 
+import "package:flutter/foundation.dart";
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
+
 export "package:minisound_platform_interface/minisound_platform_interface.dart"
     show
-        AudioData,
         MinisoundPlatformException,
         MinisoundPlatformOutOfMemoryException,
-        SoundFormat;
+        NoiseType,
+        WaveformType;
 
-/// Controls the loading and unloading of `Sound`s.
+part "sound.dart";
+
+/// Controls loading, unloading and generating of `Sound`s.
 ///
 /// Should be initialized before doing anything.
 /// Should be started to hear any sound.
@@ -19,94 +24,85 @@ final class Engine {
 
   static final _finalizer =
       Finalizer<PlatformEngine>((engine) => engine.dispose());
-  static final _soundsFinalizer = Finalizer<Sound>((sound) => sound.unload());
+  static final _soundsFinalizer =
+      Finalizer<PlatformSound>((sound) => sound.unload());
 
   final _engine = PlatformEngine();
 
   var _isInit = false;
   bool get isInit => _isInit;
 
-  /// Initializes an engine.
+  /// Initializes the engine.
   ///
-  /// Change an update period (affects the sound latency).
+  /// `periodMs` - affects sounds latency (lower period means lower latency but possibly jittering). Must be greater than zero.
   Future<void> init([int periodMs = 10]) async {
+    assert(periodMs > 0);
+
     if (_isInit) return;
 
     await _engine.init(periodMs);
     _isInit = true;
   }
 
-  /// Starts an engine.
+  /// Starts the engine.
   Future<void> start() async => _engine.start();
 
-  /// Copies `data` to the internal memory location and creates a `Sound` from it.
-  Future<Sound> loadSound(AudioData audioData) async {
-    final engineSound = await _engine.loadSound(audioData);
-    final sound = Sound._(engineSound);
-    _soundsFinalizer.attach(this, sound);
+  /// Copies `data` to the internal memory location and creates a `LoadedSound` from it.
+  Future<LoadedSound> loadSound(
+    TypedData audioData, {
+    @Deprecated("Should be used only in case something is not working.")
+    bool doAddToFinalizer = true,
+  }) async {
+    final platformSound = await _engine.loadSound(audioData);
+    final sound = LoadedSound._(platformSound);
+    if (doAddToFinalizer) _soundsFinalizer.attach(sound, platformSound);
     return sound;
   }
 
-  /// Loads a sound file and creates a `Sound` from it.
-  Future<Sound> loadSoundFile(String filePath) async {
-    final file = File(filePath);
-    final bytes = await file.readAsBytes();
-    return loadSound(AudioData.detectFromBuffer(bytes.buffer.asFloat32List()));
-  }
-}
+  /// Loads a file and creates a `LoadedSound` from it.
+  Future<LoadedSound> loadSoundFile(String filePath) async =>
+      loadSound(await File(filePath).readAsBytes());
 
-/// A sound.
-final class Sound {
-  Sound._(PlatformSound sound) : _sound = sound;
-
-  final PlatformSound _sound;
-
-  /// a `double` greater than `0` (values greater than `1` may behave differently from platform to platform)
-  double get volume => _sound.volume;
-  set volume(double value) => _sound.volume = value < 0 ? 0 : value;
-
-  Duration get duration =>
-      Duration(milliseconds: (_sound.duration * 1000).toInt());
-
-  bool get isLooped => _sound.looping.$1;
-  Duration get loopDelay => Duration(milliseconds: _sound.looping.$2);
-
-  /// Starts a sound. Stopped and played again if it is already started.
-  void play() {
-    if (_sound.looping.$1) _sound.looping = (false, 0);
-
-    _sound.replay();
+  /// Generates a waveform sound using given parameters.
+  WaveformSound genWaveform(
+    WaveformType type, {
+    double freq = 440.0,
+    @Deprecated(
+        "Should be used only in special cases (see the migration guide in README).")
+    bool doAddToFinalizer = true,
+  }) {
+    final platformSound = _engine.generateWaveform(type: type, freq: freq);
+    final sound = WaveformSound._(platformSound);
+    if (doAddToFinalizer) _soundsFinalizer.attach(sound, platformSound);
+    return sound;
   }
 
-  /// Starts sound looping.
-  ///
-  /// `delay` is clamped positive
-  void playLooped({Duration delay = Duration.zero}) {
-    final delayMs = delay < Duration.zero ? 0 : delay.inMilliseconds;
-    if (!_sound.looping.$1 || _sound.looping.$2 != delayMs) {
-      _sound.looping = (true, delayMs);
-    }
-
-    _sound.play();
+  /// Generates a noise sound using given parameters.
+  NoiseSound genNoise(
+    NoiseType type, {
+    int seed = 0,
+    @Deprecated(
+        "Should be used only in special cases (see the migration guide in README).")
+    bool doAddToFinalizer = true,
+  }) {
+    final platformSound = _engine.generateNoise(type: type, seed: seed);
+    final sound = NoiseSound._(platformSound);
+    if (doAddToFinalizer) _soundsFinalizer.attach(sound, platformSound);
+    return sound;
   }
 
-  /// Does not reset a sound position.
-  ///
-  /// If sound is looped, when played again will wait `loopDelay` and play. If you do not want this, use `stop()`.
-  void pause() {
-    if (_sound.looping.$1) _sound.looping = (false, 0);
-
-    _sound.pause();
+  /// Generates a pulsewave sound using given parameters.
+  PulseSound genPulse({
+    double freq = 440.0,
+    double dutyCycle = 0.5,
+    @Deprecated(
+        "Should be used only in special cases (see the migration guide in README).")
+    bool doAddToFinalizer = true,
+  }) {
+    final platformSound =
+        _engine.generatePulse(freq: freq, dutyCycle: dutyCycle);
+    final sound = PulseSound._(platformSound);
+    if (doAddToFinalizer) _soundsFinalizer.attach(sound, platformSound);
+    return sound;
   }
-
-  /// Resets a sound position.
-  ///
-  /// If sound is looped, when played again will NOT wait `loopDelay` and play. If you do not want this, use `pause()`.
-  void stop() {
-    if (_sound.looping.$1) _sound.looping = (false, 0);
-
-    _sound.stop();
-  }
-
-  void unload() => _sound.unload();
 }

@@ -1,19 +1,23 @@
 # minisound
 
-A high-level real-time audio playback library based on [miniaudio](https://miniaud.io). The library offers basic functionality and quite low latency. Not really suitable for big sounds right now. Supports MP3, WAV and FLAC formats.
+A high-level real-time audio playback library based on [miniaudio](https://miniaud.io). The library offers basic functionality and quite low latency. Supports MP3, WAV and FLAC formats.
 
 Run `make help` from the root project directory to get started.
 
 ## Platform support
 
-| Platform | Tested     | Supposed to work | Unsupported |
-| -------- | -----------| -----------------| ------------|
-| Android | SDK 31, 19  | SDK 16+          | SDK 15-     |
-| iOS     | None        | Unknown          | Unknown     |
-| Windows | 11, 7 (x64) | Vista+           | XP-         |
-| macOS   | None        | Unknown          | Unknown     |
-| Linux   | Fedora 39-40, Mint 22 | Any    | None        |
-| Web     | Chrome 93+, Firefox 79+, Safari 16+ | Browsers with an `AudioWorklet` support | Browsers without an `AudioWorklet` support |
+|Platform|Tested     |Supposed to work|Unsupported|
+|--------|-----------|----------------|-----------|
+|Android |SDK 31, 19 |SDK 16+         |SDK 15-    |
+|iOS     |None       |Unknown         |Unknown    |
+|Windows |11, 7 (x64)|Vista+          |XP-        |
+|macOS   |None       |Unknown         |Unknown    |
+|Linux   |Fedora 39-40, Mint 22|Any   |None       |
+|Web     |Chrome 93+, Firefox 79+, Safari 16+|Browsers with an `AudioWorklet` support|Browsers without an `AudioWorklet` support|
+
+## Migration
+
+There was some breaking changes in 2.0.0 version, see the [migration guide](#migration-guide) down below.
 
 ## Getting started on the web
 
@@ -56,131 +60,157 @@ window.addEventListener('load', async function (ev) {
 
 ## Usage
 
+
 To use this plugin, add `minisound` as a [dependency in your pubspec.yaml file](https://flutter.dev/platform-plugins/).
 
-```dart
-import "package:minisound/engine.dart" as minisound;
+### Playback
 
-void main() {
+```dart
+// if you are using flutter, use
+import "package:minisound/engine_flutter.dart" as minisound;
+// and with plain dart use
+import "package:minisound/engine.dart" as minisound;
+// the difference is that flutter version allows you to load from assets, which is a concept specific to flutter
+
+void main() async {
   final engine = minisound.Engine();
 
-  // this method takes an update period in milliseconds as an argument, which
-  // determines the length of the latency (does not currently affect the web)
-  await engine.init(); 
+  // engine initialization
+  {
+    // you can pass `periodMs` as an argument, to change determines the latency (does not affect web). can cause crackles if too low
+    await engine.init(); 
 
-  // there is also a 'loadSound' method to load a sound from the Uint8List
-  final sound = await engine.loadSoundAsset("asset/path.ext");
-  sound.volume = 0.5;
+    // for web: this should be executed after the first user interaction due to browsers' autoplay policy
+    await engine.start(); 
+  }
 
-  // this may cause a MinisoundPlatformException to be thrown on the web
-  // before any user interaction due to the autoplay policy
-  await engine.start(); 
 
-  sound.play();
+  // there is a base `Sound` interface that is implemented by `LoadedSound` (which reads data from a defined length memory location) 
+  final LoadedSound sound;
 
-  await Future.delayed(sound.duration*.5);
+  // sound loading
+  {
+    // there are also `loadSoundFile` and `loadSound` methods to load sounds from file (by filename) and `TypedData` respectfully
+    final sound = await engine.loadSoundAsset("asset/path.ext");
 
-  sound.pause(); // this method saves sound position
-  sound.stop(); // but this does not
+    // you can get and set sound's volume (1 by default)
+    sound.volume *= 0.5;
+  }
 
-  final loopDelay=Duratoin(seconds: 1);
-  sound.playLooped(delay: loopDelay); // sound will be looped with one second period
 
-  await Future.delayed((sound.duration + loopDelay) * 5); // sound duration does not account loop delay
+  // playing, pausing and stopping
+  {
+    sound.play();
 
-  sound.stop();
+    await Future.delayed(sound.duration * .5); // waiting while the first half plays
 
-  // it is recommended to unload sounds manually to prevent memory leaks
-  sound.unload(); 
+    sound.pause(); 
+    // when sound is paused, `resume` will continue the sound and `play` will start from the beginning
+    sound.resume(); 
 
-  // the engine and all loaded sounds will be automatically disposed when 
-  // engine gets garbage-collected
+    sound.stop(); 
+  }
+
+  
+  // looping
+  {
+    final loopDelay = const Duration(seconds: 1);
+
+    sound.playLooped(delay: loopDelay); // sound will be looped with one second period
+
+    // btw, sound duration does not account loop delay
+    await Future.delayed((sound.duration + loopDelay) * 5); // waiting for sound to loop 5 times (with all the delays)
+
+    sound.stop();
+  }
+
+<!-- // it is recommended to unload sounds manually to prevent memory leaks -->
+<!-- sound.unload(); -->
+
+  // the engine will be automatically disposed when gets garbage-collected
 }
 ```
 
-### Recorder Example
+### Generation 
+
+```dart
+// you may want to read previous example first for more detailed explanation
+
+import "package:minisound/engine_flutter.dart" as minisound;
+
+void main() async {
+  final engine = minisound.Engine();
+  await engine.init(); 
+  await engine.start(); 
+
+  // `Sound` is also implemented by a `GeneratedSound` which is extended by `WaveformSound`, `NoiseSound` and `PulseSound` 
+
+  // there are four types of a waveform: sine, square, triangle and sawtooth; the type can be changed later
+  final WaveformSound wave = engine.genWaveform(WaveformType.sine);
+  // and three types of a noise: white, pink and brownian; CANNOT be changed later
+  final NoiseSound noise = engine.genNoise(NoiseType.white);
+  // pulsewave is basically a square wave with a different ratio between high and low levels (which is represented by the `dutyCycle`)
+  final PulseSound pulse = engine.genPulse(dutyCycle: 0.25);
+
+  wave.play();
+  noise.play();
+  pulse.play();
+  // generated sounds have no duration, which makes sense if you think about it; for this reason they cannot be looped
+  await Future.delayed(const Duration(seconds: 1))
+  wave.stop();
+  noise.stop();
+  pulse.stop();
+
+<!-- // still required -->
+<!-- sound.unload(); -->
+}
+```
+
+### Recording
 
 ```dart
 import "package:minisound/recorder.dart" as minisound;
 
 void main() async {
+  // recorder records into memory using the wav format 
   final recorder = minisound.Recorder();
 
-  // Initialize the recorder's engine
-  await recorder.initEngine();
+  // recording format characteristics can be changed via this function params
+  recorder.init();
 
-  // Initialize the recorder for streaming
-  await recorder.initStream(
-    sampleRate: 48000,
-    channels: 1,
-    format: minisound.AudioFormat.float32,
-    bufferLenS: 5,
-  );
+  // just starts the engine
+  await recorder.start();
 
-  // Start recording
-  recorder.start();
+  await Future.delayed(const Duration(seconds: 1));
 
-  // Wait for some time while recording
-  await Future.delayed(Duration(seconds: 5));
+  // returns what've been recorded
+  final recording = await recorder.stop();
 
-  // Stop recording
-  recorder.stop();
-
-  // Get the recorded buffer
-  final buffer = recorder.getBuffer(recorder.availableFloatCount);
-
-  // Process the recorded buffer as needed
-  // ...
-
-  // Dispose of the recorder resources
-  recorder.dispose();
+  // all data is provided via buffer; sound can be used from it via `engine.loadSound(recording.buffer)`
+  print(recording.buffer);
 }
 ```
 
-### Generator Example
+## Migration guide
 
+### 1.6.0 -> 2.0.0
+
+- Recording and generation APIs got heavily changed. See examples for new usage.
+
+- Sound autounloading logic got changed, now they depend on the sound object itself, rather than the engine.
 ```dart
-import "package:minisound/generator.dart" as minisound;
+  // remove
+  // sound.unload();
+```
+Due to this, when sound objects got garbage collected (may be immediately after or not the moment it goes out of scope), sound stops and unloads. If this happens, you are probably doing it wrong, as there no any reference to it left for you to stop it later. If it was a prior version, you would've beed successfully creating an indefenetely played sound that stops only when the engine goes out of scope. There is a possiblity to revert this behaviour via the `doAddToFinalizer` parameter to engine functions that return `Sound`s, but it is already deprecated. It you are sure that your usecase is valid, create a github issue, providing the code. Maybe this will change my mind.
 
-void main() async {
-  final generator = minisound.Generator();
+### 1.4.0 -> 1.6.0
 
-  // Initialize the generator's engine
-  await generator.initEngine();
-
-  // Initialize the generator
-  await generator.init(
-    minisound.AudioFormat.float32,
-    2,
-    48000,
-    5,
-  );
-
-  // Set the waveform type, frequency, and amplitude
-  generator.setWaveform(minisound.WaveformType.sine, 440.0, 0.5);
-
-  // Set the noise type, seed, and amplitude
-  generator.setNoise(minisound.NoiseType.white, 0, 0.2);
-
-  // Start the generator
-  generator.start();
-
-  // Generate and process audio data in a loop
-  while (true) {
-    final buffer = generator.getBuffer(generator.availableFloatCount);
-
-    // Process the generated buffer as needed
-    // ...
-
-    await Future.delayed(Duration(milliseconds: 100));
-  }
-
-  // Stop the generator
-  generator.stop();
-
-  // Dispose of the generator resources
-  generator.dispose();
-}
+- The main file (`minisound.dart`) became `engine_flutter.dart`.
+```dart
+// import "package:minisound/minisound.dart";
+// becomes
+import "package:minisound/engine_flutter.dart";
 ```
 
 ## Building the project
@@ -219,7 +249,6 @@ To manually build the project, follow these steps:
 
 ## TODO
 
-- [ ] Fix non-intuitiveness of pausing and stopping, then playing again looped sounds
-- [ ] Stop crash when no devices found for playback or capture
-- [ ] Extract buffer stuff to unified AV Buffer packages dart and C.
+<!-- - [ ] Stop crash when no devices found for playback or capture -->
+<!-- - [ ] Extract buffer stuff to unified AV Buffer packages dart and C. -->
 <!-- - [ ] Switch engine init to state machine. -->

@@ -4,7 +4,7 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: prefer_expression_function_bodies
 // ignore_for_file: sort_constructors_first
-// ignore_for_file: unused_element
+// ignore_for_file: unused_element, unused_field
 
 // AUTO GENERATED FILE, DO NOT EDIT.
 //
@@ -28,6 +28,362 @@ class MinisoundFfiBindings {
           lookup)
       : _lookup = lookup;
 
+  ffi.Pointer<EncodedSoundData> encoded_sound_data_alloc() {
+    return _encoded_sound_data_alloc();
+  }
+
+  late final _encoded_sound_data_allocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<EncodedSoundData> Function()>>(
+          'encoded_sound_data_alloc');
+  late final _encoded_sound_data_alloc = _encoded_sound_data_allocPtr
+      .asFunction<ffi.Pointer<EncodedSoundData> Function()>();
+
+  int encoded_sound_data_init(
+    ffi.Pointer<EncodedSoundData> self,
+    ffi.Pointer<ffi.Uint8> data,
+    int data_size,
+  ) {
+    return _encoded_sound_data_init(
+      self,
+      data,
+      data_size,
+    );
+  }
+
+  late final _encoded_sound_data_initPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<EncodedSoundData>,
+              ffi.Pointer<ffi.Uint8>, ffi.Size)>>('encoded_sound_data_init');
+  late final _encoded_sound_data_init = _encoded_sound_data_initPtr.asFunction<
+      int Function(
+          ffi.Pointer<EncodedSoundData>, ffi.Pointer<ffi.Uint8>, int)>();
+
+  void encoded_sound_data_uninit(
+    ffi.Pointer<EncodedSoundData> self,
+  ) {
+    return _encoded_sound_data_uninit(
+      self,
+    );
+  }
+
+  late final _encoded_sound_data_uninitPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(ffi.Pointer<EncodedSoundData>)>>(
+      'encoded_sound_data_uninit');
+  late final _encoded_sound_data_uninit = _encoded_sound_data_uninitPtr
+      .asFunction<void Function(ffi.Pointer<EncodedSoundData>)>();
+
+  bool encoded_sound_data_get_is_looped(
+    ffi.Pointer<EncodedSoundData> self,
+  ) {
+    return _encoded_sound_data_get_is_looped(
+      self,
+    );
+  }
+
+  late final _encoded_sound_data_get_is_loopedPtr = _lookup<
+          ffi.NativeFunction<ffi.Bool Function(ffi.Pointer<EncodedSoundData>)>>(
+      'encoded_sound_data_get_is_looped');
+  late final _encoded_sound_data_get_is_looped =
+      _encoded_sound_data_get_is_loopedPtr
+          .asFunction<bool Function(ffi.Pointer<EncodedSoundData>)>();
+
+  void encoded_sound_data_set_looped(
+    ffi.Pointer<EncodedSoundData> self,
+    bool value,
+    int delay_ms,
+  ) {
+    return _encoded_sound_data_set_looped(
+      self,
+      value,
+      delay_ms,
+    );
+  }
+
+  late final _encoded_sound_data_set_loopedPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<EncodedSoundData>, ffi.Bool,
+              ffi.Size)>>('encoded_sound_data_set_looped');
+  late final _encoded_sound_data_set_looped = _encoded_sound_data_set_loopedPtr
+      .asFunction<void Function(ffi.Pointer<EncodedSoundData>, bool, int)>();
+
+  SoundData encoded_sound_data_ww_sound_data(
+    ffi.Pointer<EncodedSoundData> self,
+  ) {
+    return _encoded_sound_data_ww_sound_data(
+      self,
+    );
+  }
+
+  late final _encoded_sound_data_ww_sound_dataPtr = _lookup<
+          ffi
+          .NativeFunction<SoundData Function(ffi.Pointer<EncodedSoundData>)>>(
+      'encoded_sound_data_ww_sound_data');
+  late final _encoded_sound_data_ww_sound_data =
+      _encoded_sound_data_ww_sound_dataPtr
+          .asFunction<SoundData Function(ffi.Pointer<EncodedSoundData>)>();
+
+  ffi.Pointer<NoiseSoundData> noise_sound_data_alloc() {
+    return _noise_sound_data_alloc();
+  }
+
+  late final _noise_sound_data_allocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<NoiseSoundData> Function()>>(
+          'noise_sound_data_alloc');
+  late final _noise_sound_data_alloc = _noise_sound_data_allocPtr
+      .asFunction<ffi.Pointer<NoiseSoundData> Function()>();
+
+  int noise_sound_data_init(
+    ffi.Pointer<NoiseSoundData> self,
+    int type,
+    int seed,
+  ) {
+    return _noise_sound_data_init(
+      self,
+      type,
+      seed,
+    );
+  }
+
+  late final _noise_sound_data_initPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<NoiseSoundData>, ffi.Int32,
+              ffi.Int32)>>('noise_sound_data_init');
+  late final _noise_sound_data_init = _noise_sound_data_initPtr
+      .asFunction<int Function(ffi.Pointer<NoiseSoundData>, int, int)>();
+
+  void noise_sound_data_uninit(
+    ffi.Pointer<NoiseSoundData> self,
+  ) {
+    return _noise_sound_data_uninit(
+      self,
+    );
+  }
+
+  late final _noise_sound_data_uninitPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(ffi.Pointer<NoiseSoundData>)>>(
+      'noise_sound_data_uninit');
+  late final _noise_sound_data_uninit = _noise_sound_data_uninitPtr
+      .asFunction<void Function(ffi.Pointer<NoiseSoundData>)>();
+
+  void noise_sound_data_set_seed(
+    ffi.Pointer<NoiseSoundData> self,
+    int value,
+  ) {
+    return _noise_sound_data_set_seed(
+      self,
+      value,
+    );
+  }
+
+  late final _noise_sound_data_set_seedPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<NoiseSoundData>,
+              ffi.Int32)>>('noise_sound_data_set_seed');
+  late final _noise_sound_data_set_seed = _noise_sound_data_set_seedPtr
+      .asFunction<void Function(ffi.Pointer<NoiseSoundData>, int)>();
+
+  SoundData noise_sound_data_ww_sound_data(
+    ffi.Pointer<NoiseSoundData> self,
+  ) {
+    return _noise_sound_data_ww_sound_data(
+      self,
+    );
+  }
+
+  late final _noise_sound_data_ww_sound_dataPtr = _lookup<
+          ffi.NativeFunction<SoundData Function(ffi.Pointer<NoiseSoundData>)>>(
+      'noise_sound_data_ww_sound_data');
+  late final _noise_sound_data_ww_sound_data =
+      _noise_sound_data_ww_sound_dataPtr
+          .asFunction<SoundData Function(ffi.Pointer<NoiseSoundData>)>();
+
+  ffi.Pointer<PulseSoundData> pulse_sound_data_alloc() {
+    return _pulse_sound_data_alloc();
+  }
+
+  late final _pulse_sound_data_allocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<PulseSoundData> Function()>>(
+          'pulse_sound_data_alloc');
+  late final _pulse_sound_data_alloc = _pulse_sound_data_allocPtr
+      .asFunction<ffi.Pointer<PulseSoundData> Function()>();
+
+  int pulse_sound_data_init(
+    ffi.Pointer<PulseSoundData> self,
+    double frequency,
+    double duty_cycle,
+  ) {
+    return _pulse_sound_data_init(
+      self,
+      frequency,
+      duty_cycle,
+    );
+  }
+
+  late final _pulse_sound_data_initPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<PulseSoundData>, ffi.Double,
+              ffi.Double)>>('pulse_sound_data_init');
+  late final _pulse_sound_data_init = _pulse_sound_data_initPtr
+      .asFunction<int Function(ffi.Pointer<PulseSoundData>, double, double)>();
+
+  void pulse_sound_data_uninit(
+    ffi.Pointer<PulseSoundData> self,
+  ) {
+    return _pulse_sound_data_uninit(
+      self,
+    );
+  }
+
+  late final _pulse_sound_data_uninitPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(ffi.Pointer<PulseSoundData>)>>(
+      'pulse_sound_data_uninit');
+  late final _pulse_sound_data_uninit = _pulse_sound_data_uninitPtr
+      .asFunction<void Function(ffi.Pointer<PulseSoundData>)>();
+
+  void pulse_sound_data_set_freq(
+    ffi.Pointer<PulseSoundData> self,
+    double value,
+  ) {
+    return _pulse_sound_data_set_freq(
+      self,
+      value,
+    );
+  }
+
+  late final _pulse_sound_data_set_freqPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<PulseSoundData>,
+              ffi.Double)>>('pulse_sound_data_set_freq');
+  late final _pulse_sound_data_set_freq = _pulse_sound_data_set_freqPtr
+      .asFunction<void Function(ffi.Pointer<PulseSoundData>, double)>();
+
+  void pulse_sound_data_set_duty_cycle(
+    ffi.Pointer<PulseSoundData> self,
+    double value,
+  ) {
+    return _pulse_sound_data_set_duty_cycle(
+      self,
+      value,
+    );
+  }
+
+  late final _pulse_sound_data_set_duty_cyclePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<PulseSoundData>,
+              ffi.Double)>>('pulse_sound_data_set_duty_cycle');
+  late final _pulse_sound_data_set_duty_cycle =
+      _pulse_sound_data_set_duty_cyclePtr
+          .asFunction<void Function(ffi.Pointer<PulseSoundData>, double)>();
+
+  SoundData pulse_sound_data_ww_sound_data(
+    ffi.Pointer<PulseSoundData> self,
+  ) {
+    return _pulse_sound_data_ww_sound_data(
+      self,
+    );
+  }
+
+  late final _pulse_sound_data_ww_sound_dataPtr = _lookup<
+          ffi.NativeFunction<SoundData Function(ffi.Pointer<PulseSoundData>)>>(
+      'pulse_sound_data_ww_sound_data');
+  late final _pulse_sound_data_ww_sound_data =
+      _pulse_sound_data_ww_sound_dataPtr
+          .asFunction<SoundData Function(ffi.Pointer<PulseSoundData>)>();
+
+  ffi.Pointer<WaveformSoundData> waveform_sound_data_alloc() {
+    return _waveform_sound_data_alloc();
+  }
+
+  late final _waveform_sound_data_allocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<WaveformSoundData> Function()>>(
+          'waveform_sound_data_alloc');
+  late final _waveform_sound_data_alloc = _waveform_sound_data_allocPtr
+      .asFunction<ffi.Pointer<WaveformSoundData> Function()>();
+
+  int waveform_sound_data_init(
+    ffi.Pointer<WaveformSoundData> self,
+    int type,
+    double frequency,
+  ) {
+    return _waveform_sound_data_init(
+      self,
+      type,
+      frequency,
+    );
+  }
+
+  late final _waveform_sound_data_initPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<WaveformSoundData>, ffi.Int32,
+              ffi.Double)>>('waveform_sound_data_init');
+  late final _waveform_sound_data_init = _waveform_sound_data_initPtr
+      .asFunction<int Function(ffi.Pointer<WaveformSoundData>, int, double)>();
+
+  void waveform_sound_data_uninit(
+    ffi.Pointer<WaveformSoundData> self,
+  ) {
+    return _waveform_sound_data_uninit(
+      self,
+    );
+  }
+
+  late final _waveform_sound_data_uninitPtr = _lookup<
+          ffi
+          .NativeFunction<ffi.Void Function(ffi.Pointer<WaveformSoundData>)>>(
+      'waveform_sound_data_uninit');
+  late final _waveform_sound_data_uninit = _waveform_sound_data_uninitPtr
+      .asFunction<void Function(ffi.Pointer<WaveformSoundData>)>();
+
+  void waveform_sound_data_set_type(
+    ffi.Pointer<WaveformSoundData> self,
+    int value,
+  ) {
+    return _waveform_sound_data_set_type(
+      self,
+      value,
+    );
+  }
+
+  late final _waveform_sound_data_set_typePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<WaveformSoundData>,
+              ffi.Int32)>>('waveform_sound_data_set_type');
+  late final _waveform_sound_data_set_type = _waveform_sound_data_set_typePtr
+      .asFunction<void Function(ffi.Pointer<WaveformSoundData>, int)>();
+
+  void waveform_sound_data_set_freq(
+    ffi.Pointer<WaveformSoundData> self,
+    double value,
+  ) {
+    return _waveform_sound_data_set_freq(
+      self,
+      value,
+    );
+  }
+
+  late final _waveform_sound_data_set_freqPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<WaveformSoundData>,
+              ffi.Double)>>('waveform_sound_data_set_freq');
+  late final _waveform_sound_data_set_freq = _waveform_sound_data_set_freqPtr
+      .asFunction<void Function(ffi.Pointer<WaveformSoundData>, double)>();
+
+  SoundData waveform_sound_data_ww_sound_data(
+    ffi.Pointer<WaveformSoundData> self,
+  ) {
+    return _waveform_sound_data_ww_sound_data(
+      self,
+    );
+  }
+
+  late final _waveform_sound_data_ww_sound_dataPtr = _lookup<
+          ffi
+          .NativeFunction<SoundData Function(ffi.Pointer<WaveformSoundData>)>>(
+      'waveform_sound_data_ww_sound_data');
+  late final _waveform_sound_data_ww_sound_data =
+      _waveform_sound_data_ww_sound_dataPtr
+          .asFunction<SoundData Function(ffi.Pointer<WaveformSoundData>)>();
+
   ffi.Pointer<Sound> sound_alloc() {
     return _sound_alloc();
   }
@@ -39,37 +395,22 @@ class MinisoundFfiBindings {
 
   int sound_init(
     ffi.Pointer<Sound> self,
-    ffi.Pointer<ffi.Float> data,
-    int data_size,
-    int sound_format,
-    int channels,
-    int sample_rate,
-    ffi.Pointer<ffi.Void> vengine,
+    SoundData sound_data,
+    ffi.Pointer<ffi.Void> v_engine,
   ) {
     return _sound_init(
       self,
-      data,
-      data_size,
-      sound_format,
-      channels,
-      sample_rate,
-      vengine,
+      sound_data,
+      v_engine,
     );
   }
 
   late final _sound_initPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(
-              ffi.Pointer<Sound>,
-              ffi.Pointer<ffi.Float>,
-              ffi.Size,
-              ffi.Int32,
-              ffi.Uint32,
-              ffi.Uint32,
+          ffi.Int32 Function(ffi.Pointer<Sound>, SoundData,
               ffi.Pointer<ffi.Void>)>>('sound_init');
   late final _sound_init = _sound_initPtr.asFunction<
-      int Function(ffi.Pointer<Sound>, ffi.Pointer<ffi.Float>, int, int, int,
-          int, ffi.Pointer<ffi.Void>)>();
+      int Function(ffi.Pointer<Sound>, SoundData, ffi.Pointer<ffi.Void>)>();
 
   void sound_unload(
     ffi.Pointer<Sound> self,
@@ -98,20 +439,6 @@ class MinisoundFfiBindings {
           'sound_play');
   late final _sound_play =
       _sound_playPtr.asFunction<int Function(ffi.Pointer<Sound>)>();
-
-  int sound_replay(
-    ffi.Pointer<Sound> self,
-  ) {
-    return _sound_replay(
-      self,
-    );
-  }
-
-  late final _sound_replayPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<Sound>)>>(
-          'sound_replay');
-  late final _sound_replay =
-      _sound_replayPtr.asFunction<int Function(ffi.Pointer<Sound>)>();
 
   void sound_pause(
     ffi.Pointer<Sound> self,
@@ -180,29 +507,70 @@ class MinisoundFfiBindings {
   }
 
   late final _sound_get_durationPtr =
-      _lookup<ffi.NativeFunction<ffi.Float Function(ffi.Pointer<Sound>)>>(
+      _lookup<ffi.NativeFunction<ffi.Double Function(ffi.Pointer<Sound>)>>(
           'sound_get_duration');
   late final _sound_get_duration =
       _sound_get_durationPtr.asFunction<double Function(ffi.Pointer<Sound>)>();
 
-  void sound_set_looped(
+  ffi.Pointer<EncodedSoundData> sound_get_encoded_data(
     ffi.Pointer<Sound> self,
-    bool value,
-    int delay_ms,
   ) {
-    return _sound_set_looped(
+    return _sound_get_encoded_data(
       self,
-      value,
-      delay_ms,
     );
   }
 
-  late final _sound_set_loopedPtr = _lookup<
+  late final _sound_get_encoded_dataPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Void Function(
-              ffi.Pointer<Sound>, ffi.Bool, ffi.Size)>>('sound_set_looped');
-  late final _sound_set_looped = _sound_set_loopedPtr
-      .asFunction<void Function(ffi.Pointer<Sound>, bool, int)>();
+          ffi.Pointer<EncodedSoundData> Function(
+              ffi.Pointer<Sound>)>>('sound_get_encoded_data');
+  late final _sound_get_encoded_data = _sound_get_encoded_dataPtr
+      .asFunction<ffi.Pointer<EncodedSoundData> Function(ffi.Pointer<Sound>)>();
+
+  ffi.Pointer<WaveformSoundData> sound_get_waveform_data(
+    ffi.Pointer<Sound> self,
+  ) {
+    return _sound_get_waveform_data(
+      self,
+    );
+  }
+
+  late final _sound_get_waveform_dataPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<WaveformSoundData> Function(
+              ffi.Pointer<Sound>)>>('sound_get_waveform_data');
+  late final _sound_get_waveform_data = _sound_get_waveform_dataPtr.asFunction<
+      ffi.Pointer<WaveformSoundData> Function(ffi.Pointer<Sound>)>();
+
+  ffi.Pointer<NoiseSoundData> sound_get_noise_data(
+    ffi.Pointer<Sound> self,
+  ) {
+    return _sound_get_noise_data(
+      self,
+    );
+  }
+
+  late final _sound_get_noise_dataPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<NoiseSoundData> Function(
+              ffi.Pointer<Sound>)>>('sound_get_noise_data');
+  late final _sound_get_noise_data = _sound_get_noise_dataPtr
+      .asFunction<ffi.Pointer<NoiseSoundData> Function(ffi.Pointer<Sound>)>();
+
+  ffi.Pointer<PulseSoundData> sound_get_pulse_data(
+    ffi.Pointer<Sound> self,
+  ) {
+    return _sound_get_pulse_data(
+      self,
+    );
+  }
+
+  late final _sound_get_pulse_dataPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<PulseSoundData> Function(
+              ffi.Pointer<Sound>)>>('sound_get_pulse_data');
+  late final _sound_get_pulse_data = _sound_get_pulse_dataPtr
+      .asFunction<ffi.Pointer<PulseSoundData> Function(ffi.Pointer<Sound>)>();
 
   ffi.Pointer<Engine> engine_alloc() {
     return _engine_alloc();
@@ -261,296 +629,233 @@ class MinisoundFfiBindings {
   int engine_load_sound(
     ffi.Pointer<Engine> self,
     ffi.Pointer<Sound> sound,
-    ffi.Pointer<ffi.Float> data,
+    ffi.Pointer<ffi.Uint8> data,
     int data_size,
-    int sound_format,
-    int channels,
-    int sample_rate,
   ) {
     return _engine_load_sound(
       self,
       sound,
       data,
       data_size,
-      sound_format,
-      channels,
-      sample_rate,
     );
   }
 
   late final _engine_load_soundPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(
-              ffi.Pointer<Engine>,
-              ffi.Pointer<Sound>,
-              ffi.Pointer<ffi.Float>,
-              ffi.Size,
-              ffi.Int32,
-              ffi.Uint32,
-              ffi.Uint32)>>('engine_load_sound');
+          ffi.Int32 Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>,
+              ffi.Pointer<ffi.Uint8>, ffi.Size)>>('engine_load_sound');
   late final _engine_load_sound = _engine_load_soundPtr.asFunction<
       int Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>,
-          ffi.Pointer<ffi.Float>, int, int, int, int)>();
+          ffi.Pointer<ffi.Uint8>, int)>();
 
-  ffi.Pointer<Generator> generator_create() {
-    return _generator_create();
-  }
-
-  late final _generator_createPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<Generator> Function()>>(
-          'generator_create');
-  late final _generator_create =
-      _generator_createPtr.asFunction<ffi.Pointer<Generator> Function()>();
-
-  int generator_init(
-    ffi.Pointer<Generator> self,
-    int sound_format,
-    int channels,
-    int sample_rate,
-    double buffer_len_s,
-  ) {
-    return _generator_init(
-      self,
-      sound_format,
-      channels,
-      sample_rate,
-      buffer_len_s,
-    );
-  }
-
-  late final _generator_initPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Int32, ffi.Uint32,
-              ffi.Uint32, ffi.Float)>>('generator_init');
-  late final _generator_init = _generator_initPtr.asFunction<
-      int Function(ffi.Pointer<Generator>, int, int, int, double)>();
-
-  void generator_uninit(
-    ffi.Pointer<Generator> self,
-  ) {
-    return _generator_uninit(
-      self,
-    );
-  }
-
-  late final _generator_uninitPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<Generator>)>>(
-          'generator_uninit');
-  late final _generator_uninit =
-      _generator_uninitPtr.asFunction<void Function(ffi.Pointer<Generator>)>();
-
-  double generator_get_volume(
-    ffi.Pointer<Generator> self,
-  ) {
-    return _generator_get_volume(
-      self,
-    );
-  }
-
-  late final _generator_get_volumePtr =
-      _lookup<ffi.NativeFunction<ffi.Float Function(ffi.Pointer<Generator>)>>(
-          'generator_get_volume');
-  late final _generator_get_volume = _generator_get_volumePtr
-      .asFunction<double Function(ffi.Pointer<Generator>)>();
-
-  void generator_set_volume(
-    ffi.Pointer<Generator> self,
-    double value,
-  ) {
-    return _generator_set_volume(
-      self,
-      value,
-    );
-  }
-
-  late final _generator_set_volumePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(
-              ffi.Pointer<Generator>, ffi.Float)>>('generator_set_volume');
-  late final _generator_set_volume = _generator_set_volumePtr
-      .asFunction<void Function(ffi.Pointer<Generator>, double)>();
-
-  int generator_set_waveform(
-    ffi.Pointer<Generator> self,
+  int engine_generate_waveform(
+    ffi.Pointer<Engine> self,
+    ffi.Pointer<Sound> sound,
     int type,
     double frequency,
-    double amplitude,
   ) {
-    return _generator_set_waveform(
+    return _engine_generate_waveform(
       self,
+      sound,
       type,
       frequency,
-      amplitude,
     );
   }
 
-  late final _generator_set_waveformPtr = _lookup<
+  late final _engine_generate_waveformPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Int32, ffi.Double,
-              ffi.Double)>>('generator_set_waveform');
-  late final _generator_set_waveform = _generator_set_waveformPtr
-      .asFunction<int Function(ffi.Pointer<Generator>, int, double, double)>();
+          ffi.Int32 Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>, ffi.Int32,
+              ffi.Double)>>('engine_generate_waveform');
+  late final _engine_generate_waveform =
+      _engine_generate_waveformPtr.asFunction<
+          int Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>, int, double)>();
 
-  int generator_set_pulsewave(
-    ffi.Pointer<Generator> generator,
+  int engine_generate_noise(
+    ffi.Pointer<Engine> self,
+    ffi.Pointer<Sound> sound,
+    int type,
+    int seed,
+  ) {
+    return _engine_generate_noise(
+      self,
+      sound,
+      type,
+      seed,
+    );
+  }
+
+  late final _engine_generate_noisePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>, ffi.Int32,
+              ffi.Int32)>>('engine_generate_noise');
+  late final _engine_generate_noise = _engine_generate_noisePtr.asFunction<
+      int Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>, int, int)>();
+
+  int engine_generate_pulse(
+    ffi.Pointer<Engine> self,
+    ffi.Pointer<Sound> sound,
     double frequency,
-    double amplitude,
     double duty_cycle,
   ) {
-    return _generator_set_pulsewave(
-      generator,
+    return _engine_generate_pulse(
+      self,
+      sound,
       frequency,
-      amplitude,
       duty_cycle,
     );
   }
 
-  late final _generator_set_pulsewavePtr = _lookup<
+  late final _engine_generate_pulsePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Double, ffi.Double,
-              ffi.Double)>>('generator_set_pulsewave');
-  late final _generator_set_pulsewave = _generator_set_pulsewavePtr.asFunction<
-      int Function(ffi.Pointer<Generator>, double, double, double)>();
+          ffi.Int32 Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>,
+              ffi.Double, ffi.Double)>>('engine_generate_pulse');
+  late final _engine_generate_pulse = _engine_generate_pulsePtr.asFunction<
+      int Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>, double, double)>();
 
-  int generator_set_noise(
-    ffi.Pointer<Generator> self,
-    int type,
-    int seed,
-    double amplitude,
+  int sizeof_recording() {
+    return _sizeof_recording();
+  }
+
+  late final _sizeof_recordingPtr =
+      _lookup<ffi.NativeFunction<ffi.Size Function()>>('sizeof_recording');
+  late final _sizeof_recording =
+      _sizeof_recordingPtr.asFunction<int Function()>();
+
+  ffi.Pointer<ffi.Uint8> recording_get_buf(
+    ffi.Pointer<Recording> self,
   ) {
-    return _generator_set_noise(
+    return _recording_get_buf(
       self,
-      type,
-      seed,
-      amplitude,
     );
   }
 
-  late final _generator_set_noisePtr = _lookup<
+  late final _recording_get_bufPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Generator>, ffi.Int32, ffi.Int32,
-              ffi.Double)>>('generator_set_noise');
-  late final _generator_set_noise = _generator_set_noisePtr
-      .asFunction<int Function(ffi.Pointer<Generator>, int, int, double)>();
+          ffi.Pointer<ffi.Uint8> Function(
+              ffi.Pointer<Recording>)>>('recording_get_buf');
+  late final _recording_get_buf = _recording_get_bufPtr
+      .asFunction<ffi.Pointer<ffi.Uint8> Function(ffi.Pointer<Recording>)>();
 
-  int generator_start(
-    ffi.Pointer<Generator> self,
+  int recording_get_size(
+    ffi.Pointer<Recording> self,
   ) {
-    return _generator_start(
+    return _recording_get_size(
       self,
     );
   }
 
-  late final _generator_startPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<Generator>)>>(
-          'generator_start');
-  late final _generator_start =
-      _generator_startPtr.asFunction<int Function(ffi.Pointer<Generator>)>();
+  late final _recording_get_sizePtr =
+      _lookup<ffi.NativeFunction<ffi.Size Function(ffi.Pointer<Recording>)>>(
+          'recording_get_size');
+  late final _recording_get_size =
+      _recording_get_sizePtr.asFunction<int Function(ffi.Pointer<Recording>)>();
 
-  void generator_stop(
-    ffi.Pointer<Generator> self,
+  ffi.Pointer<RecorderBuffer> recorder_buffer_alloc() {
+    return _recorder_buffer_alloc();
+  }
+
+  late final _recorder_buffer_allocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<RecorderBuffer> Function()>>(
+          'recorder_buffer_alloc');
+  late final _recorder_buffer_alloc = _recorder_buffer_allocPtr
+      .asFunction<ffi.Pointer<RecorderBuffer> Function()>();
+
+  int recorder_buffer_init(
+    ffi.Pointer<RecorderBuffer> self,
+    int encoding,
+    ffi.Pointer<ffi.Void> v_device,
   ) {
-    return _generator_stop(
+    return _recorder_buffer_init(
       self,
+      encoding,
+      v_device,
     );
   }
 
-  late final _generator_stopPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<Generator>)>>(
-          'generator_stop');
-  late final _generator_stop =
-      _generator_stopPtr.asFunction<void Function(ffi.Pointer<Generator>)>();
-
-  int generator_get_available_float_count(
-    ffi.Pointer<Generator> self,
-  ) {
-    return _generator_get_available_float_count(
-      self,
-    );
-  }
-
-  late final _generator_get_available_float_countPtr =
-      _lookup<ffi.NativeFunction<ffi.Size Function(ffi.Pointer<Generator>)>>(
-          'generator_get_available_float_count');
-  late final _generator_get_available_float_count =
-      _generator_get_available_float_countPtr
-          .asFunction<int Function(ffi.Pointer<Generator>)>();
-
-  int generator_load_buffer(
-    ffi.Pointer<Generator> self,
-    ffi.Pointer<ffi.Float> output,
-    int floats_to_read,
-  ) {
-    return _generator_load_buffer(
-      self,
-      output,
-      floats_to_read,
-    );
-  }
-
-  late final _generator_load_bufferPtr = _lookup<
+  late final _recorder_buffer_initPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Size Function(ffi.Pointer<Generator>, ffi.Pointer<ffi.Float>,
-              ffi.Size)>>('generator_load_buffer');
-  late final _generator_load_buffer = _generator_load_bufferPtr.asFunction<
-      int Function(ffi.Pointer<Generator>, ffi.Pointer<ffi.Float>, int)>();
+          ffi.Int32 Function(ffi.Pointer<RecorderBuffer>, ffi.Int32,
+              ffi.Pointer<ffi.Void>)>>('recorder_buffer_init');
+  late final _recorder_buffer_init = _recorder_buffer_initPtr.asFunction<
+      int Function(ffi.Pointer<RecorderBuffer>, int, ffi.Pointer<ffi.Void>)>();
 
-  ffi.Pointer<Recorder> recorder_create() {
-    return _recorder_create();
+  void recorder_buffer_uninit(
+    ffi.Pointer<RecorderBuffer> self,
+  ) {
+    return _recorder_buffer_uninit(
+      self,
+    );
   }
 
-  late final _recorder_createPtr =
+  late final _recorder_buffer_uninitPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(ffi.Pointer<RecorderBuffer>)>>(
+      'recorder_buffer_uninit');
+  late final _recorder_buffer_uninit = _recorder_buffer_uninitPtr
+      .asFunction<void Function(ffi.Pointer<RecorderBuffer>)>();
+
+  int recorder_buffer_write(
+    ffi.Pointer<RecorderBuffer> self,
+    ffi.Pointer<ffi.Uint8> data,
+    int data_len_pcm,
+  ) {
+    return _recorder_buffer_write(
+      self,
+      data,
+      data_len_pcm,
+    );
+  }
+
+  late final _recorder_buffer_writePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(ffi.Pointer<RecorderBuffer>,
+              ffi.Pointer<ffi.Uint8>, ffi.Size)>>('recorder_buffer_write');
+  late final _recorder_buffer_write = _recorder_buffer_writePtr.asFunction<
+      int Function(ffi.Pointer<RecorderBuffer>, ffi.Pointer<ffi.Uint8>, int)>();
+
+  Recording recorder_buffer_consume(
+    ffi.Pointer<RecorderBuffer> self,
+  ) {
+    return _recorder_buffer_consume(
+      self,
+    );
+  }
+
+  late final _recorder_buffer_consumePtr = _lookup<
+          ffi.NativeFunction<Recording Function(ffi.Pointer<RecorderBuffer>)>>(
+      'recorder_buffer_consume');
+  late final _recorder_buffer_consume = _recorder_buffer_consumePtr
+      .asFunction<Recording Function(ffi.Pointer<RecorderBuffer>)>();
+
+  ffi.Pointer<Recorder> recorder_alloc() {
+    return _recorder_alloc();
+  }
+
+  late final _recorder_allocPtr =
       _lookup<ffi.NativeFunction<ffi.Pointer<Recorder> Function()>>(
-          'recorder_create');
-  late final _recorder_create =
-      _recorder_createPtr.asFunction<ffi.Pointer<Recorder> Function()>();
+          'recorder_alloc');
+  late final _recorder_alloc =
+      _recorder_allocPtr.asFunction<ffi.Pointer<Recorder> Function()>();
 
-  int recorder_init_file(
+  int recorder_init(
     ffi.Pointer<Recorder> self,
-    ffi.Pointer<ffi.Char> filename,
+    int format,
+    int channel_count,
     int sample_rate,
-    int channels,
-    int sound_format,
   ) {
-    return _recorder_init_file(
+    return _recorder_init(
       self,
-      filename,
+      format,
+      channel_count,
       sample_rate,
-      channels,
-      sound_format,
     );
   }
 
-  late final _recorder_init_filePtr = _lookup<
+  late final _recorder_initPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Recorder>, ffi.Pointer<ffi.Char>,
-              ffi.Uint32, ffi.Uint32, ffi.Int32)>>('recorder_init_file');
-  late final _recorder_init_file = _recorder_init_filePtr.asFunction<
-      int Function(
-          ffi.Pointer<Recorder>, ffi.Pointer<ffi.Char>, int, int, int)>();
-
-  int recorder_init_stream(
-    ffi.Pointer<Recorder> self,
-    int sample_rate,
-    int channels,
-    int sound_format,
-    double buffer_duration_seconds,
-  ) {
-    return _recorder_init_stream(
-      self,
-      sample_rate,
-      channels,
-      sound_format,
-      buffer_duration_seconds,
-    );
-  }
-
-  late final _recorder_init_streamPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Recorder>, ffi.Uint32, ffi.Uint32,
-              ffi.Int32, ffi.Float)>>('recorder_init_stream');
-  late final _recorder_init_stream = _recorder_init_streamPtr
-      .asFunction<int Function(ffi.Pointer<Recorder>, int, int, int, double)>();
+          ffi.Int32 Function(ffi.Pointer<Recorder>, ffi.Int32, ffi.Uint32,
+              ffi.Uint32)>>('recorder_init');
+  late final _recorder_init = _recorder_initPtr
+      .asFunction<int Function(ffi.Pointer<Recorder>, int, int, int)>();
 
   void recorder_uninit(
     ffi.Pointer<Recorder> self,
@@ -582,19 +887,22 @@ class MinisoundFfiBindings {
 
   int recorder_start(
     ffi.Pointer<Recorder> self,
+    int encoding,
   ) {
     return _recorder_start(
       self,
+      encoding,
     );
   }
 
-  late final _recorder_startPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<Recorder>)>>(
-          'recorder_start');
+  late final _recorder_startPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int32 Function(
+              ffi.Pointer<Recorder>, ffi.Int32)>>('recorder_start');
   late final _recorder_start =
-      _recorder_startPtr.asFunction<int Function(ffi.Pointer<Recorder>)>();
+      _recorder_startPtr.asFunction<int Function(ffi.Pointer<Recorder>, int)>();
 
-  void recorder_stop(
+  Recording recorder_stop(
     ffi.Pointer<Recorder> self,
   ) {
     return _recorder_stop(
@@ -603,57 +911,13 @@ class MinisoundFfiBindings {
   }
 
   late final _recorder_stopPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<Recorder>)>>(
+      _lookup<ffi.NativeFunction<Recording Function(ffi.Pointer<Recorder>)>>(
           'recorder_stop');
   late final _recorder_stop =
-      _recorder_stopPtr.asFunction<void Function(ffi.Pointer<Recorder>)>();
-
-  int recorder_get_available_float_count(
-    ffi.Pointer<Recorder> self,
-  ) {
-    return _recorder_get_available_float_count(
-      self,
-    );
-  }
-
-  late final _recorder_get_available_float_countPtr =
-      _lookup<ffi.NativeFunction<ffi.Size Function(ffi.Pointer<Recorder>)>>(
-          'recorder_get_available_float_count');
-  late final _recorder_get_available_float_count =
-      _recorder_get_available_float_countPtr
-          .asFunction<int Function(ffi.Pointer<Recorder>)>();
-
-  int recorder_load_buffer(
-    ffi.Pointer<Recorder> self,
-    ffi.Pointer<ffi.Float> output,
-    int floats_to_read,
-  ) {
-    return _recorder_load_buffer(
-      self,
-      output,
-      floats_to_read,
-    );
-  }
-
-  late final _recorder_load_bufferPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Size Function(ffi.Pointer<Recorder>, ffi.Pointer<ffi.Float>,
-              ffi.Size)>>('recorder_load_buffer');
-  late final _recorder_load_buffer = _recorder_load_bufferPtr.asFunction<
-      int Function(ffi.Pointer<Recorder>, ffi.Pointer<ffi.Float>, int)>();
+      _recorder_stopPtr.asFunction<Recording Function(ffi.Pointer<Recorder>)>();
 }
 
-abstract class SoundFormat {
-  static const int SOUND_FORMAT_UNKNOWN = 0;
-  static const int SOUND_FORMAT_U8 = 1;
-  static const int SOUND_FORMAT_S16 = 2;
-  static const int SOUND_FORMAT_S24 = 3;
-  static const int SOUND_FORMAT_S32 = 4;
-  static const int SOUND_FORMAT_F32 = 5;
-  static const int SOUND_FORMAT_COUNT = 6;
-}
-
-final class Sound extends ffi.Opaque {}
+final class EncodedSoundData extends ffi.Opaque {}
 
 abstract class Result {
   static const int Ok = 0;
@@ -670,54 +934,56 @@ abstract class Result {
   static const int RESULT_COUNT = 11;
 }
 
+final class SoundData extends ffi.Struct {
+  external ffi.Pointer<PrivateSoundDataImpl> __vtbl;
+
+  external ffi.Pointer<ffi.Void> _self;
+}
+
+final class PrivateSoundDataImpl extends ffi.Opaque {}
+
+final class NoiseSoundData extends ffi.Opaque {}
+
+abstract class NoiseType {
+  static const int NOISE_TYPE_WHITE = 0;
+  static const int NOISE_TYPE_PINK = 1;
+  static const int NOISE_TYPE_BROWNIAN = 2;
+}
+
+final class PulseSoundData extends ffi.Opaque {}
+
+final class WaveformSoundData extends ffi.Opaque {}
+
+abstract class WaveformType {
+  static const int WAVEFORM_TYPE_SINE = 0;
+  static const int WAVEFORM_TYPE_SQUARE = 1;
+  static const int WAVEFORM_TYPE_TRIANGLE = 2;
+  static const int WAVEFORM_TYPE_SAWTOOTH = 3;
+}
+
+final class Sound extends ffi.Opaque {}
+
 final class Engine extends ffi.Opaque {}
 
-abstract class GeneratorResult {
-  static const int GENERATOR_OK = 0;
-  static const int GENERATOR_UNKNOWN_ERROR = 1;
-  static const int GENERATOR_DEVICE_INIT_ERROR = 2;
-  static const int GENERATOR_ARG_ERROR = 3;
-  static const int GENERATOR_CIRCULAR_BUFFER_INIT_ERROR = 4;
-  static const int GENERATOR_SET_TYPE_ERROR = 5;
-  static const int GENERATOR_DEVICE_START_ERROR = 6;
+final class Recording extends ffi.Struct {
+  external ffi.Pointer<ffi.Uint8> buf;
+
+  @ffi.Size()
+  external int size;
 }
 
-abstract class GeneratorType {
-  static const int GENERATOR_TYPE_WAVEFORM = 0;
-  static const int GENERATOR_TYPE_PULSEWAVE = 1;
-  static const int GENERATOR_TYPE_NOISE = 2;
-}
+final class RecorderBuffer extends ffi.Opaque {}
 
-abstract class GeneratorWaveformType {
-  static const int GENERATOR_WAVEFORM_TYPE_SINE = 0;
-  static const int GENERATOR_WAVEFORM_TYPE_SQUARE = 1;
-  static const int GENERATOR_WAVEFORM_TYPE_TRIANGLE = 2;
-  static const int GENERATOR_WAVEFORM_TYPE_SAWTOOTH = 3;
-}
-
-abstract class GeneratorNoiseType {
-  static const int GENERATOR_NOISE_TYPE_WHITE = 0;
-  static const int GENERATOR_NOISE_TYPE_PINK = 1;
-  static const int GENERATOR_NOISE_TYPE_BROWNIAN = 2;
-}
-
-final class Generator extends ffi.Opaque {}
-
-abstract class RecorderResult {
-  static const int RECORDER_OK = 0;
-  static const int RECORDER_ERROR_UNKNOWN = 1;
-  static const int RECORDER_ERROR_OUT_OF_MEMORY = 2;
-  static const int RECORDER_ERROR_INVALID_ARGUMENT = 3;
-  static const int RECORDER_ERROR_ALREADY_RECORDING = 4;
-  static const int RECORDER_ERROR_NOT_RECORDING = 5;
-  static const int RECORDER_ERROR_INVALID_FORMAT = 6;
-  static const int RECORDER_ERROR_INVALID_CHANNELS = 7;
+abstract class RecordingEncoding {
+  static const int RECORDING_ENCODING_WAV = 1;
 }
 
 final class Recorder extends ffi.Opaque {}
 
-const int __bool_true_false_are_defined = 1;
-
-const int true1 = 1;
-
-const int false1 = 0;
+abstract class RecorderFormat {
+  static const int RECORDER_FORMAT_U8 = 1;
+  static const int RECORDER_FORMAT_S16 = 2;
+  static const int RECORDER_FORMAT_S24 = 3;
+  static const int RECORDER_FORMAT_S32 = 4;
+  static const int RECORDER_FORMAT_F32 = 5;
+}

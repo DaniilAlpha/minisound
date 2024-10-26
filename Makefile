@@ -3,7 +3,11 @@ SHELL := /bin/bash
 
 
 SRC_DIR := ./minisound_ffi/src/
+
 WEB_BUILD_DIR := ./minisound_web/lib/build/
+
+NATIVE_TEST_SRC_DIR := ./minisound_ffi/test_native/
+NATIVE_TEST_BUILD_DIR := ./minisound_ffi/test_native/build/
 
 
 help:
@@ -28,12 +32,13 @@ pubspec_release: _check_if_version_set
 	@ echo "Switching our pubspecs : release $(VER)..."
 	@ python update_pubspecs.py $(VER) --release
 
+
 _init_submodules:
 	git submodule update --init --recursive
 
 build_web_lib: _init_submodules
 	@ echo "Building ffi lib to web via emscripten..."
-	@ emcmake cmake -S $(SRC_DIR) -B $(WEB_BUILD_DIR)/cmake_stuff/ && cmake --build $(WEB_BUILD_DIR)/cmake_stuff/
+	@ emcmake cmake -S $(SRC_DIR) -B $(WEB_BUILD_DIR)/cmake_stuff/ --log-level=$(CMAKE_LOG_LEVEL) && cmake --build $(WEB_BUILD_DIR)/cmake_stuff/
 
 clean_web_lib:
 	@ echo "Cleaning web lib..."
@@ -42,3 +47,11 @@ ifeq ($(OS),Windows_NT)
 else
 	@ rm -rf $(WEB_BUILD_DIR)/*
 endif
+
+
+build_native_test:
+	@ cmake -B $(NATIVE_TEST_BUILD_DIR)/lib/ -S $(SRC_DIR) --log-level=$(CMAKE_LOG_LEVEL); cmake --build $(NATIVE_TEST_BUILD_DIR)/lib/
+	@ cmake -B $(NATIVE_TEST_BUILD_DIR) -S $(NATIVE_TEST_SRC_DIR) --log-level=$(CMAKE_LOG_LEVEL); cmake --build $(NATIVE_TEST_BUILD_DIR)
+
+clean_native_test:
+	@ rm -rf $(NATIVE_TEST_BUILD_DIR)/*

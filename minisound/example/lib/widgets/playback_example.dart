@@ -1,7 +1,6 @@
 import "dart:async";
 
 import "package:flutter/material.dart";
-import "package:minisound/engine.dart";
 import "package:minisound/engine_flutter.dart";
 
 class PlaybackExample extends StatefulWidget {
@@ -14,32 +13,22 @@ class PlaybackExample extends StatefulWidget {
 }
 
 class _PlaybackExampleState extends State<PlaybackExample> {
-  Future<Map<String, Sound>> soundsFuture = Future.delayed(
-    const Duration(seconds: 30),
-    () => Future.error(TimeoutException("Took too long to load sounds!")),
-  );
-  Sound? currentSound;
-
+  LoadedSound? currentSound;
   var loopDelay = 0.0;
 
-  Future<Map<String, Sound>> _initSounds() async {
-    final soundNames = [
+  late Future<Map<String, LoadedSound>> soundsFuture = _initSounds();
+
+  Future<Map<String, LoadedSound>> _initSounds() async {
+    const soundNames = [
       "assets/laser_shoot.wav",
+      "assets/laser_shoot_16bit.wav",
       "assets/laser_shoot.mp3",
     ];
     return Future.wait(soundNames.map(widget.engine.loadSoundAsset))
         .then((sounds) {
-      setState(() {
-        currentSound = sounds.first;
-      });
+      currentSound = sounds.first;
       return Map.fromIterables(soundNames, sounds);
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    soundsFuture = _initSounds();
   }
 
   @override
@@ -71,6 +60,8 @@ class _PlaybackExampleState extends State<PlaybackExample> {
               ),
               ElevatedButton(
                   onPressed: currentSound?.pause, child: const Text("PAUSE")),
+              ElevatedButton(
+                  onPressed: currentSound?.resume, child: const Text("RESUME")),
               ElevatedButton(
                   onPressed: currentSound?.stop, child: const Text("STOP")),
               Row(mainAxisSize: MainAxisSize.min, children: [

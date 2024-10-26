@@ -29,36 +29,92 @@ final class FfiEngine implements PlatformEngine {
   }
 
   @override
-  Future<PlatformSound> loadSound(AudioData audioData) async {
-    final dataPtr =
-        malloc.allocate<Float>(audioData.buffer.length * sizeOf<Float>());
+  Future<FfiEncodedSound> loadSound(TypedData data) async {
+    final sound = _bindings.sound_alloc();
+    if (sound == nullptr) throw MinisoundPlatformOutOfMemoryException();
+
+    final dataLength = data.lengthInBytes;
+    final dataPtr = malloc.allocate<Uint8>(dataLength);
     if (dataPtr == nullptr) {
+      malloc.free(sound);
       throw MinisoundPlatformOutOfMemoryException();
     }
 
-    dataPtr.copy(audioData.buffer);
+    dataPtr.copy(data);
 
-    final sound = _bindings.sound_alloc();
-    if (sound == nullptr) {
+    final r = _bindings.engine_load_sound(_self, sound, dataPtr, dataLength);
+    if (r != c.Result.Ok) {
+      malloc.free(sound);
       malloc.free(dataPtr);
-      throw MinisoundPlatformException("Failed to allocate a sound.");
+      throw MinisoundPlatformException("Failed to load a sound (code: $r).");
     }
 
-    final r = _bindings.engine_load_sound(
-      _self,
-      sound,
-      dataPtr,
-      audioData.buffer.lengthInBytes,
-      audioData.format.toC(),
-      audioData.channels,
-      audioData.sampleRate,
-    );
+    return FfiEncodedSound._(sound, data: dataPtr);
+  }
+
+  @override
+  FfiWaveformSound generateWaveform({
+    required WaveformType type,
+    required double freq,
+  }) {
+    final sound = _bindings.sound_alloc();
+    if (sound == nullptr) throw MinisoundPlatformOutOfMemoryException();
+
+    final r =
+        _bindings.engine_generate_waveform(_self, sound, type.toC(), freq);
     if (r != c.Result.Ok) {
-      malloc.free(dataPtr);
       malloc.free(sound);
       throw MinisoundPlatformException("Failed to load a sound (code: $r).");
     }
 
-    return FfiSound._fromPtrs(sound, dataPtr);
+    return FfiWaveformSound._(sound, type: type, freq: freq);
   }
+
+  @override
+  FfiNoiseSound generateNoise({required NoiseType type, required int seed}) {
+    final sound = _bindings.sound_alloc();
+    if (sound == nullptr) throw MinisoundPlatformOutOfMemoryException();
+
+    final r = _bindings.engine_generate_noise(_self, sound, type.toC(), seed);
+    if (r != c.Result.Ok) {
+      malloc.free(sound);
+      throw MinisoundPlatformException("Failed to load a sound (code: $r).");
+    }
+
+    return FfiNoiseSound._(sound, type: type, seed: seed);
+  }
+
+  @override
+  FfiPulseSound generatePulse({
+    required double freq,
+    required double dutyCycle,
+  }) {
+    final sound = _bindings.sound_alloc();
+    if (sound == nullptr) throw MinisoundPlatformOutOfMemoryException();
+
+    final r = _bindings.engine_generate_pulse(_self, sound, freq, dutyCycle);
+    if (r != c.Result.Ok) {
+      malloc.free(sound);
+      throw MinisoundPlatformException("Failed to load a sound (code: $r).");
+    }
+
+    return FfiPulseSound._(sound, freq: freq, dutyCycle: dutyCycle);
+  }
+}
+
+extension on WaveformType {
+  int toC() => switch (this) {
+        WaveformType.sine => c.WaveformType.WAVEFORM_TYPE_SINE,
+        WaveformType.square => c.WaveformType.WAVEFORM_TYPE_SQUARE,
+        WaveformType.triangle => c.WaveformType.WAVEFORM_TYPE_TRIANGLE,
+        WaveformType.sawtooth => c.WaveformType.WAVEFORM_TYPE_SAWTOOTH,
+      };
+}
+
+extension on NoiseType {
+  int toC() => switch (this) {
+        NoiseType.white => c.NoiseType.NOISE_TYPE_WHITE,
+        NoiseType.pink => c.NoiseType.NOISE_TYPE_PINK,
+        NoiseType.brownian => c.NoiseType.NOISE_TYPE_BROWNIAN,
+      };
 }

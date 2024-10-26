@@ -32,28 +32,28 @@ file(GLOB_RECURSE MAIN_SOURCES
     ${MAIN_PATH}/src/*.c
     ${MAIN_PATH}/external/*/src/*.c
 )
-target_sources(${MAIN_LIB} PUBLIC ${MAIN_SOURCES})
+target_sources(${MAIN_LIB} PRIVATE ${MAIN_SOURCES})
 
 # Includes
 # file(GLOB_RECURSE MAIN_INCLUDES LIST_DIRECTORIES TRUE
 #     ${MAIN_PATH}/external/*/include/
 # )
-# message(FATAL_ERROR ${MAIN_INCLUDES})
 # list(APPEND MAIN_INCLUDES ${MAIN_PATH}/include/)
-# target_include_directories(${MAIN_LIB} PUBLIC ${MAIN_INCLUDES})
+# target_include_directories(${MAIN_LIB} PRIVATE ${MAIN_INCLUDES})
 
 
 # Definitions
-target_compile_definitions(${MAIN_LIB} PUBLIC DART_SHARED_LIB
+target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB
     # ours
     MILO_DEFAULT_LVL=MILO_LVL_NONE
     ENGINE_MILO_LVL=MILO_LVL_NONE
     SOUND_MILO_LVL=MILO_LVL_NONE
-    GENERATOR_MILO_LVL=MILO_LVL_NONE
     RECORDER_MILO_LVL=MILO_LVL_NONE
     # miniaudio
     MA_ENABLE_ONLY_SPECIFIC_BACKENDS
-    MA_DEBUG_OUTPUT
+    MA_NO_RESOURCE_MANAGER
+
+    # MA_DEBUG_OUTPUT
 )
 
 # Platform-specific definitions
@@ -62,7 +62,7 @@ if(NOT EMSCRIPTEN)
         message(ERROR "No miniaudio backend for your platform enabled! Sound will not work!")
     endif()
 
-    target_compile_definitions(${MAIN_LIB} PUBLIC
+    target_compile_definitions(${MAIN_LIB} PRIVATE
         # windows
         MA_ENABLE_WASAPI
         # linux
@@ -73,9 +73,10 @@ if(NOT EMSCRIPTEN)
         MA_ENABLE_OPENSL
         # apple
         MA_ENABLE_COREAUDIO
+
     )
 else()
-    target_compile_definitions(${MAIN_LIB} PUBLIC
+    target_compile_definitions(${MAIN_LIB} PRIVATE
         MA_ENABLE_WEBAUDIO
         MA_ENABLE_AUDIO_WORKLETS
     )
@@ -83,32 +84,33 @@ endif()
 
 
 # Set properties
+target_compile_options(${MAIN_LIB} PRIVATE -W -Wall -Wextra -Wformat -Wno-unused-function)
+
 if(NOT EMSCRIPTEN)
     set_target_properties(${MAIN_LIB} PROPERTIES
         PUBLIC_HEADER include/minisound.h
         OUTPUT_NAME ${MAIN_LIB}
     )
 
-    set(COMMON_OPTIONS -O3)
-    target_compile_options(${MAIN_LIB} PUBLIC ${COMMON_OPTIONS})
-    target_link_options(${MAIN_LIB} PUBLIC ${COMMON_OPTIONS})
+    set(COMPILE_AND_LINK_OPTS -O3)
+    target_compile_options(${MAIN_LIB} PRIVATE ${COMPILE_AND_LINK_OPTS})
+    target_link_options(${MAIN_LIB} PRIVATE ${COMPILE_AND_LINK_OPTS})
     unset(COMMON_OPTIONS)
 else()
     set_target_properties(${MAIN_LIB} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${WEB_OUT_DIR}
     )
 
-    target_compile_options(${MAIN_LIB} PUBLIC -O3 -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
+    # TODO add -flto
+    target_compile_options(${MAIN_LIB} PRIVATE -O3 -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
     set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
         -O3 \
         -flto -fno-rtti -fno-exceptions \
         -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall \
         -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb \
-        -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sNO_FETCH_SUPPORT_INDEXEDDB \
-        -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=65536 \
+        -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB \
+        -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072 \
         -sSTACK_OVERFLOW_CHECK=1 \
-        \
-        -fsanitize=address \
     ")
 endif()
 
@@ -158,3 +160,4 @@ endif()
 if(ANDROID)
     target_link_libraries(${MAIN_LIB} OpenSLES log)
 endif()
+
