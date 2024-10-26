@@ -155,26 +155,26 @@ packages:
     dependency: transitive
     description:
       name: minisound_ffi
-      sha256: "49bc12a85e1db237953bb932d7cbcd2e0925f38fbc813f57225f6c373b3eac7f"
+      sha256: d1eeae6ad72d14f80bab89da1899537f3d92816f4e290014d3ea0c6ef3a7a7e1
       url: "https://pub.dev"
     source: hosted
-    version: "1.6.0"
+    version: "2.0.0"
   minisound_platform_interface:
     dependency: transitive
     description:
       name: minisound_platform_interface
-      sha256: "41e0a6d33bb008ba3f4c513adeb54c4aadd0e63999b127655bdcc54eedd05346"
+      sha256: b69fd7edbe381844ef12bf4d73d80b0da1e5473a9908a5a0f037216e0c8c4217
       url: "https://pub.dev"
     source: hosted
-    version: "1.6.0"
+    version: "2.0.0"
   minisound_web:
     dependency: transitive
     description:
       name: minisound_web
-      sha256: "236b9d8a51c2f22f52ec53477b1ee6aef74d24389c9b84b85d0e154a820d0ff4"
+      sha256: eb83949ca5681b63a4d92e63d219b9a9324a0925e4be7a20a3243cedb92dd3ee
       url: "https://pub.dev"
     source: hosted
-    version: "1.6.0"
+    version: "2.0.0"
   path:
     dependency: transitive
     description:
