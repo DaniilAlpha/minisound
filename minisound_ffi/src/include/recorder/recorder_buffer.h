@@ -1,19 +1,14 @@
-#ifndef RECORDING_H
-#define RECORDING_H
+#ifndef RECORDER_BUFFER_H
+#define RECORDER_BUFFER_H
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
-#include "../external/result/result.h"
+#include "../../external/result/result.h"
+#include "recording.h"
 
 typedef struct RecorderBuffer RecorderBuffer;
-
-typedef struct Recording {
-    uint8_t *buf;
-    size_t size;
-} Recording;
-
 typedef enum RecordingEncoding {
     RECORDING_ENCODING_WAV = 1,
     // RECORDING_ENCODING_FLAC,

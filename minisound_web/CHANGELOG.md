@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.0
+
+Recording and generation API got rewritten.
+Changes how automatic sound unloading works.
+
 ## 1.6.0 
 
 Fixed.

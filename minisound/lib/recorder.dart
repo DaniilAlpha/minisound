@@ -18,7 +18,7 @@ final class Recorder {
   static final _finalizer =
       Finalizer<PlatformRecorder>((recorder) => recorder.dispose());
   static final _recordingsFinalizer =
-      Finalizer<Recording>((recording) => recording.dispose());
+      Finalizer<PlatformRecording>((recording) => recording.dispose());
 
   final _recorder = PlatformRecorder();
 
@@ -64,7 +64,7 @@ final class Recorder {
   Future<Recording> stop() async {
     final platformRecording = _recorder.stop();
     final recording = Recording._(platformRecording);
-    _recordingsFinalizer.attach(this, recording);
+    _recordingsFinalizer.attach(recording, platformRecording);
     return recording;
   }
 }
@@ -76,6 +76,4 @@ final class Recording {
 
   /// Buffer that contains recorded data in a WAV format. Can be directly used to load `Sound`s from.
   Uint8List get buffer => _recording.buffer;
-
-  void dispose() => _recording.dispose();
 }

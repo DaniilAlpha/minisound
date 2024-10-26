@@ -1,4 +1,4 @@
-#include "../include/recorder_buffer.h"
+#include "../../include/recorder/recorder_buffer.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -6,8 +6,8 @@
 #include <string.h>
 
 #define MILO_LVL RECORDER_MILO_LVL
-#include "../external/milo/milo.h"
-#include "../external/miniaudio/include/miniaudio.h"
+#include "../../external/milo/milo.h"
+#include "../../external/miniaudio/include/miniaudio.h"
 
 #define RECORDING_MIN_CAP (65536)
 #define RECORDING_FADE_MS (64)

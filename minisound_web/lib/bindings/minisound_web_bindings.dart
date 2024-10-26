@@ -147,9 +147,10 @@ void pulse_sound_data_set_duty_cycle(
 final class Recorder extends Opaque {}
 
 final class Recording extends Opaque {
-  // TODO!!!
-  Pointer<Uint8> get buf => const Pointer(0);
-  int get size => 0;
+  Recording._(this.buf, this.size);
+
+  final Pointer<Uint8> buf;
+  final int size;
 }
 
 abstract class RecorderFormat {
@@ -179,7 +180,19 @@ bool recorder_get_is_recording(Pointer<Recorder> self) =>
 
 int recorder_start(Pointer<Recorder> self, int encoding) =>
     _recorder_start(self.addr, encoding);
-Recording recorder_stop(Pointer<Recorder> self) => _recorder_stop(self.addr);
+
+Recording recorder_stop(Pointer<Recorder> self) {
+  final tmpRec = malloc.allocate<Uint8>(_sizeof_recording());
+
+  _recorder_stop(self.addr, tmpRec.addr);
+  final buf = Pointer<Uint8>(_recording_get_buf(tmpRec.addr)),
+      size = _recording_get_size(tmpRec.addr);
+  final rec = Recording._(buf, size);
+
+  malloc.free(tmpRec);
+
+  return rec;
+}
 
 // *************
 // ** JS part **
@@ -188,7 +201,7 @@ Recording recorder_stop(Pointer<Recorder> self) => _recorder_stop(self.addr);
 @JS("ccall")
 external dynamic _ccall(
   String name,
-  String returnType,
+  String? returnType,
   List<String> argTypes,
   List args,
   Map opts,
@@ -305,17 +318,28 @@ Future<int> _recorder_init(
       "recorder_init",
       "number",
       ["number", "number", "number", "number"],
-      [self, sample_rate, channel_count, sample_rate],
+      [self, format, channel_count, sample_rate],
       {"async": true},
     ));
 @JS()
 external void _recorder_uninit(int self);
 
 @JS()
-// watch out: enscripten does not support `bool`
 external int _recorder_get_is_recording(int self);
 
 @JS()
 external int _recorder_start(int self, int encoding);
+void _recorder_stop(int self, int out_recording) => _ccall(
+      "recorder_stop",
+      null,
+      ["number", "number"],
+      [out_recording, self],
+      {},
+    );
+
 @JS()
-external Recording _recorder_stop(int self);
+external int _sizeof_recording();
+@JS()
+external int _recording_get_buf(int self);
+@JS()
+external int _recording_get_size(int self);

@@ -38,6 +38,7 @@ class _GenerationExampleState extends State<GenerationExample> {
           onChanged: (type) => setState(() {
             generatorType = type!;
 
+            sound?.stop();
             sound = null;
           }),
         ),

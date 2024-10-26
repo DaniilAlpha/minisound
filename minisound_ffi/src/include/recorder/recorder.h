@@ -4,9 +4,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "../external/result/result.h"
-#include "export.h"
+#include "../../external/result/result.h"
+#include "../export.h"
 #include "recorder_buffer.h"
+#include "recording.h"
 
 typedef struct Recorder Recorder;
 typedef enum RecorderFormat {

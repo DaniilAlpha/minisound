@@ -1,17 +1,15 @@
-// TODO! crashes if no device; maybe can use NULL backend?
-// web bugs:
-// - on recorder_start() : divide by zero in minisound.c:7539
+// TODO!!! the same u8 bug as generator, probably doing something wrong
 
-#include "../include/recorder.h"
+#include "../../include/recorder/recorder.h"
 
 #include <stdlib.h>
 #include <string.h>
 
-#include "../external/miniaudio/include/miniaudio.h"
-#include "../include/recorder_buffer.h"
+#include "../../external/miniaudio/include/miniaudio.h"
+#include "../../include/recorder/recorder_buffer.h"
 
 #define MILO_LVL RECORDER_MILO_LVL
-#include "../external/milo/milo.h"
+#include "../../external/milo/milo.h"
 
 /*************
  ** private **
@@ -49,7 +47,9 @@ Result recorder_init(
 ) {
     ma_device_config device_config =
         ma_device_config_init(ma_device_type_capture);
-    device_config.capture.format = (ma_format)format;
+    // TODO!!! restore when bug fixed
+    // device_config.capture.format = (ma_format)format;
+    device_config.capture.format = ma_format_u8;
     device_config.capture.channels = channel_count;
     device_config.sampleRate = sample_rate;
     device_config.dataCallback = data_callback;
