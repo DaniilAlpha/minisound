@@ -42,6 +42,3 @@ flutter:
         default_package: minisound_ffi
       web:
         default_package: minisound_web
-
-  assets:
-    - assets/laser_shoot.wav
