@@ -34,7 +34,7 @@ Result noise_sound_data_init(
     int32_t const seed
 ) {
     ma_noise_config const config = ma_noise_config_init(
-        ma_format_u8,
+        ma_format_f32,
         1,
         (ma_noise_type)type,
         seed,

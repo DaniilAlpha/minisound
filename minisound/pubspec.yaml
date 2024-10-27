@@ -1,7 +1,7 @@
 
 name: minisound
 description: A high-level real-time audio playback library based on Miniaudio.
-version: 2.0.0
+version: 2.0.1
 repository: https://github.com/DaniilAlpha/minisound/tree/master/minisound
 
 #####
@@ -20,7 +20,7 @@ dependencies:
   minisound_web: ^2.0.0
 
 dev_dependencies:
-  flutter_lints: ^2.0.1
+  flutter_lints: ^5.0.0
 
 #####
 
@@ -39,6 +39,3 @@ flutter:
         default_package: minisound_ffi
       web:
         default_package: minisound_web
-
-  assets:
-    - assets/laser_shoot.wav

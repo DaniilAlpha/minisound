@@ -34,7 +34,7 @@ final class Engine {
 
   /// Initializes the engine.
   ///
-  /// `periodMs` - affects sounds latency (lower period means lower latency but possibly jittering). Must be greater than zero.
+  /// `periodMs` - affects sounds latency (lower period means lower latency but possibble crackles). Must be greater than zero. Ignored on the web.
   Future<void> init([int periodMs = 10]) async {
     assert(periodMs > 0);
 

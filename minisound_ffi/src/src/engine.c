@@ -1,7 +1,3 @@
-/* TODO!!!
-For some reason using generated audio as data source works only
-with U8 format (i assume an incorrect buffer length computation). */
-
 #include "../include/engine.h"
 
 #include <stdbool.h>
@@ -36,7 +32,11 @@ Result engine_init(Engine *const self, uint32_t const period_ms) {
     self->is_started = false;
 
     ma_engine_config engine_config = ma_engine_config_init();
+#if (__EMSCRIPTEN__)
+    (void)period_ms;
+#else
     engine_config.periodSizeInMilliseconds = period_ms;
+#endif
     engine_config.noAutoStart = true;
     if (ma_engine_init(&engine_config, &self->engine) != MA_SUCCESS)
         return error("miniaudio engine initialization error!"), UnknownErr;

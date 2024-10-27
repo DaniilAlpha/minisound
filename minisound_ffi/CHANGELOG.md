@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1
+
+Fix strange bugs on specific audio formats on the web.
+
 ## 2.0.0
 
 Recording and generation API got rewritten.

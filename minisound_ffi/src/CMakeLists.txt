@@ -46,8 +46,8 @@ target_sources(${MAIN_LIB} PRIVATE ${MAIN_SOURCES})
 target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB
     # ours
     MILO_DEFAULT_LVL=MILO_LVL_NONE
-    ENGINE_MILO_LVL=MILO_LVL_NONE
-    SOUND_MILO_LVL=MILO_LVL_NONE
+    ENGINE_MILO_LVL=MILO_LVL_INFO
+    SOUND_MILO_LVL=MILO_LVL_INFO
     RECORDER_MILO_LVL=MILO_LVL_NONE
     # miniaudio
     MA_ENABLE_ONLY_SPECIFIC_BACKENDS
@@ -73,7 +73,6 @@ if(NOT EMSCRIPTEN)
         MA_ENABLE_OPENSL
         # apple
         MA_ENABLE_COREAUDIO
-
     )
 else()
     target_compile_definitions(${MAIN_LIB} PRIVATE
@@ -101,7 +100,6 @@ else()
         RUNTIME_OUTPUT_DIRECTORY ${WEB_OUT_DIR}
     )
 
-    # TODO add -flto
     target_compile_options(${MAIN_LIB} PRIVATE -O3 -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
     set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
         -O3 \
@@ -112,6 +110,17 @@ else()
         -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072 \
         -sSTACK_OVERFLOW_CHECK=1 \
     ")
+
+    # target_compile_options(${MAIN_LIB} PRIVATE -Og -g3 -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
+    # set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
+    #     -Og -g3 -gsource-map \
+    #     -fno-rtti -fno-exceptions \
+    #     -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall \
+    #     -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb \
+    #     -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB \
+    #     -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072 \
+    #     -sSTACK_OVERFLOW_CHECK=1 -sSAFE_HEAP \
+    # ")
 endif()
 
 
