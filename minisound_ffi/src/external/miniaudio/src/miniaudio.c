@@ -28495,7 +28495,8 @@ static EM_BOOL ma_audio_worklet_process_callback__webaudio(int inputCount, const
             /* We've read the data from the client. Now we need to deinterleave the buffer and output to the output buffer. */
             for (ma_uint32 iChannel = 0; iChannel < pDevice->playback.internalChannels; iChannel += 1) {
                 for (ma_uint32 iFrame = 0; iFrame < frameCount; iFrame += 1) {
-                    pOutputs[0].data[frameCount*iChannel + iFrame] = pDevice->webaudio.pIntermediaryBuffer[iFrame*pDevice->playback.internalChannels + iChannel];
+                    pOutputs[0].data[frameCount*iChannel + iFrame] = 
+                        pDevice->webaudio.pIntermediaryBuffer[iFrame*pDevice->playback.internalChannels + iChannel];
                 }
             }
         }

@@ -9,7 +9,7 @@
 #include <threads.h>
 
 #include "engine.h"
-#include "recorder.h"
+#include "recorder/recorder.h"
 #include "sound_data/encoded_sound_data.h"
 
 #define lenof(arr) (sizeof(arr) / sizeof(arr[0]))

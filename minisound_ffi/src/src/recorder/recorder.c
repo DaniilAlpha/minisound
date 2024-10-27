@@ -1,5 +1,3 @@
-// TODO!!! the same u8 bug as generator, probably doing something wrong
-
 #include "../../include/recorder/recorder.h"
 
 #include <stdlib.h>
@@ -47,9 +45,7 @@ Result recorder_init(
 ) {
     ma_device_config device_config =
         ma_device_config_init(ma_device_type_capture);
-    // TODO!!! restore when bug fixed
-    // device_config.capture.format = (ma_format)format;
-    device_config.capture.format = ma_format_u8;
+    device_config.capture.format = (ma_format)format;
     device_config.capture.channels = channel_count;
     device_config.sampleRate = sample_rate;
     device_config.dataCallback = data_callback;

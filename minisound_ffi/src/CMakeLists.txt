@@ -53,7 +53,7 @@ target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB
     MA_ENABLE_ONLY_SPECIFIC_BACKENDS
     MA_NO_RESOURCE_MANAGER
 
-    MA_DEBUG_OUTPUT
+    # MA_DEBUG_OUTPUT
 )
 
 # Platform-specific definitions
@@ -100,27 +100,27 @@ else()
         RUNTIME_OUTPUT_DIRECTORY ${WEB_OUT_DIR}
     )
 
-    # target_compile_options(${MAIN_LIB} PRIVATE -O3 -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
-    # set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
-    #     -O3 \
-    #     -flto -fno-rtti -fno-exceptions \
-    #     -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall \
-    #     -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb \
-    #     -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB \
-    #     -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072 \
-    #     -sSTACK_OVERFLOW_CHECK=1 \
-    # ")
-
-    target_compile_options(${MAIN_LIB} PRIVATE -Og -g3 -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
+    target_compile_options(${MAIN_LIB} PRIVATE -O3 -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
     set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
-        -Og -g3 -gsource-map \
-        -fno-rtti -fno-exceptions \
+        -O3 \
+        -flto -fno-rtti -fno-exceptions \
         -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall \
         -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb \
         -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB \
         -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072 \
-        -sSTACK_OVERFLOW_CHECK=1 -sSAFE_HEAP=1 \
+        -sSTACK_OVERFLOW_CHECK=1 \
     ")
+
+    # target_compile_options(${MAIN_LIB} PRIVATE -Og -g3 -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
+    # set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
+    #     -Og -g3 -gsource-map \
+    #     -fno-rtti -fno-exceptions \
+    #     -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall \
+    #     -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb \
+    #     -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB \
+    #     -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072 \
+    #     -sSTACK_OVERFLOW_CHECK=1 -sSAFE_HEAP \
+    # ")
 endif()
 
 

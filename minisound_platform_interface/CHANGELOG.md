@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1
+
+Upgrade dependencies.
+
 ## 2.0.0
 
 Recording and generation API got rewritten.

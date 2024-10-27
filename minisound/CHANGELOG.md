@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.0.1
+
+Fix strange bugs on specific audio formats on the web.
+Make `Sound` sub- and classes extendable from outside.
+
 ## 2.0.0
 
 Recording and generation API got rewritten.

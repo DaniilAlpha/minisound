@@ -1,6 +1,6 @@
 part of "engine.dart";
 
-sealed class Sound {
+abstract class Sound {
   Sound();
 
   PlatformSound get _sound;
@@ -32,7 +32,7 @@ sealed class Sound {
 }
 
 /// A sound loaded from some kind of source.
-final class LoadedSound extends Sound {
+class LoadedSound extends Sound {
   LoadedSound._(PlatformEncodedSound sound) : _sound = sound;
 
   @override
@@ -63,9 +63,9 @@ final class LoadedSound extends Sound {
   }
 }
 
-sealed class GeneratedSound extends Sound {}
+abstract class GeneratedSound extends Sound {}
 
-final class WaveformSound extends GeneratedSound {
+class WaveformSound extends GeneratedSound {
   WaveformSound._(PlatformWaveformSound sound) : _sound = sound;
 
   @override
@@ -79,7 +79,7 @@ final class WaveformSound extends GeneratedSound {
   set freq(double value) => _sound.freq = value < 0 ? 0 : value;
 }
 
-final class NoiseSound extends GeneratedSound {
+class NoiseSound extends GeneratedSound {
   NoiseSound._(PlatformNoiseSound sound) : _sound = sound;
 
   @override
@@ -92,7 +92,7 @@ final class NoiseSound extends GeneratedSound {
   // set seed(int value) => _sound.seed = value;
 }
 
-final class PulseSound extends GeneratedSound {
+class PulseSound extends GeneratedSound {
   PulseSound._(PlatformPulseSound sound) : _sound = sound;
 
   @override

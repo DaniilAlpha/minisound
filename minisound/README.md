@@ -2,8 +2,6 @@
 
 A high-level real-time audio playback library based on [miniaudio](https://miniaud.io). The library offers basic functionality and quite low latency. Supports MP3, WAV and FLAC formats.
 
-Run `make help` from the root project directory to get started.
-
 ## Platform support
 
 |Platform|Tested     |Supposed to work|Unsupported|
@@ -17,7 +15,7 @@ Run `make help` from the root project directory to get started.
 
 ## Migration
 
-There was some breaking changes in 2.0.0 version, see the [migration guide](#migration-guide) down below.
+There was some pretty major changes in 2.0.0 version, see the [migration guide](#migration-guide) down below.
 
 ## Getting started on the web
 
@@ -124,10 +122,7 @@ void main() async {
     sound.stop();
   }
 
-<!-- // it is recommended to unload sounds manually to prevent memory leaks -->
-<!-- sound.unload(); -->
-
-  // the engine will be automatically disposed when gets garbage-collected
+  // engine and sounds will be automatically disposed when gets garbage-collected
 }
 ```
 
@@ -160,9 +155,6 @@ void main() async {
   wave.stop();
   noise.stop();
   pulse.stop();
-
-<!-- // still required -->
-<!-- sound.unload(); -->
 }
 ```
 
@@ -188,6 +180,8 @@ void main() async {
 
   // all data is provided via buffer; sound can be used from it via `engine.loadSound(recording.buffer)`
   print(recording.buffer);
+
+  // recordings will be automatically disposed when gets garbage-collected
 }
 ```
 
@@ -202,15 +196,16 @@ void main() async {
   // remove
   // sound.unload();
 ```
-Due to this, when sound objects got garbage collected (may be immediately after or not the moment it goes out of scope), sound stops and unloads. If this happens, you are probably doing it wrong, as there no any reference to it left for you to stop it later. If it was a prior version, you would've beed successfully creating an indefenetely played sound that stops only when the engine goes out of scope. There is a possiblity to revert this behaviour via the `doAddToFinalizer` parameter to engine functions that return `Sound`s, but it is already deprecated. It you are sure that your usecase is valid, create a github issue, providing the code. Maybe this will change my mind.
+As a result, when `Sound` objects get garbage collected (which may be immediately after or not at the moment they go out of scope), they stop and unload. If you want to prevent this, you are probably doing something wrong, as this means you are creating an indefenetely played sound with no way to access it. Though this behaviour can still be disabled via the `doAddToFinalizer` parameter to sound loading and generation methods of the `Engine` class. However, it disables any finalization, so you'll need to manage `Sound`s completely yourself. If you believe your usecase is valid, create a github issue and provide the code. Maybe it will change my mind.
 
 ### 1.4.0 -> 1.6.0
 
 - The main file (`minisound.dart`) became `engine_flutter.dart`.
 ```dart
 // import "package:minisound/minisound.dart";
-// becomes
+// becomes two files
 import "package:minisound/engine_flutter.dart";
+import "package:minisound/engine.dart";
 ```
 
 ## Building the project
@@ -250,5 +245,4 @@ To manually build the project, follow these steps:
 ## TODO
 
 <!-- - [ ] Stop crash when no devices found for playback or capture -->
-<!-- - [ ] Extract buffer stuff to unified AV Buffer packages dart and C. -->
 <!-- - [ ] Switch engine init to state machine. -->
