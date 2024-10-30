@@ -33,7 +33,8 @@ Result engine_init(Engine *const self, uint32_t const period_ms) {
 
     ma_engine_config engine_config = ma_engine_config_init();
 #if (__EMSCRIPTEN__)
-    (void)period_ms;
+    // TODO!!! does not work without this. doe not work if channels are > 2
+    engine_config.periodSizeInFrames = 128 / 2;
 #else
     engine_config.periodSizeInMilliseconds = period_ms;
 #endif

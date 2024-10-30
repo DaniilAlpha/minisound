@@ -150,28 +150,28 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "2.0.0"
+    version: "2.0.1"
   minisound_ffi:
     dependency: transitive
     description:
       path: "../../minisound_ffi"
       relative: true
     source: path
-    version: "2.0.0"
+    version: "2.0.1"
   minisound_platform_interface:
     dependency: transitive
     description:
       path: "../../minisound_platform_interface"
       relative: true
     source: path
-    version: "2.0.0"
+    version: "2.0.1"
   minisound_web:
     dependency: transitive
     description:
       path: "../../minisound_web"
       relative: true
     source: path
-    version: "2.0.0"
+    version: "2.0.1"
   path:
     dependency: transitive
     description:
