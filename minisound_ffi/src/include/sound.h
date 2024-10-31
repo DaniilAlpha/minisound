@@ -15,9 +15,14 @@
 
 typedef struct Sound Sound;
 
+typedef struct ma_engine ma_engine;
+
 EXPORT Sound *sound_alloc(void);
-Result
-sound_init(Sound *const self, SoundData const sound_data, void *const v_engine);
+Result sound_init(
+    Sound *const self,
+    SoundData const sound_data,
+    ma_engine *const engine
+);
 EXPORT void sound_unload(Sound *const self);
 
 EXPORT Result sound_play(Sound *const self);

@@ -8,6 +8,8 @@
 #include "../../external/result/result.h"
 #include "recording.h"
 
+typedef struct ma_device ma_device;
+
 typedef struct RecorderBuffer RecorderBuffer;
 typedef enum RecordingEncoding {
     RECORDING_ENCODING_WAV = 1,
@@ -19,7 +21,7 @@ RecorderBuffer *recorder_buffer_alloc(void);
 Result recorder_buffer_init(
     RecorderBuffer *const self,
     RecordingEncoding const encoding,
-    void *const v_device
+    ma_device *const device
 );
 void recorder_buffer_uninit(RecorderBuffer *const self);
 

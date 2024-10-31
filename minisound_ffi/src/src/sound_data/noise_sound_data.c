@@ -35,7 +35,7 @@ Result noise_sound_data_init(
 ) {
     ma_noise_config const config = ma_noise_config_init(
         ma_format_f32,
-        1,
+        2,
         (ma_noise_type)type,
         seed,
         DEFAULT_AMPLITUDE
