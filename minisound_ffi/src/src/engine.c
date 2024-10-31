@@ -31,15 +31,16 @@ Engine *engine_alloc(void) { return malloc(sizeof(Engine)); }
 Result engine_init(Engine *const self, uint32_t const period_ms) {
     self->is_started = false;
 
-    ma_engine_config engine_config = ma_engine_config_init();
+    ma_engine_config config = ma_engine_config_init();
 #if (__EMSCRIPTEN__)
-    // TODO!!! does not work without this. doe not work if channels are > 2
-    engine_config.periodSizeInFrames = 128 / 2;
+    // TODO!!! does not work without this. probably does not work if channels
+    // are > 2
+    // engine_config.periodSizeInFrames = 128 / 2;
 #else
-    engine_config.periodSizeInMilliseconds = period_ms;
+    config.periodSizeInMilliseconds = period_ms;
 #endif
-    engine_config.noAutoStart = true;
-    if (ma_engine_init(&engine_config, &self->engine) != MA_SUCCESS)
+    config.noAutoStart = true;
+    if (ma_engine_init(&config, &self->engine) != MA_SUCCESS)
         return error("miniaudio engine initialization error!"), UnknownErr;
 
     // self->dec_config = ma_decoder_config_init(
@@ -149,4 +150,22 @@ Result engine_generate_pulse(
     );
 
     return info("pulse generated"), Ok;
+}
+
+void engine_test(uint8_t const *const data, size_t const data_size) {
+    static ma_engine engine;
+    static ma_decoder d;
+    static ma_sound sound;
+
+    info("hi");
+    ma_engine_config config = ma_engine_config_init();
+    config.periodSizeInFrames = 128 / 2;
+    // config.noAutoStart = true;
+    if (ma_engine_init(&config, &engine)) abort();
+
+    if (ma_decoder_init_memory(data, data_size, NULL, &d)) abort();
+
+    if (ma_sound_init_from_data_source(&engine, &d, 0, NULL, &sound)) abort();
+
+    if (ma_sound_start(&sound)) abort();
 }

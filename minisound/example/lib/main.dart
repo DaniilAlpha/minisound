@@ -22,7 +22,8 @@ class _ExamplePageState extends State<ExamplePage> {
   final engine = Engine();
   final recorder = Recorder();
 
-  late final initFuture = engine.init().then((_) => recorder.init());
+  late final initFuture = engine.init();
+  // .then((_) => recorder.init());
 
   @override
   Widget build(BuildContext context) {
@@ -39,11 +40,11 @@ class _ExamplePageState extends State<ExamplePage> {
                 hasError: false
               ) =>
                 Column(children: [
-                  PlaybackExample(engine),
-                  space,
-                  GenerationExample(engine),
-                  space,
-                  RecordingExample(recorder, engine: engine),
+                  // PlaybackExample(engine),
+                  // space,
+                  // GenerationExample(engine),
+                  // space,
+                  // RecordingExample(recorder, engine: engine),
                 ]),
               AsyncSnapshot(connectionState: ConnectionState.waiting) =>
                 const Center(child: CircularProgressIndicator()),

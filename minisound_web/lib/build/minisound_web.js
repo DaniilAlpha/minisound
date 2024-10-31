@@ -734,7 +734,7 @@ var tempI64;
 // end include: runtime_debug.js
 // === Body ===
 var ASM_CONSTS = {
-  40272: ($0, $1, $2, $3, $4) => {
+  40320: ($0, $1, $2, $3, $4) => {
     if (typeof window === "undefined" || (window.AudioContext || window.webkitAudioContext) === undefined) {
       return 0;
     }
@@ -805,7 +805,7 @@ var ASM_CONSTS = {
     window.miniaudio.referenceCount += 1;
     return 1;
   },
-  42430: () => {
+  42478: () => {
     if (typeof (window.miniaudio) !== "undefined") {
       window.miniaudio.referenceCount -= 1;
       if (window.miniaudio.referenceCount === 0) {
@@ -813,8 +813,8 @@ var ASM_CONSTS = {
       }
     }
   },
-  42594: () => (navigator.mediaDevices !== undefined && navigator.mediaDevices.getUserMedia !== undefined),
-  42698: () => {
+  42642: () => (navigator.mediaDevices !== undefined && navigator.mediaDevices.getUserMedia !== undefined),
+  42746: () => {
     try {
       var temp = new (window.AudioContext || window.webkitAudioContext);
       var sampleRate = temp.sampleRate;
@@ -824,12 +824,12 @@ var ASM_CONSTS = {
       return 0;
     }
   },
-  42869: ($0, $1) => miniaudio.track_device({
+  42917: ($0, $1) => miniaudio.track_device({
     webaudio: emscriptenGetAudioObject($0),
     state: 1,
     pDevice: $1
   }),
-  42971: ($0, $1) => {
+  43019: ($0, $1) => {
     var getUserMediaResult = 0;
     var audioWorklet = emscriptenGetAudioObject($0);
     var audioContext = emscriptenGetAudioObject($1);
@@ -847,14 +847,14 @@ var ASM_CONSTS = {
     });
     return getUserMediaResult;
   },
-  43533: ($0, $1) => {
+  43581: ($0, $1) => {
     var audioWorklet = emscriptenGetAudioObject($0);
     var audioContext = emscriptenGetAudioObject($1);
     audioWorklet.connect(audioContext.destination);
     return 0;
   },
-  43693: $0 => emscriptenGetAudioObject($0).sampleRate,
-  43745: $0 => {
+  43741: $0 => emscriptenGetAudioObject($0).sampleRate,
+  43793: $0 => {
     var device = miniaudio.get_device_by_index($0);
     if (device.streamNode !== undefined) {
       device.streamNode.disconnect();
@@ -862,15 +862,15 @@ var ASM_CONSTS = {
     }
     device.pDevice = undefined;
   },
-  43929: $0 => {
+  43977: $0 => {
     miniaudio.untrack_device_by_index($0);
   },
-  43972: $0 => {
+  44020: $0 => {
     var device = miniaudio.get_device_by_index($0);
     device.webaudio.resume();
     device.state = miniaudio.device_state.started;
   },
-  44097: $0 => {
+  44145: $0 => {
     var device = miniaudio.get_device_by_index($0);
     device.webaudio.suspend();
     device.state = miniaudio.device_state.stopped;
@@ -1204,6 +1204,10 @@ function syscallGetVarargI() {
 function ___syscall_openat(dirfd, path, flags, varargs) {
   SYSCALLS.varargs = varargs;
 }
+
+var __abort_js = () => {
+  abort("");
+};
 
 var readEmAsmArgsArray = [];
 
@@ -1953,6 +1957,7 @@ var wasmImports = {
   /** @export */ __syscall_fcntl64: ___syscall_fcntl64,
   /** @export */ __syscall_ioctl: ___syscall_ioctl,
   /** @export */ __syscall_openat: ___syscall_openat,
+  /** @export */ _abort_js: __abort_js,
   /** @export */ alignfault,
   /** @export */ emscripten_asm_const_int: _emscripten_asm_const_int,
   /** @export */ emscripten_create_audio_context: _emscripten_create_audio_context,
@@ -2005,6 +2010,8 @@ var _engine_generate_waveform = Module["_engine_generate_waveform"] = (a0, a1, a
 var _engine_generate_noise = Module["_engine_generate_noise"] = (a0, a1, a2, a3) => (_engine_generate_noise = Module["_engine_generate_noise"] = wasmExports["engine_generate_noise"])(a0, a1, a2, a3);
 
 var _engine_generate_pulse = Module["_engine_generate_pulse"] = (a0, a1, a2, a3) => (_engine_generate_pulse = Module["_engine_generate_pulse"] = wasmExports["engine_generate_pulse"])(a0, a1, a2, a3);
+
+var _engine_test = Module["_engine_test"] = (a0, a1) => (_engine_test = Module["_engine_test"] = wasmExports["engine_test"])(a0, a1);
 
 var _recorder_alloc = Module["_recorder_alloc"] = () => (_recorder_alloc = Module["_recorder_alloc"] = wasmExports["recorder_alloc"])();
 

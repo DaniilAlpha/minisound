@@ -6,6 +6,18 @@ final class WebEngine implements PlatformEngine {
   final Pointer<c.Engine> _self;
 
   @override
+  @deprecated
+  Future<void> test(TypedData data) async {
+    final dataSize = data.lengthInBytes;
+    final dataPtr = malloc.allocate<Uint8>(dataSize);
+    if (dataPtr == nullptr) throw MinisoundPlatformOutOfMemoryException();
+
+    dataPtr.copy(data);
+
+    await c.engine_test(dataPtr, dataSize);
+  }
+
+  @override
   Future<void> init(int periodMs) async {
     final r = await c.engine_init(_self, periodMs);
     if (r != c.Result.Ok) {

@@ -44,5 +44,6 @@ EXPORT Result engine_generate_pulse(
     double const frequency,
     double const duty_cycle
 );
+EXPORT void engine_test(uint8_t const *const data, size_t const data_size);
 
 #endif

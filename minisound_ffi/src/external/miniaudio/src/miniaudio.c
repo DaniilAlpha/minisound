@@ -30226,6 +30226,7 @@ MA_API ma_result ma_device_init(ma_context* pContext, const ma_device_config* pC
     ma_device_descriptor descriptorPlayback;
     ma_device_descriptor descriptorCapture;
 
+
     /* The context can be null, in which case we self-manage it. */
     if (pContext == NULL) {
         return ma_device_init_ex(NULL, 0, NULL, pConfig, pDevice);
@@ -30483,6 +30484,7 @@ MA_API ma_result ma_device_init(ma_context* pContext, const ma_device_config* pC
     If we're using fixed sized callbacks we'll need to make use of an intermediary buffer. Needs to
     be done after post_init_setup() because we'll need access to the sample rate.
     */
+    printf("========== %s, %u, %u, %i\n", pConfig->noFixedSizedCallback ? "true" : "false", pConfig->periodSizeInFrames, pConfig->periodSizeInMilliseconds, pConfig->deviceType);
     if (pConfig->noFixedSizedCallback == MA_FALSE) {
         /* We're using a fixed sized data callback so we'll need an intermediary buffer. */
         ma_uint32 intermediaryBufferCap = pConfig->periodSizeInFrames;
