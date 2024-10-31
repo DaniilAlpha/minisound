@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.2
+
+Fix more strange playback bugs.
+
 ## 2.0.1
 
 Fix strange bugs on specific audio formats on the web.
