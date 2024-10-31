@@ -83,10 +83,8 @@ RecorderBuffer *recorder_buffer_alloc(void) {
 Result recorder_buffer_init(
     RecorderBuffer *const self,
     RecordingEncoding const encoding,
-    void *const v_device
+    ma_device *const device
 ) {
-    ma_device const *const device = v_device;
-
     self->buf = malloc(RECORDING_MIN_CAP);
     if (self->buf == NULL) return OutOfMemErr;
 

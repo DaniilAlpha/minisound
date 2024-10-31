@@ -40,8 +40,8 @@ final class Engine {
 
     if (_isInit) return;
 
-    await _engine.init(periodMs);
     _isInit = true;
+    await _engine.init(periodMs);
   }
 
   /// Starts the engine.

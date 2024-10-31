@@ -1,5 +1,3 @@
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -88,6 +86,8 @@ MiunteResult test_encoded_sounds() {
         "./minisound/example/assets/laser_shoot.wav",
         "./minisound/example/assets/laser_shoot_16bit.wav",
         "./minisound/example/assets/laser_shoot.mp3",
+        "./minisound/example/assets/00_plus.mp3",
+        "./minisound/example/assets/kevin_macleod_call_to_adventure.mp3",
     };
     for (size_t i = 0; i < lenof(paths); i++) {
         Sound *const sound = sound_alloc();

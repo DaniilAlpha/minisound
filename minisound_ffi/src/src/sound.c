@@ -20,15 +20,16 @@ Sound *sound_alloc(void) { return malloc(sizeof(Sound)); }
 Result sound_init(
     Sound *const self,
     SoundData const sound_data,
-    void *const v_engine
+    ma_engine *const engine
 ) {
     self->sound_data = sound_data;
-    self->engine = v_engine;
+    self->engine = engine;
 
     ma_result const r = ma_sound_init_from_data_source(
         self->engine,
         sound_data_get_ds(&self->sound_data),
         MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION,
+        NULL,
         NULL,
         &self->sound
     );

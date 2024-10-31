@@ -50,7 +50,13 @@ Result encoded_sound_data_init(
                ),
                UnknownErr;
 
-    return info("encoded sound data initialized"), Ok;
+    return info(
+               "encoded sound data initialized (format : %i, channel count : %u, sample rate : %u)",
+               self->decoder.outputFormat,
+               self->decoder.outputChannels,
+               self->decoder.outputSampleRate
+           ),
+           Ok;
 }
 void encoded_sound_data_uninit(EncodedSoundData *const self) {
     ma_decoder_uninit(&self->decoder);

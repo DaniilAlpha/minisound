@@ -7,6 +7,7 @@
 // ignore_for_file: unused_element, unused_field
 
 @JS("Module")
+// ignore: unnecessary_library_name
 library minisound;
 
 import "package:js/js.dart";

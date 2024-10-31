@@ -38,21 +38,21 @@ class MinisoundFfiBindings {
   late final _encoded_sound_data_alloc = _encoded_sound_data_allocPtr
       .asFunction<ffi.Pointer<EncodedSoundData> Function()>();
 
-  int encoded_sound_data_init(
+  Result encoded_sound_data_init(
     ffi.Pointer<EncodedSoundData> self,
     ffi.Pointer<ffi.Uint8> data,
     int data_size,
   ) {
-    return _encoded_sound_data_init(
+    return Result.fromValue(_encoded_sound_data_init(
       self,
       data,
       data_size,
-    );
+    ));
   }
 
   late final _encoded_sound_data_initPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<EncodedSoundData>,
+          ffi.UnsignedInt Function(ffi.Pointer<EncodedSoundData>,
               ffi.Pointer<ffi.Uint8>, ffi.Size)>>('encoded_sound_data_init');
   late final _encoded_sound_data_init = _encoded_sound_data_initPtr.asFunction<
       int Function(
@@ -132,21 +132,21 @@ class MinisoundFfiBindings {
   late final _noise_sound_data_alloc = _noise_sound_data_allocPtr
       .asFunction<ffi.Pointer<NoiseSoundData> Function()>();
 
-  int noise_sound_data_init(
+  Result noise_sound_data_init(
     ffi.Pointer<NoiseSoundData> self,
-    int type,
+    NoiseType type,
     int seed,
   ) {
-    return _noise_sound_data_init(
+    return Result.fromValue(_noise_sound_data_init(
       self,
-      type,
+      type.value,
       seed,
-    );
+    ));
   }
 
   late final _noise_sound_data_initPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<NoiseSoundData>, ffi.Int32,
+          ffi.UnsignedInt Function(ffi.Pointer<NoiseSoundData>, ffi.UnsignedInt,
               ffi.Int32)>>('noise_sound_data_init');
   late final _noise_sound_data_init = _noise_sound_data_initPtr
       .asFunction<int Function(ffi.Pointer<NoiseSoundData>, int, int)>();
@@ -207,21 +207,21 @@ class MinisoundFfiBindings {
   late final _pulse_sound_data_alloc = _pulse_sound_data_allocPtr
       .asFunction<ffi.Pointer<PulseSoundData> Function()>();
 
-  int pulse_sound_data_init(
+  Result pulse_sound_data_init(
     ffi.Pointer<PulseSoundData> self,
     double frequency,
     double duty_cycle,
   ) {
-    return _pulse_sound_data_init(
+    return Result.fromValue(_pulse_sound_data_init(
       self,
       frequency,
       duty_cycle,
-    );
+    ));
   }
 
   late final _pulse_sound_data_initPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<PulseSoundData>, ffi.Double,
+          ffi.UnsignedInt Function(ffi.Pointer<PulseSoundData>, ffi.Double,
               ffi.Double)>>('pulse_sound_data_init');
   late final _pulse_sound_data_init = _pulse_sound_data_initPtr
       .asFunction<int Function(ffi.Pointer<PulseSoundData>, double, double)>();
@@ -300,22 +300,22 @@ class MinisoundFfiBindings {
   late final _waveform_sound_data_alloc = _waveform_sound_data_allocPtr
       .asFunction<ffi.Pointer<WaveformSoundData> Function()>();
 
-  int waveform_sound_data_init(
+  Result waveform_sound_data_init(
     ffi.Pointer<WaveformSoundData> self,
-    int type,
+    WaveformType type,
     double frequency,
   ) {
-    return _waveform_sound_data_init(
+    return Result.fromValue(_waveform_sound_data_init(
       self,
-      type,
+      type.value,
       frequency,
-    );
+    ));
   }
 
   late final _waveform_sound_data_initPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<WaveformSoundData>, ffi.Int32,
-              ffi.Double)>>('waveform_sound_data_init');
+          ffi.UnsignedInt Function(ffi.Pointer<WaveformSoundData>,
+              ffi.UnsignedInt, ffi.Double)>>('waveform_sound_data_init');
   late final _waveform_sound_data_init = _waveform_sound_data_initPtr
       .asFunction<int Function(ffi.Pointer<WaveformSoundData>, int, double)>();
 
@@ -336,18 +336,18 @@ class MinisoundFfiBindings {
 
   void waveform_sound_data_set_type(
     ffi.Pointer<WaveformSoundData> self,
-    int value,
+    WaveformType value,
   ) {
     return _waveform_sound_data_set_type(
       self,
-      value,
+      value.value,
     );
   }
 
   late final _waveform_sound_data_set_typePtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(ffi.Pointer<WaveformSoundData>,
-              ffi.Int32)>>('waveform_sound_data_set_type');
+              ffi.UnsignedInt)>>('waveform_sound_data_set_type');
   late final _waveform_sound_data_set_type = _waveform_sound_data_set_typePtr
       .asFunction<void Function(ffi.Pointer<WaveformSoundData>, int)>();
 
@@ -393,21 +393,21 @@ class MinisoundFfiBindings {
   late final _sound_alloc =
       _sound_allocPtr.asFunction<ffi.Pointer<Sound> Function()>();
 
-  int sound_init(
+  Result sound_init(
     ffi.Pointer<Sound> self,
     SoundData sound_data,
     ffi.Pointer<ffi.Void> v_engine,
   ) {
-    return _sound_init(
+    return Result.fromValue(_sound_init(
       self,
       sound_data,
       v_engine,
-    );
+    ));
   }
 
   late final _sound_initPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Sound>, SoundData,
+          ffi.UnsignedInt Function(ffi.Pointer<Sound>, SoundData,
               ffi.Pointer<ffi.Void>)>>('sound_init');
   late final _sound_init = _sound_initPtr.asFunction<
       int Function(ffi.Pointer<Sound>, SoundData, ffi.Pointer<ffi.Void>)>();
@@ -426,16 +426,16 @@ class MinisoundFfiBindings {
   late final _sound_unload =
       _sound_unloadPtr.asFunction<void Function(ffi.Pointer<Sound>)>();
 
-  int sound_play(
+  Result sound_play(
     ffi.Pointer<Sound> self,
   ) {
-    return _sound_play(
+    return Result.fromValue(_sound_play(
       self,
-    );
+    ));
   }
 
   late final _sound_playPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<Sound>)>>(
+      _lookup<ffi.NativeFunction<ffi.UnsignedInt Function(ffi.Pointer<Sound>)>>(
           'sound_play');
   late final _sound_play =
       _sound_playPtr.asFunction<int Function(ffi.Pointer<Sound>)>();
@@ -582,19 +582,20 @@ class MinisoundFfiBindings {
   late final _engine_alloc =
       _engine_allocPtr.asFunction<ffi.Pointer<Engine> Function()>();
 
-  int engine_init(
+  Result engine_init(
     ffi.Pointer<Engine> self,
     int period_ms,
   ) {
-    return _engine_init(
+    return Result.fromValue(_engine_init(
       self,
       period_ms,
-    );
+    ));
   }
 
   late final _engine_initPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Engine>, ffi.Uint32)>>('engine_init');
+          ffi.UnsignedInt Function(
+              ffi.Pointer<Engine>, ffi.Uint32)>>('engine_init');
   late final _engine_init =
       _engine_initPtr.asFunction<int Function(ffi.Pointer<Engine>, int)>();
 
@@ -612,102 +613,102 @@ class MinisoundFfiBindings {
   late final _engine_uninit =
       _engine_uninitPtr.asFunction<void Function(ffi.Pointer<Engine>)>();
 
-  int engine_start(
+  Result engine_start(
     ffi.Pointer<Engine> self,
   ) {
-    return _engine_start(
+    return Result.fromValue(_engine_start(
       self,
-    );
+    ));
   }
 
-  late final _engine_startPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Pointer<Engine>)>>(
-          'engine_start');
+  late final _engine_startPtr = _lookup<
+          ffi.NativeFunction<ffi.UnsignedInt Function(ffi.Pointer<Engine>)>>(
+      'engine_start');
   late final _engine_start =
       _engine_startPtr.asFunction<int Function(ffi.Pointer<Engine>)>();
 
-  int engine_load_sound(
+  Result engine_load_sound(
     ffi.Pointer<Engine> self,
     ffi.Pointer<Sound> sound,
     ffi.Pointer<ffi.Uint8> data,
     int data_size,
   ) {
-    return _engine_load_sound(
+    return Result.fromValue(_engine_load_sound(
       self,
       sound,
       data,
       data_size,
-    );
+    ));
   }
 
   late final _engine_load_soundPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>,
+          ffi.UnsignedInt Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>,
               ffi.Pointer<ffi.Uint8>, ffi.Size)>>('engine_load_sound');
   late final _engine_load_sound = _engine_load_soundPtr.asFunction<
       int Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>,
           ffi.Pointer<ffi.Uint8>, int)>();
 
-  int engine_generate_waveform(
+  Result engine_generate_waveform(
     ffi.Pointer<Engine> self,
     ffi.Pointer<Sound> sound,
-    int type,
+    WaveformType type,
     double frequency,
   ) {
-    return _engine_generate_waveform(
+    return Result.fromValue(_engine_generate_waveform(
       self,
       sound,
-      type,
+      type.value,
       frequency,
-    );
+    ));
   }
 
   late final _engine_generate_waveformPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>, ffi.Int32,
-              ffi.Double)>>('engine_generate_waveform');
+          ffi.UnsignedInt Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>,
+              ffi.UnsignedInt, ffi.Double)>>('engine_generate_waveform');
   late final _engine_generate_waveform =
       _engine_generate_waveformPtr.asFunction<
           int Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>, int, double)>();
 
-  int engine_generate_noise(
+  Result engine_generate_noise(
     ffi.Pointer<Engine> self,
     ffi.Pointer<Sound> sound,
-    int type,
+    NoiseType type,
     int seed,
   ) {
-    return _engine_generate_noise(
+    return Result.fromValue(_engine_generate_noise(
       self,
       sound,
-      type,
+      type.value,
       seed,
-    );
+    ));
   }
 
   late final _engine_generate_noisePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>, ffi.Int32,
-              ffi.Int32)>>('engine_generate_noise');
+          ffi.UnsignedInt Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>,
+              ffi.UnsignedInt, ffi.Int32)>>('engine_generate_noise');
   late final _engine_generate_noise = _engine_generate_noisePtr.asFunction<
       int Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>, int, int)>();
 
-  int engine_generate_pulse(
+  Result engine_generate_pulse(
     ffi.Pointer<Engine> self,
     ffi.Pointer<Sound> sound,
     double frequency,
     double duty_cycle,
   ) {
-    return _engine_generate_pulse(
+    return Result.fromValue(_engine_generate_pulse(
       self,
       sound,
       frequency,
       duty_cycle,
-    );
+    ));
   }
 
   late final _engine_generate_pulsePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>,
+          ffi.UnsignedInt Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>,
               ffi.Double, ffi.Double)>>('engine_generate_pulse');
   late final _engine_generate_pulse = _engine_generate_pulsePtr.asFunction<
       int Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>, double, double)>();
@@ -760,21 +761,21 @@ class MinisoundFfiBindings {
   late final _recorder_buffer_alloc = _recorder_buffer_allocPtr
       .asFunction<ffi.Pointer<RecorderBuffer> Function()>();
 
-  int recorder_buffer_init(
+  Result recorder_buffer_init(
     ffi.Pointer<RecorderBuffer> self,
-    int encoding,
+    RecordingEncoding encoding,
     ffi.Pointer<ffi.Void> v_device,
   ) {
-    return _recorder_buffer_init(
+    return Result.fromValue(_recorder_buffer_init(
       self,
-      encoding,
+      encoding.value,
       v_device,
-    );
+    ));
   }
 
   late final _recorder_buffer_initPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<RecorderBuffer>, ffi.Int32,
+          ffi.UnsignedInt Function(ffi.Pointer<RecorderBuffer>, ffi.UnsignedInt,
               ffi.Pointer<ffi.Void>)>>('recorder_buffer_init');
   late final _recorder_buffer_init = _recorder_buffer_initPtr.asFunction<
       int Function(ffi.Pointer<RecorderBuffer>, int, ffi.Pointer<ffi.Void>)>();
@@ -793,21 +794,21 @@ class MinisoundFfiBindings {
   late final _recorder_buffer_uninit = _recorder_buffer_uninitPtr
       .asFunction<void Function(ffi.Pointer<RecorderBuffer>)>();
 
-  int recorder_buffer_write(
+  Result recorder_buffer_write(
     ffi.Pointer<RecorderBuffer> self,
     ffi.Pointer<ffi.Uint8> data,
     int data_len_pcm,
   ) {
-    return _recorder_buffer_write(
+    return Result.fromValue(_recorder_buffer_write(
       self,
       data,
       data_len_pcm,
-    );
+    ));
   }
 
   late final _recorder_buffer_writePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<RecorderBuffer>,
+          ffi.UnsignedInt Function(ffi.Pointer<RecorderBuffer>,
               ffi.Pointer<ffi.Uint8>, ffi.Size)>>('recorder_buffer_write');
   late final _recorder_buffer_write = _recorder_buffer_writePtr.asFunction<
       int Function(ffi.Pointer<RecorderBuffer>, ffi.Pointer<ffi.Uint8>, int)>();
@@ -836,24 +837,24 @@ class MinisoundFfiBindings {
   late final _recorder_alloc =
       _recorder_allocPtr.asFunction<ffi.Pointer<Recorder> Function()>();
 
-  int recorder_init(
+  Result recorder_init(
     ffi.Pointer<Recorder> self,
-    int format,
+    RecorderFormat format,
     int channel_count,
     int sample_rate,
   ) {
-    return _recorder_init(
+    return Result.fromValue(_recorder_init(
       self,
-      format,
+      format.value,
       channel_count,
       sample_rate,
-    );
+    ));
   }
 
   late final _recorder_initPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<Recorder>, ffi.Int32, ffi.Uint32,
-              ffi.Uint32)>>('recorder_init');
+          ffi.UnsignedInt Function(ffi.Pointer<Recorder>, ffi.UnsignedInt,
+              ffi.Uint32, ffi.Uint32)>>('recorder_init');
   late final _recorder_init = _recorder_initPtr
       .asFunction<int Function(ffi.Pointer<Recorder>, int, int, int)>();
 
@@ -885,20 +886,20 @@ class MinisoundFfiBindings {
   late final _recorder_get_is_recording = _recorder_get_is_recordingPtr
       .asFunction<bool Function(ffi.Pointer<Recorder>)>();
 
-  int recorder_start(
+  Result recorder_start(
     ffi.Pointer<Recorder> self,
-    int encoding,
+    RecordingEncoding encoding,
   ) {
-    return _recorder_start(
+    return Result.fromValue(_recorder_start(
       self,
-      encoding,
-    );
+      encoding.value,
+    ));
   }
 
   late final _recorder_startPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(
-              ffi.Pointer<Recorder>, ffi.Int32)>>('recorder_start');
+          ffi.UnsignedInt Function(
+              ffi.Pointer<Recorder>, ffi.UnsignedInt)>>('recorder_start');
   late final _recorder_start =
       _recorder_startPtr.asFunction<int Function(ffi.Pointer<Recorder>, int)>();
 
@@ -919,19 +920,38 @@ class MinisoundFfiBindings {
 
 final class EncodedSoundData extends ffi.Opaque {}
 
-abstract class Result {
-  static const int Ok = 0;
-  static const int UnknownErr = 1;
-  static const int OutOfMemErr = 2;
-  static const int RangeErr = 3;
-  static const int HashCollisionErr = 4;
-  static const int FileUnavailableErr = 5;
-  static const int FileReadingErr = 6;
-  static const int FileWritingErr = 7;
-  static const int FormatErr = 8;
-  static const int ArgErr = 9;
-  static const int StateErr = 10;
-  static const int RESULT_COUNT = 11;
+enum Result {
+  Ok(0),
+  UnknownErr(1),
+  OutOfMemErr(2),
+  RangeErr(3),
+  HashCollisionErr(4),
+  FileUnavailableErr(5),
+  FileReadingErr(6),
+  FileWritingErr(7),
+  FormatErr(8),
+  ArgErr(9),
+  StateErr(10),
+  RESULT_COUNT(11);
+
+  final int value;
+  const Result(this.value);
+
+  static Result fromValue(int value) => switch (value) {
+        0 => Ok,
+        1 => UnknownErr,
+        2 => OutOfMemErr,
+        3 => RangeErr,
+        4 => HashCollisionErr,
+        5 => FileUnavailableErr,
+        6 => FileReadingErr,
+        7 => FileWritingErr,
+        8 => FormatErr,
+        9 => ArgErr,
+        10 => StateErr,
+        11 => RESULT_COUNT,
+        _ => throw ArgumentError("Unknown value for Result: $value"),
+      };
 }
 
 final class SoundData extends ffi.Struct {
@@ -944,21 +964,42 @@ final class PrivateSoundDataImpl extends ffi.Opaque {}
 
 final class NoiseSoundData extends ffi.Opaque {}
 
-abstract class NoiseType {
-  static const int NOISE_TYPE_WHITE = 0;
-  static const int NOISE_TYPE_PINK = 1;
-  static const int NOISE_TYPE_BROWNIAN = 2;
+enum NoiseType {
+  NOISE_TYPE_WHITE(0),
+  NOISE_TYPE_PINK(1),
+  NOISE_TYPE_BROWNIAN(2);
+
+  final int value;
+  const NoiseType(this.value);
+
+  static NoiseType fromValue(int value) => switch (value) {
+        0 => NOISE_TYPE_WHITE,
+        1 => NOISE_TYPE_PINK,
+        2 => NOISE_TYPE_BROWNIAN,
+        _ => throw ArgumentError("Unknown value for NoiseType: $value"),
+      };
 }
 
 final class PulseSoundData extends ffi.Opaque {}
 
 final class WaveformSoundData extends ffi.Opaque {}
 
-abstract class WaveformType {
-  static const int WAVEFORM_TYPE_SINE = 0;
-  static const int WAVEFORM_TYPE_SQUARE = 1;
-  static const int WAVEFORM_TYPE_TRIANGLE = 2;
-  static const int WAVEFORM_TYPE_SAWTOOTH = 3;
+enum WaveformType {
+  WAVEFORM_TYPE_SINE(0),
+  WAVEFORM_TYPE_SQUARE(1),
+  WAVEFORM_TYPE_TRIANGLE(2),
+  WAVEFORM_TYPE_SAWTOOTH(3);
+
+  final int value;
+  const WaveformType(this.value);
+
+  static WaveformType fromValue(int value) => switch (value) {
+        0 => WAVEFORM_TYPE_SINE,
+        1 => WAVEFORM_TYPE_SQUARE,
+        2 => WAVEFORM_TYPE_TRIANGLE,
+        3 => WAVEFORM_TYPE_SAWTOOTH,
+        _ => throw ArgumentError("Unknown value for WaveformType: $value"),
+      };
 }
 
 final class Sound extends ffi.Opaque {}
@@ -974,16 +1015,36 @@ final class Recording extends ffi.Struct {
 
 final class RecorderBuffer extends ffi.Opaque {}
 
-abstract class RecordingEncoding {
-  static const int RECORDING_ENCODING_WAV = 1;
+enum RecordingEncoding {
+  RECORDING_ENCODING_WAV(1);
+
+  final int value;
+  const RecordingEncoding(this.value);
+
+  static RecordingEncoding fromValue(int value) => switch (value) {
+        1 => RECORDING_ENCODING_WAV,
+        _ => throw ArgumentError("Unknown value for RecordingEncoding: $value"),
+      };
 }
 
 final class Recorder extends ffi.Opaque {}
 
-abstract class RecorderFormat {
-  static const int RECORDER_FORMAT_U8 = 1;
-  static const int RECORDER_FORMAT_S16 = 2;
-  static const int RECORDER_FORMAT_S24 = 3;
-  static const int RECORDER_FORMAT_S32 = 4;
-  static const int RECORDER_FORMAT_F32 = 5;
+enum RecorderFormat {
+  RECORDER_FORMAT_U8(1),
+  RECORDER_FORMAT_S16(2),
+  RECORDER_FORMAT_S24(3),
+  RECORDER_FORMAT_S32(4),
+  RECORDER_FORMAT_F32(5);
+
+  final int value;
+  const RecorderFormat(this.value);
+
+  static RecorderFormat fromValue(int value) => switch (value) {
+        1 => RECORDER_FORMAT_U8,
+        2 => RECORDER_FORMAT_S16,
+        3 => RECORDER_FORMAT_S24,
+        4 => RECORDER_FORMAT_S32,
+        5 => RECORDER_FORMAT_F32,
+        _ => throw ArgumentError("Unknown value for RecorderFormat: $value"),
+      };
 }

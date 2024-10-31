@@ -63,7 +63,7 @@ class FfiRecorder implements PlatformRecorder {
 }
 
 extension on RecorderFormat {
-  int toC() => switch (this) {
+  c.RecorderFormat toC() => switch (this) {
         RecorderFormat.u8 => c.RecorderFormat.RECORDER_FORMAT_U8,
         RecorderFormat.s16 => c.RecorderFormat.RECORDER_FORMAT_S16,
         RecorderFormat.s24 => c.RecorderFormat.RECORDER_FORMAT_S24,

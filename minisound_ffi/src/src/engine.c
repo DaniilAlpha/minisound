@@ -31,14 +31,14 @@ Engine *engine_alloc(void) { return malloc(sizeof(Engine)); }
 Result engine_init(Engine *const self, uint32_t const period_ms) {
     self->is_started = false;
 
-    ma_engine_config engine_config = ma_engine_config_init();
+    ma_engine_config config = ma_engine_config_init();
 #if (__EMSCRIPTEN__)
     (void)period_ms;
 #else
-    engine_config.periodSizeInMilliseconds = period_ms;
+    config.periodSizeInMilliseconds = period_ms;
 #endif
-    engine_config.noAutoStart = true;
-    if (ma_engine_init(&engine_config, &self->engine) != MA_SUCCESS)
+    config.noAutoStart = true;
+    if (ma_engine_init(&config, &self->engine) != MA_SUCCESS)
         return error("miniaudio engine initialization error!"), UnknownErr;
 
     // self->dec_config = ma_decoder_config_init(

@@ -24,6 +24,7 @@ class _PlaybackExampleState extends State<PlaybackExample> {
       "assets/laser_shoot_16bit.wav",
       "assets/laser_shoot.mp3",
       "assets/00_plus.mp3",
+      "assets/kevin_macleod_call_to_adventure.mp3",
     ];
     return Future.wait(soundNames.map(widget.engine.loadSoundAsset))
         .then((sounds) {
