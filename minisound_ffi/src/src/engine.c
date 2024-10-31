@@ -33,9 +33,7 @@ Result engine_init(Engine *const self, uint32_t const period_ms) {
 
     ma_engine_config config = ma_engine_config_init();
 #if (__EMSCRIPTEN__)
-    // TODO!!! does not work without this. probably does not work if channels
-    // are > 2
-    // engine_config.periodSizeInFrames = 128 / 2;
+    (void)period_ms;
 #else
     config.periodSizeInMilliseconds = period_ms;
 #endif
@@ -150,22 +148,4 @@ Result engine_generate_pulse(
     );
 
     return info("pulse generated"), Ok;
-}
-
-void engine_test(uint8_t const *const data, size_t const data_size) {
-    static ma_engine engine;
-    static ma_decoder d;
-    static ma_sound sound;
-
-    info("hi");
-    ma_engine_config config = ma_engine_config_init();
-    config.periodSizeInFrames = 128 / 2;
-    // config.noAutoStart = true;
-    if (ma_engine_init(&config, &engine)) abort();
-
-    if (ma_decoder_init_memory(data, data_size, NULL, &d)) abort();
-
-    if (ma_sound_init_from_data_source(&engine, &d, 0, NULL, &sound)) abort();
-
-    if (ma_sound_start(&sound)) abort();
 }

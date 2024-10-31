@@ -1,3 +1,5 @@
+// TODO! bug - segfault on generate pink noise
+
 #ifndef NOISE_SOUND_DATA_H
 #define NOISE_SOUND_DATA_H
 

@@ -7,8 +7,6 @@ enum NoiseType { white, pink, brownian }
 abstract interface class PlatformEngine {
   factory PlatformEngine() => MinisoundPlatform.instance.createEngine();
 
-  @deprecated
-  Future<void> test(TypedData data);
   Future<void> init(int periodMs);
   void dispose();
 

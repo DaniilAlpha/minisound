@@ -7,6 +7,7 @@
 // ignore_for_file: unused_element, unused_field
 
 @JS("Module")
+// ignore: unnecessary_library_name
 library minisound;
 
 import "package:js/js.dart";
@@ -32,8 +33,6 @@ abstract class Result {
 
 final class Engine extends Opaque {}
 
-Future<void> engine_test(Pointer<Uint8> data, int data_size) =>
-    _engine_test(data.addr, data_size);
 Pointer<Engine> engine_alloc() => Pointer(_engine_alloc());
 Future<int> engine_init(Pointer<Engine> self, int period_ms) =>
     _engine_init(self.addr, period_ms);
@@ -210,15 +209,6 @@ external dynamic _ccall(
 );
 
 // JS engine
-
-@deprecated
-Future<void> _engine_test(int data, int data_size) async => _ccall(
-      "engine_test",
-      null,
-      ["number", "number"],
-      [data, data_size],
-      {"async": true},
-    );
 
 @JS()
 external int _engine_alloc();

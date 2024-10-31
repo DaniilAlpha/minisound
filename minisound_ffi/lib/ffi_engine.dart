@@ -103,7 +103,7 @@ final class FfiEngine implements PlatformEngine {
 }
 
 extension on WaveformType {
-  int toC() => switch (this) {
+  c.WaveformType toC() => switch (this) {
         WaveformType.sine => c.WaveformType.WAVEFORM_TYPE_SINE,
         WaveformType.square => c.WaveformType.WAVEFORM_TYPE_SQUARE,
         WaveformType.triangle => c.WaveformType.WAVEFORM_TYPE_TRIANGLE,
@@ -112,7 +112,7 @@ extension on WaveformType {
 }
 
 extension on NoiseType {
-  int toC() => switch (this) {
+  c.NoiseType toC() => switch (this) {
         NoiseType.white => c.NoiseType.NOISE_TYPE_WHITE,
         NoiseType.pink => c.NoiseType.NOISE_TYPE_PINK,
         NoiseType.brownian => c.NoiseType.NOISE_TYPE_BROWNIAN,

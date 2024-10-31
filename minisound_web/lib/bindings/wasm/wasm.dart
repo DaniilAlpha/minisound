@@ -1,4 +1,5 @@
 @JS()
+// ignore: unnecessary_library_name
 library wasm;
 
 import "dart:typed_data";

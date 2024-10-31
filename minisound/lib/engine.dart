@@ -2,7 +2,6 @@ import "dart:io";
 import "dart:typed_data";
 
 import "package:flutter/foundation.dart";
-import "package:flutter/services.dart";
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
 
 export "package:minisound_platform_interface/minisound_platform_interface.dart"
@@ -41,12 +40,8 @@ final class Engine {
 
     if (_isInit) return;
 
-    await _engine.init(periodMs);
     _isInit = true;
-
-    // await _engine.test(
-    //   await rootBundle.load("assets/kevin_macleod_call_to_adventure.mp3"),
-    // );
+    await _engine.init(periodMs);
   }
 
   /// Starts the engine.

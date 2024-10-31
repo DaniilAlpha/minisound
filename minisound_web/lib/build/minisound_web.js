@@ -734,7 +734,7 @@ var tempI64;
 // end include: runtime_debug.js
 // === Body ===
 var ASM_CONSTS = {
-  40320: ($0, $1, $2, $3, $4) => {
+  40608: ($0, $1, $2, $3, $4) => {
     if (typeof window === "undefined" || (window.AudioContext || window.webkitAudioContext) === undefined) {
       return 0;
     }
@@ -749,6 +749,7 @@ var ASM_CONSTS = {
       window.miniaudio.device_state = {};
       window.miniaudio.device_state.stopped = $3;
       window.miniaudio.device_state.started = $4;
+      let miniaudio = window.miniaudio;
       miniaudio.devices = [];
       miniaudio.track_device = function(device) {
         for (var iDevice = 0; iDevice < miniaudio.devices.length; ++iDevice) {
@@ -786,9 +787,9 @@ var ASM_CONSTS = {
       miniaudio.unlock = function() {
         for (var i = 0; i < miniaudio.devices.length; ++i) {
           var device = miniaudio.devices[i];
-          if (device != null && device.webaudio != null && device.state === window.miniaudio.device_state.started) {
+          if (device != null && device.webaudio != null && device.state === miniaudio.device_state.started) {
             device.webaudio.resume().then(() => {
-              Module._ma_device__on_notification_unlocked(device.pDevice);
+              _ma_device__on_notification_unlocked(device.pDevice);
             }, error => {
               console.error("Failed to resume audiocontext", error);
             });
@@ -805,16 +806,19 @@ var ASM_CONSTS = {
     window.miniaudio.referenceCount += 1;
     return 1;
   },
-  42478: () => {
+  42786: () => {
     if (typeof (window.miniaudio) !== "undefined") {
+      miniaudio.unlock_event_types.map(function(event_type) {
+        document.removeEventListener(event_type, miniaudio.unlock, true);
+      });
       window.miniaudio.referenceCount -= 1;
       if (window.miniaudio.referenceCount === 0) {
         delete window.miniaudio;
       }
     }
   },
-  42642: () => (navigator.mediaDevices !== undefined && navigator.mediaDevices.getUserMedia !== undefined),
-  42746: () => {
+  43076: () => (navigator.mediaDevices !== undefined && navigator.mediaDevices.getUserMedia !== undefined),
+  43180: () => {
     try {
       var temp = new (window.AudioContext || window.webkitAudioContext);
       var sampleRate = temp.sampleRate;
@@ -824,12 +828,11 @@ var ASM_CONSTS = {
       return 0;
     }
   },
-  42917: ($0, $1) => miniaudio.track_device({
+  43351: $0 => window.miniaudio.track_device({
     webaudio: emscriptenGetAudioObject($0),
-    state: 1,
-    pDevice: $1
+    state: 1
   }),
-  43019: ($0, $1) => {
+  43447: ($0, $1) => {
     var getUserMediaResult = 0;
     var audioWorklet = emscriptenGetAudioObject($0);
     var audioContext = emscriptenGetAudioObject($1);
@@ -847,33 +850,32 @@ var ASM_CONSTS = {
     });
     return getUserMediaResult;
   },
-  43581: ($0, $1) => {
+  44009: ($0, $1) => {
     var audioWorklet = emscriptenGetAudioObject($0);
     var audioContext = emscriptenGetAudioObject($1);
     audioWorklet.connect(audioContext.destination);
     return 0;
   },
-  43741: $0 => emscriptenGetAudioObject($0).sampleRate,
-  43793: $0 => {
-    var device = miniaudio.get_device_by_index($0);
+  44169: $0 => emscriptenGetAudioObject($0).sampleRate,
+  44221: $0 => {
+    var device = window.miniaudio.get_device_by_index($0);
     if (device.streamNode !== undefined) {
       device.streamNode.disconnect();
       device.streamNode = undefined;
     }
-    device.pDevice = undefined;
   },
-  43977: $0 => {
-    miniaudio.untrack_device_by_index($0);
+  44384: $0 => {
+    window.miniaudio.untrack_device_by_index($0);
   },
-  44020: $0 => {
-    var device = miniaudio.get_device_by_index($0);
+  44434: $0 => {
+    var device = window.miniaudio.get_device_by_index($0);
     device.webaudio.resume();
-    device.state = miniaudio.device_state.started;
+    device.state = window.miniaudio.device_state.started;
   },
-  44145: $0 => {
-    var device = miniaudio.get_device_by_index($0);
+  44573: $0 => {
+    var device = window.miniaudio.get_device_by_index($0);
     device.webaudio.suspend();
-    device.state = miniaudio.device_state.stopped;
+    device.state = window.miniaudio.device_state.stopped;
   }
 };
 
@@ -1204,10 +1206,6 @@ function syscallGetVarargI() {
 function ___syscall_openat(dirfd, path, flags, varargs) {
   SYSCALLS.varargs = varargs;
 }
-
-var __abort_js = () => {
-  abort("");
-};
 
 var readEmAsmArgsArray = [];
 
@@ -1957,7 +1955,6 @@ var wasmImports = {
   /** @export */ __syscall_fcntl64: ___syscall_fcntl64,
   /** @export */ __syscall_ioctl: ___syscall_ioctl,
   /** @export */ __syscall_openat: ___syscall_openat,
-  /** @export */ _abort_js: __abort_js,
   /** @export */ alignfault,
   /** @export */ emscripten_asm_const_int: _emscripten_asm_const_int,
   /** @export */ emscripten_create_audio_context: _emscripten_create_audio_context,
@@ -2010,8 +2007,6 @@ var _engine_generate_waveform = Module["_engine_generate_waveform"] = (a0, a1, a
 var _engine_generate_noise = Module["_engine_generate_noise"] = (a0, a1, a2, a3) => (_engine_generate_noise = Module["_engine_generate_noise"] = wasmExports["engine_generate_noise"])(a0, a1, a2, a3);
 
 var _engine_generate_pulse = Module["_engine_generate_pulse"] = (a0, a1, a2, a3) => (_engine_generate_pulse = Module["_engine_generate_pulse"] = wasmExports["engine_generate_pulse"])(a0, a1, a2, a3);
-
-var _engine_test = Module["_engine_test"] = (a0, a1) => (_engine_test = Module["_engine_test"] = wasmExports["engine_test"])(a0, a1);
 
 var _recorder_alloc = Module["_recorder_alloc"] = () => (_recorder_alloc = Module["_recorder_alloc"] = wasmExports["recorder_alloc"])();
 
@@ -2111,17 +2106,17 @@ var dynCall_viiii = Module["dynCall_viiii"] = (a0, a1, a2, a3, a4) => (dynCall_v
 
 var dynCall_iiiiiiii = Module["dynCall_iiiiiiii"] = (a0, a1, a2, a3, a4, a5, a6, a7) => (dynCall_iiiiiiii = Module["dynCall_iiiiiiii"] = wasmExports["dynCall_iiiiiiii"])(a0, a1, a2, a3, a4, a5, a6, a7);
 
+var dynCall_iiiiii = Module["dynCall_iiiiii"] = (a0, a1, a2, a3, a4, a5) => (dynCall_iiiiii = Module["dynCall_iiiiii"] = wasmExports["dynCall_iiiiii"])(a0, a1, a2, a3, a4, a5);
+
 var dynCall_iiiiiii = Module["dynCall_iiiiiii"] = (a0, a1, a2, a3, a4, a5, a6) => (dynCall_iiiiiii = Module["dynCall_iiiiiii"] = wasmExports["dynCall_iiiiiii"])(a0, a1, a2, a3, a4, a5, a6);
+
+var dynCall_iiiiiiiii = Module["dynCall_iiiiiiiii"] = (a0, a1, a2, a3, a4, a5, a6, a7, a8) => (dynCall_iiiiiiiii = Module["dynCall_iiiiiiiii"] = wasmExports["dynCall_iiiiiiiii"])(a0, a1, a2, a3, a4, a5, a6, a7, a8);
 
 var dynCall_iij = Module["dynCall_iij"] = (a0, a1, a2, a3) => (dynCall_iij = Module["dynCall_iij"] = wasmExports["dynCall_iij"])(a0, a1, a2, a3);
 
 var dynCall_viiiii = Module["dynCall_viiiii"] = (a0, a1, a2, a3, a4, a5) => (dynCall_viiiii = Module["dynCall_viiiii"] = wasmExports["dynCall_viiiii"])(a0, a1, a2, a3, a4, a5);
 
 var dynCall_jii = Module["dynCall_jii"] = (a0, a1, a2) => (dynCall_jii = Module["dynCall_jii"] = wasmExports["dynCall_jii"])(a0, a1, a2);
-
-var dynCall_iiiiiiiii = Module["dynCall_iiiiiiiii"] = (a0, a1, a2, a3, a4, a5, a6, a7, a8) => (dynCall_iiiiiiiii = Module["dynCall_iiiiiiiii"] = wasmExports["dynCall_iiiiiiiii"])(a0, a1, a2, a3, a4, a5, a6, a7, a8);
-
-var dynCall_iiiiii = Module["dynCall_iiiiii"] = (a0, a1, a2, a3, a4, a5) => (dynCall_iiiiii = Module["dynCall_iiiiii"] = wasmExports["dynCall_iiiiii"])(a0, a1, a2, a3, a4, a5);
 
 var dynCall_jiji = Module["dynCall_jiji"] = (a0, a1, a2, a3, a4) => (dynCall_jiji = Module["dynCall_jiji"] = wasmExports["dynCall_jiji"])(a0, a1, a2, a3, a4);
 

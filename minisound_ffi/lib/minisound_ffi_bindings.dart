@@ -713,22 +713,6 @@ class MinisoundFfiBindings {
   late final _engine_generate_pulse = _engine_generate_pulsePtr.asFunction<
       int Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>, double, double)>();
 
-  void engine_test(
-    ffi.Pointer<ffi.Uint8> data,
-    int data_size,
-  ) {
-    return _engine_test(
-      data,
-      data_size,
-    );
-  }
-
-  late final _engine_testPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(ffi.Pointer<ffi.Uint8>, ffi.Size)>>('engine_test');
-  late final _engine_test =
-      _engine_testPtr.asFunction<void Function(ffi.Pointer<ffi.Uint8>, int)>();
-
   int sizeof_recording() {
     return _sizeof_recording();
   }
