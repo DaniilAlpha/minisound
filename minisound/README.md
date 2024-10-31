@@ -1,6 +1,6 @@
 # minisound
 
-A high-level real-time audio playback library based on [miniaudio](https://miniaud.io). The library offers basic functionality and quite low latency. Supports MP3, WAV and FLAC formats.
+A high-level real-time audio playback, generation and recording library based on [miniaudio](https://miniaud.io). The library offers basic functionality and quite low latency. Supports MP3, WAV and FLAC formats.
 
 ## Platform support
 
@@ -19,7 +19,7 @@ There was some pretty major changes in 2.0.0 version, see the [migration guide](
 
 ## Getting started on the web
 
-While the main script is quite large, there are a loader script provided. Include it in the `web/index.html` file like this
+While the main script is quite large, there is a loader script provided. Include it in the `web/index.html` file like this
 
 ```html
   <script src="assets/packages/minisound_web/build/minisound_web.loader.js"></script>
@@ -54,10 +54,9 @@ window.addEventListener('load', async function (ev) {
   );
 ```
 
-`Minisound` uses `SharedArrayBuffer` feature, so you should [enable cross-origin isolation on your site](https://web.dev/cross-origin-isolation-guide/).
+`Minisound` depends on `SharedArrayBuffer` feature, so you should [enable cross-origin isolation on your site](https://web.dev/cross-origin-isolation-guide/).
 
 ## Usage
-
 
 To use this plugin, add `minisound` as a [dependency in your pubspec.yaml file](https://flutter.dev/platform-plugins/).
 
