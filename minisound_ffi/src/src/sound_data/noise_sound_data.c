@@ -1,6 +1,7 @@
 #include "../../include/sound_data/noise_sound_data.h"
 
 #include <stdlib.h>
+#include <assert.h>
 
 #include "../../external/miniaudio/include/miniaudio.h"
 
@@ -70,8 +71,8 @@ SoundData noise_sound_data_ww_sound_data(NoiseSoundData *const self) WRAP_BODY(
 // clang-format off
 
 // this ensures safe casting between `NoiseType` and `ma_noise_type`
-_Static_assert((int)NOISE_TYPE_WHITE == (int)ma_noise_type_white, "`GENERATOR_NOISE_TYPE_WHITE` should match `ma_noise_type_white`.");
-_Static_assert((int)NOISE_TYPE_PINK == (int)ma_noise_type_pink, "`GENERATOR_NOISE_TYPE_PINK` should match `ma_noise_type_pink`.");
-_Static_assert((int)NOISE_TYPE_BROWNIAN == (int)ma_noise_type_brownian, "`GENERATOR_NOISE_TYPE_BROWNIAN` should match `ma_noise_type_brownian`.");
+static_assert((int)NOISE_TYPE_WHITE == (int)ma_noise_type_white, "`GENERATOR_NOISE_TYPE_WHITE` should match `ma_noise_type_white`.");
+static_assert((int)NOISE_TYPE_PINK == (int)ma_noise_type_pink, "`GENERATOR_NOISE_TYPE_PINK` should match `ma_noise_type_pink`.");
+static_assert((int)NOISE_TYPE_BROWNIAN == (int)ma_noise_type_brownian, "`GENERATOR_NOISE_TYPE_BROWNIAN` should match `ma_noise_type_brownian`.");
 
 // clang-format on

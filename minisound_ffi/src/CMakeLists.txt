@@ -45,10 +45,10 @@ target_sources(${MAIN_LIB} PRIVATE ${MAIN_SOURCES})
 # Definitions
 target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB
     # ours
-    MILO_DEFAULT_LVL=MILO_LVL_NONE
-    ENGINE_MILO_LVL=MILO_LVL_NONE
-    SOUND_MILO_LVL=MILO_LVL_NONE
-    RECORDER_MILO_LVL=MILO_LVL_NONE
+    MILO_DEFAULT_LVL=MILO_LVL_WARN
+    ENGINE_MILO_LVL=MILO_LVL_WARN
+    SOUND_MILO_LVL=MILO_LVL_WARN
+    RECORDER_MILO_LVL=MILO_LVL_WARN
     # miniaudio
     MA_ENABLE_ONLY_SPECIFIC_BACKENDS
     MA_NO_RESOURCE_MANAGER
@@ -62,7 +62,7 @@ if(NOT EMSCRIPTEN)
         message(ERROR "No miniaudio backend for your platform enabled! Sound will not work!")
     endif()
 
-    target_compile_definitions(${MAIN_LIB} PRIVATE
+    target_compile_definitions(${MAIN_LIB} PUBLIC
         # windows
         MA_ENABLE_WASAPI
         # linux
@@ -83,7 +83,11 @@ endif()
 
 
 # Set properties
-target_compile_options(${MAIN_LIB} PRIVATE -W -Wall -Wextra -Wformat -Wno-unused-function)
+if(NOT MSVC)
+    target_compile_options(${MAIN_LIB} PRIVATE -W -Wall -Wextra -Wformat -Wno-unused-function)
+else()
+    target_compile_options(${MAIN_LIB} PRIVATE -W3)
+endif()
 
 if(NOT EMSCRIPTEN)
     set_target_properties(${MAIN_LIB} PROPERTIES
@@ -91,7 +95,9 @@ if(NOT EMSCRIPTEN)
         OUTPUT_NAME ${MAIN_LIB}
     )
 
-    set(COMPILE_AND_LINK_OPTS -O3)
+    if(NOT MSVC)
+        set(COMPILE_AND_LINK_OPTS -O3)
+    endif()
     target_compile_options(${MAIN_LIB} PRIVATE ${COMPILE_AND_LINK_OPTS})
     target_link_options(${MAIN_LIB} PRIVATE ${COMPILE_AND_LINK_OPTS})
     unset(COMMON_OPTIONS)

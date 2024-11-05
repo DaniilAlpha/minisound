@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.3
+
+Fix compiler flags on windows.
+
 ## 2.0.2
 
 Fix more strange playback bugs.

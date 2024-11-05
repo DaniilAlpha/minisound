@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "../../external/miniaudio/include/miniaudio.h"
 #include "../../include/recorder/recorder_buffer.h"
@@ -104,15 +105,15 @@ Recording recorder_stop(Recorder *const self) {
 // clang-format off
 
 // this ensures safe casting between `RecorderEncoding` and `ma_encoder_format`
-_Static_assert((int)RECORDING_ENCODING_WAV == (int)ma_encoding_format_wav, "`RECORDING_ENCODING_WAV` should match `ma_encoding_format_wav`.");
-// _Static_assert((int)RECORDING_ENCODING_FLAC == (int)ma_encoding_format_flac, "`RECORDING_ENCODING_FLAC` should match `ma_encoding_format_flac`.");
-// _Static_assert((int)RECORDING_ENCODING_MP3 == (int)ma_encoding_format_mp3, "`RECORDING_ENCODING_MP3` should match `ma_encoding_format_mp3`.");
+static_assert((int)RECORDING_ENCODING_WAV == (int)ma_encoding_format_wav, "`RECORDING_ENCODING_WAV` should match `ma_encoding_format_wav`.");
+// static_assert((int)RECORDING_ENCODING_FLAC == (int)ma_encoding_format_flac, "`RECORDING_ENCODING_FLAC` should match `ma_encoding_format_flac`.");
+// static_assert((int)RECORDING_ENCODING_MP3 == (int)ma_encoding_format_mp3, "`RECORDING_ENCODING_MP3` should match `ma_encoding_format_mp3`.");
 
 // this ensures safe casting between `RecorderFormat` and `ma_format`
-_Static_assert((int)RECORDER_FORMAT_U8 == (int)ma_format_u8, "`RECORDER_FORMAT_U8` should match `ma_format_u8`.");
-_Static_assert((int)RECORDER_FORMAT_S16 == (int)ma_format_s16, "`RECORDER_FORMAT_S16` should match `ma_format_s16`.");
-_Static_assert((int)RECORDER_FORMAT_S24 == (int)ma_format_s24, "`RECORDER_FORMAT_S24` should match `ma_format_s24`.");
-_Static_assert((int)RECORDER_FORMAT_S32 == (int)ma_format_s32, "`RECORDER_FORMAT_S32` should match `ma_format_s32`.");
-_Static_assert((int)RECORDER_FORMAT_F32 == (int)ma_format_f32, "`RECORDER_FORMAT_F32` should match `ma_format_f32`.");
+static_assert((int)RECORDER_FORMAT_U8 == (int)ma_format_u8, "`RECORDER_FORMAT_U8` should match `ma_format_u8`.");
+static_assert((int)RECORDER_FORMAT_S16 == (int)ma_format_s16, "`RECORDER_FORMAT_S16` should match `ma_format_s16`.");
+static_assert((int)RECORDER_FORMAT_S24 == (int)ma_format_s24, "`RECORDER_FORMAT_S24` should match `ma_format_s24`.");
+static_assert((int)RECORDER_FORMAT_S32 == (int)ma_format_s32, "`RECORDER_FORMAT_S32` should match `ma_format_s32`.");
+static_assert((int)RECORDER_FORMAT_F32 == (int)ma_format_f32, "`RECORDER_FORMAT_F32` should match `ma_format_f32`.");
 
 // clang-format on
