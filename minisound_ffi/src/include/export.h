@@ -6,6 +6,8 @@
 #elif __EMSCRIPTEN__
 #  include <emscripten.h>
 #  define EXPORT EMSCRIPTEN_KEEPALIVE
+#elif __OSX__
+#define EXPORT __attribute__((visibility("default"))) __attribute__((used))
 #else
 #  define EXPORT
 #endif

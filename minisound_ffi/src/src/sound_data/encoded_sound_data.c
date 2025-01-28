@@ -30,7 +30,7 @@ static ma_data_source *encoded_sound_data_get_ds(EncodedSoundData *const self) {
  ** public **
  ************/
 
-EncodedSoundData *encoded_sound_data_alloc() {
+EncodedSoundData *encoded_sound_data_alloc(void) {
     return malloc(sizeof(EncodedSoundData));
 }
 Result encoded_sound_data_init(
