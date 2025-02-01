@@ -37,7 +37,7 @@ static void data_callback(
  ** public **
  ************/
 
-Recorder *recorder_alloc() { return malloc(sizeof(Recorder)); }
+Recorder *recorder_alloc(void) { return malloc(sizeof(Recorder)); }
 Result recorder_init(
     Recorder *const self,
     RecorderFormat const format,

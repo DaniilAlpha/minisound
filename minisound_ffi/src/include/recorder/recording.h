@@ -11,7 +11,7 @@ typedef struct Recording {
     size_t size;
 } Recording;
 
-EXPORT size_t sizeof_recording();
+EXPORT size_t sizeof_recording(void);
 
 EXPORT uint8_t const *recording_get_buf(Recording const *const self);
 EXPORT size_t recording_get_size(Recording const *const self);

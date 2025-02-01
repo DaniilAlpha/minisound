@@ -45,10 +45,10 @@ target_sources(${MAIN_LIB} PRIVATE ${MAIN_SOURCES})
 # Definitions
 target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB
     # ours
-    MILO_DEFAULT_LVL=MILO_LVL_WARN
-    ENGINE_MILO_LVL=MILO_LVL_WARN
-    SOUND_MILO_LVL=MILO_LVL_WARN
-    RECORDER_MILO_LVL=MILO_LVL_WARN
+    MILO_DEFAULT_LVL=MILO_LVL_NONE
+    ENGINE_MILO_LVL=MILO_LVL_NONE
+    SOUND_MILO_LVL=MILO_LVL_NONE
+    RECORDER_MILO_LVL=MILO_LVL_NONE
     # miniaudio
     MA_ENABLE_ONLY_SPECIFIC_BACKENDS
     MA_NO_RESOURCE_MANAGER
@@ -85,6 +85,9 @@ endif()
 # Set properties
 if(NOT MSVC)
     target_compile_options(${MAIN_LIB} PRIVATE -W -Wall -Wextra -Wformat -Wno-unused-function)
+    # if(APPLE)
+    #     target_compile_options(${MAIN_LIB} PUBLIC -Wno-strict-prototypes -Wno-comma)
+    # endif()
 else()
     target_compile_options(${MAIN_LIB} PRIVATE -W3)
 endif()

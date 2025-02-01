@@ -17,6 +17,9 @@ help:
 	@ echo "  pubspec_release: Switches pubspecs for release."
 	@ echo "  build_web_lib: Builds the ffi lib to web via emscripten."
 	@ echo "  clean_web_lib: Cleans the web lib." 
+	@ echo "  build_native_test: Build automatic tests for the native platform."
+	@ echo "  clean_native_test: Cleans automatic tests." 
+	# TODO add help for native test targets
 
 
 _check_if_version_set:
@@ -50,8 +53,14 @@ endif
 
 
 build_native_test:
+	@ echo "Building automatic tests for the native platform..."
 	@ cmake -B $(NATIVE_TEST_BUILD_DIR)/lib/ -S $(SRC_DIR) --log-level=$(CMAKE_LOG_LEVEL); cmake --build $(NATIVE_TEST_BUILD_DIR)/lib/
 	@ cmake -B $(NATIVE_TEST_BUILD_DIR) -S $(NATIVE_TEST_SRC_DIR) --log-level=$(CMAKE_LOG_LEVEL); cmake --build $(NATIVE_TEST_BUILD_DIR)
 
 clean_native_test:
+	@ echo "Cleaning automatic tests..."
+ifeq ($(OS),Windows_NT)
+	@ del /S $(NATIVE_TEST_BUILD_DIR)/*
+else
 	@ rm -rf $(NATIVE_TEST_BUILD_DIR)/*
+endif

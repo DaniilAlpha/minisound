@@ -1,7 +1,5 @@
 // Relative import to be able to reuse the C sources.
 // See the comment in ../{projectName}.podspec for more information.
-//
-// TODO try to recreate this file every time automatically in the CMakeLists.txt
 
 #include "../../src/external/miniaudio/src/miniaudio.c"
 

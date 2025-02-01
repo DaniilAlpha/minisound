@@ -1,6 +1,6 @@
 #include "../../include/recorder/recording.h"
 
-size_t sizeof_recording() { return sizeof(Recording); }
+size_t sizeof_recording(void) { return sizeof(Recording); }
 
 uint8_t const *recording_get_buf(Recording const *const self) {
     return self->buf;
