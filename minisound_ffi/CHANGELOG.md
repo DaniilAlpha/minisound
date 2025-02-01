@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.4
+
+An attempt to fix iOS build.
+
 ## 2.0.3
 
 Fix compiler flags on windows.
