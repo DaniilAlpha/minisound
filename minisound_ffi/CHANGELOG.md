@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.5
+
+Add gradle namespace to fix Android build.
+
 ## 2.0.4
 
 An attempt to fix iOS build.
