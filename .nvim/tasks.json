@@ -32,7 +32,7 @@
             "icon": "󰐊",
             "cmd": [
                 "cd ./minisound/example/",
-                "flutter run -d linux"
+                "flutter run -d android"
             ]
         },
         "test": {
