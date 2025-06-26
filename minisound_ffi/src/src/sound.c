@@ -30,7 +30,6 @@ Result sound_init(
         sound_data_get_ds(&self->sound_data),
         MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION,
         NULL,
-        NULL,
         &self->sound
     );
     if (r != MA_SUCCESS)

@@ -15,7 +15,7 @@ target_sources(${TEST} PRIVATE ${TEST_SOURCES})
 target_include_directories(${TEST} PRIVATE ${MAIN_PATH}/include/)
 target_include_directories(${TEST} PRIVATE ${TEST_PATH}/external/miunte/)
 
-set(COMPILE_AND_LINK_OPTS -Og -g -fsanitize=address)
+set(COMPILE_AND_LINK_OPTS -Og -g -fsanitize=address,leak)
 target_compile_options(${TEST} PRIVATE ${COMPILE_AND_LINK_OPTS})
 target_link_options(${TEST} PRIVATE ${COMPILE_AND_LINK_OPTS})
 
