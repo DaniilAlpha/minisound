@@ -151,13 +151,6 @@ packages:
       relative: true
     source: path
     version: "2.0.2"
-  minisound_ffi:
-    dependency: transitive
-    description:
-      path: "../../minisound_ffi"
-      relative: true
-    source: path
-    version: "2.0.4"
   minisound_platform_interface:
     dependency: transitive
     description:
