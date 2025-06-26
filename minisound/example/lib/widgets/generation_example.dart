@@ -129,31 +129,34 @@ class _GenerationExampleState extends State<GenerationExample> {
             ]),
           ]),
       },
-      ElevatedButton(
-        child: const Text("PLAY"),
-        onPressed: () {
-          sound?.stop();
-          sound = switch (generatorType) {
-            GeneratorType.wave => widget.engine.genWaveform(
-                waveformType,
-                freq: pow(2, freq).toDouble(),
-              ),
-            GeneratorType.noise => widget.engine.genNoise(noiseType),
-            GeneratorType.pulse => widget.engine.genPulse(
-                dutyCycle: dutyCycle,
-                freq: pow(2, freq).toDouble(),
-              ),
-          }
-            ..volume = 0.3;
-          widget.engine.start().then((_) => sound!.play());
-        },
-      ),
-      ElevatedButton(
+      OverflowBar(children: [
+        ElevatedButton(
+          child: const Text("PLAY"),
+          onPressed: () {
+            sound?.stop();
+            sound = switch (generatorType) {
+              GeneratorType.wave => widget.engine.genWaveform(
+                  waveformType,
+                  freq: pow(2, freq).toDouble(),
+                ),
+              GeneratorType.noise => widget.engine.genNoise(noiseType),
+              GeneratorType.pulse => widget.engine.genPulse(
+                  dutyCycle: dutyCycle,
+                  freq: pow(2, freq).toDouble(),
+                ),
+            }
+              ..volume = 0.3;
+            widget.engine.start().then((_) => sound!.play());
+          },
+        ),
+        ElevatedButton(
           child: const Text("STOP"),
           onPressed: () {
             sound?.stop();
             sound = null;
-          }),
+          },
+        ),
+      ]),
     ]);
   }
 }
