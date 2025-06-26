@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.6
+
+Update miniaudio.
+
 ## 2.0.5
 
 Add gradle namespace to fix Android build.
