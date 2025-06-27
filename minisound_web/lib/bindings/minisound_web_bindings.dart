@@ -7,11 +7,9 @@
 // ignore_for_file: unused_element, unused_field
 
 @JS("Module")
-// ignore: unnecessary_library_name
-library minisound;
+library;
 
-import "package:js/js.dart";
-import "package:js/js_util.dart";
+import "dart:js_interop";
 import "package:minisound_web/bindings/wasm/wasm.dart";
 
 abstract class Result {
@@ -122,8 +120,11 @@ Pointer<PulseSoundData> sound_get_pulse_data(Pointer<Sound> self) =>
 
 bool encoded_sound_data_get_is_looped(Pointer<EncodedSoundData> self) =>
     _encoded_sound_data_get_is_looped(self.addr) != 0;
-int encoded_sound_data_set_looped(
-        Pointer<EncodedSoundData> self, bool value, int delay_ms) =>
+void encoded_sound_data_set_looped(
+  Pointer<EncodedSoundData> self,
+  bool value,
+  int delay_ms,
+) =>
     _encoded_sound_data_set_looped(self.addr, value ? 1 : 0, delay_ms);
 
 void waveform_sound_data_set_type(Pointer<WaveformSoundData> self, int value) =>
@@ -200,26 +201,31 @@ Recording recorder_stop(Pointer<Recorder> self) {
 // *************
 
 @JS("ccall")
-external dynamic _ccall(
+external JSAny? _ccall(
   String name,
-  String? returnType,
-  List<String> argTypes,
-  List args,
-  Map opts,
+  JSString? returnType,
+  JSArray<JSString> argTypes,
+  JSArray<JSAny?> args,
+  JSObject opts,
 );
+final _ccallTypeNumber = "number".toJS;
+const _ccallTypeVoid = null;
+final _ccallAsyncOpts = {"async": true.toJS}.jsify() as JSObject;
+final _ccallDefaultOpts = JSObject();
 
 // JS engine
 
 @JS()
 external int _engine_alloc();
-Future<int> _engine_init(int self, int period_ms) async =>
-    promiseToFuture(_ccall(
+Future<int> _engine_init(int self, int period_ms) async => (_ccall(
       "engine_init",
-      "number",
-      ["number", "number"],
-      [self, period_ms],
-      {"async": true},
-    ));
+      _ccallTypeNumber,
+      [_ccallTypeNumber, _ccallTypeNumber].toJS,
+      [self.toJS, period_ms.toJS].toJS,
+      _ccallAsyncOpts,
+    ) as JSPromise)
+        .toDart
+        .then((res) => (res as JSNumber).toDartInt);
 
 @JS()
 external void _engine_uninit(int self);
@@ -290,7 +296,7 @@ external int _sound_get_pulse_data(int sound);
 @JS()
 external int _encoded_sound_data_get_is_looped(int self);
 @JS()
-external int _encoded_sound_data_set_looped(int self, int value, int delay_ms);
+external void _encoded_sound_data_set_looped(int self, int value, int delay_ms);
 
 @JS()
 external void _waveform_sound_data_set_type(int self, int value);
@@ -315,13 +321,16 @@ Future<int> _recorder_init(
   int channel_count,
   int sample_rate,
 ) async =>
-    promiseToFuture(_ccall(
+    (_ccall(
       "recorder_init",
-      "number",
-      ["number", "number", "number", "number"],
-      [self, format, channel_count, sample_rate],
-      {"async": true},
-    ));
+      _ccallTypeNumber,
+      [_ccallTypeNumber, _ccallTypeNumber, _ccallTypeNumber, _ccallTypeNumber]
+          .toJS,
+      [self.toJS, format.toJS, channel_count.toJS, sample_rate.toJS].toJS,
+      _ccallAsyncOpts,
+    ) as JSPromise)
+        .toDart
+        .then((res) => (res as JSNumber).toDartInt);
 @JS()
 external void _recorder_uninit(int self);
 
@@ -332,10 +341,10 @@ external int _recorder_get_is_recording(int self);
 external int _recorder_start(int self, int encoding);
 void _recorder_stop(int self, int out_recording) => _ccall(
       "recorder_stop",
-      null,
-      ["number", "number"],
-      [out_recording, self],
-      {},
+      _ccallTypeVoid,
+      [_ccallTypeNumber, _ccallTypeNumber].toJS,
+      [out_recording.toJS, self.toJS].toJS,
+      _ccallDefaultOpts,
     );
 
 @JS()
