@@ -6,7 +6,7 @@
 	url = https://github.com/DaniilAlpha/result
 [submodule "minisound_ffi/src/external/woodi"]
 	path = minisound_ffi/src/external/woodi
-	url = git@github.com:DaniilAlpha/woodi.git
+	url = https://github.com/DaniilAlpha/woodi.git
 [submodule "minisound_ffi/test_native/external/miunte"]
 	path = minisound_ffi/test_native/external/miunte
-	url = git@github.com:DaniilAlpha/miunte.git
+	url = https://github.com/DaniilAlpha/miunte.git
