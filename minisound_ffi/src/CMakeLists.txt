@@ -39,16 +39,24 @@ target_sources(${MAIN_LIB} PRIVATE ${MAIN_SOURCES})
 #     ${MAIN_PATH}/external/*/include/
 # )
 # list(APPEND MAIN_INCLUDES ${MAIN_PATH}/include/)
-# target_include_directories(${MAIN_LIB} PRIVATE ${MAIN_INCLUDES})
-
+target_include_directories(${MAIN_LIB} PRIVATE "include/" ${MAIN_INCLUDES})
 
 # Definitions
-target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB
+target_compile_definitions(${MAIN_LIB} PUBLIC DART_SHARED_LIB
     # ours
-    MILO_DEFAULT_LVL=MILO_LVL_NONE
-    ENGINE_MILO_LVL=MILO_LVL_NONE
-    SOUND_MILO_LVL=MILO_LVL_NONE
-    RECORDER_MILO_LVL=MILO_LVL_NONE
+    MILO_CONFIG="milo.config.h"
+    $<$<CONFIG:Debug>:
+        MILO_DEFAULT_LVL=MILO_LVL_INFO
+        ENGINE_MILO_LVL=MILO_LVL_INFO
+        SOUND_MILO_LVL=MILO_LVL_INFO
+        RECORDER_MILO_LVL=MILO_LVL_WARN
+    >
+    $<$<CONFIG:Release>:
+        MILO_DEFAULT_LVL=MILO_LVL_NONE
+        ENGINE_MILO_LVL=MILO_LVL_NONE
+        SOUND_MILO_LVL=MILO_LVL_NONE
+        RECORDER_MILO_LVL=MILO_LVL_NONE
+    >
     # miniaudio
     MA_ENABLE_ONLY_SPECIFIC_BACKENDS
     MA_NO_RESOURCE_MANAGER
@@ -59,7 +67,8 @@ target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB
 # Platform-specific definitions
 if(NOT EMSCRIPTEN)
     if(NOT (WIN32 OR LINUX OR ANDROID OR APPLE))
-        message(ERROR "No miniaudio backend for your platform enabled! Sound will not work!")
+        message(ERROR
+            "Sound won't work, as no backend for your platform was enabled! ")
     endif()
 
     target_compile_definitions(${MAIN_LIB} PUBLIC
@@ -84,9 +93,11 @@ endif()
 
 # Set properties
 if(NOT MSVC)
-    target_compile_options(${MAIN_LIB} PRIVATE -W -Wall -Wextra -Wformat -Wno-unused-function)
+    target_compile_options(${MAIN_LIB} PRIVATE
+        -W -Wall -Wextra -Wformat -Wno-unused-function)
     # if(APPLE)
-    #     target_compile_options(${MAIN_LIB} PUBLIC -Wno-strict-prototypes -Wno-comma)
+    #     target_compile_options(${MAIN_LIB} PUBLIC
+    #           -Wno-strict-prototypes -Wno-comma)
     # endif()
 else()
     target_compile_options(${MAIN_LIB} PRIVATE -W3)
@@ -99,35 +110,42 @@ if(NOT EMSCRIPTEN)
     )
 
     if(NOT MSVC)
-        set(COMPILE_AND_LINK_OPTS -O3)
+        set(COMPILE_AND_LINK_OPTS
+            $<$<CONFIG:Debug>: -Og -g > $<$<CONFIG:Release>: -O3 >)
+        target_compile_options(${MAIN_LIB} PRIVATE ${COMPILE_AND_LINK_OPTS})
+        target_link_options(${MAIN_LIB} PRIVATE ${COMPILE_AND_LINK_OPTS})
+        unset(COMPILE_AND_LINK_OPTS)
     endif()
-    target_compile_options(${MAIN_LIB} PRIVATE ${COMPILE_AND_LINK_OPTS})
-    target_link_options(${MAIN_LIB} PRIVATE ${COMPILE_AND_LINK_OPTS})
-    unset(COMMON_OPTIONS)
 else()
     set_target_properties(${MAIN_LIB} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${WEB_OUT_DIR}
     )
 
-    target_compile_options(${MAIN_LIB} PRIVATE -O3 -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
+    target_compile_options(${MAIN_LIB} PRIVATE
+        -O3 -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
     set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
         -O3 \
         -flto -fno-rtti -fno-exceptions \
         -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall \
         -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb \
-        -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB \
-        -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072 \
+        -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER \
+        -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB \
+        -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 \
+        -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072 \
         -sSTACK_OVERFLOW_CHECK=1 \
     ")
 
-    # target_compile_options(${MAIN_LIB} PRIVATE -Og -g3 -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
+    # target_compile_options(${MAIN_LIB} PRIVATE
+    #     -Og -g3 -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
     # set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
     #     -Og -g3 -gsource-map \
     #     -fno-rtti -fno-exceptions \
     #     -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall \
     #     -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb \
-    #     -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB \
-    #     -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072 \
+    #     -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER \
+    #     -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB \
+    #     -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 \
+    #     -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072 \
     #     -sSTACK_OVERFLOW_CHECK=1 -sSAFE_HEAP \
     # ")
 endif()
@@ -166,7 +184,7 @@ if(EMSCRIPTEN)
     # Add custom command to modify the output JS file
     add_custom_command(
         TARGET ${MAIN_LIB} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E echo "Modifying ${MAIN_LIB}.js to use locateFile"
+        COMMAND ${CMAKE_COMMAND} -E echo "Using locateFile in ${MAIN_LIB}.js"
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/modify_js.cmake
         WORKING_DIRECTORY ${WEB_OUT_DIR}
         COMMENT "Post-processing ${MAIN_LIB}.js"
@@ -178,4 +196,5 @@ endif()
 if(ANDROID)
     target_link_libraries(${MAIN_LIB} OpenSLES log)
 endif()
+
 

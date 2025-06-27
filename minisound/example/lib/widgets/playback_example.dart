@@ -19,7 +19,6 @@ class _PlaybackExampleState extends State<PlaybackExample> {
     "assets/laser_shoot.mp3",
     "assets/00_plus.mp3",
     "assets/kevin_macleod_call_to_adventure.mp3",
-    "assets/tested audio.mp3"
   ];
 
   final sounds = <String, LoadedSound>{};
