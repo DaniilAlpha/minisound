@@ -15,7 +15,7 @@ A high-level real-time audio playback library based on [miniaudio](https://minia
 |Web      |Chrome(ium) 93+, Firefox 79+, Safari 16+|Browsers with an `AudioWorklet` support|Browsers without an `AudioWorklet` support|
 |Wasm     |Chrome(ium) 137+ |Any*      |None*      |
 
-> \* This refers to platforms, for which apps can be comiled compiled. E.g. Windows 7 support is dropped by Dart itself, so it is technically cannot be supported.
+> \* This refers to platforms, for which apps can be actually compiled. E.g. Windows 7 support is dropped by Dart itself, so it is technically cannot be supported.
 
 
 ## Migration
