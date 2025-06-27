@@ -72,6 +72,13 @@
                 "cd ./minisound/example/",
                 "flutter run -d chrome --web-browser-flag '--enable-features=SharedArrayBuffer'"
             ]
+        },
+        "run wasm": {
+            "icon": "󰐊",
+            "cmd": [
+                "cd ./minisound/example/",
+                "flutter run -d chrome --wasm --web-browser-flag '--enable-features=SharedArrayBuffer'"
+            ]
         }
     }
 }

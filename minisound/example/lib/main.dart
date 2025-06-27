@@ -8,6 +8,8 @@ import "package:minisound/recorder.dart";
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  if (const bool.fromEnvironment('dart.tool.dart2wasm'))
+    print("Its the actual WASM build!");
   runApp(const MaterialApp(title: "Minisound Example", home: ExamplePage()));
 }
 

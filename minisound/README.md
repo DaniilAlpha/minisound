@@ -1,23 +1,31 @@
 # minisound
 
-A high-level real-time audio playback library based on [miniaudio](https://miniaud.io). The library offers basic functionality and quite low latency. Supports MP3, WAV and FLAC formats.
+A high-level real-time audio playback library based on [miniaudio](https://miniaud.io). The library offers basic functionality for realtime audio applications and quite low latency. Supports MP3, WAV and FLAC formats.
+
 
 ## Platform support
 
-|Platform|Tested     |Supposed to work|Unsupported|
-|--------|-----------|----------------|-----------|
-|Android |SDK 31, 19 |SDK 16+         |SDK 15-    |
-|iOS     |None       |Unknown         |Unknown    |
-|Windows |11, 7 (x64)|Vista+          |XP-        |
-|macOS   |None       |Unknown         |Unknown    |
-|Linux   |Fedora 39-40, Mint 22|Any   |None       |
-|Web     |Chrome 93+, Firefox 79+, Safari 16+|Browsers with an `AudioWorklet` support|Browsers without an `AudioWorklet` support|
+|Platform |Tested     |Supposed to work|Unsupported|
+|-------- |-----------|----------------|-----------|
+|Android  |SDK 31, 19 |Any*            |None*      |
+|Windows  |11,        |Any*            |None*      |
+|GNU/Linux|Fedora 42, Mint 22|Any*     |None*      |
+|iOS      |None       |Unknown         |Unknown    |
+|macOS    |None       |Unknown         |Unknown    |
+|Web      |Chrome(ium) 93+, Firefox 79+, Safari 16+|Browsers with an `AudioWorklet` support|Browsers without an `AudioWorklet` support|
+|Wasm     |Chrome(ium) 137+ |Any*      |None*      |
+
+> * This refers to platforms, for which apps can be comiled compiled. E.g. Windows 7 support is dropped by Dart itself, so it is technically cannot be supported.
+
 
 ## Migration
 
 There was some pretty major changes in 2.0.0 version, see the [migration guide](#migration-guide) down below.
 
-## Getting started on the web
+
+## Getting started 
+
+### Web / Wasm
 
 While the main script is quite large, there are a loader script provided. Include it in the `web/index.html` file like this
 
@@ -56,10 +64,11 @@ window.addEventListener('load', async function (ev) {
 
 `Minisound` uses `SharedArrayBuffer` feature, so you should [enable cross-origin isolation on your site](https://web.dev/cross-origin-isolation-guide/).
 
+
 ## Usage
 
-
 To use this plugin, add `minisound` as a [dependency in your pubspec.yaml file](https://flutter.dev/platform-plugins/).
+
 
 ### Playback
 
@@ -126,6 +135,7 @@ void main() async {
 }
 ```
 
+
 ### Generation 
 
 ```dart
@@ -158,6 +168,7 @@ void main() async {
 }
 ```
 
+
 ### Recording
 
 ```dart
@@ -185,6 +196,7 @@ void main() async {
 }
 ```
 
+
 ## Migration guide
 
 ### 1.6.0 -> 2.0.0
@@ -197,6 +209,7 @@ void main() async {
   // sound.unload();
 ```
 As a result, when `Sound` objects get garbage collected (which may be immediately after or not at the moment they go out of scope), they stop and unload. If you want to prevent this, you are probably doing something wrong, as this means you are creating an indefenetely played sound with no way to access it. Though this behaviour can still be disabled via the `doAddToFinalizer` parameter to sound loading and generation methods of the `Engine` class. However, it disables any finalization, so you'll need to manage `Sound`s completely yourself. If you believe your usecase is valid, create a github issue and provide the code. Maybe it will change my mind.
+
 
 ### 1.4.0 -> 1.6.0
 
@@ -235,14 +248,9 @@ To manually build the project, follow these steps:
     cmake --build ./minisound_web/lib/build/cmake_stuff 
     ```
 
-4. For development work, it's useful to run `ffigen` from the `minisound_ffi` directory:
+4. For the development work, it's useful to run `ffigen` from the `minisound_ffi` directory:
 
     ```bash
     cd ./minisound_ffi/
     dart run ffigen
     ```
-
-## TODO
-
-<!-- - [ ] Stop crash when no devices found for playback or capture -->
-<!-- - [ ] Switch engine init to state machine. -->
