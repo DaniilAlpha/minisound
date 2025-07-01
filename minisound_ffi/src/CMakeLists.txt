@@ -46,9 +46,9 @@ target_compile_definitions(${MAIN_LIB} PUBLIC DART_SHARED_LIB
     # ours
     MILO_CONFIG="milo.config.h"
     $<$<CONFIG:Debug>:
-        MILO_DEFAULT_LVL=MILO_LVL_INFO
-        ENGINE_MILO_LVL=MILO_LVL_INFO
-        SOUND_MILO_LVL=MILO_LVL_INFO
+        MILO_DEFAULT_LVL=MILO_LVL_WARN
+        ENGINE_MILO_LVL=MILO_LVL_WARN
+        SOUND_MILO_LVL=MILO_LVL_WARN
         RECORDER_MILO_LVL=MILO_LVL_WARN
     >
     $<$<CONFIG:Release>:
