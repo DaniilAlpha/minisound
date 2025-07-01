@@ -39,22 +39,24 @@ class _RecordingExampleState extends State<RecordingExample> {
             ),
       Column(
           children: sounds.reversed
-              .map((t) => Row(mainAxisSize: MainAxisSize.min, children: [
-                    Text(t.$1.toString()),
-                    space,
-                    Text("${t.$2.duration}s"),
-                    space,
-                    ElevatedButton(
-                      child: const Text("PLAY"),
-                      onPressed: () =>
-                          widget.engine.start().then((_) => t.$2.play()),
-                    ),
-                    ElevatedButton(
-                      child: const Text("STOP"),
-                      onPressed: () =>
-                          widget.engine.start().then((_) => t.$2.stop()),
-                    ),
-                  ]))
+              .map((t) => OverflowBar(
+                      overflowAlignment: OverflowBarAlignment.center,
+                      children: [
+                        Text(t.$1.toString()),
+                        space,
+                        Text("${t.$2.duration}s"),
+                        space,
+                        ElevatedButton(
+                          child: const Text("PLAY"),
+                          onPressed: () =>
+                              widget.engine.start().then((_) => t.$2.play()),
+                        ),
+                        ElevatedButton(
+                          child: const Text("STOP"),
+                          onPressed: () =>
+                              widget.engine.start().then((_) => t.$2.stop()),
+                        ),
+                      ]))
               .toList()),
     ]);
   }

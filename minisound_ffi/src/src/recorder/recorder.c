@@ -1,7 +1,7 @@
 #include "../../include/recorder/recorder.h"
 
 #include <stdlib.h>
-#include <string.h>
+
 #include <assert.h>
 
 #include "../../external/miniaudio/include/miniaudio.h"

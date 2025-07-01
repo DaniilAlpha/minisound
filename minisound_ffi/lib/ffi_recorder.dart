@@ -26,11 +26,16 @@ class FfiRecorder implements PlatformRecorder {
     required int channelCount,
     required int sampleRate,
   }) async {
-    final r =
-        _bindings.recorder_init(_self, format.toC(), channelCount, sampleRate);
+    final r = _bindings.recorder_init(
+      _self,
+      format.toC(),
+      channelCount,
+      sampleRate,
+    );
     if (r != c.Result.Ok) {
       throw MinisoundPlatformException(
-          "Failed to initialize recorder with file (code: $r).");
+        "Failed to initialize recorder (code: $r).${Platform.isAndroid ? " It is possible that you forgot to request the microphone permission. See the README for more info." : ""}",
+      );
     }
   }
 
@@ -48,7 +53,8 @@ class FfiRecorder implements PlatformRecorder {
     );
     if (r != c.Result.Ok) {
       throw MinisoundPlatformException(
-          "Failed to start the recorder (code: $r).");
+        "Failed to start the recorder (code: $r).",
+      );
     }
   }
 

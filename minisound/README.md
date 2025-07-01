@@ -25,6 +25,11 @@ There was some pretty major changes in 2.0.0 version, see the [migration guide](
 
 ## Getting started 
 
+### Android
+
+Apart from setting the permission in the Android manifest (which is done by `minisound`), you also have to request permission from the user at runtime. This can be done easily with [`permission_handler` package](https://pub.dev/packages/permission_handler) (you can see the example for how to do this) or any analogous.   
+
+
 ### Web / Wasm
 
 While the main script is quite large, there are a loader script provided. Include it in the `web/index.html` file like this

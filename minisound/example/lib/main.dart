@@ -4,6 +4,7 @@ import "package:example/widgets/recording_example.dart";
 import "package:flutter/material.dart";
 import "package:minisound/engine.dart";
 import "package:minisound/recorder.dart";
+import "package:permission_handler/permission_handler.dart";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +25,10 @@ class _ExamplePageState extends State<ExamplePage> {
   final engine = Engine();
   final recorder = Recorder();
 
-  late final initFuture = engine.init() /* .then((_) => recorder.init()) */;
+  late final initFuture = engine.init().then((_) async {
+    await Permission.microphone.request();
+    return recorder.init();
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -30,7 +30,7 @@ class WebRecorder implements PlatformRecorder {
         await c.recorder_init(_self, format.toC(), channelCount, sampleRate);
     if (r != c.Result.Ok) {
       throw MinisoundPlatformException(
-          "Failed to initialize recorder with file (code: $r).");
+          "Failed to initialize recorder (code: $r).");
     }
   }
 
