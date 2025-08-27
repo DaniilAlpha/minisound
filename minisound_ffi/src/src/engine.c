@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "../external/miniaudio/include/miniaudio.h"
+#include "../external/miniaudio/miniaudio.h"
 #include "../include/sound_data/encoded_sound_data.h"
 #include "../include/sound_data/pulse_sound_data.h"
 

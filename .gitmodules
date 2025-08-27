@@ -10,3 +10,6 @@
 [submodule "minisound_ffi/test_native/external/miunte"]
 	path = minisound_ffi/test_native/external/miunte
 	url = https://github.com/DaniilAlpha/miunte.git
+[submodule "minisound_ffi/src/external/miniaudio"]
+	path = minisound_ffi/src/external/miniaudio
+	url = https://github.com/mackron/miniaudio.git

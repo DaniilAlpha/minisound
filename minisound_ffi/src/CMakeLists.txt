@@ -12,6 +12,7 @@ else()
 endif()
 
 
+
 # Main lib
 if(NOT EMSCRIPTEN)
     add_library(${MAIN_LIB} SHARED)
@@ -28,23 +29,16 @@ endif()
 
 
 # Sources
-file(GLOB_RECURSE MAIN_SOURCES
-    ${MAIN_PATH}/src/*.c
-    ${MAIN_PATH}/external/*/src/*.c
-)
+file(GLOB_RECURSE MAIN_SOURCES ${MAIN_PATH}/src/*.c)
 target_sources(${MAIN_LIB} PRIVATE ${MAIN_SOURCES})
 
-# Includes
-# file(GLOB_RECURSE MAIN_INCLUDES LIST_DIRECTORIES TRUE
-#     ${MAIN_PATH}/external/*/include/
-# )
-# list(APPEND MAIN_INCLUDES ${MAIN_PATH}/include/)
-target_include_directories(${MAIN_LIB} PRIVATE "include/" ${MAIN_INCLUDES})
+# TODO!!! won't work on iOS/MacOS
+target_include_directories(${MAIN_LIB} PRIVATE "include/")
 
 # Definitions
 target_compile_definitions(${MAIN_LIB} PUBLIC DART_SHARED_LIB
     # ours
-    MILO_CONFIG="milo.config.h"
+    MILO_CONFIG="../include/milo.config.h"
     $<$<CONFIG:Debug>:
         MILO_DEFAULT_LVL=MILO_LVL_WARN
         ENGINE_MILO_LVL=MILO_LVL_WARN
@@ -112,8 +106,8 @@ if(NOT EMSCRIPTEN)
     if(NOT MSVC)
         set(COMPILE_AND_LINK_OPTS
             $<$<CONFIG:Debug>: -Og -g > $<$<CONFIG:Release>: -O3 >)
-        target_compile_options(${MAIN_LIB} PRIVATE ${COMPILE_AND_LINK_OPTS})
-        target_link_options(${MAIN_LIB} PRIVATE ${COMPILE_AND_LINK_OPTS})
+        target_compile_options(${MAIN_LIB} PUBLIC ${COMPILE_AND_LINK_OPTS})
+        target_link_options(${MAIN_LIB} PUBLIC ${COMPILE_AND_LINK_OPTS})
         unset(COMPILE_AND_LINK_OPTS)
     endif()
 else()
@@ -192,7 +186,30 @@ if(EMSCRIPTEN)
 endif()
 
 
-# Additional libs
+# Libs
+set(MINIAUDIO_NO_RUNTIME_LINKING ON CACHE BOOL "Disable runtime linking")
+set(MINIAUDIO_NO_EXTRA_NODES ON CACHE BOOL "Do not build extra node graph nodes")
+set(MINIAUDIO_NO_RESOURCE_MANAGER ON CACHE BOOL "Disable the resource manager API")
+set(MINIAUDIO_ENABLE_ONLY_SPECIFIC_BACKENDS ON CACHE BOOL "Only enable specific backends. Backends can be enabled with MINIAUDIO_ENABLE_[BACKEND].")
+if (NOT EMSCRIPTEN)
+    set(MINIAUDIO_ENABLE_PULSEAUDIO ON CACHE BOOL "Disable the PulseAudio backend")
+    # set(MINIAUDIO_ENABLE_ALSA ON CACHE BOOL "Disable the ALSA backend")
+    # set(MINIAUDIO_ENABLE_JACK ON CACHE BOOL "Disable the JACK backend")
+    # windows
+    set(MINIAUDIO_ENABLE_WASAPI ON CACHE BOOL "Enable the WASAPI backend")
+    # android
+    set(MINIAUDIO_ENABLE_AAUDIO ON CACHE BOOL "Enable the AAudio backend")
+    set(MINIAUDIO_ENABLE_OPENSL ON CACHE BOOL "Enable the OpenSL|ES backend")
+    # apple
+    set(MINIAUDIO_ENABLE_COREAUDIO ON CACHE BOOL "Enable the CoreAudio backend")
+else()
+    # MA_ENABLE_WEBAUDIO
+    # MA_ENABLE_AUDIO_WORKLETS
+endif()
+add_subdirectory(external/miniaudio/)
+target_compile_options(miniaudio PUBLIC -fPIC)
+target_link_libraries(${MAIN_LIB} miniaudio)
+
 if(ANDROID)
     target_link_libraries(${MAIN_LIB} OpenSLES log)
 endif()

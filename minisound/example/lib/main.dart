@@ -1,6 +1,9 @@
+import "dart:io";
+
 import "package:example/widgets/generation_example.dart";
 import "package:example/widgets/playback_example.dart";
 import "package:example/widgets/recording_example.dart";
+import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:minisound/engine.dart";
 import "package:minisound/recorder.dart";
@@ -9,8 +12,9 @@ import "package:permission_handler/permission_handler.dart";
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (const bool.fromEnvironment('dart.tool.dart2wasm'))
-    print("Its the actual WASM build!");
+  if (kIsWasm) {
+    if (kDebugMode) print("Its the actual WASM build!");
+  }
   runApp(const MaterialApp(title: "Minisound Example", home: ExamplePage()));
 }
 
@@ -25,10 +29,10 @@ class _ExamplePageState extends State<ExamplePage> {
   final engine = Engine();
   final recorder = Recorder();
 
-  late final initFuture = engine.init().then((_) async {
-    await Permission.microphone.request();
-    return recorder.init();
-  });
+  late final initFuture = engine.init().then((_) {
+    if (kIsWeb || !Platform.isLinux) return Permission.microphone.request();
+    return Future.value();
+  }).then((_) => recorder.init());
 
   @override
   Widget build(BuildContext context) {

@@ -7,7 +7,7 @@
 
 #define MILO_LVL RECORDER_MILO_LVL
 #include "../../external/milo/milo.h"
-#include "../../external/miniaudio/include/miniaudio.h"
+#include "../../external/miniaudio/miniaudio.h"
 
 #define RECORDING_MIN_CAP (65536)
 #define RECORDING_FADE_MS (64)
@@ -62,9 +62,9 @@ static ma_result encoder_on_seek(
 
     size_t off = 0;
     switch (origin) {
-    case ma_seek_origin_start: off = off_from_origin; break;
-    case ma_seek_origin_current: off = self->off + off_from_origin; break;
-    case ma_seek_origin_end: off = self->size - 1 - off_from_origin; break;
+    case MA_SEEK_SET: off = off_from_origin; break;
+    case MA_SEEK_CUR: off = self->off + off_from_origin; break;
+    case MA_SEEK_END: off = self->size - 1 - off_from_origin; break;
     }
     if (off >= self->size) return MA_OUT_OF_RANGE;
 

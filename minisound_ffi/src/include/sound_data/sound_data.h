@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "../../external/miniaudio/include/miniaudio.h"
+#include "../../external/miniaudio/miniaudio.h"
 #include "../../external/woodi/woodi.h"
 
 typedef enum SoundDataType {

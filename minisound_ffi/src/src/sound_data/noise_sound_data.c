@@ -1,9 +1,10 @@
 #include "../../include/sound_data/noise_sound_data.h"
 
 #include <stdlib.h>
+
 #include <assert.h>
 
-#include "../../external/miniaudio/include/miniaudio.h"
+#include "../../external/miniaudio/miniaudio.h"
 
 #define MILO_LVL SOUND_MILO_LVL
 #include "../../external/milo/milo.h"

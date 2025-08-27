@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "../external/miniaudio/include/miniaudio.h"
+#include "../external/miniaudio/miniaudio.h"
 
 #define MILO_LVL SOUND_MILO_LVL
 #include "../external/milo/milo.h"
@@ -29,6 +29,7 @@ Result sound_init(
         self->engine,
         sound_data_get_ds(&self->sound_data),
         MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION,
+        NULL,
         NULL,
         &self->sound
     );

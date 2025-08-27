@@ -4,7 +4,7 @@
 
 #include <assert.h>
 
-#include "../../external/miniaudio/include/miniaudio.h"
+#include "../../external/miniaudio/miniaudio.h"
 #include "../../include/recorder/recorder_buffer.h"
 
 #define MILO_LVL RECORDER_MILO_LVL
