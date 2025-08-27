@@ -5,9 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <miniaudio.h>
+
 #define MILO_LVL RECORDER_MILO_LVL
 #include "../../external/milo/milo.h"
-#include "../../external/miniaudio/miniaudio.h"
 
 #define RECORDING_MIN_CAP (65536)
 #define RECORDING_FADE_MS (64)

@@ -1,9 +1,17 @@
-# Setup
 cmake_minimum_required(VERSION 3.11)
 project(minisound_ffi VERSION 1.0.0 LANGUAGES C)
 
 
-# Set lib name
+### paths ###
+
+set(MAIN_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+if (EMSCRIPTEN)
+    set(WEB_OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/../)
+endif()
+
+
+### library ###
+
 if(NOT EMSCRIPTEN)
     set(MAIN_LIB minisound_ffi)
 else()
@@ -11,81 +19,39 @@ else()
     set(MAIN_JS minisound_web_js)
 endif()
 
-
-
-# Main lib
 if(NOT EMSCRIPTEN)
     add_library(${MAIN_LIB} SHARED)
 else()
     add_executable(${MAIN_LIB})
 endif()
 
-
-# Set paths
-set(MAIN_PATH ${CMAKE_CURRENT_SOURCE_DIR})
-if (EMSCRIPTEN)
-    set(WEB_OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/../)
-endif()
-
-
-# Sources
 file(GLOB_RECURSE MAIN_SOURCES ${MAIN_PATH}/src/*.c)
 target_sources(${MAIN_LIB} PRIVATE ${MAIN_SOURCES})
-
 # TODO!!! won't work on iOS/MacOS
 target_include_directories(${MAIN_LIB} PRIVATE "include/")
 
-# Definitions
-target_compile_definitions(${MAIN_LIB} PUBLIC DART_SHARED_LIB
-    # ours
-    MILO_CONFIG="../include/milo.config.h"
+# dart stuff
+target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB)
+
+
+### properties ###
+
+# logging
+target_compile_definitions(${MAIN_LIB} PRIVATE
+    MILO_CONFIG="milo.config.h"
     $<$<CONFIG:Debug>:
         MILO_DEFAULT_LVL=MILO_LVL_WARN
         ENGINE_MILO_LVL=MILO_LVL_WARN
         SOUND_MILO_LVL=MILO_LVL_WARN
         RECORDER_MILO_LVL=MILO_LVL_WARN
-    >
-    $<$<CONFIG:Release>:
+    > $<$<CONFIG:Release>:
         MILO_DEFAULT_LVL=MILO_LVL_NONE
         ENGINE_MILO_LVL=MILO_LVL_NONE
         SOUND_MILO_LVL=MILO_LVL_NONE
         RECORDER_MILO_LVL=MILO_LVL_NONE
-    >
-    # miniaudio
-    MA_ENABLE_ONLY_SPECIFIC_BACKENDS
-    MA_NO_RESOURCE_MANAGER
+    >)
 
-    # MA_DEBUG_OUTPUT
-)
-
-# Platform-specific definitions
-if(NOT EMSCRIPTEN)
-    if(NOT (WIN32 OR LINUX OR ANDROID OR APPLE))
-        message(ERROR
-            "Sound won't work, as no backend for your platform was enabled! ")
-    endif()
-
-    target_compile_definitions(${MAIN_LIB} PUBLIC
-        # windows
-        MA_ENABLE_WASAPI
-        # linux
-        MA_ENABLE_PULSEAUDIO
-        MA_ENABLE_JACK
-        MA_ENABLE_ALSA
-        # android
-        MA_ENABLE_OPENSL
-        # apple
-        MA_ENABLE_COREAUDIO
-    )
-else()
-    target_compile_definitions(${MAIN_LIB} PRIVATE
-        MA_ENABLE_WEBAUDIO
-        MA_ENABLE_AUDIO_WORKLETS
-    )
-endif()
-
-
-# Set properties
+# warnings
 if(NOT MSVC)
     target_compile_options(${MAIN_LIB} PRIVATE
         -W -Wall -Wextra -Wformat -Wno-unused-function)
@@ -94,29 +60,13 @@ if(NOT MSVC)
     #           -Wno-strict-prototypes -Wno-comma)
     # endif()
 else()
-    target_compile_options(${MAIN_LIB} PRIVATE -W3)
+    target_compile_options(${MAIN_LIB} PRIVATE /W4)
 endif()
 
-if(NOT EMSCRIPTEN)
-    set_target_properties(${MAIN_LIB} PROPERTIES
-        PUBLIC_HEADER include/minisound.h
-        OUTPUT_NAME ${MAIN_LIB}
-    )
-
-    if(NOT MSVC)
-        set(COMPILE_AND_LINK_OPTS
-            $<$<CONFIG:Debug>: -Og -g > $<$<CONFIG:Release>: -O3 >)
-        target_compile_options(${MAIN_LIB} PUBLIC ${COMPILE_AND_LINK_OPTS})
-        target_link_options(${MAIN_LIB} PUBLIC ${COMPILE_AND_LINK_OPTS})
-        unset(COMPILE_AND_LINK_OPTS)
-    endif()
-else()
-    set_target_properties(${MAIN_LIB} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${WEB_OUT_DIR}
-    )
-
+if(EMSCRIPTEN)
     target_compile_options(${MAIN_LIB} PRIVATE
         -O3 -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
+    # TODO check if there's a reason not to use target_link_options
     set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
         -O3 \
         -flto -fno-rtti -fno-exceptions \
@@ -144,8 +94,59 @@ else()
     # ")
 endif()
 
+if(NOT EMSCRIPTEN)
+    set_target_properties(${MAIN_LIB} PROPERTIES
+        PUBLIC_HEADER include/minisound.h
+        OUTPUT_NAME ${MAIN_LIB}
+    )
+else()
+    set_target_properties(${MAIN_LIB} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${WEB_OUT_DIR}
+    )
+endif()
 
-# Additional emscripten-only stuff
+
+### miniaudio ###
+
+# TODO if this works out, make an issue in miniaudio to make defs PUBLIC
+# TODO try somehow enabling pipewire (if it's present in MA at all)
+
+option(MINIAUDIO_NO_RUNTIME_LINKING "" ON)
+option(MINIAUDIO_NO_EXTRA_NODES "" ON)
+option(MINIAUDIO_NO_RESOURCE_MANAGER "" ON)
+option(MINIAUDIO_ENABLE_ONLY_SPECIFIC_BACKENDS "" ON)
+if (NOT EMSCRIPTEN)
+    if(NOT (WIN32 OR LINUX OR ANDROID OR APPLE))
+        message(ERROR
+            "Sound won't work, as no backend for your platform was enabled! ")
+    endif()
+
+    # linux
+    # option(MINIAUDIO_ENABLE_PULSEAUDIO "" ON)
+    option(MINIAUDIO_ENABLE_ALSA "" ON)
+    # windows
+    option(MINIAUDIO_ENABLE_WASAPI "" ON)
+    # android
+    option(MINIAUDIO_ENABLE_AAUDIO "" ON)
+    option(MINIAUDIO_ENABLE_OPENSL "" ON)
+    # apple
+    option(MINIAUDIO_ENABLE_COREAUDIO "" ON)
+else()
+    option(MINIAUDIO_ENABLE_WEBAUDIO "" ON)
+endif()
+
+add_subdirectory(external/miniaudio/)
+
+target_compile_options(miniaudio PUBLIC -fPIC)
+if(EMSCRIPTEN)
+    target_compile_definitions(miniaudio PUBLIC MA_ENABLE_AUDIO_WORKLETS)
+endif()
+
+target_link_libraries(${MAIN_LIB} miniaudio)
+
+
+### compile emscripten into the JS+WASM lib ###
+
 if(EMSCRIPTEN)
     file(GLOB_RECURSE JS_SOURCES ${MAIN_PATH}/js/*.js)
 
@@ -186,32 +187,10 @@ if(EMSCRIPTEN)
 endif()
 
 
-# Libs
-set(MINIAUDIO_NO_RUNTIME_LINKING ON CACHE BOOL "Disable runtime linking")
-set(MINIAUDIO_NO_EXTRA_NODES ON CACHE BOOL "Do not build extra node graph nodes")
-set(MINIAUDIO_NO_RESOURCE_MANAGER ON CACHE BOOL "Disable the resource manager API")
-set(MINIAUDIO_ENABLE_ONLY_SPECIFIC_BACKENDS ON CACHE BOOL "Only enable specific backends. Backends can be enabled with MINIAUDIO_ENABLE_[BACKEND].")
-if (NOT EMSCRIPTEN)
-    set(MINIAUDIO_ENABLE_PULSEAUDIO ON CACHE BOOL "Disable the PulseAudio backend")
-    # set(MINIAUDIO_ENABLE_ALSA ON CACHE BOOL "Disable the ALSA backend")
-    # set(MINIAUDIO_ENABLE_JACK ON CACHE BOOL "Disable the JACK backend")
-    # windows
-    set(MINIAUDIO_ENABLE_WASAPI ON CACHE BOOL "Enable the WASAPI backend")
-    # android
-    set(MINIAUDIO_ENABLE_AAUDIO ON CACHE BOOL "Enable the AAudio backend")
-    set(MINIAUDIO_ENABLE_OPENSL ON CACHE BOOL "Enable the OpenSL|ES backend")
-    # apple
-    set(MINIAUDIO_ENABLE_COREAUDIO ON CACHE BOOL "Enable the CoreAudio backend")
-else()
-    # MA_ENABLE_WEBAUDIO
-    # MA_ENABLE_AUDIO_WORKLETS
-endif()
-add_subdirectory(external/miniaudio/)
-target_compile_options(miniaudio PUBLIC -fPIC)
-target_link_libraries(${MAIN_LIB} miniaudio)
+### ###
 
 if(ANDROID)
-    target_link_libraries(${MAIN_LIB} OpenSLES log)
+    # find_library(AAUDIO_LIB AAudio)
+    # find_library(AAudio-lib AAudio)
+    target_link_libraries(${MAIN_LIB} OpenSLES log AAudio)
 endif()
-
-

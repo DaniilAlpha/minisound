@@ -1,7 +1,8 @@
 #ifndef SILENCE_DATA_SOURCE_H
 #define SILENCE_DATA_SOURCE_H
 
-#include "../../external/miniaudio/miniaudio.h"
+#include <miniaudio.h>
+
 #include "../../external/result/result.h"
 
 typedef struct SilenceDataSourceConfig {
