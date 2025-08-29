@@ -1,16 +1,13 @@
 // Relative import to be able to reuse the C sources.
-// See the comment in ../{projectName}.podspec for more information.
+// See the comment in ../minisound_ffi.podspec for more information.
 
-#include "../../src/external/miniaudio/src/miniaudio.c"
-
+#include "../../src/external/miniaudio/miniaudio.c"
 #include "../../src/src/engine.c"
-#include "../../src/src/sound.c"
 #include "../../src/src/milo.c"
-
 #include "../../src/src/recorder/recorder.c"
 #include "../../src/src/recorder/recorder_buffer.c"
 #include "../../src/src/recorder/recording.c"
-
+#include "../../src/src/sound.c"
 #include "../../src/src/sound_data/encoded_sound_data.c"
 #include "../../src/src/sound_data/noise_sound_data.c"
 #include "../../src/src/sound_data/pulse_sound_data.c"

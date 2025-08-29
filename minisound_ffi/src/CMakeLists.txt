@@ -111,18 +111,17 @@ endif()
 # TODO if this works out, make an issue in miniaudio to make defs PUBLIC
 # TODO try somehow enabling pipewire (if it's present in MA at all)
 
-option(MINIAUDIO_NO_RUNTIME_LINKING "" ON)
 option(MINIAUDIO_NO_EXTRA_NODES "" ON)
 option(MINIAUDIO_NO_RESOURCE_MANAGER "" ON)
 option(MINIAUDIO_ENABLE_ONLY_SPECIFIC_BACKENDS "" ON)
 if (NOT EMSCRIPTEN)
     if(NOT (WIN32 OR LINUX OR ANDROID OR APPLE))
         message(ERROR
-            "Sound won't work, as no backend for your platform was enabled! ")
+            "Minisound won't work, as no backend for your platform was enabled!")
     endif()
 
     # linux
-    # option(MINIAUDIO_ENABLE_PULSEAUDIO "" ON)
+    option(MINIAUDIO_ENABLE_PULSEAUDIO "" ON)
     option(MINIAUDIO_ENABLE_ALSA "" ON)
     # windows
     option(MINIAUDIO_ENABLE_WASAPI "" ON)
@@ -190,7 +189,5 @@ endif()
 ### ###
 
 if(ANDROID)
-    # find_library(AAUDIO_LIB AAudio)
-    # find_library(AAudio-lib AAudio)
-    target_link_libraries(${MAIN_LIB} OpenSLES log AAudio)
+    target_link_libraries(${MAIN_LIB} log)
 endif()
