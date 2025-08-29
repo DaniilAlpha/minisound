@@ -28,7 +28,8 @@ endif()
 file(GLOB_RECURSE MAIN_SOURCES ${MAIN_PATH}/src/*.c)
 target_sources(${MAIN_LIB} PRIVATE ${MAIN_SOURCES})
 # TODO!!! won't work on iOS/MacOS
-target_include_directories(${MAIN_LIB} PRIVATE "include/")
+target_include_directories(${MAIN_LIB} PUBLIC "include/")
+# target_include_directories(${MAIN_LIB} INTERFACE "include/")
 
 # dart stuff
 target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB)
@@ -117,7 +118,7 @@ option(MINIAUDIO_ENABLE_ONLY_SPECIFIC_BACKENDS "" ON)
 if (NOT EMSCRIPTEN)
     if(NOT (WIN32 OR LINUX OR ANDROID OR APPLE))
         message(ERROR
-            "Minisound won't work, as no backend for your platform was enabled!")
+            "Sound won't work, as no backend for your platform was enabled!")
     endif()
 
     # linux

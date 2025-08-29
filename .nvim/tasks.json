@@ -1,6 +1,7 @@
 {
     "init": {
         "cmds": [
+            "export CMAKE_EXPORT_COMPILE_COMMANDS=1",
             "export CMAKE_LOG_LEVEL=NOTICE"
         ]
     },
