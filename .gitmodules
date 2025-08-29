@@ -12,4 +12,4 @@
 	url = https://github.com/DaniilAlpha/miunte.git
 [submodule "minisound_ffi/src/external/miniaudio"]
 	path = minisound_ffi/src/external/miniaudio
-	url = https://github.com/mackron/miniaudio.git
+	url = git@github.com:DaniilAlpha/miniaudio.git
