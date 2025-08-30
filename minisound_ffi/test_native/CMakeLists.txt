@@ -19,5 +19,3 @@ target_link_options(${TEST} PRIVATE ${COMPILE_AND_LINK_OPTS})
 
 add_subdirectory(../src/ ${CMAKE_CURRENT_BINARY_DIR}/minisound/)
 target_link_libraries(${TEST} minisound_ffi)
-
-
