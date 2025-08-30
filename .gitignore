@@ -1,3 +1,4 @@
 .vscode/
 .nvim/
 lib/build/cmake_stuff/
+.cache/

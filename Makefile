@@ -19,7 +19,6 @@ help:
 	@ echo "  clean_web_lib: Cleans the web lib." 
 	@ echo "  build_native_test: Build automatic tests for the native platform."
 	@ echo "  clean_native_test: Cleans automatic tests." 
-	# TODO add help for native test targets
 
 
 _check_if_version_set:

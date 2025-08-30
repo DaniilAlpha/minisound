@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MIUNTE_STOP_ON_FAILURE (1)
-#include <miunte.h>
+#include <engine.h>
+#include <recorder/recorder.h>
+#include <sound_data/encoded_sound_data.h>
 #include <threads.h>
 
-#include "engine.h"
-#include "recorder/recorder.h"
-#include "sound_data/encoded_sound_data.h"
+#define MIUNTE_STOP_ON_FAILURE (1)
+#include <miunte.h>
 
 #define lenof(arr) (sizeof(arr) / sizeof(arr[0]))
 

@@ -17,7 +17,8 @@ Result encoded_sound_data_init(
 );
 void encoded_sound_data_uninit(EncodedSoundData *const self);
 
-EXPORT bool encoded_sound_data_get_is_looped(EncodedSoundData const *const self
+EXPORT bool encoded_sound_data_get_is_looped(
+    EncodedSoundData const *const self
 );
 EXPORT void encoded_sound_data_set_looped(
     EncodedSoundData *const self,

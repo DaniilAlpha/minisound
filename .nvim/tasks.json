@@ -14,7 +14,7 @@
                 "cd ./minisound_ffi/ && flutter pub get && flutter pub upgrade && cd ../",
                 "cd ./minisound_web/ && flutter pub get && flutter pub upgrade && cd ../",
                 "cd ./minisound/ && flutter pub get && flutter pub upgrade && cd ../",
-                "cd ./minisound/example/ && flutter pub get && flutter pub upgrade && cd ../"
+                "cd ./minisound/example/ && flutter pub get && flutter pub upgrade"
             ],
             "noninteractive": true
         },
@@ -25,7 +25,7 @@
                 "cd ./minisound_ffi/ && flutter clean && cd ../",
                 "cd ./minisound_web/ && flutter clean && cd ../",
                 "cd ./minisound/ && flutter clean && cd ../",
-                "cd ./minisound/example/ && flutter clean && cd ../"
+                "cd ./minisound/example/ && flutter clean"
             ],
             "noninteractive": true
         },

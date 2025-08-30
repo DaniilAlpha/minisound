@@ -1,6 +1,7 @@
 #include "../../include/sound_data/waveform_sound_data.h"
 
 #include <stdlib.h>
+
 #include <assert.h>
 
 #define MILO_LVL SOUND_MILO_LVL
@@ -16,7 +17,8 @@ struct WaveformSoundData {
     ma_waveform waveform;
 };
 
-static ma_data_source *waveform_sound_data_get_ds(WaveformSoundData *const self
+static ma_data_source *waveform_sound_data_get_ds(
+    WaveformSoundData *const self
 ) {
     return &self->waveform;
 }
@@ -64,17 +66,17 @@ void waveform_sound_data_set_freq(
     ma_waveform_set_frequency(&self->waveform, value);
 }
 
-SoundData waveform_sound_data_ww_sound_data(WaveformSoundData *const self)
-    WRAP_BODY(
-        SoundData,
-        SOUND_DATA_INTERFACE(WaveformSoundData),
-        {
-            .type = SOUND_DATA_TYPE_WAVEFORM,
+SoundData
+waveform_sound_data_ww_sound_data(WaveformSoundData *const self) WRAP_BODY(
+    SoundData,
+    SOUND_DATA_INTERFACE(WaveformSoundData),
+    {
+        .type = SOUND_DATA_TYPE_WAVEFORM,
 
-            .get_ds = waveform_sound_data_get_ds,
-            .uninit = waveform_sound_data_uninit,
-        }
-    );
+        .get_ds = waveform_sound_data_get_ds,
+        .uninit = waveform_sound_data_uninit,
+    }
+);
 
 // clang-format off
 

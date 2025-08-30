@@ -28,8 +28,7 @@ endif()
 file(GLOB_RECURSE MAIN_SOURCES ${MAIN_PATH}/src/*.c)
 target_sources(${MAIN_LIB} PRIVATE ${MAIN_SOURCES})
 # TODO!!! won't work on iOS/MacOS
-target_include_directories(${MAIN_LIB} PUBLIC "include/")
-# target_include_directories(${MAIN_LIB} INTERFACE "include/")
+target_include_directories(${MAIN_LIB} PUBLIC include/)
 
 # dart stuff
 target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB)
