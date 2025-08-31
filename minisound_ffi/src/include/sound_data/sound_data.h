@@ -23,9 +23,15 @@ typedef enum SoundDataType {
     }
 WRAPPER(SoundData, SOUND_DATA_INTERFACE);
 
-#define sound_data_get_type(self) ((self)->__vtbl->type)
+static inline SoundDataType sound_data_get_type(SoundData const *const self) {
+    return self->__vtbl->type;
+}
 
-#define sound_data_get_ds(self) WRAPPER_CALL(get_ds, self)
-#define sound_data_uninit(self) WRAPPER_CALL(uninit, self)
+static inline ma_data_source *sound_data_get_ds(SoundData *const self) {
+    return WRAPPER_CALL(get_ds, self);
+}
+static inline void sound_data_uninit(SoundData *const self) {
+    return WRAPPER_CALL(uninit, self);
+}
 
 #endif

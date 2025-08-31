@@ -22,9 +22,6 @@ EXPORT Result engine_load_sound(
     Sound *const sound,
     uint8_t const *const data,
     size_t const data_size
-    // SoundFormat const sound_format,
-    // uint32_t const channels,
-    // uint32_t const sample_rate
 );
 EXPORT Result engine_generate_waveform(
     Engine *const self,

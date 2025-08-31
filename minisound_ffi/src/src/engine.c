@@ -7,30 +7,35 @@
 
 #include "../include/sound_data/encoded_sound_data.h"
 #include "../include/sound_data/pulse_sound_data.h"
+#include "conviniences.h"
 
 #define MILO_LVL ENGINE_MILO_LVL
 #include "../external/milo/milo.h"
-
-#define SOUND_STREAMING_MIN_SIZE (64 * 1024 * 1024)
 
 /*************
  ** private **
  *************/
 
-struct Engine {
-    bool is_started;
+typedef enum EngineState {
+    ENGINE_STATE_UNINITIALIZED = 0,
+    ENGINE_STATE_INITIALIZED,
+    ENGINE_STATE_STARTED,
+} EngineState;
 
+struct Engine {
     ma_engine engine;
+
+    EngineState state;
 };
 
 /************
  ** public **
  ************/
 
-Engine *engine_alloc(void) { return malloc(sizeof(Engine)); }
+Engine *engine_alloc(void) { return malloc0(sizeof(Engine)); }
 
 Result engine_init(Engine *const self, uint32_t const period_ms) {
-    self->is_started = false;
+    if (self->state != ENGINE_STATE_UNINITIALIZED) return Ok;
 
     ma_engine_config config = ma_engine_config_init();
 #if (__EMSCRIPTEN__)
@@ -42,24 +47,24 @@ Result engine_init(Engine *const self, uint32_t const period_ms) {
     if (ma_engine_init(&config, &self->engine) != MA_SUCCESS)
         return error("miniaudio engine initialization error!"), UnknownErr;
 
-    // self->dec_config = ma_decoder_config_init(
-    //     self->engine.pDevice->playback.format,
-    //     self->engine.pDevice->playback.channels,
-    //     self->engine.sampleRate
-    // );
-
+    self->state = ENGINE_STATE_INITIALIZED;
     return info("engine initialized"), Ok;
 }
-void engine_uninit(Engine *const self) { ma_engine_uninit(&self->engine); }
+void engine_uninit(Engine *const self) {
+    if (self->state == ENGINE_STATE_UNINITIALIZED) return;
+
+    ma_engine_uninit(&self->engine);
+    self->state = ENGINE_STATE_UNINITIALIZED;
+}
 
 Result engine_start(Engine *const self) {
-    if (self->is_started) return Ok;
+    if (self->state == ENGINE_STATE_UNINITIALIZED) return StateErr;
+    if (self->state == ENGINE_STATE_STARTED) return Ok;
 
     if (ma_engine_start(&self->engine) != MA_SUCCESS)
         return error("miniaudio engine starting error!"), UnknownErr;
 
-    self->is_started = true;
-
+    self->state = ENGINE_STATE_STARTED;
     return info("engine started"), Ok;
 }
 
@@ -69,6 +74,8 @@ Result engine_load_sound(
     uint8_t const *const data,
     size_t const data_size
 ) {
+    if (self->state == ENGINE_STATE_UNINITIALIZED) return StateErr;
+
     EncodedSoundData *const encoded = encoded_sound_data_alloc();
     if (encoded == NULL) return OutOfMemErr;
 
@@ -94,6 +101,8 @@ Result engine_generate_waveform(
     WaveformType const type,
     double const frequency
 ) {
+    if (self->state == ENGINE_STATE_UNINITIALIZED) return StateErr;
+
     WaveformSoundData *const waveform = waveform_sound_data_alloc();
     if (waveform == NULL) return OutOfMemErr;
 
@@ -118,6 +127,8 @@ Result engine_generate_noise(
     NoiseType const type,
     int32_t const seed
 ) {
+    if (self->state == ENGINE_STATE_UNINITIALIZED) return StateErr;
+
     NoiseSoundData *const noise = noise_sound_data_alloc();
     if (noise == NULL) return OutOfMemErr;
 
@@ -136,6 +147,8 @@ Result engine_generate_pulse(
     double const frequency,
     double const duty_cycle
 ) {
+    if (self->state == ENGINE_STATE_UNINITIALIZED) return StateErr;
+
     PulseSoundData *const pulse = pulse_sound_data_alloc();
     if (pulse == NULL) return OutOfMemErr;
 
