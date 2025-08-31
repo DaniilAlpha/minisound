@@ -38,18 +38,19 @@ target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB)
 
 # logging
 target_compile_definitions(${MAIN_LIB} PRIVATE
-    MILO_CONFIG="milo.config.h"
-    $<$<CONFIG:Debug>:
-        MILO_DEFAULT_LVL=MILO_LVL_WARN
-        ENGINE_MILO_LVL=MILO_LVL_WARN
-        SOUND_MILO_LVL=MILO_LVL_WARN
-        RECORDER_MILO_LVL=MILO_LVL_WARN
-    > $<$<CONFIG:Release>:
+    # TODO! there is a bug with milo coz it's the old version
+    # MILO_CONFIG="milo.config.h"
+    # $<$<CONFIG:Debug>:
+    #     MILO_DEFAULT_LVL=MILO_LVL_WARN
+    #     ENGINE_MILO_LVL=MILO_LVL_WARN
+    #     SOUND_MILO_LVL=MILO_LVL_WARN
+    #     RECORDER_MILO_LVL=MILO_LVL_WARN
+    # > $<$<CONFIG:Release>:
         MILO_DEFAULT_LVL=MILO_LVL_NONE
         ENGINE_MILO_LVL=MILO_LVL_NONE
         SOUND_MILO_LVL=MILO_LVL_NONE
         RECORDER_MILO_LVL=MILO_LVL_NONE
-    >)
+    #[[ > ]])
 
 # warnings
 if(NOT MSVC)
@@ -190,4 +191,6 @@ endif()
 
 if(ANDROID)
     target_link_libraries(${MAIN_LIB} log)
+elseif(EMSCRIPTEN)
+    target_compile_options(miniaudio PRIVATE -sWASM_WORKERS=1)
 endif()

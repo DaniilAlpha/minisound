@@ -1,9 +1,9 @@
 #include "../../include/sound_data/noise_sound_data.h"
 
-#include <stdlib.h>
-
 #include <assert.h>
 #include <miniaudio.h>
+
+#include "conviniences.h"
 
 #define MILO_LVL SOUND_MILO_LVL
 #include "../../external/milo/milo.h"
@@ -27,7 +27,7 @@ static ma_data_source *noise_sound_data_get_ds(NoiseSoundData *const self) {
  ************/
 
 NoiseSoundData *noise_sound_data_alloc(void) {
-    return malloc(sizeof(NoiseSoundData));
+    return malloc0(sizeof(NoiseSoundData));
 }
 Result noise_sound_data_init(
     NoiseSoundData *const self,

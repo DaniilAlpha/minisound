@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -89,6 +90,16 @@ MiunteResult test_encoded_sounds() {
         "./minisound/example/assets/00_plus.mp3",
         "./minisound/example/assets/kevin_macleod_call_to_adventure.mp3",
     };
+    static float const durations[] = {
+        0.337,
+        0.337,
+        0.379,
+        0.377,
+        247.249,
+    };
+    static float const sleep_duration =
+        0.660;  // careful! should be a multiplier of the engine period
+
     for (size_t i = 0; i < lenof(paths); i++) {
         Sound *const sound = sound_alloc();
         MIUNTE_EXPECT(sound != NULL, "sound should be allocated properly");
@@ -107,7 +118,28 @@ MiunteResult test_encoded_sounds() {
 
         MIUNTE_EXPECT(sound_play(sound) == Ok, "sound playing should not fail");
 
-        sleep(600);
+        MIUNTE_EXPECT(
+            fabs(sound_get_duration(sound) - durations[i]) <= 0.001,
+            "sound duration should not be misreported"
+        );
+
+        sleep(1000 * sleep_duration);
+
+        if (sound_get_duration(sound) > sleep_duration) {
+            MIUNTE_EXPECT(
+                sound_get_is_playing(sound) &&
+                    fabs(sound_get_position(sound) - sleep_duration) <= 0.033,
+                "sound should be playing at `sleep_dutation` right here"
+            );
+        } else {
+            MIUNTE_EXPECT(
+                !sound_get_is_playing(sound) &&
+                    fabs(
+                        sound_get_position(sound) - sound_get_duration(sound)
+                    ) <= 0.033,
+                "sound should be ended right here"
+            );
+        }
 
         sound_unload(sound);
         free(buf), buf = NULL;
@@ -148,6 +180,11 @@ MiunteResult test_looping() {
 
     sleep((600 + loop_delay_ms) * 3);
 
+    MIUNTE_EXPECT(
+        sound_get_is_playing(sound),
+        "looped sound should still be playing after several times"
+    );
+
     sound_unload(sound);
     free(buf), buf = NULL;
     free(sound);
@@ -171,6 +208,11 @@ MiunteResult test_generated_waveform_sounds() {
         );
         MIUNTE_EXPECT(sound_play(sound) == Ok, "sound playing should not fail");
 
+        MIUNTE_EXPECT(
+            sound_get_duration(sound) == 0.0,
+            "generated sounds should be durationless"
+        );
+
         sleep(200);
 
         sound_unload(sound);
@@ -189,6 +231,11 @@ MiunteResult test_generated_noise_sounds() {
     );
     MIUNTE_EXPECT(sound_play(sound) == Ok, "sound playing should not fail");
 
+    MIUNTE_EXPECT(
+        sound_get_duration(sound) == 0.0,
+        "generated sounds should be durationless"
+    );
+
     sleep(1000);
 
     sound_unload(sound);
@@ -205,7 +252,13 @@ MiunteResult test_generated_pulse_sounds() {
             engine_generate_pulse(engine, sound, 261.63, i) == Ok,
             "sound generation should not fail"
         );
+        sound_set_volume(sound, 0.4);
         MIUNTE_EXPECT(sound_play(sound) == Ok, "sound playing should not fail");
+
+        MIUNTE_EXPECT(
+            sound_get_duration(sound) == 0.0,
+            "generated sounds should be durationless"
+        );
 
         sleep(250);
 

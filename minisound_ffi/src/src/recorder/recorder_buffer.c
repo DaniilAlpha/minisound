@@ -7,6 +7,8 @@
 
 #include <miniaudio.h>
 
+#include "conviniences.h"
+
 #define MILO_LVL RECORDER_MILO_LVL
 #include "../../external/milo/milo.h"
 
@@ -79,7 +81,7 @@ static ma_result encoder_on_seek(
  ************/
 
 RecorderBuffer *recorder_buffer_alloc(void) {
-    return malloc(sizeof(RecorderBuffer));
+    return malloc0(sizeof(RecorderBuffer));
 }
 Result recorder_buffer_init(
     RecorderBuffer *const self,

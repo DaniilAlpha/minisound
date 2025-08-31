@@ -6,6 +6,7 @@
 #include <miniaudio.h>
 
 #include "../../include/recorder/recorder_buffer.h"
+#include "conviniences.h"
 
 #define MILO_LVL RECORDER_MILO_LVL
 #include "../../external/milo/milo.h"
@@ -14,10 +15,17 @@
  ** private **
  *************/
 
+typedef enum RecorderState {
+    RECORDER_UNINITIALIZED = 0,
+    RECORDER_INITIALIZED,
+} RecorderState;
+
 struct Recorder {
     ma_device device;
 
     RecorderBuffer *rec_buf;
+
+    RecorderState state;
 };
 
 static void data_callback(
@@ -27,7 +35,6 @@ static void data_callback(
     uint32_t const data_len_pcm
 ) {
     (void)_;
-
     Recorder *const self = device->pUserData;
 
     recorder_buffer_write(self->rec_buf, data, data_len_pcm);
@@ -37,13 +44,15 @@ static void data_callback(
  ** public **
  ************/
 
-Recorder *recorder_alloc(void) { return malloc(sizeof(Recorder)); }
+Recorder *recorder_alloc(void) { return malloc0(sizeof(Recorder)); }
 Result recorder_init(
     Recorder *const self,
     RecorderFormat const format,
     uint32_t const channel_count,
     uint32_t const sample_rate
 ) {
+    if (self->state != RECORDER_UNINITIALIZED) return Ok;
+
     ma_device_config device_config =
         ma_device_config_init(ma_device_type_capture);
     device_config.capture.format = (ma_format)format;
@@ -61,19 +70,25 @@ Result recorder_init(
 
     self->rec_buf = NULL;
 
+    self->state = RECORDER_INITIALIZED;
     return info("recorder initialized"), Ok;
 }
 void recorder_uninit(Recorder *const self) {
+    if (self->state == RECORDER_UNINITIALIZED) return;
+
     ma_device_uninit(&self->device);
     if (self->rec_buf != NULL)
         recorder_buffer_uninit(self->rec_buf), free(self->rec_buf);
+    self->state = RECORDER_UNINITIALIZED;
 }
 
 bool recorder_get_is_recording(Recorder const *self) {
+    if (self->state == RECORDER_UNINITIALIZED) return false;
     return self->rec_buf != NULL;
 }
 
 Result recorder_start(Recorder *const self, RecordingEncoding const encoding) {
+    if (self->state == RECORDER_UNINITIALIZED) return StateErr;
     if (self->rec_buf != NULL) return Ok;
 
     self->rec_buf = recorder_buffer_alloc();
@@ -92,7 +107,9 @@ Result recorder_start(Recorder *const self, RecordingEncoding const encoding) {
     return info("recorder started"), Ok;
 }
 Recording recorder_stop(Recorder *const self) {
-    if (self->rec_buf == NULL) return (Recording){.buf = NULL, .size = 0};
+    static Recording const empty = {.buf = NULL, .size = 0};
+    if (self->state == RECORDER_UNINITIALIZED) return empty;
+    if (self->rec_buf == NULL) return empty;
 
     ma_device_stop(&self->device);
 

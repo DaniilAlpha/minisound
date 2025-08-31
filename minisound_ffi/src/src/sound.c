@@ -31,7 +31,11 @@ struct Sound {
 
 static void on_sound_ended(void *const vself, ma_sound *const _) {
     Sound *const self = vself;
+    (void)_;
 
+    info("sound ended");
+
+    // TODO? potential race condition here
     self->state = SOUND_STATE_STOPPED;
 }
 
@@ -114,12 +118,26 @@ void sound_set_volume(Sound *const self, float const value) {
     ma_sound_set_volume(&self->sound, value);
 }
 
-double sound_get_duration(Sound *const self) {
+float sound_get_duration(Sound const *const self) {
     if (self->state == SOUND_STATE_UNINITIALIZED) return 0.0;
 
-    ma_uint64 length_in_frames;
-    ma_sound_get_length_in_pcm_frames(&self->sound, &length_in_frames);
-    return (double)length_in_frames / ma_engine_get_sample_rate(self->engine);
+    float length_in_seconds;
+    ma_sound_get_length_in_seconds(&self->sound, &length_in_seconds);
+    return length_in_seconds;
+}
+
+float sound_get_position(Sound const *const self) {
+    if (self->state == SOUND_STATE_UNINITIALIZED) return 0.0;
+
+    float pos_in_seconds;
+    ma_sound_get_cursor_in_seconds(&self->sound, &pos_in_seconds);
+    return pos_in_seconds;
+}
+
+bool sound_get_is_playing(Sound const *const self) {
+    if (self->state == SOUND_STATE_UNINITIALIZED) return false;
+
+    return self->state == SOUND_STATE_PLAYING;
 }
 
 EncodedSoundData *sound_get_encoded_data(Sound const *const self) {

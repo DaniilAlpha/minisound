@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "../../include/sound_data/silence_data_source.h"
+#include "conviniences.h"
 
 #define MILO_LVL SOUND_MILO_LVL
 #include "../../external/milo/milo.h"
@@ -31,7 +32,7 @@ static ma_data_source *encoded_sound_data_get_ds(EncodedSoundData *const self) {
  ************/
 
 EncodedSoundData *encoded_sound_data_alloc(void) {
-    return malloc(sizeof(EncodedSoundData));
+    return malloc0(sizeof(EncodedSoundData));
 }
 Result encoded_sound_data_init(
     EncodedSoundData *const self,

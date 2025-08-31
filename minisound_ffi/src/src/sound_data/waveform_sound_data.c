@@ -1,8 +1,8 @@
 #include "../../include/sound_data/waveform_sound_data.h"
 
-#include <stdlib.h>
-
 #include <assert.h>
+
+#include "conviniences.h"
 
 #define MILO_LVL SOUND_MILO_LVL
 #include "../../external/milo/milo.h"
@@ -28,7 +28,7 @@ static ma_data_source *waveform_sound_data_get_ds(
  ************/
 
 WaveformSoundData *waveform_sound_data_alloc(void) {
-    return malloc(sizeof(WaveformSoundData));
+    return malloc0(sizeof(WaveformSoundData));
 }
 Result waveform_sound_data_init(
     WaveformSoundData *const self,

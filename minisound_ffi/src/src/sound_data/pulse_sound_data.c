@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 
+#include "conviniences.h"
+
 #define MILO_LVL SOUND_MILO_LVL
 #include "../../external/milo/milo.h"
 
@@ -79,7 +81,7 @@ static ma_result pulse_sound_data_on_get_cursor(
  ************/
 
 PulseSoundData *pulse_sound_data_alloc(void) {
-    return malloc(sizeof(PulseSoundData));
+    return malloc0(sizeof(PulseSoundData));
 }
 Result pulse_sound_data_init(
     PulseSoundData *const self,
