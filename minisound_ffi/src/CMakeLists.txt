@@ -65,34 +65,33 @@ else()
 endif()
 
 if(EMSCRIPTEN)
-    target_compile_options(${MAIN_LIB} PRIVATE
+    #[[ target_compile_options(${MAIN_LIB} PUBLIC
         -O3 -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
-    # TODO check if there's a reason not to use target_link_options
-    set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
-        -O3 \
-        -flto -fno-rtti -fno-exceptions \
-        -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall \
-        -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb \
-        -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER \
-        -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB \
-        -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 \
-        -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072 \
-        -sSTACK_OVERFLOW_CHECK=1 \
-    ")
+    target_link_options(${MAIN_LIB} PUBLIC
+        -O3
+        -flto -fno-rtti -fno-exceptions
+        -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall
+        -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb
+        -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER
+        -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB
+        -sWASM_WORKERS=1 -sAUDIO_WORKLET=1
+        -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072
+        -sSTACK_OVERFLOW_CHECK=1
+    ) ]]
 
-    # target_compile_options(${MAIN_LIB} PRIVATE
-    #     -Og -g3 -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
-    # set_target_properties(${MAIN_LIB} PROPERTIES LINK_FLAGS "\
-    #     -Og -g3 -gsource-map \
-    #     -fno-rtti -fno-exceptions \
-    #     -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall \
-    #     -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb \
-    #     -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER \
-    #     -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB \
-    #     -sWASM_WORKERS=1 -sAUDIO_WORKLET=1 \
-    #     -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072 \
-    #     -sSTACK_OVERFLOW_CHECK=1 -sSAFE_HEAP \
-    # ")
+    target_compile_options(${MAIN_LIB} PUBLIC
+        -Og -g3 -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
+    target_link_options(${MAIN_LIB} PUBLIC
+        -Og -g3 -gsource-map
+        -fno-rtti -fno-exceptions
+        -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall
+        -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb
+        -sNO_DEFAULT_TO_CXX -sNO_TEXTDECODER
+        -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB
+        -sWASM_WORKERS=1 -sAUDIO_WORKLET=1
+        -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072
+        -sSTACK_OVERFLOW_CHECK=1 -sSAFE_HEAP
+    )
 endif()
 
 if(NOT EMSCRIPTEN)
@@ -137,7 +136,12 @@ endif()
 
 add_subdirectory(external/miniaudio/)
 
-target_compile_options(miniaudio PUBLIC -fPIC)
+if(NOT EMSCRIPTEN)
+    target_compile_options(miniaudio PUBLIC -fPIC)
+else()
+    target_compile_options(miniaudio PRIVATE -sWASM_WORKERS=1 -Wno-c23-extensions -Wno-unknown-warning-option)
+endif()
+
 if(EMSCRIPTEN)
     target_compile_definitions(miniaudio PUBLIC MA_ENABLE_AUDIO_WORKLETS)
 endif()
@@ -191,6 +195,4 @@ endif()
 
 if(ANDROID)
     target_link_libraries(${MAIN_LIB} log)
-elseif(EMSCRIPTEN)
-    target_compile_options(miniaudio PRIVATE -sWASM_WORKERS=1)
 endif()
