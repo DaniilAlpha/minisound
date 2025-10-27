@@ -23,7 +23,6 @@ class _PlaybackExampleState extends State<PlaybackExample> {
 
   final sounds = <String, LoadedSound>{};
   String? currentSoundName;
-  var loopDelay = 0.0;
 
   @override
   void initState() {
@@ -97,30 +96,36 @@ class _PlaybackExampleState extends State<PlaybackExample> {
             onPressed: currentSound?.stop, child: const Text("STOP")),
       ]),
       Row(mainAxisSize: MainAxisSize.min, children: [
-        const Text("Loop delay\n(changes after replay): "),
+        const Text("Loop delay\n(changes immediately): "),
         SizedBox(
           width: 200,
           child: Slider(
-            value: loopDelay,
+            value: currentSound == null
+                ? 0.0
+                : currentSound.loopDelay.inMilliseconds.toDouble(),
             min: 0,
-            max: 7,
-            divisions: 200,
-            label: loopDelay.toStringAsFixed(2),
-            onChanged: (value) => setState(() {
-              loopDelay = value;
-            }),
+            max: 7000,
+            // divisions: 100,
+            label: currentSound == null
+                ? null
+                : (currentSound.loopDelay.inMilliseconds / 1000)
+                    .toStringAsFixed(2),
+            onChanged: currentSound == null
+                ? null
+                : (value) => setState(() {
+                      currentSound.loopDelay =
+                          Duration(milliseconds: value.toInt());
+                    }),
           ),
         ),
       ]),
-      ElevatedButton(
-        onPressed: currentSound == null
+      Switch(
+        value: currentSound == null ? false : currentSound.isLooped,
+        onChanged: currentSound == null
             ? null
-            : () => widget.engine.start().then((_) => currentSound.playLooped(
-                  delay: Duration(
-                    milliseconds: (loopDelay * 1000).toInt(),
-                  ),
-                )),
-        child: const Text("PLAY LOOPED"),
+            : (val) => setState(() {
+                  currentSound.isLooped = val;
+                }),
       ),
     ]);
   }

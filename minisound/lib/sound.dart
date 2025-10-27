@@ -46,27 +46,14 @@ class LoadedSound extends Sound {
       // TODO? maybe increase resolution?
       Duration(milliseconds: (_sound.position * 1000).toInt());
 
-  /// Returns the current loop delay, or `null` if not looped (or not playing at all).
-  Duration? get loopDelay =>
-      !_sound.looping.$1 ? null : Duration(milliseconds: _sound.looping.$2);
+  /// Whether the playbal should be started again automatically after `loopDelay`ms when the sound is ended.
+  bool get isLooped => _sound.looping.$1;
+  set isLooped(bool val) => _sound.looping = (val, _sound.looping.$2);
 
-  /// Starts sound with looping.
-  ///
-  /// `delay` - delay before sound will be played again. Clamped positive.
-  void playLooped({Duration delay = Duration.zero}) {
-    super.pause();
-    final delayMs = delay < Duration.zero ? 0 : delay.inMilliseconds;
-    if (!_sound.looping.$1 || _sound.looping.$2 != delayMs) {
-      _sound.looping = (true, delayMs);
-    }
-    super.resume();
-  }
-
-  @override
-  void stop() {
-    if (_sound.looping.$1) _sound.looping = (false, 0);
-    super.stop();
-  }
+  /// The current loop delay, even when looping is disabled.
+  Duration get loopDelay => Duration(milliseconds: _sound.looping.$2);
+  set loopDelay(Duration val) =>
+      _sound.looping = (_sound.looping.$1, max(0, val.inMilliseconds));
 }
 
 abstract class GeneratedSound extends Sound {}

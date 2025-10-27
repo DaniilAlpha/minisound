@@ -20,6 +20,7 @@ struct EncodedSoundData {
     bool is_looped;
     // TODO? maybe temporary, but who really knows
     bool is_using_loop_delay;
+    // TODO! would defenetely benefit from double buffering
     SilenceDataSource loop_delay_ds;
 };
 
