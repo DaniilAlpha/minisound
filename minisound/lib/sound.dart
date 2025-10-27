@@ -9,6 +9,8 @@ abstract class Sound {
   double get volume => _sound.volume;
   set volume(double value) => _sound.volume = value < 0 ? 0 : value;
 
+  bool get isPlaying => _sound.isPlaying;
+
   /// Starts the sound. Continues if was paused.
   void resume() => _sound.play();
 
@@ -40,15 +42,19 @@ class LoadedSound extends Sound {
 
   Duration get duration =>
       Duration(milliseconds: (_sound.duration * 1000).toInt());
+  Duration get position =>
+      // TODO? maybe increase resolution?
+      Duration(milliseconds: (_sound.position * 1000).toInt());
 
-  // bool get isLooped => _sound.looping.$1;
-  // Duration get loopDelay => Duration(milliseconds: _sound.looping.$2);
+  /// Returns the current loop delay, or `null` if not looped (or not playing at all).
+  Duration? get loopDelay =>
+      !_sound.looping.$1 ? null : Duration(milliseconds: _sound.looping.$2);
 
   /// Starts sound with looping.
   ///
   /// `delay` - delay before sound will be played again. Clamped positive.
   void playLooped({Duration delay = Duration.zero}) {
-    super.stop();
+    super.pause();
     final delayMs = delay < Duration.zero ? 0 : delay.inMilliseconds;
     if (!_sound.looping.$1 || _sound.looping.$2 != delayMs) {
       _sound.looping = (true, delayMs);
@@ -74,7 +80,7 @@ class WaveformSound extends GeneratedSound {
   WaveformType get type => _sound.type;
   set type(WaveformType value) => _sound.type = value;
 
-  /// Waveform frequency. Generally, corresponds to pitch.
+  /// Waveform frequency. Corresponds to pitch.
   double get freq => _sound.freq;
   set freq(double value) => _sound.freq = value < 0 ? 0 : value;
 }
@@ -86,10 +92,6 @@ class NoiseSound extends GeneratedSound {
   final PlatformNoiseSound _sound;
 
   NoiseType get type => _sound.type;
-
-  // /// Seed used in RNG for the noise.
-  // int get seed => _sound.seed;
-  // set seed(int value) => _sound.seed = value;
 }
 
 class PulseSound extends GeneratedSound {
@@ -98,7 +100,7 @@ class PulseSound extends GeneratedSound {
   @override
   final PlatformPulseSound _sound;
 
-  /// Waveform frequency. Generally, corresponds to pitch.
+  /// Waveform frequency. Corresponds to pitch.
   double get freq => _sound.freq;
   set freq(double value) => _sound.freq = value < 0 ? 0 : value;
 

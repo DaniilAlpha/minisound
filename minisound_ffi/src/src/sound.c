@@ -33,10 +33,10 @@ static void on_sound_ended(void *const vself, ma_sound *const _) {
     Sound *const self = vself;
     (void)_;
 
-    info("sound ended");
-
     // TODO? potential race condition here
     self->state = SOUND_STATE_STOPPED;
+
+    info("sound ended");
 }
 
 /************
@@ -77,8 +77,10 @@ void sound_unload(Sound *const self) {
     if (self->state == SOUND_STATE_UNINITIALIZED) return;
 
     ma_sound_uninit(&self->sound);
+
     sound_data_uninit(&self->sound_data);
     free(self->sound_data._self);
+
     self->state = SOUND_STATE_UNINITIALIZED;
 }
 

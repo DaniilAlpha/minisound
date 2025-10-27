@@ -168,6 +168,14 @@ MiunteResult test_looping() {
         "sound loading should not fail"
     );
 
+    encoded_sound_data_set_looped(sound_get_encoded_data(sound), true, 0);
+    MIUNTE_EXPECT(
+        sound_play(sound) == Ok,
+        "sound looped playing should not fail"
+    );
+
+    sleep((600) * 3);
+
     encoded_sound_data_set_looped(
         sound_get_encoded_data(sound),
         true,
@@ -198,14 +206,14 @@ MiunteResult test_generated_waveform_sounds() {
         MIUNTE_EXPECT(sound != NULL, "sound should be allocated properly");
 
         MIUNTE_EXPECT(
-            engine_generate_waveform(
-                engine,
-                sound,
-                WAVEFORM_TYPE_SINE,
-                freqs[i]
-            ) == Ok,
+            engine_generate_waveform(engine, sound) == Ok,
             "sound generation should not fail"
         );
+        waveform_sound_data_set_type(
+            sound_get_waveform_data(sound),
+            WAVEFORM_TYPE_SINE
+        );
+        waveform_sound_data_set_freq(sound_get_waveform_data(sound), freqs[i]);
         MIUNTE_EXPECT(sound_play(sound) == Ok, "sound playing should not fail");
 
         MIUNTE_EXPECT(
@@ -226,7 +234,7 @@ MiunteResult test_generated_noise_sounds() {
     MIUNTE_EXPECT(sound != NULL, "sound should be allocated properly");
 
     MIUNTE_EXPECT(
-        engine_generate_noise(engine, sound, NOISE_TYPE_PINK, 0) == Ok,
+        engine_generate_noise(engine, sound, NOISE_TYPE_PINK) == Ok,
         "sound generation should not fail"
     );
     MIUNTE_EXPECT(sound_play(sound) == Ok, "sound playing should not fail");
@@ -249,10 +257,12 @@ MiunteResult test_generated_pulse_sounds() {
 
     for (double i = 0.01; i < 1.0; i += 0.16) {
         MIUNTE_EXPECT(
-            engine_generate_pulse(engine, sound, 261.63, i) == Ok,
+            engine_generate_pulse(engine, sound) == Ok,
             "sound generation should not fail"
         );
-        sound_set_volume(sound, 0.4);
+        pulse_sound_data_set_freq(sound_get_pulse_data(sound), 100.0);
+        pulse_sound_data_set_duty_cycle(sound_get_pulse_data(sound), i);
+        sound_set_volume(sound, 0.3);
         MIUNTE_EXPECT(sound_play(sound) == Ok, "sound playing should not fail");
 
         MIUNTE_EXPECT(

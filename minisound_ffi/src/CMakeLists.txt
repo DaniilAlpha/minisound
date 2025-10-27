@@ -34,23 +34,20 @@ target_include_directories(${MAIN_LIB} PUBLIC include/)
 target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB)
 
 
-### properties ###
 
 # logging
 target_compile_definitions(${MAIN_LIB} PRIVATE
-    # TODO! there is a bug with milo coz it's the old version
-    # MILO_CONFIG="milo.config.h"
-    # $<$<CONFIG:Debug>:
-    #     MILO_DEFAULT_LVL=MILO_LVL_WARN
-    #     ENGINE_MILO_LVL=MILO_LVL_WARN
-    #     SOUND_MILO_LVL=MILO_LVL_WARN
-    #     RECORDER_MILO_LVL=MILO_LVL_WARN
-    # > $<$<CONFIG:Release>:
+    $<$<CONFIG:Debug>:
+        MILO_DEFAULT_LVL=MILO_LVL_INFO
+        ENGINE_MILO_LVL=MILO_LVL_INFO
+        SOUND_MILO_LVL=MILO_LVL_INFO
+        RECORDER_MILO_LVL=MILO_LVL_INFO
+    > $<$<CONFIG:Release>:
         MILO_DEFAULT_LVL=MILO_LVL_NONE
         ENGINE_MILO_LVL=MILO_LVL_NONE
         SOUND_MILO_LVL=MILO_LVL_NONE
         RECORDER_MILO_LVL=MILO_LVL_NONE
-    #[[ > ]])
+    >)
 
 # warnings
 if(NOT MSVC)

@@ -8,6 +8,7 @@
 typedef struct SilenceDataSourceConfig {
     ma_format format;
     ma_uint32 sample_rate;
+    ma_uint32 channel_count;
 
     ma_uint64 len_frames;
 } SilenceDataSourceConfig;
@@ -15,6 +16,7 @@ typedef struct SilenceDataSourceConfig {
 SilenceDataSourceConfig silence_data_source_config(
     ma_format const format,
     ma_uint32 const sample_rate,
+    ma_uint32 const channel_count,
 
     ma_uint64 const len_frames
 );

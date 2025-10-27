@@ -8,15 +8,14 @@
 typedef struct PulseSoundData PulseSoundData;
 
 PulseSoundData *pulse_sound_data_alloc(void);
-Result pulse_sound_data_init(
-    PulseSoundData *const self,
-    double const frequency,
-    double const duty_cycle
-);
+Result pulse_sound_data_init(PulseSoundData *const self);
 void pulse_sound_data_uninit(PulseSoundData *const self);
 
+EXPORT double pulse_sound_data_get_freq(PulseSoundData *const self);
 EXPORT void
 pulse_sound_data_set_freq(PulseSoundData *const self, double const value);
+
+EXPORT double pulse_sound_data_get_duty_cycle(PulseSoundData *const self);
 EXPORT void
 pulse_sound_data_set_duty_cycle(PulseSoundData *const self, double const value);
 

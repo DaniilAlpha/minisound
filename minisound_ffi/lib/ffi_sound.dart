@@ -5,51 +5,56 @@ sealed class FfiSound implements PlatformSound {
 
   final Pointer<c.Sound> _self;
 
-  late var _volume = _bindings.sound_get_volume(_self);
+  late var _volume = _binds.sound_get_volume(_self);
   @override
   double get volume => _volume;
   @override
   set volume(double value) {
-    _bindings.sound_set_volume(_self, value);
+    _binds.sound_set_volume(_self, value);
     _volume = value;
   }
 
   @override
+  bool get isPlaying => _binds.sound_get_is_playing(_self);
+
+  @override
   void unload() {
-    _bindings.sound_unload(_self);
+    _binds.sound_unload(_self);
     malloc.free(_self);
   }
 
   @override
   void play() {
-    final r = _bindings.sound_play(_self);
+    final r = _binds.sound_play(_self);
     if (r != c.Result.Ok) {
       throw MinisoundPlatformException("Failed to play the sound (code: $r).");
     }
   }
 
   @override
-  void pause() => _bindings.sound_pause(_self);
+  void pause() => _binds.sound_pause(_self);
   @override
-  void stop() => _bindings.sound_stop(_self);
+  void stop() => _binds.sound_stop(_self);
 }
 
 final class FfiEncodedSound extends FfiSound implements PlatformEncodedSound {
   FfiEncodedSound._(super.self, {required Pointer data}) : _data = data;
 
-  late final _soundData = _bindings.sound_get_encoded_data(_self);
+  late final _soundData = _binds.sound_get_encoded_data(_self);
 
   final Pointer _data;
 
   @override
-  late final duration = _bindings.sound_get_duration(_self);
+  late final duration = _binds.sound_get_duration(_self);
+  @override
+  double get position => _binds.sound_get_position(_self);
 
   var _looping = (false, 0);
   @override
   PlatformSoundLooping get looping => _looping;
   @override
   set looping(PlatformSoundLooping value) {
-    _bindings.encoded_sound_data_set_looped(_soundData, value.$1, value.$2);
+    _binds.encoded_sound_data_set_looped(_soundData, value.$1, value.$2);
     _looping = value;
   }
 
@@ -61,81 +66,59 @@ final class FfiEncodedSound extends FfiSound implements PlatformEncodedSound {
 }
 
 final class FfiWaveformSound extends FfiSound implements PlatformWaveformSound {
-  FfiWaveformSound._(
-    super.self, {
-    required WaveformType type,
-    required double freq,
-  })  : _type = type,
-        _freq = freq;
+  FfiWaveformSound._(super.self);
 
-  late final _soundData = _bindings.sound_get_waveform_data(_self);
+  late final _waveform = _binds.sound_get_waveform_data(_self);
 
-  WaveformType _type;
+  late WaveformType _type =
+      _binds.waveform_sound_data_get_type(_waveform).toDart();
   @override
   WaveformType get type => _type;
   @override
   set type(WaveformType value) {
-    _bindings.waveform_sound_data_set_type(_soundData, value.toC());
+    _binds.waveform_sound_data_set_type(_waveform, value.toC());
     _type = value;
   }
 
-  double _freq;
+  late double _freq = _binds.waveform_sound_data_get_freq(_waveform);
   @override
   double get freq => _freq;
   @override
   set freq(double value) {
-    _bindings.waveform_sound_data_set_freq(_soundData, value);
+    _binds.waveform_sound_data_set_freq(_waveform, value);
     _freq = value;
   }
 }
 
 final class FfiNoiseSound extends FfiSound implements PlatformNoiseSound {
-  FfiNoiseSound._(
-    super.self, {
-    required this.type,
-    required int seed,
-  }) : _seed = seed;
+  FfiNoiseSound._(super.self, this.type);
 
-  late final _soundData = _bindings.sound_get_noise_data(_self);
+  // late final _noise = _binds.sound_get_noise_data(_self);
 
   @override
   final NoiseType type;
-
-  int _seed;
-  @override
-  int get seed => _seed;
-  @override
-  set seed(int value) {
-    _bindings.noise_sound_data_set_seed(_soundData, value);
-    _seed = value;
-  }
 }
 
 final class FfiPulseSound extends FfiSound implements PlatformPulseSound {
-  FfiPulseSound._(
-    super.self, {
-    required double freq,
-    required double dutyCycle,
-  })  : _freq = freq,
-        _dutyCycle = dutyCycle;
+  FfiPulseSound._(super.self);
 
-  late final _soundData = _bindings.sound_get_pulse_data(_self);
+  late final _pulse = _binds.sound_get_pulse_data(_self);
 
-  double _freq;
+  late double _freq = _binds.pulse_sound_data_get_freq(_pulse);
   @override
   double get freq => _freq;
   @override
   set freq(double value) {
-    _bindings.pulse_sound_data_set_freq(_soundData, value);
+    _binds.pulse_sound_data_set_freq(_pulse, value);
     _freq = value;
   }
 
-  double _dutyCycle;
+  late double _dutyCycle = _binds.pulse_sound_data_get_duty_cycle(_pulse);
   @override
   double get dutyCycle => _dutyCycle;
   @override
   set dutyCycle(double value) {
-    _bindings.pulse_sound_data_set_duty_cycle(_soundData, value);
+    _binds.pulse_sound_data_set_duty_cycle(_pulse, value);
     _dutyCycle = value;
   }
 }

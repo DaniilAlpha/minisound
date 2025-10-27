@@ -1,13 +1,15 @@
 part of "minisound_ffi.dart";
 
 final class FfiEngine implements PlatformEngine {
-  FfiEngine._(Pointer<c.Engine> self) : _self = self;
+  FfiEngine._() : _self = _binds.engine_alloc() {
+    if (_self == nullptr) throw MinisoundPlatformOutOfMemoryException();
+  }
 
   final Pointer<c.Engine> _self;
 
   @override
   Future<void> init(int periodMs) async {
-    final r = _bindings.engine_init(_self, periodMs);
+    final r = _binds.engine_init(_self, periodMs);
     if (r != c.Result.Ok) {
       throw MinisoundPlatformException("Failed to init the engine (code: $r).");
     }
@@ -15,22 +17,23 @@ final class FfiEngine implements PlatformEngine {
 
   @override
   void dispose() {
-    _bindings.engine_uninit(_self);
+    _binds.engine_uninit(_self);
     malloc.free(_self);
   }
 
   @override
   void start() {
-    final r = _bindings.engine_start(_self);
+    final r = _binds.engine_start(_self);
     if (r != c.Result.Ok) {
       throw MinisoundPlatformException(
-          "Failed to start the engine (code: $r).");
+        "Failed to start the engine (code: $r).",
+      );
     }
   }
 
   @override
   Future<FfiEncodedSound> loadSound(TypedData data) async {
-    final sound = _bindings.sound_alloc();
+    final sound = _binds.sound_alloc();
     if (sound == nullptr) throw MinisoundPlatformOutOfMemoryException();
 
     final dataLength = data.lengthInBytes;
@@ -42,10 +45,10 @@ final class FfiEngine implements PlatformEngine {
 
     dataPtr.copy(data);
 
-    final r = _bindings.engine_load_sound(_self, sound, dataPtr, dataLength);
+    final r = _binds.engine_load_sound(_self, sound, dataPtr, dataLength);
     if (r != c.Result.Ok) {
-      malloc.free(sound);
       malloc.free(dataPtr);
+      malloc.free(sound);
       throw MinisoundPlatformException("Failed to load a sound (code: $r).");
     }
 
@@ -53,52 +56,45 @@ final class FfiEngine implements PlatformEngine {
   }
 
   @override
-  FfiWaveformSound generateWaveform({
-    required WaveformType type,
-    required double freq,
-  }) {
-    final sound = _bindings.sound_alloc();
+  FfiWaveformSound generateWaveform() {
+    final sound = _binds.sound_alloc();
     if (sound == nullptr) throw MinisoundPlatformOutOfMemoryException();
 
-    final r =
-        _bindings.engine_generate_waveform(_self, sound, type.toC(), freq);
+    final r = _binds.engine_generate_waveform(_self, sound);
     if (r != c.Result.Ok) {
       malloc.free(sound);
       throw MinisoundPlatformException("Failed to load a sound (code: $r).");
     }
 
-    return FfiWaveformSound._(sound, type: type, freq: freq);
+    return FfiWaveformSound._(sound);
   }
 
   @override
-  FfiNoiseSound generateNoise({required NoiseType type, required int seed}) {
-    final sound = _bindings.sound_alloc();
+  FfiNoiseSound generateNoise(NoiseType type) {
+    final sound = _binds.sound_alloc();
     if (sound == nullptr) throw MinisoundPlatformOutOfMemoryException();
 
-    final r = _bindings.engine_generate_noise(_self, sound, type.toC(), seed);
+    final r = _binds.engine_generate_noise(_self, sound, type.toC());
     if (r != c.Result.Ok) {
       malloc.free(sound);
       throw MinisoundPlatformException("Failed to load a sound (code: $r).");
     }
 
-    return FfiNoiseSound._(sound, type: type, seed: seed);
+    return FfiNoiseSound._(sound, type);
   }
 
   @override
-  FfiPulseSound generatePulse({
-    required double freq,
-    required double dutyCycle,
-  }) {
-    final sound = _bindings.sound_alloc();
+  FfiPulseSound generatePulse() {
+    final sound = _binds.sound_alloc();
     if (sound == nullptr) throw MinisoundPlatformOutOfMemoryException();
 
-    final r = _bindings.engine_generate_pulse(_self, sound, freq, dutyCycle);
+    final r = _binds.engine_generate_pulse(_self, sound);
     if (r != c.Result.Ok) {
       malloc.free(sound);
       throw MinisoundPlatformException("Failed to load a sound (code: $r).");
     }
 
-    return FfiPulseSound._(sound, freq: freq, dutyCycle: dutyCycle);
+    return FfiPulseSound._(sound);
   }
 }
 
@@ -108,6 +104,15 @@ extension on WaveformType {
         WaveformType.square => c.WaveformType.WAVEFORM_TYPE_SQUARE,
         WaveformType.triangle => c.WaveformType.WAVEFORM_TYPE_TRIANGLE,
         WaveformType.sawtooth => c.WaveformType.WAVEFORM_TYPE_SAWTOOTH,
+      };
+}
+
+extension on c.WaveformType {
+  WaveformType toDart() => switch (this) {
+        c.WaveformType.WAVEFORM_TYPE_SINE => WaveformType.sine,
+        c.WaveformType.WAVEFORM_TYPE_SQUARE => WaveformType.square,
+        c.WaveformType.WAVEFORM_TYPE_TRIANGLE => WaveformType.triangle,
+        c.WaveformType.WAVEFORM_TYPE_SAWTOOTH => WaveformType.sawtooth,
       };
 }
 

@@ -1,10 +1,8 @@
 #ifndef SOUND_DATA_H
 #define SOUND_DATA_H
 
-#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
-
-#include <miniaudio.h>
 
 #include "../../external/woodi/woodi.h"
 
@@ -18,7 +16,7 @@ typedef enum SoundDataType {
     {                                                                          \
         SoundDataType const type;                                              \
                                                                                \
-        ma_data_source *(*const get_ds)(Self *const);                          \
+        void *(*const get_ds)(Self *const);                                    \
         void (*const uninit)(Self *const);                                     \
     }
 WRAPPER(SoundData, SOUND_DATA_INTERFACE);
@@ -27,7 +25,8 @@ static inline SoundDataType sound_data_get_type(SoundData const *const self) {
     return self->__vtbl->type;
 }
 
-static inline ma_data_source *sound_data_get_ds(SoundData *const self) {
+/// Assuming returning `ma_ds` (without exposing to public api).
+static inline void *sound_data_get_ds(SoundData *const self) {
     return WRAPPER_CALL(get_ds, self);
 }
 static inline void sound_data_uninit(SoundData *const self) {

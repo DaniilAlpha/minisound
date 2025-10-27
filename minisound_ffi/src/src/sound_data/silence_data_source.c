@@ -4,8 +4,6 @@
 
 #include "../../external/result/result.h"
 
-#define SILENCE_DATA_SOURCE_CHANNEL_COUNT (1)
-
 /*************
  ** private **
  *************/
@@ -31,7 +29,7 @@ static ma_result silence_data_source_on_read(
         data,
         data_len_frames,
         self->_config.format,
-        SILENCE_DATA_SOURCE_CHANNEL_COUNT
+        self->_config.channel_count
     );
 
     return *out_read_data_len_frames = data_len_frames, MA_SUCCESS;
@@ -59,13 +57,13 @@ static ma_result silence_data_source_on_get_data_format(
     SilenceDataSource const *const self = v_self;
 
     return *out_format = self->_config.format,
-           *out_channels = SILENCE_DATA_SOURCE_CHANNEL_COUNT,
+           *out_channels = self->_config.channel_count,
            *out_sample_rate = self->_config.sample_rate,
            ma_channel_map_init_standard(
                ma_standard_channel_map_default,
                out_channel_map,
                channel_map_cap,
-               SILENCE_DATA_SOURCE_CHANNEL_COUNT
+               self->_config.channel_count
            ),
            MA_SUCCESS;
 }
@@ -95,12 +93,14 @@ static ma_result silence_data_source_on_get_len(
 SilenceDataSourceConfig silence_data_source_config(
     ma_format const format,
     ma_uint32 const sample_rate,
+    ma_uint32 const channel_count,
 
     ma_uint64 const len_frames
 ) {
     return (SilenceDataSourceConfig){
         .format = format,
         .sample_rate = sample_rate,
+        .channel_count = channel_count,
 
         .len_frames = len_frames,
     };

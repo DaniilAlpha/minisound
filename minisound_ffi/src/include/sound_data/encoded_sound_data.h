@@ -1,6 +1,7 @@
 #ifndef ENCODED_SOUND_DATA_H
 #define ENCODED_SOUND_DATA_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "../../external/result/result.h"

@@ -29,18 +29,11 @@ final class Engine {
 
   final _engine = PlatformEngine();
 
-  var _isInit = false;
-  bool get isInit => _isInit;
-
   /// Initializes the engine.
   ///
   /// `periodMs` - affects sounds latency (lower period means lower latency but possibble crackles). Must be greater than zero. Ignored on the web.
   Future<void> init([int periodMs = 10]) async {
     assert(periodMs > 0);
-
-    if (_isInit) return;
-
-    _isInit = true;
     await _engine.init(periodMs);
   }
 
@@ -63,7 +56,7 @@ final class Engine {
   Future<LoadedSound> loadSoundFile(String filePath) async =>
       loadSound(await File(filePath).readAsBytes());
 
-  /// Generates a waveform sound using given parameters.
+  /// Generates a waveform sound with provided `type` and `freq`.
   WaveformSound genWaveform(
     WaveformType type, {
     double freq = 440.0,
@@ -71,27 +64,28 @@ final class Engine {
         "Should be used only in special cases (see the migration guide in README).")
     bool doAddToFinalizer = true,
   }) {
-    final platformSound = _engine.generateWaveform(type: type, freq: freq);
+    final platformSound = _engine.generateWaveform();
     final sound = WaveformSound._(platformSound);
     if (doAddToFinalizer) _soundsFinalizer.attach(sound, platformSound);
-    return sound;
+    return sound
+      ..type = type
+      ..freq = freq;
   }
 
-  /// Generates a noise sound using given parameters.
+  /// Generates a noise with the provided `type`.
   NoiseSound genNoise(
     NoiseType type, {
-    int seed = 0,
     @Deprecated(
         "Should be used only in special cases (see the migration guide in README).")
     bool doAddToFinalizer = true,
   }) {
-    final platformSound = _engine.generateNoise(type: type, seed: seed);
+    final platformSound = _engine.generateNoise(type);
     final sound = NoiseSound._(platformSound);
     if (doAddToFinalizer) _soundsFinalizer.attach(sound, platformSound);
     return sound;
   }
 
-  /// Generates a pulsewave sound using given parameters.
+  /// Generates a pulsewave sound with provided `freq` and `dutyCycle`.
   PulseSound genPulse({
     double freq = 440.0,
     double dutyCycle = 0.5,
@@ -99,10 +93,11 @@ final class Engine {
         "Should be used only in special cases (see the migration guide in README).")
     bool doAddToFinalizer = true,
   }) {
-    final platformSound =
-        _engine.generatePulse(freq: freq, dutyCycle: dutyCycle);
+    final platformSound = _engine.generatePulse();
     final sound = PulseSound._(platformSound);
     if (doAddToFinalizer) _soundsFinalizer.attach(sound, platformSound);
-    return sound;
+    return sound
+      ..freq = freq
+      ..dutyCycle = dutyCycle;
   }
 }

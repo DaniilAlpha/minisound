@@ -44,6 +44,7 @@ Result encoded_sound_data_init(
 
     ma_result const r =
         ma_decoder_init_memory(data, data_size, NULL, &self->decoder);
+
     if (r != MA_SUCCESS)
         return error(
                    "miniaudio decoder initialization error! Error code: %d",
@@ -71,7 +72,7 @@ void encoded_sound_data_set_looped(
     bool const value,
     size_t const delay_ms
 ) {
-    ma_data_source_set_current(&self->decoder, &self->decoder);
+    // ma_data_source_set_current(&self->decoder, &self->decoder);
     ma_data_source_set_looping(&self->decoder, false);
     ma_data_source_set_next(&self->decoder, NULL);
 
@@ -85,6 +86,7 @@ void encoded_sound_data_set_looped(
             SilenceDataSourceConfig const config = silence_data_source_config(
                 self->decoder.outputFormat,
                 self->decoder.outputSampleRate,
+                self->decoder.outputChannels,
                 (delay_ms * self->decoder.outputSampleRate) / 1000
             );
             silence_data_source_init(&self->loop_delay_ds, &config);

@@ -13,12 +13,14 @@ class FfiRecording implements PlatformRecording {
 }
 
 class FfiRecorder implements PlatformRecorder {
-  FfiRecorder._(Pointer<c.Recorder> self) : _self = self;
+  FfiRecorder._() : _self = _binds.recorder_alloc() {
+    if (_self == nullptr) throw MinisoundPlatformOutOfMemoryException();
+  }
 
   final Pointer<c.Recorder> _self;
 
   @override
-  bool get isRecording => _bindings.recorder_get_is_recording(_self);
+  bool get isRecording => _binds.recorder_get_is_recording(_self);
 
   @override
   Future<void> init({
@@ -26,7 +28,7 @@ class FfiRecorder implements PlatformRecorder {
     required int channelCount,
     required int sampleRate,
   }) async {
-    final r = _bindings.recorder_init(
+    final r = _binds.recorder_init(
       _self,
       format.toC(),
       channelCount,
@@ -41,13 +43,13 @@ class FfiRecorder implements PlatformRecorder {
 
   @override
   void dispose() {
-    _bindings.recorder_uninit(_self);
+    _binds.recorder_uninit(_self);
     malloc.free(_self);
   }
 
   @override
   void start() {
-    final r = _bindings.recorder_start(
+    final r = _binds.recorder_start(
       _self,
       c.RecordingEncoding.RECORDING_ENCODING_WAV,
     );
@@ -60,10 +62,10 @@ class FfiRecorder implements PlatformRecorder {
 
   @override
   FfiRecording stop() {
-    if (!_bindings.recorder_get_is_recording(_self)) {
+    if (!_binds.recorder_get_is_recording(_self)) {
       throw MinisoundPlatformException("Recording has no data.");
     }
-    final recording = _bindings.recorder_stop(_self);
+    final recording = _binds.recorder_stop(_self);
     return FfiRecording._(recording);
   }
 }

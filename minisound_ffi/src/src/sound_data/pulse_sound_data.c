@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 
+#include <miniaudio.h>
+
 #include "conviniences.h"
 
 #define MILO_LVL SOUND_MILO_LVL
@@ -83,18 +85,14 @@ static ma_result pulse_sound_data_on_get_cursor(
 PulseSoundData *pulse_sound_data_alloc(void) {
     return malloc0(sizeof(PulseSoundData));
 }
-Result pulse_sound_data_init(
-    PulseSoundData *const self,
-    double const frequency,
-    double const duty_cycle
-) {
+Result pulse_sound_data_init(PulseSoundData *const self) {
     ma_pulsewave_config const config = ma_pulsewave_config_init(
         ma_format_f32,
         1,
         48000,
-        duty_cycle,
+        0.5,
         DEFAULT_AMPLITUDE,
-        frequency
+        0.0
     );
 
     static ma_data_source_vtable const vtbl = {
@@ -121,8 +119,15 @@ void pulse_sound_data_uninit(PulseSoundData *const self) {
     ma_pulsewave_uninit(&self->pulsewave);
 }
 
+double pulse_sound_data_get_freq(PulseSoundData *const self) {
+    return self->pulsewave.config.frequency;
+}
 void pulse_sound_data_set_freq(PulseSoundData *const self, double const value) {
     ma_pulsewave_set_frequency(&self->pulsewave, value);
+}
+
+double pulse_sound_data_get_duty_cycle(PulseSoundData *const self) {
+    return self->pulsewave.config.dutyCycle;
 }
 void pulse_sound_data_set_duty_cycle(
     PulseSoundData *const self,

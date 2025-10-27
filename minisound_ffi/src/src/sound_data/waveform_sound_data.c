@@ -1,6 +1,7 @@
 #include "../../include/sound_data/waveform_sound_data.h"
 
 #include <assert.h>
+#include <miniaudio.h>
 
 #include "conviniences.h"
 
@@ -30,19 +31,15 @@ static ma_data_source *waveform_sound_data_get_ds(
 WaveformSoundData *waveform_sound_data_alloc(void) {
     return malloc0(sizeof(WaveformSoundData));
 }
-Result waveform_sound_data_init(
-    WaveformSoundData *const self,
-    WaveformType const type,
-    double const frequency
-) {
+Result waveform_sound_data_init(WaveformSoundData *const self) {
     ma_waveform_config const config = ma_waveform_config_init(
         // TODO? maybe needs not to be hardcoded here
         ma_format_f32,
         1,
         48000,
-        (ma_waveform_type)type,
+        ma_waveform_type_sine,
         DEFAULT_AMPLITUDE,
-        frequency
+        0.0
     );
     if (ma_waveform_init(&config, &self->waveform) != MA_SUCCESS)
         return error("failed to initialize waveform"), UnknownErr;
@@ -53,11 +50,18 @@ void waveform_sound_data_uninit(WaveformSoundData *const self) {
     ma_waveform_uninit(&self->waveform);
 }
 
+WaveformType waveform_sound_data_get_type(WaveformSoundData *const self) {
+    return (WaveformType)self->waveform.config.type;
+}
 void waveform_sound_data_set_type(
     WaveformSoundData *const self,
     WaveformType const value
 ) {
     ma_waveform_set_type(&self->waveform, (ma_waveform_type)value);
+}
+
+double waveform_sound_data_get_freq(WaveformSoundData *const self) {
+    return (WaveformType)self->waveform.config.frequency;
 }
 void waveform_sound_data_set_freq(
     WaveformSoundData *const self,

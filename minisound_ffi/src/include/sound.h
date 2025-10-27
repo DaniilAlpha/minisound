@@ -1,10 +1,6 @@
 #ifndef SOUND_H
 #define SOUND_H
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-
 #include "../external/result/result.h"
 #include "export.h"
 #include "sound_data/encoded_sound_data.h"

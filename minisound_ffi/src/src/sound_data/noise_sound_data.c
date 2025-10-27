@@ -29,16 +29,12 @@ static ma_data_source *noise_sound_data_get_ds(NoiseSoundData *const self) {
 NoiseSoundData *noise_sound_data_alloc(void) {
     return malloc0(sizeof(NoiseSoundData));
 }
-Result noise_sound_data_init(
-    NoiseSoundData *const self,
-    NoiseType const type,
-    int32_t const seed
-) {
+Result noise_sound_data_init(NoiseSoundData *const self, NoiseType const type) {
     ma_noise_config const config = ma_noise_config_init(
         ma_format_f32,
         2,
         (ma_noise_type)type,
-        seed,
+        1999999999,
         DEFAULT_AMPLITUDE
     );
     if (ma_noise_init(&config, NULL, &self->noise) != MA_SUCCESS)
@@ -48,13 +44,6 @@ Result noise_sound_data_init(
 }
 void noise_sound_data_uninit(NoiseSoundData *const self) {
     ma_noise_uninit(&self->noise, NULL);
-}
-
-void noise_sound_data_set_seed(
-    NoiseSoundData *const self,
-    int32_t const value
-) {
-    ma_noise_set_seed(&self->noise, value);
 }
 
 SoundData noise_sound_data_ww_sound_data(NoiseSoundData *const self) WRAP_BODY(

@@ -13,7 +13,7 @@ part "ffi_recorder.dart";
 // dynamic lib
 
 const String _libName = "minisound_ffi";
-final _bindings = c.MinisoundFfiBindings(() {
+final _binds = c.MinisoundFfiBindings(() {
   if (Platform.isMacOS || Platform.isIOS) {
     return DynamicLibrary.open("$_libName.framework/$_libName");
   } else if (Platform.isAndroid || Platform.isLinux) {
@@ -25,10 +25,9 @@ final _bindings = c.MinisoundFfiBindings(() {
 }());
 
 extension PointerCopy on Pointer {
-  void copy(TypedData typedData) {
-    final data = typedData.buffer.asUint8List();
-    cast<Uint8>().asTypedList(data.length).setAll(0, data);
-  }
+  void copy(TypedData typedData) => cast<Uint8>()
+      .asTypedList(typedData.lengthInBytes)
+      .setAll(0, typedData.buffer.asUint8List());
 }
 
 // minisound ffi
@@ -39,16 +38,7 @@ class MinisoundFfi extends MinisoundPlatform {
   static void registerWith() => MinisoundPlatform.instance = MinisoundFfi._();
 
   @override
-  PlatformEngine createEngine() {
-    final self = _bindings.engine_alloc();
-    if (self == nullptr) throw MinisoundPlatformOutOfMemoryException();
-    return FfiEngine._(self);
-  }
-
+  final createEngine = FfiEngine._;
   @override
-  PlatformRecorder createRecorder() {
-    final self = _bindings.recorder_alloc();
-    if (self == nullptr) throw MinisoundPlatformOutOfMemoryException();
-    return FfiRecorder._(self);
-  }
+  final createRecorder = FfiRecorder._;
 }

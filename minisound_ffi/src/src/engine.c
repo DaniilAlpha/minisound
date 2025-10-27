@@ -95,20 +95,13 @@ Result engine_load_sound(
     return info("sound loaded"), Ok;
 }
 
-Result engine_generate_waveform(
-    Engine *const self,
-    Sound *const sound,
-    WaveformType const type,
-    double const frequency
-) {
+Result engine_generate_waveform(Engine *const self, Sound *const sound) {
     if (self->state == ENGINE_STATE_UNINITIALIZED) return StateErr;
 
     WaveformSoundData *const waveform = waveform_sound_data_alloc();
     if (waveform == NULL) return OutOfMemErr;
 
-    UNROLL_CLEANUP(waveform_sound_data_init(waveform, type, frequency), {
-        free(waveform);
-    });
+    UNROLL_CLEANUP(waveform_sound_data_init(waveform), { free(waveform); });
 
     UNROLL_CLEANUP(
         sound_init(
@@ -124,16 +117,14 @@ Result engine_generate_waveform(
 Result engine_generate_noise(
     Engine *const self,
     Sound *const sound,
-    NoiseType const type,
-    int32_t const seed
+    NoiseType const type
 ) {
     if (self->state == ENGINE_STATE_UNINITIALIZED) return StateErr;
 
     NoiseSoundData *const noise = noise_sound_data_alloc();
     if (noise == NULL) return OutOfMemErr;
 
-    UNROLL_CLEANUP(noise_sound_data_init(noise, type, seed), { free(noise); });
-
+    UNROLL_CLEANUP(noise_sound_data_init(noise, type), { free(noise); });
     UNROLL_CLEANUP(
         sound_init(sound, noise_sound_data_ww_sound_data(noise), &self->engine),
         { noise_sound_data_uninit(noise), free(noise); }
@@ -141,20 +132,13 @@ Result engine_generate_noise(
 
     return info("noise generated"), Ok;
 }
-Result engine_generate_pulse(
-    Engine *const self,
-    Sound *const sound,
-    double const frequency,
-    double const duty_cycle
-) {
+Result engine_generate_pulse(Engine *const self, Sound *const sound) {
     if (self->state == ENGINE_STATE_UNINITIALIZED) return StateErr;
 
     PulseSoundData *const pulse = pulse_sound_data_alloc();
     if (pulse == NULL) return OutOfMemErr;
 
-    UNROLL_CLEANUP(pulse_sound_data_init(pulse, frequency, duty_cycle), {
-        free(pulse);
-    });
+    UNROLL_CLEANUP(pulse_sound_data_init(pulse), { free(pulse); });
 
     UNROLL_CLEANUP(
         sound_init(sound, pulse_sound_data_ww_sound_data(pulse), &self->engine),
