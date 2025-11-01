@@ -27,8 +27,13 @@ abstract class Sound {
     resume();
   }
 
+  void seek(Duration position) => _sound.seek(position.inMilliseconds / 1000);
+
   @Deprecated("Only use if loading sound WITHOUT auto management.")
   void unload() => _sound.unload();
+
+  /// Current sound position.
+  Duration get cursor => Duration(milliseconds: (_sound.cursor * 1000).round());
 }
 
 /// A sound loaded from some kind of source.
