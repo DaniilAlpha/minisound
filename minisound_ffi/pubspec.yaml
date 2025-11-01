@@ -11,7 +11,8 @@ environment:
 
 dependencies:
   ffi: ^2.1.3
-  minisound_platform_interface: ^2.0.1
+  minisound_platform_interface: #^2.0.1
+    path: ../minisound_platform_interface
 
 dev_dependencies:
   flutter_lints: ^5.0.0

@@ -5,6 +5,9 @@ sealed class FfiSound implements PlatformSound {
 
   final Pointer<c.Sound> _self;
 
+  @override
+  double get cursor => _bindings.sound_get_cursor(_self);
+
   late var _volume = _bindings.sound_get_volume(_self);
   @override
   double get volume => _volume;
@@ -32,6 +35,9 @@ sealed class FfiSound implements PlatformSound {
   void pause() => _bindings.sound_pause(_self);
   @override
   void stop() => _bindings.sound_stop(_self);
+
+  @override
+  void seek(double seconds) => _bindings.sound_seek(_self, seconds);
 }
 
 final class FfiEncodedSound extends FfiSound implements PlatformEncodedSound {

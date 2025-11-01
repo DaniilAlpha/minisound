@@ -462,11 +462,43 @@ class MinisoundFfiBindings {
     );
   }
 
-  late final _sound_stopPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<Sound>)>>(
-          'sound_stop');
+  late final _sound_stopPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+            ffi.Pointer<Sound>,
+          )>>('sound_stop');
   late final _sound_stop =
       _sound_stopPtr.asFunction<void Function(ffi.Pointer<Sound>)>();
+
+  void sound_seek(
+    ffi.Pointer<Sound> self,
+    double value,
+  ) {
+    return _sound_seek(
+      self,
+      value,
+    );
+  }
+
+  late final _sound_seekPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(ffi.Pointer<Sound>, ffi.Float)>>(
+      'sound_seek');
+  late final _sound_seek =
+      _sound_seekPtr.asFunction<void Function(ffi.Pointer<Sound>, double)>();
+
+  double sound_get_cursor(
+    ffi.Pointer<Sound> self,
+  ) {
+    return _sound_get_cursor(
+      self,
+    );
+  }
+
+  late final _sound_get_cursorPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(ffi.Pointer<Sound>)>>(
+          'sound_get_cursor');
+  late final _sound_get_cursor =
+      _sound_get_cursorPtr.asFunction<double Function(ffi.Pointer<Sound>)>();
 
   double sound_get_volume(
     ffi.Pointer<Sound> self,

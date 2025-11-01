@@ -23,7 +23,6 @@ abstract class Sound {
   /// Starts the sound. Played from the beginning if was paused.
   @nonVirtual
   void play() {
-    stop();
     resume();
   }
 

@@ -161,18 +161,16 @@ packages:
   minisound_platform_interface:
     dependency: transitive
     description:
-      name: minisound_platform_interface
-      sha256: b346450fd79ad58a0f179e47f4dcb7c155b815eb0cbf0014091c38443d840668
-      url: "https://pub.dev"
-    source: hosted
+      path: "../../minisound_platform_interface"
+      relative: true
+    source: path
     version: "2.0.1"
   minisound_web:
     dependency: transitive
     description:
-      name: minisound_web
-      sha256: a68089e66f239626728ec4827664c1aee166a1622e85cfc3a21b427a55891f2b
-      url: "https://pub.dev"
-    source: hosted
+      path: "../../minisound_web"
+      relative: true
+    source: path
     version: "2.0.2"
   path:
     dependency: transitive

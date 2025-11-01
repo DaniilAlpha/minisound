@@ -4,6 +4,7 @@ typedef PlatformSoundLooping = (bool isLooped, int delayMs);
 
 abstract interface class PlatformSound {
   double get volume;
+  double get cursor;
   set volume(double value);
 
   void unload();
@@ -11,6 +12,7 @@ abstract interface class PlatformSound {
   void play();
   void pause();
   void stop();
+  void seek(double seconds);
 }
 
 abstract interface class PlatformEncodedSound extends PlatformSound {

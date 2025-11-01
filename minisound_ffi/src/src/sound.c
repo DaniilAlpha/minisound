@@ -70,6 +70,19 @@ void sound_set_volume(Sound *const self, float const value) {
     ma_sound_set_volume(&self->sound, value);
 }
 
+float sound_get_cursor(Sound const *const self) {
+    ma_uint64 cursor_in_frames;
+    ma_sound_get_cursor_in_pcm_frames(&self->sound, &cursor_in_frames);
+    return (float)cursor_in_frames / ma_engine_get_sample_rate(self->engine);
+}
+
+void sound_seek(Sound *const self, float const value) {
+    ma_sound_seek_to_pcm_frame(
+        &self->sound,
+        (ma_uint64)(ma_engine_get_sample_rate(self->engine) * value)
+    );
+}
+
 double sound_get_duration(Sound *const self) {
     ma_uint64 length_in_frames;
     ma_sound_get_length_in_pcm_frames(&self->sound, &length_in_frames);
