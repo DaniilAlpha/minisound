@@ -32,6 +32,8 @@ WaveformSoundData *waveform_sound_data_alloc(void) {
     return malloc0(sizeof(WaveformSoundData));
 }
 Result waveform_sound_data_init(WaveformSoundData *const self) {
+    ma_result r;
+
     ma_waveform_config const config = ma_waveform_config_init(
         // TODO? maybe needs not to be hardcoded here
         ma_format_f32,
@@ -41,8 +43,9 @@ Result waveform_sound_data_init(WaveformSoundData *const self) {
         DEFAULT_AMPLITUDE,
         0.0
     );
-    if (ma_waveform_init(&config, &self->waveform) != MA_SUCCESS)
-        return error("failed to initialize waveform"), UnknownErr;
+    if ((r = ma_waveform_init(&config, &self->waveform)) != MA_SUCCESS)
+        return error("miniaudio waveform initialization error (code: %i)!", r),
+               UnknownErr;
 
     return Ok;
 }

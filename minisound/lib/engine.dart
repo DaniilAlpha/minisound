@@ -32,8 +32,8 @@ final class Engine {
 
   /// Initializes the engine.
   ///
-  /// `periodMs` - affects sounds latency (lower period means lower latency but possibble crackles). Must be greater than zero. Ignored on the web.
-  Future<void> init([int periodMs = 10]) async {
+  /// `periodMs` - affects sounds latency (lower period means lower latency but possibble crackles). Must be greater than zero. Probably has no effect on the web.
+  Future<void> init([int periodMs = kIsWeb ? 30 : 10]) async {
     assert(periodMs > 0);
     await _engine.init(periodMs);
   }

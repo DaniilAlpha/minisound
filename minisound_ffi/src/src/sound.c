@@ -36,7 +36,7 @@ static void on_sound_ended(void *const vself, ma_sound *const _) {
     // TODO? potential race condition here
     self->state = SOUND_STATE_STOPPED;
 
-    info("sound ended");
+    trace("sound ended.");
 }
 
 /************
@@ -51,6 +51,8 @@ Result sound_init(
 ) {
     if (self->state != SOUND_STATE_UNINITIALIZED) return Ok;
 
+    ma_result r;
+
     self->sound_data = sound_data;
     self->engine = engine;
 
@@ -58,20 +60,19 @@ Result sound_init(
     notifications.onAtEnd = on_sound_ended;
     notifications.pUserData = self;
 
-    ma_result const r = ma_sound_init_from_data_source(
-        self->engine,
-        sound_data_get_ds(&self->sound_data),
-        MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION,
-        NULL,
-        &notifications,
-        &self->sound
-    );
-    if (r != MA_SUCCESS)
-        return error("miniaudio sound initialization error! Error code: %d", r),
+    if ((r = ma_sound_init_from_data_source(
+             self->engine,
+             sound_data_get_ds(&self->sound_data),
+             MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION,
+             NULL,
+             &notifications,
+             &self->sound
+         )) != MA_SUCCESS)
+        return error("miniaudio sound initialization error (code: %i)!", r),
                UnknownErr;
 
     self->state = SOUND_STATE_STOPPED;
-    return info("sound initialized"), Ok;
+    return info("sound initialized."), Ok;
 }
 void sound_unload(Sound *const self) {
     if (self->state == SOUND_STATE_UNINITIALIZED) return;
@@ -88,11 +89,14 @@ Result sound_play(Sound *const self) {
     if (self->state == SOUND_STATE_UNINITIALIZED) return StateErr;
     if (self->state != SOUND_STATE_STOPPED) return Ok;
 
-    if (ma_sound_start(&self->sound) != MA_SUCCESS)
-        return error("miniaudio sound starting error!"), UnknownErr;
+    ma_result r;
+
+    if ((r = ma_sound_start(&self->sound)) != MA_SUCCESS)
+        return error("miniaudio sound starting error (code: %i)!", r),
+               UnknownErr;
 
     self->state = SOUND_STATE_PLAYING;
-    return info("sound played"), Ok;
+    return trace("sound played."), Ok;
 }
 void sound_pause(Sound *const self) {
     if (self->state == SOUND_STATE_UNINITIALIZED) return;
@@ -101,14 +105,14 @@ void sound_pause(Sound *const self) {
     ma_sound_stop(&self->sound);
 
     self->state = SOUND_STATE_STOPPED;
-    info("sound paused");
+    trace("sound paused.");
 }
 void sound_stop(Sound *const self) {
     if (self->state == SOUND_STATE_UNINITIALIZED) return;
 
     sound_pause(self);
     ma_sound_seek_to_pcm_frame(&self->sound, 0);
-    info("sound stopped");
+    trace("sound stopped.");
 }
 
 float sound_get_volume(Sound const *const self) {

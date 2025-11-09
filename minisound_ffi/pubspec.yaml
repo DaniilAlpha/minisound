@@ -32,9 +32,8 @@ ffigen:
       # to generate only what is needed, specified only headers directly used in bindings
       - "src/include/sound.h"
       - "src/include/engine.h"
-      - "src/include/recorder/recorder.h"
-      - "src/include/recorder/recorder_buffer.h"
       - "src/include/recorder/recording.h"
+      - "src/include/recorder/recorder.h"
       - "src/include/sound_data/encoded_sound_data.h"
       - "src/include/sound_data/waveform_sound_data.h"
       - "src/include/sound_data/noise_sound_data.h"

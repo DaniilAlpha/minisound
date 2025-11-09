@@ -30,6 +30,8 @@ NoiseSoundData *noise_sound_data_alloc(void) {
     return malloc0(sizeof(NoiseSoundData));
 }
 Result noise_sound_data_init(NoiseSoundData *const self, NoiseType const type) {
+    ma_result r;
+
     ma_noise_config const config = ma_noise_config_init(
         ma_format_f32,
         2,
@@ -37,8 +39,9 @@ Result noise_sound_data_init(NoiseSoundData *const self, NoiseType const type) {
         1999999999,
         DEFAULT_AMPLITUDE
     );
-    if (ma_noise_init(&config, NULL, &self->noise) != MA_SUCCESS)
-        return error("failed to initialize noise"), UnknownErr;
+    if ((r = ma_noise_init(&config, NULL, &self->noise)) != MA_SUCCESS)
+        return error("miniaudio noise initialization error (code: %i)!", r),
+               UnknownErr;
 
     return Ok;
 }

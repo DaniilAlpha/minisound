@@ -762,14 +762,52 @@ class MinisoundFfiBindings {
   late final _engine_generate_pulse = _engine_generate_pulsePtr
       .asFunction<int Function(ffi.Pointer<Engine>, ffi.Pointer<Sound>)>();
 
-  int sizeof_recording() {
-    return _sizeof_recording();
+  ffi.Pointer<Recording> recording_alloc() {
+    return _recording_alloc();
   }
 
-  late final _sizeof_recordingPtr =
-      _lookup<ffi.NativeFunction<ffi.Size Function()>>('sizeof_recording');
-  late final _sizeof_recording =
-      _sizeof_recordingPtr.asFunction<int Function()>();
+  late final _recording_allocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<Recording> Function()>>(
+          'recording_alloc');
+  late final _recording_alloc =
+      _recording_allocPtr.asFunction<ffi.Pointer<Recording> Function()>();
+
+  Result recording_init(
+    ffi.Pointer<Recording> self,
+    RecordingEncoding encoding,
+    RecordingFormat format,
+    int channel_count,
+    int sample_rate,
+  ) {
+    return Result.fromValue(_recording_init(
+      self,
+      encoding.value,
+      format.value,
+      channel_count,
+      sample_rate,
+    ));
+  }
+
+  late final _recording_initPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.UnsignedInt Function(ffi.Pointer<Recording>, ffi.UnsignedInt,
+              ffi.UnsignedInt, ffi.Uint32, ffi.Uint32)>>('recording_init');
+  late final _recording_init = _recording_initPtr
+      .asFunction<int Function(ffi.Pointer<Recording>, int, int, int, int)>();
+
+  void recording_uninit(
+    ffi.Pointer<Recording> self,
+  ) {
+    return _recording_uninit(
+      self,
+    );
+  }
+
+  late final _recording_uninitPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<Recording>)>>(
+          'recording_uninit');
+  late final _recording_uninit =
+      _recording_uninitPtr.asFunction<void Function(ffi.Pointer<Recording>)>();
 
   ffi.Pointer<ffi.Uint8> recording_get_buf(
     ffi.Pointer<Recording> self,
@@ -800,81 +838,38 @@ class MinisoundFfiBindings {
   late final _recording_get_size =
       _recording_get_sizePtr.asFunction<int Function(ffi.Pointer<Recording>)>();
 
-  ffi.Pointer<RecorderBuffer> recorder_buffer_alloc() {
-    return _recorder_buffer_alloc();
-  }
-
-  late final _recorder_buffer_allocPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<RecorderBuffer> Function()>>(
-          'recorder_buffer_alloc');
-  late final _recorder_buffer_alloc = _recorder_buffer_allocPtr
-      .asFunction<ffi.Pointer<RecorderBuffer> Function()>();
-
-  Result recorder_buffer_init(
-    ffi.Pointer<RecorderBuffer> self,
-    RecordingEncoding encoding,
-    ffi.Pointer<ma_device> device,
-  ) {
-    return Result.fromValue(_recorder_buffer_init(
-      self,
-      encoding.value,
-      device,
-    ));
-  }
-
-  late final _recorder_buffer_initPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.UnsignedInt Function(ffi.Pointer<RecorderBuffer>, ffi.UnsignedInt,
-              ffi.Pointer<ma_device>)>>('recorder_buffer_init');
-  late final _recorder_buffer_init = _recorder_buffer_initPtr.asFunction<
-      int Function(ffi.Pointer<RecorderBuffer>, int, ffi.Pointer<ma_device>)>();
-
-  void recorder_buffer_uninit(
-    ffi.Pointer<RecorderBuffer> self,
-  ) {
-    return _recorder_buffer_uninit(
-      self,
-    );
-  }
-
-  late final _recorder_buffer_uninitPtr = _lookup<
-          ffi.NativeFunction<ffi.Void Function(ffi.Pointer<RecorderBuffer>)>>(
-      'recorder_buffer_uninit');
-  late final _recorder_buffer_uninit = _recorder_buffer_uninitPtr
-      .asFunction<void Function(ffi.Pointer<RecorderBuffer>)>();
-
-  Result recorder_buffer_write(
-    ffi.Pointer<RecorderBuffer> self,
+  Result recording_write(
+    ffi.Pointer<Recording> self,
     ffi.Pointer<ffi.Uint8> data,
-    int data_len_pcm,
+    int data_len_frames,
   ) {
-    return Result.fromValue(_recorder_buffer_write(
+    return Result.fromValue(_recording_write(
       self,
       data,
-      data_len_pcm,
+      data_len_frames,
     ));
   }
 
-  late final _recorder_buffer_writePtr = _lookup<
+  late final _recording_writePtr = _lookup<
       ffi.NativeFunction<
-          ffi.UnsignedInt Function(ffi.Pointer<RecorderBuffer>,
-              ffi.Pointer<ffi.Uint8>, ffi.Size)>>('recorder_buffer_write');
-  late final _recorder_buffer_write = _recorder_buffer_writePtr.asFunction<
-      int Function(ffi.Pointer<RecorderBuffer>, ffi.Pointer<ffi.Uint8>, int)>();
+          ffi.UnsignedInt Function(ffi.Pointer<Recording>,
+              ffi.Pointer<ffi.Uint8>, ffi.Size)>>('recording_write');
+  late final _recording_write = _recording_writePtr.asFunction<
+      int Function(ffi.Pointer<Recording>, ffi.Pointer<ffi.Uint8>, int)>();
 
-  Recording recorder_buffer_consume(
-    ffi.Pointer<RecorderBuffer> self,
+  Result recording_fit(
+    ffi.Pointer<Recording> self,
   ) {
-    return _recorder_buffer_consume(
+    return Result.fromValue(_recording_fit(
       self,
-    );
+    ));
   }
 
-  late final _recorder_buffer_consumePtr = _lookup<
-          ffi.NativeFunction<Recording Function(ffi.Pointer<RecorderBuffer>)>>(
-      'recorder_buffer_consume');
-  late final _recorder_buffer_consume = _recorder_buffer_consumePtr
-      .asFunction<Recording Function(ffi.Pointer<RecorderBuffer>)>();
+  late final _recording_fitPtr = _lookup<
+          ffi.NativeFunction<ffi.UnsignedInt Function(ffi.Pointer<Recording>)>>(
+      'recording_fit');
+  late final _recording_fit =
+      _recording_fitPtr.asFunction<int Function(ffi.Pointer<Recording>)>();
 
   ffi.Pointer<Recorder> recorder_alloc() {
     return _recorder_alloc();
@@ -888,24 +883,17 @@ class MinisoundFfiBindings {
 
   Result recorder_init(
     ffi.Pointer<Recorder> self,
-    RecorderFormat format,
-    int channel_count,
-    int sample_rate,
   ) {
     return Result.fromValue(_recorder_init(
       self,
-      format.value,
-      channel_count,
-      sample_rate,
     ));
   }
 
   late final _recorder_initPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.UnsignedInt Function(ffi.Pointer<Recorder>, ffi.UnsignedInt,
-              ffi.Uint32, ffi.Uint32)>>('recorder_init');
-  late final _recorder_init = _recorder_initPtr
-      .asFunction<int Function(ffi.Pointer<Recorder>, int, int, int)>();
+          ffi.NativeFunction<ffi.UnsignedInt Function(ffi.Pointer<Recorder>)>>(
+      'recorder_init');
+  late final _recorder_init =
+      _recorder_initPtr.asFunction<int Function(ffi.Pointer<Recorder>)>();
 
   void recorder_uninit(
     ffi.Pointer<Recorder> self,
@@ -938,21 +926,27 @@ class MinisoundFfiBindings {
   Result recorder_start(
     ffi.Pointer<Recorder> self,
     RecordingEncoding encoding,
+    RecordingFormat format,
+    int channel_count,
+    int sample_rate,
   ) {
     return Result.fromValue(_recorder_start(
       self,
       encoding.value,
+      format.value,
+      channel_count,
+      sample_rate,
     ));
   }
 
   late final _recorder_startPtr = _lookup<
       ffi.NativeFunction<
-          ffi.UnsignedInt Function(
-              ffi.Pointer<Recorder>, ffi.UnsignedInt)>>('recorder_start');
-  late final _recorder_start =
-      _recorder_startPtr.asFunction<int Function(ffi.Pointer<Recorder>, int)>();
+          ffi.UnsignedInt Function(ffi.Pointer<Recorder>, ffi.UnsignedInt,
+              ffi.UnsignedInt, ffi.Uint32, ffi.Uint32)>>('recorder_start');
+  late final _recorder_start = _recorder_startPtr
+      .asFunction<int Function(ffi.Pointer<Recorder>, int, int, int, int)>();
 
-  Recording recorder_stop(
+  ffi.Pointer<Recording> recorder_stop(
     ffi.Pointer<Recorder> self,
   ) {
     return _recorder_stop(
@@ -960,11 +954,12 @@ class MinisoundFfiBindings {
     );
   }
 
-  late final _recorder_stopPtr =
-      _lookup<ffi.NativeFunction<Recording Function(ffi.Pointer<Recorder>)>>(
-          'recorder_stop');
-  late final _recorder_stop =
-      _recorder_stopPtr.asFunction<Recording Function(ffi.Pointer<Recorder>)>();
+  late final _recorder_stopPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<Recording> Function(
+              ffi.Pointer<Recorder>)>>('recorder_stop');
+  late final _recorder_stop = _recorder_stopPtr
+      .asFunction<ffi.Pointer<Recording> Function(ffi.Pointer<Recorder>)>();
 }
 
 final class EncodedSoundData extends ffi.Opaque {}
@@ -1088,16 +1083,9 @@ final class ma_engine extends ffi.Opaque {}
 
 final class Engine extends ffi.Opaque {}
 
-final class Recording extends ffi.Struct {
-  external ffi.Pointer<ffi.Uint8> buf;
-
-  @ffi.Size()
-  external int size;
-}
-
 final class ma_device extends ffi.Opaque {}
 
-final class RecorderBuffer extends ffi.Opaque {}
+final class Recording extends ffi.Opaque {}
 
 enum RecordingEncoding {
   RECORDING_ENCODING_WAV(1);
@@ -1111,24 +1099,24 @@ enum RecordingEncoding {
       };
 }
 
-final class Recorder extends ffi.Opaque {}
-
-enum RecorderFormat {
-  RECORDER_FORMAT_U8(1),
-  RECORDER_FORMAT_S16(2),
-  RECORDER_FORMAT_S24(3),
-  RECORDER_FORMAT_S32(4),
-  RECORDER_FORMAT_F32(5);
+enum RecordingFormat {
+  RECORDING_FORMAT_U8(1),
+  RECORDING_FORMAT_S16(2),
+  RECORDING_FORMAT_S24(3),
+  RECORDING_FORMAT_S32(4),
+  RECORDING_FORMAT_F32(5);
 
   final int value;
-  const RecorderFormat(this.value);
+  const RecordingFormat(this.value);
 
-  static RecorderFormat fromValue(int value) => switch (value) {
-        1 => RECORDER_FORMAT_U8,
-        2 => RECORDER_FORMAT_S16,
-        3 => RECORDER_FORMAT_S24,
-        4 => RECORDER_FORMAT_S32,
-        5 => RECORDER_FORMAT_F32,
-        _ => throw ArgumentError('Unknown value for RecorderFormat: $value'),
+  static RecordingFormat fromValue(int value) => switch (value) {
+        1 => RECORDING_FORMAT_U8,
+        2 => RECORDING_FORMAT_S16,
+        3 => RECORDING_FORMAT_S24,
+        4 => RECORDING_FORMAT_S32,
+        5 => RECORDING_FORMAT_F32,
+        _ => throw ArgumentError('Unknown value for RecordingFormat: $value'),
       };
 }
+
+final class Recorder extends ffi.Opaque {}

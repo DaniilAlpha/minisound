@@ -32,7 +32,7 @@ class _RecordingExampleState extends State<RecordingExample> {
                 final recording = await widget.recorder.stop();
                 sounds.add((
                   DateTime.now(),
-                  await widget.engine.loadSound(recording.buffer)
+                  await widget.engine.loadSound(recording.data)
                 ));
                 setState(() {});
               },

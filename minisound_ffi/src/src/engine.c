@@ -33,22 +33,20 @@ struct Engine {
  ************/
 
 Engine *engine_alloc(void) { return malloc0(sizeof(Engine)); }
-
 Result engine_init(Engine *const self, uint32_t const period_ms) {
     if (self->state != ENGINE_STATE_UNINITIALIZED) return Ok;
 
+    ma_result r;
+
     ma_engine_config config = ma_engine_config_init();
-#if (__EMSCRIPTEN__)
-    (void)period_ms;
-#else
     config.periodSizeInMilliseconds = period_ms;
-#endif
     config.noAutoStart = true;
-    if (ma_engine_init(&config, &self->engine) != MA_SUCCESS)
-        return error("miniaudio engine initialization error!"), UnknownErr;
+    if ((r = ma_engine_init(&config, &self->engine)) != MA_SUCCESS)
+        return error("miniaudio engine initialization error (code: %i)!", r),
+               UnknownErr;
 
     self->state = ENGINE_STATE_INITIALIZED;
-    return info("engine initialized"), Ok;
+    return info("engine initialized."), Ok;
 }
 void engine_uninit(Engine *const self) {
     if (self->state == ENGINE_STATE_UNINITIALIZED) return;
@@ -58,14 +56,17 @@ void engine_uninit(Engine *const self) {
 }
 
 Result engine_start(Engine *const self) {
+    ma_result r;
+
     if (self->state == ENGINE_STATE_UNINITIALIZED) return StateErr;
     if (self->state == ENGINE_STATE_STARTED) return Ok;
 
-    if (ma_engine_start(&self->engine) != MA_SUCCESS)
-        return error("miniaudio engine starting error!"), UnknownErr;
+    if ((r = ma_engine_start(&self->engine)) != MA_SUCCESS)
+        return error("miniaudio engine starting error (code: %i)!", r),
+               UnknownErr;
 
     self->state = ENGINE_STATE_STARTED;
-    return info("engine started"), Ok;
+    return info("engine started."), Ok;
 }
 
 Result engine_load_sound(
@@ -92,7 +93,7 @@ Result engine_load_sound(
         { encoded_sound_data_uninit(encoded), free(encoded); }
     );
 
-    return info("sound loaded"), Ok;
+    return info("sound loaded."), Ok;
 }
 
 Result engine_generate_waveform(Engine *const self, Sound *const sound) {
@@ -112,7 +113,7 @@ Result engine_generate_waveform(Engine *const self, Sound *const sound) {
         { waveform_sound_data_uninit(waveform), free(waveform); }
     );
 
-    return info("waveform generated"), Ok;
+    return info("waveform generated."), Ok;
 }
 Result engine_generate_noise(
     Engine *const self,
@@ -130,7 +131,7 @@ Result engine_generate_noise(
         { noise_sound_data_uninit(noise), free(noise); }
     );
 
-    return info("noise generated"), Ok;
+    return info("noise generated."), Ok;
 }
 Result engine_generate_pulse(Engine *const self, Sound *const sound) {
     if (self->state == ENGINE_STATE_UNINITIALIZED) return StateErr;
@@ -145,5 +146,5 @@ Result engine_generate_pulse(Engine *const self, Sound *const sound) {
         { pulse_sound_data_uninit(pulse), free(pulse); }
     );
 
-    return info("pulse generated"), Ok;
+    return info("pulse generated."), Ok;
 }

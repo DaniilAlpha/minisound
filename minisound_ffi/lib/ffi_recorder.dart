@@ -1,15 +1,20 @@
 part of "minisound_ffi.dart";
 
 class FfiRecording implements PlatformRecording {
-  FfiRecording._(c.Recording self) : _self = self;
+  FfiRecording._(Pointer<c.Recording> self) : _self = self;
 
-  final c.Recording _self;
-
-  @override
-  Uint8List get buffer => _self.buf.asTypedList(_self.size);
+  final Pointer<c.Recording> _self;
 
   @override
-  void dispose() => malloc.free(_self.buf);
+  Uint8List get buffer => _binds
+      .recording_get_buf(_self)
+      .asTypedList(_binds.recording_get_size(_self));
+
+  @override
+  void dispose() {
+    _binds.recording_uninit(_self);
+    malloc.free(_self);
+  }
 }
 
 class FfiRecorder implements PlatformRecorder {
@@ -23,20 +28,11 @@ class FfiRecorder implements PlatformRecorder {
   bool get isRecording => _binds.recorder_get_is_recording(_self);
 
   @override
-  Future<void> init({
-    required RecorderFormat format,
-    required int channelCount,
-    required int sampleRate,
-  }) async {
-    final r = _binds.recorder_init(
-      _self,
-      format.toC(),
-      channelCount,
-      sampleRate,
-    );
+  Future<void> init() async {
+    final r = _binds.recorder_init(_self);
     if (r != c.Result.Ok) {
       throw MinisoundPlatformException(
-        "Failed to initialize recorder (code: $r).${Platform.isAndroid ? " It is possible that you forgot to request the microphone permission. See the README for more info." : ""}",
+        "Failed to init the recorder (code: $r).",
       );
     }
   }
@@ -48,10 +44,17 @@ class FfiRecorder implements PlatformRecorder {
   }
 
   @override
-  void start() {
+  void start({
+    required RecordingFormat format,
+    required int channelCount,
+    required int sampleRate,
+  }) {
     final r = _binds.recorder_start(
       _self,
       c.RecordingEncoding.RECORDING_ENCODING_WAV,
+      format.toC(),
+      channelCount,
+      sampleRate,
     );
     if (r != c.Result.Ok) {
       throw MinisoundPlatformException(
@@ -63,19 +66,20 @@ class FfiRecorder implements PlatformRecorder {
   @override
   FfiRecording stop() {
     if (!_binds.recorder_get_is_recording(_self)) {
-      throw MinisoundPlatformException("Recording has no data.");
+      throw MinisoundPlatformException("Recording is not started.");
     }
     final recording = _binds.recorder_stop(_self);
+    if (recording == nullptr) throw MinisoundPlatformOutOfMemoryException();
     return FfiRecording._(recording);
   }
 }
 
-extension on RecorderFormat {
-  c.RecorderFormat toC() => switch (this) {
-        RecorderFormat.u8 => c.RecorderFormat.RECORDER_FORMAT_U8,
-        RecorderFormat.s16 => c.RecorderFormat.RECORDER_FORMAT_S16,
-        RecorderFormat.s24 => c.RecorderFormat.RECORDER_FORMAT_S24,
-        RecorderFormat.s32 => c.RecorderFormat.RECORDER_FORMAT_S32,
-        RecorderFormat.f32 => c.RecorderFormat.RECORDER_FORMAT_F32,
-      };
+extension on RecordingFormat {
+  c.RecordingFormat toC() => switch (this) {
+    RecordingFormat.u8 => c.RecordingFormat.RECORDING_FORMAT_U8,
+    RecordingFormat.s16 => c.RecordingFormat.RECORDING_FORMAT_S16,
+    RecordingFormat.s24 => c.RecordingFormat.RECORDING_FORMAT_S24,
+    RecordingFormat.s32 => c.RecordingFormat.RECORDING_FORMAT_S32,
+    RecordingFormat.f32 => c.RecordingFormat.RECORDING_FORMAT_F32,
+  };
 }

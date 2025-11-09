@@ -86,6 +86,8 @@ PulseSoundData *pulse_sound_data_alloc(void) {
     return malloc0(sizeof(PulseSoundData));
 }
 Result pulse_sound_data_init(PulseSoundData *const self) {
+    ma_result r;
+
     ma_pulsewave_config const config = ma_pulsewave_config_init(
         ma_format_f32,
         1,
@@ -106,11 +108,14 @@ Result pulse_sound_data_init(PulseSoundData *const self) {
     };
     ma_data_source_config ds_config = ma_data_source_config_init();
     ds_config.vtable = &vtbl;
-    if (ma_data_source_init(&ds_config, &self->ds) != MA_SUCCESS)
-        return error("base ds initialization error"), UnknownErr;
+    if ((r = ma_data_source_init(&ds_config, &self->ds)) != MA_SUCCESS)
+        return error("miniaudio ds initialization error (code: %i)!", r),
+               UnknownErr;
 
-    if (ma_pulsewave_init(&config, &self->pulsewave) != MA_SUCCESS)
-        return error("pulsewave initializatoin error"), UnknownErr;
+    if ((r = ma_pulsewave_init(&config, &self->pulsewave)) != MA_SUCCESS)
+        return ma_data_source_uninit(&self->ds),
+               error("miniaudio pulsewave initializatoin error (code: %i)!", r),
+               UnknownErr;
 
     return Ok;
 }

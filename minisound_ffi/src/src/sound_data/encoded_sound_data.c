@@ -40,21 +40,18 @@ Result encoded_sound_data_init(
     uint8_t const *const data,
     size_t const data_size
 ) {
+    ma_result r;
+
     self->is_looped = false;
     self->is_using_loop_delay = false;
 
-    ma_result const r =
-        ma_decoder_init_memory(data, data_size, NULL, &self->decoder);
-
-    if (r != MA_SUCCESS)
-        return error(
-                   "miniaudio decoder initialization error! Error code: %d",
-                   r
-               ),
+    if ((r = ma_decoder_init_memory(data, data_size, NULL, &self->decoder)) !=
+        MA_SUCCESS)
+        return error("miniaudio decoder initialization error (code: %i)!", r),
                UnknownErr;
 
     return info(
-               "encoded sound data initialized (format : %i, channel count : %u, sample rate : %u)",
+               "encoded sound data initialized (format : %i, channel count : %u, sample rate : %u).",
                self->decoder.outputFormat,
                self->decoder.outputChannels,
                self->decoder.outputSampleRate
@@ -73,13 +70,13 @@ void encoded_sound_data_set_looped(
     bool const value,
     size_t const delay_ms
 ) {
-    // ma_data_source_set_current(&self->decoder, &self->decoder);
     ma_data_source_set_looping(&self->decoder, false);
     ma_data_source_set_next(&self->decoder, NULL);
 
     if (value) {
         if (delay_ms == 0) {
             ma_data_source_set_looping(&self->decoder, true);
+            ma_data_source_set_current(&self->decoder, &self->decoder);
         } else {
             if (self->is_using_loop_delay)
                 silence_data_source_uninit(&self->loop_delay_ds);
@@ -99,7 +96,7 @@ void encoded_sound_data_set_looped(
         }
     }
 
-    info(
+    trace(
         "encoded sound data looping set : %s (%zu ms delay)",
         value ? "true" : "false",
         delay_ms
