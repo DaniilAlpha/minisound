@@ -6,23 +6,29 @@
 
 #include "../../external/result/result.h"
 #include "../export.h"
-#include "./recording.h"
+#include "./rec.h"
 
 typedef struct Recorder Recorder;
 
-EXPORT Recorder *recorder_alloc(void);
+EXPORT Recorder *recorder_alloc(size_t const max_rec_count);
 EXPORT Result recorder_init(Recorder *const self);
 EXPORT void recorder_uninit(Recorder *const self);
 
-EXPORT bool recorder_get_is_recording(Recorder const *recorder);
+EXPORT Result recorder_start(Recorder *const self);
 
-EXPORT Result recorder_start(
+EXPORT Result recorder_record(
     Recorder *const self,
-    RecordingEncoding const encoding,
-    RecordingFormat const format,
+    RecEncoding const encoding,
+    RecFormat const format,
     uint32_t const channel_count,
-    uint32_t const sample_rate
+    uint32_t const sample_rate,
+
+    RecOnDataFn *const on_data_available,
+    size_t const data_availability_threshold,
+
+    Rec const **const out
 );
-EXPORT Recording *recorder_stop(Recorder *const self);
+EXPORT Result
+recorder_stop_recording(Recorder *const self, Rec const *const rec);
 
 #endif

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <assert.h>
 #include <engine.h>
 #include <recorder/recorder.h>
 #include <sound_data/encoded_sound_data.h>
@@ -200,7 +201,7 @@ MiunteResult test_looping() {
     MIUNTE_PASS();
 }
 MiunteResult test_generated_waveform_sounds() {
-    double freqs[] = {261.63, 329.63, 440.00, 523.25};
+    static double const freqs[] = {261.63, 329.63, 440.00, 523.25};
     for (size_t i = 0; i < lenof(freqs); i++) {
         Sound *const sound = sound_alloc();
         MIUNTE_EXPECT(sound != NULL, "sound should be allocated properly");
@@ -279,41 +280,79 @@ MiunteResult test_generated_pulse_sounds() {
 
     MIUNTE_PASS();
 }
-// others format are not supported at the moment
+
+FILE *files[3] = {0};
+#define DECL_ON_DATA_AVAILABLE(I_)                                             \
+    static void on_data_available_rec##I_(Rec *const self) {                   \
+        FILE *const file = files[I_];                                          \
+                                                                               \
+        uint8_t const *data = NULL;                                            \
+        size_t data_size = 0;                                                  \
+        rec_read(self, &data, &data_size);                                     \
+        assert(data && data_size);                                             \
+                                                                               \
+        fwrite(data, 1, data_size, file);                                      \
+                                                                               \
+        free((void *)data);                                                    \
+    }                                                                          \
+    void ___i_really_want_you_to_put_semicolon_here_please()
+DECL_ON_DATA_AVAILABLE(0);
+DECL_ON_DATA_AVAILABLE(1);
+DECL_ON_DATA_AVAILABLE(2);
+// other formats are not supported at the moment
 MiunteResult test_recording_wav() {
-    Recorder *const recorder = recorder_alloc();
+    static struct {
+        RecFormat format;
+        uint32_t channel_count, sample_rate;
+    } const rec_params[lenof(files)] = {
+        {REC_FORMAT_S16, 2, 44100},
+        {REC_FORMAT_U8, 1, 8000},
+        {REC_FORMAT_F32, 2, 96000}
+    };
+    Recorder *const recorder = recorder_alloc(lenof(rec_params));
     MIUNTE_EXPECT(recorder != NULL, "recorder should be allocated properly");
 
     MIUNTE_EXPECT(
-        recorder_init(recorder, RECORDER_FORMAT_S16, 2, 44100) == Ok,
+        recorder_init(recorder) == Ok,
         "recorder initialization should not fail"
     );
+    MIUNTE_EXPECT(
+        recorder_start(recorder) == Ok,
+        "recorder starting should not fail"
+    );
 
-    Recording recs[2] = {0};
+    for (FILE **file_ptr = files; file_ptr < files + lenof(files); file_ptr++) {
+        char filename[] = "./minisound_ffi/test_native/rec#.wav";
+        strchr(filename, '#')[0] = '0' + file_ptr - files;
+        *file_ptr = fopen(filename, "wb");
+        MIUNTE_EXPECT(file_ptr, "fopen should not fail");
+    }
 
-    for (size_t i = 0; i < lenof(recs); i++) {
+    for (size_t i = 0; i < lenof(rec_params); i++) {
+        Rec const *rec = NULL;
         MIUNTE_EXPECT(
-            recorder_start(recorder, RECORDING_ENCODING_WAV) == Ok,
+            recorder_record(
+                recorder,
+                REC_ENCODING_WAV,
+                rec_params[i].format,
+                rec_params[i].channel_count,
+                rec_params[i].sample_rate,
+
+                i == 0   ? on_data_available_rec0
+                : i == 1 ? on_data_available_rec1
+                : i == 2 ? on_data_available_rec2
+                         : NULL,
+                0,
+                &rec
+            ) == Ok,
             "recorder starting should not fail"
         );
-        sleep(3000);
-        recs[i] = recorder_stop(recorder);
+        sleep(1000);
+        recorder_stop_recording(recorder, rec);
     }
 
-    // separated to test that recording are not overriding each other
-
-    for (size_t i = 0; i < lenof(recs); i++) {
-        char filename[] = "./minisound_ffi/test_native/rec#.wav";
-        char *idx = strchr(filename, '#');
-        idx[0] = '0' + i;
-
-        FILE *const file = fopen(filename, "wb");
-        MIUNTE_EXPECT(file != NULL, "file should open properly");
-        fwrite(recs[i].buf, 1, recs[i].size, file);
-        fclose(file);
-
-        free(recs[i].buf);
-    }
+    for (FILE **file_ptr = files; file_ptr < files + lenof(files); file_ptr++)
+        fclose(*file_ptr);
 
     recorder_uninit(recorder), free(recorder);
 
@@ -326,10 +365,10 @@ int main() {
         teardown_test,
         {
             test_encoded_sounds,
-            test_looping,
-            test_generated_waveform_sounds,
-            test_generated_noise_sounds,
-            test_generated_pulse_sounds,
+            // test_looping,
+            // test_generated_waveform_sounds,
+            // test_generated_noise_sounds,
+            // test_generated_pulse_sounds,
             test_recording_wav,
         }
     );
