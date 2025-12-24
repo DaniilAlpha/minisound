@@ -42,8 +42,8 @@ static inline size_t approx_1ms_size_for(
 
 static ma_result encoder_on_write(
     ma_encoder *const encoder,
-    void const *const add_data,
-    size_t const add_data_size,
+    void const *add_data,
+    size_t add_data_size,
     size_t *const out_written_data_size
 ) {
     Rec *const self = encoder->pUserData;
@@ -78,19 +78,19 @@ static ma_result encoder_on_write(
         );
     }
 
-    size_t rem_size = add_data_size;
-    for (unsigned i = 0; rem_size && i < 100; i++) {
+    for (unsigned i = 0; add_data_size && i < 100; i++) {
         void *buf = NULL;
-        size_t written_size = rem_size;
+        size_t written_size = add_data_size;
         ma_rb_acquire_write(&self->rb, &written_size, &buf);
         memcpy(buf, add_data, written_size);
-        rem_size -= written_size;
+        add_data_size -= written_size;
+        add_data += written_size;
         ma_rb_commit_write(&self->rb, written_size);
     }
-    if (rem_size)
+    if (add_data_size)
         error(
             "recording buffer is insufficient for remaining %zu bytes! expect severe glitches!",
-            rem_size
+            add_data_size
         );
 
     if (ma_rb_available_read(&self->rb) >= self->data_availability_threshold) {
