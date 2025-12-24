@@ -43,7 +43,7 @@ static void on_data(
 
     for (Rec **rec_ptr = self->recs; rec_ptr < self->recs + self->recs_len;
          rec_ptr++)
-        rec_write_raw(*rec_ptr, data, data_len_pcm);
+        if (*rec_ptr) rec_write_raw(*rec_ptr, data, data_len_pcm);
 }
 
 /************
@@ -144,7 +144,7 @@ Result recorder_record(
     );
 
     *avail_rec_ptr = rec;
-    return info("recorder started."), *out = rec, Ok;
+    return info("recorder recording."), *out = rec, Ok;
 }
 Result recorder_stop_recording(Recorder *const self, Rec const *const rec) {
     if (self->state == RECORDER_STATE_UNINITIALIZED ||

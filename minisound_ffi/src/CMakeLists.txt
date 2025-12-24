@@ -30,9 +30,7 @@ target_sources(${MAIN_LIB} PRIVATE ${MAIN_SOURCES})
 # TODO!!! won't work on iOS/MacOS
 target_include_directories(${MAIN_LIB} PUBLIC include/)
 
-# dart stuff
-target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB)
-
+# dart stuff target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB)
 
 
 # logging
@@ -41,7 +39,7 @@ target_compile_definitions(${MAIN_LIB} PRIVATE
         MILO_DEFAULT_LVL=MILO_LVL_INFO
         ENGINE_MILO_LVL=MILO_LVL_INFO
         SOUND_MILO_LVL=MILO_LVL_INFO
-        RECORDER_MILO_LVL=MILO_LVL_INFO
+        RECORDER_MILO_LVL=MILO_LVL_TRACE
     > $<$<CONFIG:Release>:
         MILO_DEFAULT_LVL=MILO_LVL_NONE
         ENGINE_MILO_LVL=MILO_LVL_NONE
@@ -105,7 +103,7 @@ endif()
 
 ### miniaudio ###
 
-# TODO if this works out, make an issue in miniaudio to make defs PUBLIC
+# TODO? if this works out, make an issue in miniaudio to make defs PUBLIC
 # TODO try somehow enabling pipewire (if it's present in MA at all)
 
 option(MINIAUDIO_NO_EXTRA_NODES "" ON)

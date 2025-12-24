@@ -310,7 +310,7 @@ MiunteResult test_recording_wav() {
         {REC_FORMAT_F32, 2, 96000}
     };
     Recorder *const recorder = recorder_alloc(lenof(rec_params));
-    MIUNTE_EXPECT(recorder != NULL, "recorder should be allocated properly");
+    MIUNTE_EXPECT(recorder, "recorder should be allocated properly");
 
     MIUNTE_EXPECT(
         recorder_init(recorder) == Ok,
@@ -364,10 +364,10 @@ int main() {
         setup_test,
         teardown_test,
         {
-            test_encoded_sounds,
+            // test_encoded_sounds,
             // test_looping,
             // test_generated_waveform_sounds,
-            // test_generated_noise_sounds,
+            test_generated_noise_sounds,
             // test_generated_pulse_sounds,
             test_recording_wav,
         }

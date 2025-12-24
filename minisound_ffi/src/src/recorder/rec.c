@@ -64,11 +64,12 @@ static ma_result encoder_on_write(
     // not really for thread-safety but rather for polling ellimination
     size_t const avail_size = ma_rb_available_write(&self->rb);
     size_t const insufficient_size =
-        avail_size < add_data_size ? add_data_size - avail_size : 0;
+        avail_size < add_data_size ? (add_data_size - avail_size) : 0;
     if (insufficient_size) {
         void *buf = NULL;
         size_t read_size = insufficient_size;
         ma_rb_acquire_read(&self->rb, &read_size, &buf);
+        // ma_rb_seek_read(&self->rb, read_size);
         ma_rb_commit_read(&self->rb, read_size);
 
         warn(
@@ -77,21 +78,27 @@ static ma_result encoder_on_write(
         );
     }
 
-    void *buf = NULL;
-    size_t written_size = add_data_size;
-    ma_rb_acquire_write(&self->rb, &written_size, &buf);
-    memcpy(buf, add_data, written_size);
-    ma_rb_commit_write(&self->rb, written_size);
-
-    if (written_size < add_data_size)
+    size_t rem_size = add_data_size;
+    for (unsigned i = 0; rem_size && i < 100; i++) {
+        void *buf = NULL;
+        size_t written_size = rem_size;
+        ma_rb_acquire_write(&self->rb, &written_size, &buf);
+        memcpy(buf, add_data, written_size);
+        rem_size -= written_size;
+        ma_rb_commit_write(&self->rb, written_size);
+    }
+    if (rem_size)
         error(
-            "recording buffer still insufficient (%zu/%zu b)! expect severe glitches!",
-            written_size,
-            add_data_size
+            "recording buffer is insufficient for remaining %zu bytes! expect severe glitches!",
+            rem_size
         );
 
-    if (ma_rb_available_read(&self->rb) >= self->data_availability_threshold)
-        self->on_data_available(self);
+    if (ma_rb_available_read(&self->rb) >= self->data_availability_threshold) {
+        if (self->on_data_available)
+            self->on_data_available(self);
+        else
+            warn("`on_data_available` function is not provided!");
+    }
 
     return *out_written_data_size = add_data_size, MA_SUCCESS;
 }
@@ -159,7 +166,7 @@ Result rec_init(
         data_availability_threshold_ms
             ? data_availability_threshold_ms * approx_1ms_size
             // default to some arbitrary value i think should be ok
-            : 25 * approx_1ms_size;
+            : 1 * approx_1ms_size;
 
     return info("recording initialized."), Ok;
 }
@@ -185,7 +192,7 @@ Result rec_write_raw(
         return error("miniaudio encoder writing error (code: %i)!", r),
                UnknownErr;
 
-    return trace("wrote data into the recording."), Ok;
+    return trace("wrote %zu bytes into the recording.", data_len_frames), Ok;
 }
 Result rec_read(
     Rec *const self,
@@ -193,13 +200,21 @@ Result rec_read(
     size_t *const out_data_size
 ) {
     void *buf = NULL;
-    size_t read_size = -1;
-    ma_rb_acquire_read(&self->rb, &read_size, buf);
-    uint8_t *const data = malloc(read_size);
-    memcpy(data, buf, read_size);
-    ma_rb_commit_read(&self->rb, read_size);
+    size_t read_size = ma_rb_available_read(&self->rb);
 
-    return trace("read data from the recording."),
+    uint8_t *const data = malloc(read_size);
+    if (!data) return OutOfMemErr;
+    size_t const avail_size = ma_rb_available_read(&self->rb);
+
+    if (ma_rb_acquire_read(&self->rb, &read_size, &buf) != MA_SUCCESS ||
+        !memcpy(data, buf, read_size) ||
+        (printf("BUF: %zu / %zu\n", read_size, avail_size),
+         fflush(stdout),
+         0) ||
+        ma_rb_commit_read(&self->rb, read_size) != MA_SUCCESS)
+        error("miniaudio ringbuf reading failed!");
+
+    return trace("read %zu bytes from the recording.", read_size),
          *out_data = data, *out_data_size = read_size, Ok;
 }
 
