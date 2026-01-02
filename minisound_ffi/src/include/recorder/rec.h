@@ -11,6 +11,7 @@
 #include "../export.h"
 
 typedef enum RecEncoding {
+    REC_ENCODING_RAW,  // TODO! not implemented yet
     REC_ENCODING_WAV = 1,
     // REC_ENCODING_FLAC,
     // REC_ENCODING_MP3,
@@ -34,6 +35,9 @@ Result rec_init(
     RecFormat const format,
     uint32_t const channel_count,
     uint32_t const sample_rate,
+    int const in_format,
+    uint32_t const in_channel_count,
+    uint32_t const in_sample_rate,
 
     size_t const buf_size_frames,
     size_t const data_availability_threshold_frames,
@@ -52,6 +56,6 @@ EXPORT Result rec_read(
     uint8_t const **const out_data,
     size_t *const out_data_size
 );
-void rec_end(Rec *const self);
+Result rec_end(Rec *const self);
 
 #endif

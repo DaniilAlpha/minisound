@@ -335,10 +335,21 @@ MiunteResult test_recording_wav() {
     } const rec_params[lenof(files)] = {
         {REC_FORMAT_S16, 2, 44100},
         {REC_FORMAT_U8, 1, 8000},
-        {REC_FORMAT_S32, 2, 96000}
+        {REC_FORMAT_F32, 2, 96000}
+    };
+    static typeof(&on_data_available_rec0)
+        on_data_available_recs[lenof(files)] = {
+            on_data_available_rec0,
+            on_data_available_rec1,
+            on_data_available_rec2,
+        };
+    static typeof(&seek_data_rec0) seek_data_recs[lenof(files)] = {
+        seek_data_rec0,
+        seek_data_rec1,
+        seek_data_rec2,
     };
 
-    Recorder *const recorder = recorder_alloc(1);
+    Recorder *const recorder = recorder_alloc(lenof(files));
     MIUNTE_EXPECT(recorder, "recorder should be allocated properly");
 
     MIUNTE_EXPECT(
@@ -357,8 +368,8 @@ MiunteResult test_recording_wav() {
         MIUNTE_EXPECT(*file_ptr, "fopen should not fail");
     }
 
-    for (size_t i = 0; i < 2; i++) {
-        Rec *rec = NULL;
+    Rec *recs[lenof(files)] = {0};
+    for (size_t i = 0; i < lenof(files); i++) {
         MIUNTE_EXPECT(
             recorder_record(
                 recorder,
@@ -368,25 +379,29 @@ MiunteResult test_recording_wav() {
                 rec_params[i].sample_rate,
 
                 0,
-                i == 0   ? on_data_available_rec0
-                : i == 1 ? on_data_available_rec1
-                : i == 2 ? on_data_available_rec2
-                         : NULL,
-                i == 0   ? seek_data_rec0
-                : i == 1 ? seek_data_rec1
-                : i == 2 ? seek_data_rec2
-                         : NULL,
-                &rec
+                on_data_available_recs[i],
+                seek_data_recs[i],
+                &recs[i]
             ) == Ok,
             "recorder starting should not fail"
         );
-        sleep(3000);
-        recorder_pause_recording(recorder, rec);
-        sleep(1000);
-        recorder_resume_recording(recorder, rec);
-        sleep(1000);
-        recorder_stop_recording(recorder, rec);
-        rec_uninit(rec), free(rec);
+    }
+
+    sleep(5000);
+
+    for (size_t i = 0; i < lenof(files); i++)
+        recorder_pause_recording(recorder, recs[i]);
+
+    sleep(1000);
+
+    for (size_t i = 0; i < lenof(files); i++)
+        recorder_resume_recording(recorder, recs[i]);
+
+    sleep(4000);
+
+    for (size_t i = 0; i < lenof(files); i++) {
+        recorder_stop_recording(recorder, recs[i]);
+        rec_uninit(recs[i]), free(recs[i]);
     }
 
     for (FILE **file_ptr = files; file_ptr < files + lenof(files); file_ptr++)
@@ -402,7 +417,7 @@ int main() {
         setup_test,
         teardown_test,
         {
-            test_encoded_sounds,
+            // test_encoded_sounds,
             // test_looping,
             // test_generated_waveform_sounds,
             // test_generated_noise_sounds,

@@ -107,7 +107,7 @@ Result engine_generate_waveform(Engine *const self, Sound *const sound) {
             waveform,
             self->engine.pDevice->playback.format,
             self->engine.pDevice->playback.channels,
-            self->engine.pDevice->playback.internalSampleRate
+            self->engine.pDevice->sampleRate
         ),
         { free(waveform); }
     );

@@ -65,9 +65,6 @@ Result recorder_init(Recorder *const self) {
 
     ma_device_config device_config =
         ma_device_config_init(ma_device_type_capture);
-    device_config.capture.format = ma_format_s16;
-    device_config.capture.channels = 2;
-    device_config.sampleRate = 44100;
     device_config.dataCallback = on_data;
     device_config.pUserData = self;
 
@@ -138,7 +135,7 @@ Result recorder_record(
     if (!rec) return OutOfMemErr;
 
     size_t const buf_size_ms = self->device.capture.internalPeriodSizeInFrames *
-                               1000 / self->device.capture.internalSampleRate;
+                               1000 / self->device.sampleRate;
     size_t const data_availability_threshold_bufs =
         data_availability_threshold_ms < buf_size_ms
             ? 1
@@ -158,6 +155,9 @@ Result recorder_record(
             format,
             channel_count,
             sample_rate,
+            self->device.capture.format,
+            self->device.capture.channels,
+            self->device.sampleRate,
 
             data_availability_threshold_frames * RECORDING_BUF_COUNT,
             data_availability_threshold_frames,
