@@ -30,6 +30,9 @@ EXPORT Result recorder_record(
     Rec **const out
 );
 EXPORT Result
+recorder_pause_recording(Recorder *const self, Rec const *const rec);
+EXPORT Result recorder_resume_recording(Recorder *const self, Rec *const rec);
+EXPORT Result
 recorder_stop_recording(Recorder *const self, Rec const *const rec);
 
 #endif

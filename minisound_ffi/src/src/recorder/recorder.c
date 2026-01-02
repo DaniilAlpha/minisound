@@ -170,6 +170,37 @@ Result recorder_record(
     *avail_rec_ptr = rec;
     return info("recorder recording."), *out = rec, Ok;
 }
+Result recorder_pause_recording(Recorder *const self, Rec const *const rec) {
+    if (self->state == RECORDER_STATE_UNINITIALIZED ||
+        self->state == RECORDER_STATE_INITIALIZED)
+        return StateErr;
+
+    for (Rec **rec_ptr = self->recs; rec_ptr < self->recs + self->recs_len;
+         rec_ptr++)
+        if (*rec_ptr == rec) {
+            *rec_ptr = NULL;
+            break;
+        }
+
+    return info("recording paused."), Ok;
+}
+Result recorder_resume_recording(Recorder *const self, Rec *const rec) {
+    if (self->state == RECORDER_STATE_UNINITIALIZED ||
+        self->state == RECORDER_STATE_INITIALIZED)
+        return StateErr;
+
+    Rec **avail_rec_ptr = NULL;
+    for (Rec **rec_ptr = self->recs; rec_ptr < self->recs + self->recs_len;
+         rec_ptr++)
+        if (!*rec_ptr) {
+            avail_rec_ptr = rec_ptr;
+            break;
+        }
+    if (!avail_rec_ptr) return RangeErr;
+
+    *avail_rec_ptr = rec;
+    return info("recording resumed."), Ok;
+}
 Result recorder_stop_recording(Recorder *const self, Rec const *const rec) {
     if (self->state == RECORDER_STATE_UNINITIALIZED ||
         self->state == RECORDER_STATE_INITIALIZED)
@@ -182,5 +213,5 @@ Result recorder_stop_recording(Recorder *const self, Rec const *const rec) {
             break;
         }
 
-    return Ok;
+    return info("recording stopped."), Ok;
 }

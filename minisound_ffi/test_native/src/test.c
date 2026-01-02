@@ -372,6 +372,10 @@ MiunteResult test_recording_wav() {
             "recorder starting should not fail"
         );
         sleep(3000);
+        recorder_pause_recording(recorder, rec);
+        sleep(1000);
+        recorder_resume_recording(recorder, rec);
+        sleep(1000);
         recorder_stop_recording(recorder, rec);
         rec_uninit(rec), free(rec);
     }
@@ -389,12 +393,12 @@ int main() {
         setup_test,
         teardown_test,
         {
-            test_encoded_sounds,
+            // test_encoded_sounds,
             // test_looping,
             // test_generated_waveform_sounds,
             // test_generated_noise_sounds,
             // test_generated_pulse_sounds,
-            // test_recording_wav,
+            test_recording_wav,
         }
     );
 

@@ -63,7 +63,7 @@ Result sound_init(
     if ((r = ma_sound_init_from_data_source(
              self->engine,
              sound_data_get_ds(&self->sound_data),
-             MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION,
+             MA_SOUND_FLAG_NO_SPATIALIZATION,
              NULL,
              &notifications,
              &self->sound
@@ -133,7 +133,6 @@ float sound_get_duration(Sound const *const self) {
 }
 bool sound_get_is_playing(Sound const *const self) {
     if (self->state == SOUND_STATE_UNINITIALIZED) return false;
-
     return self->state == SOUND_STATE_PLAYING;
 }
 
@@ -147,6 +146,15 @@ float sound_get_cursor(Sound const *const self) {
 void sound_set_cursor(Sound *const self, float const value) {
     if (self->state == SOUND_STATE_UNINITIALIZED) return;
     ma_sound_seek_to_second(&self->sound, value);
+}
+
+float sound_get_pitch(Sound const *const self) {
+    if (self->state == SOUND_STATE_UNINITIALIZED) return 0.0;
+    return ma_sound_get_pitch(&self->sound);
+}
+void sound_set_pitch(Sound *const self, float const value) {
+    if (self->state == SOUND_STATE_UNINITIALIZED) return;
+    ma_sound_set_pitch(&self->sound, value);
 }
 
 EncodedSoundData *sound_get_encoded_data(Sound const *const self) {
