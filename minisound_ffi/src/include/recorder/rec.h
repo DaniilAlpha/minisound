@@ -25,11 +25,10 @@ typedef enum RecFormat {
 } RecFormat;
 typedef struct Rec Rec;
 typedef void RecOnDataFn(Rec *const self);
-typedef void
-RecSeekDataFn(Rec *const self, ssize_t const off, int const origin);
+typedef void RecSeekDataFn(Rec *const self, long const off, int const origin);
 
 Rec *rec_alloc(void);
-Result rec_init(
+EXPORT Result rec_init(
     Rec *const self,
     RecEncoding const encoding,
     RecFormat const format,

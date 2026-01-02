@@ -58,13 +58,14 @@ Recorder *recorder_alloc(size_t const max_rec_count) {
     self->recs_len = max_rec_count;
     return self;
 }
-Result recorder_init(Recorder *const self) {
+Result recorder_init(Recorder *const self, uint32_t const period_ms) {
     if (self->state != RECORDER_STATE_UNINITIALIZED) return Ok;
 
     ma_result r;
 
     ma_device_config device_config =
         ma_device_config_init(ma_device_type_capture);
+    device_config.periodSizeInMilliseconds = period_ms;
     device_config.dataCallback = on_data;
     device_config.pUserData = self;
 
@@ -89,6 +90,18 @@ void recorder_uninit(Recorder *const self) {
     ma_device_uninit(&self->device);
 
     self->state = RECORDER_STATE_UNINITIALIZED;
+}
+
+bool recorder_get_is_recording(
+    Recorder const *const self,
+    Rec const *const rec
+) {
+    for (Rec *const *rec_ptr = self->recs;
+         rec_ptr < self->recs + self->recs_len;
+         rec_ptr++)
+        if (*rec_ptr == rec) return true;
+
+    return false;
 }
 
 Result recorder_start(Recorder *const self) {
@@ -170,7 +183,7 @@ Result recorder_record(
     *avail_rec_ptr = rec;
     return info("recorder recording."), *out = rec, Ok;
 }
-Result recorder_pause_recording(Recorder *const self, Rec const *const rec) {
+Result recorder_pause_rec(Recorder *const self, Rec const *const rec) {
     if (self->state == RECORDER_STATE_UNINITIALIZED ||
         self->state == RECORDER_STATE_INITIALIZED)
         return StateErr;
@@ -184,7 +197,7 @@ Result recorder_pause_recording(Recorder *const self, Rec const *const rec) {
 
     return info("recording paused."), Ok;
 }
-Result recorder_resume_recording(Recorder *const self, Rec *const rec) {
+Result recorder_resume_rec(Recorder *const self, Rec *const rec) {
     if (self->state == RECORDER_STATE_UNINITIALIZED ||
         self->state == RECORDER_STATE_INITIALIZED)
         return StateErr;
@@ -201,7 +214,7 @@ Result recorder_resume_recording(Recorder *const self, Rec *const rec) {
     *avail_rec_ptr = rec;
     return info("recording resumed."), Ok;
 }
-Result recorder_stop_recording(Recorder *const self, Rec const *const rec) {
+Result recorder_stop_rec(Recorder *const self, Rec *const rec) {
     if (self->state == RECORDER_STATE_UNINITIALIZED ||
         self->state == RECORDER_STATE_INITIALIZED)
         return StateErr;
@@ -209,9 +222,11 @@ Result recorder_stop_recording(Recorder *const self, Rec const *const rec) {
     for (Rec **rec_ptr = self->recs; rec_ptr < self->recs + self->recs_len;
          rec_ptr++)
         if (*rec_ptr == rec) {
-            rec_end(*rec_ptr), *rec_ptr = NULL;
+            *rec_ptr = NULL;
             break;
         }
+
+    rec_end(rec);
 
     return info("recording stopped."), Ok;
 }

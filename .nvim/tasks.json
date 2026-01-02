@@ -21,11 +21,7 @@
 
         "rebuild web lib": {
             "desc": "build ffi lib to web via emscripten",
-            "cmd": [
-                "make proj-web-lib-clean && make proj-web-lib-build",
-                "export EMSDK_QUIET=1; . ~/emsdk/emsdk_env.sh",
-                "make build_web_lib"
-            ]
+            "cmd": "make proj-web-lib-clean && make proj-web-lib-build"
         }
     }
 }

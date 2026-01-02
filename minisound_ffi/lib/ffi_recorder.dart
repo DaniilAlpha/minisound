@@ -1,39 +1,45 @@
 part of "minisound_ffi.dart";
 
-class FfiRecording implements PlatformRecording {
-  FfiRecording._(Pointer<c.Recording> self) : _self = self;
+class FfiRec implements PlatformRec {
+  FfiRec._(Pointer<c.Rec> self) : _self = self;
 
-  final Pointer<c.Recording> _self;
+  final Pointer<c.Rec> _self;
 
   @override
-  Uint8List get buffer => _binds
-      .recording_get_buf(_self)
-      .asTypedList(_binds.recording_get_size(_self));
+  Uint8List read() {
+    final outData = malloc.allocate<Pointer<Uint8>>(sizeOf<Pointer<Uint8>>()),
+        outDataSize = malloc.allocate<Size>(sizeOf<Size>());
+    if (outData == nullptr) throw MinisoundPlatformOutOfMemoryException();
+    _binds.rec_read(_self, outData, outDataSize);
+    final data = outData.value, dataSize = outDataSize.value;
+    malloc.free(outData);
+    malloc.free(outDataSize);
+
+    final readData = data.asTypedList(dataSize);
+    malloc.free(data);
+    return readData;
+  }
 
   @override
   void dispose() {
-    _binds.recording_uninit(_self);
+    _binds.rec_uninit(_self);
     malloc.free(_self);
   }
 }
 
 class FfiRecorder implements PlatformRecorder {
-  FfiRecorder._() : _self = _binds.recorder_alloc() {
+  FfiRecorder._(int maxRecCount) : _self = _binds.recorder_alloc(maxRecCount) {
     if (_self == nullptr) throw MinisoundPlatformOutOfMemoryException();
   }
 
   final Pointer<c.Recorder> _self;
 
   @override
-  bool get isRecording => _binds.recorder_get_is_recording(_self);
-
-  @override
-  Future<void> init() async {
-    final r = _binds.recorder_init(_self);
+  Future<void> init(int periodMs) async {
+    final r = _binds.recorder_init(_self, periodMs);
     if (r != c.Result.Ok) {
       throw MinisoundPlatformException(
-        "Failed to init the recorder (code: $r).",
-      );
+          "Failed to init the recorder (code: $r).");
     }
   }
 
@@ -44,18 +50,8 @@ class FfiRecorder implements PlatformRecorder {
   }
 
   @override
-  void start({
-    required RecordingFormat format,
-    required int channelCount,
-    required int sampleRate,
-  }) {
-    final r = _binds.recorder_start(
-      _self,
-      c.RecordingEncoding.RECORDING_ENCODING_WAV,
-      format.toC(),
-      channelCount,
-      sampleRate,
-    );
+  void start() {
+    final r = _binds.recorder_start(_self);
     if (r != c.Result.Ok) {
       throw MinisoundPlatformException(
         "Failed to start the recorder (code: $r).",
@@ -64,22 +60,97 @@ class FfiRecorder implements PlatformRecorder {
   }
 
   @override
-  FfiRecording stop() {
-    if (!_binds.recorder_get_is_recording(_self)) {
-      throw MinisoundPlatformException("Recording is not started.");
+  bool isRecording(PlatformRec rec) {
+    rec as FfiRec;
+
+    return _binds.recorder_get_is_recording(_self, rec._self);
+  }
+
+  @override
+  FfiRec record({
+    required RecEncoding encoding,
+    required RecFormat format,
+    required int channelCount,
+    required int sampleRate,
+    required int dataAvailabilityThresholdMs,
+    void Function() onDataAvailableFn,
+    void Function() seekDataFn,
+  }) {
+    final outRec = malloc.allocate<Pointer<c.Rec>>(sizeOf<Pointer<c.Rec>>());
+    if (outRec == nullptr) throw MinisoundPlatformOutOfMemoryException();
+    final r = _binds.recorder_record(
+      _self,
+      encoding.toC(),
+      format.toC(),
+      channelCount,
+      sampleRate,
+      dataAvailabilityThresholdMs,
+      onDataAvailableFn,
+      seekDataFn,
+      outRec,
+    );
+    final rec = outRec.value;
+    malloc.free(outRec);
+
+    if (r != c.Result.Ok) {
+      throw MinisoundPlatformException(
+        "Failed to recor (code: $r).",
+      );
     }
-    final recording = _binds.recorder_stop(_self);
-    if (recording == nullptr) throw MinisoundPlatformOutOfMemoryException();
-    return FfiRecording._(recording);
+
+    return FfiRec._(rec);
+  }
+
+  @override
+  void pauseRec(PlatformRec rec) {
+    rec as FfiRec;
+
+    final r = _binds.recorder_pause_rec(_self, rec._self);
+    if (r != c.Result.Ok) {
+      throw MinisoundPlatformException(
+        "Failed to pause the recording (code: $r).",
+      );
+    }
+  }
+
+  @override
+  void resumeRec(PlatformRec rec) {
+    rec as FfiRec;
+
+    final r = _binds.recorder_resume_rec(_self, rec._self);
+    if (r != c.Result.Ok) {
+      throw MinisoundPlatformException(
+        "Failed to resume the recording (code: $r).",
+      );
+    }
+  }
+
+  @override
+  void stopRec(PlatformRec rec) {
+    rec as FfiRec;
+
+    final r = _binds.recorder_stop_rec(_self, rec._self);
+    if (r != c.Result.Ok) {
+      throw MinisoundPlatformException(
+        "Failed to stop the recording (code: $r).",
+      );
+    }
   }
 }
 
-extension on RecordingFormat {
-  c.RecordingFormat toC() => switch (this) {
-    RecordingFormat.u8 => c.RecordingFormat.RECORDING_FORMAT_U8,
-    RecordingFormat.s16 => c.RecordingFormat.RECORDING_FORMAT_S16,
-    RecordingFormat.s24 => c.RecordingFormat.RECORDING_FORMAT_S24,
-    RecordingFormat.s32 => c.RecordingFormat.RECORDING_FORMAT_S32,
-    RecordingFormat.f32 => c.RecordingFormat.RECORDING_FORMAT_F32,
-  };
+extension on RecEncoding {
+  c.RecEncoding toC() => switch (this) {
+        // RecEncoding.raw => c.RecEncoding.REC_ENCODING_RAW,
+        RecEncoding.wav => c.RecEncoding.REC_ENCODING_WAV,
+      };
+}
+
+extension on RecFormat {
+  c.RecFormat toC() => switch (this) {
+        RecFormat.u8 => c.RecFormat.REC_FORMAT_U8,
+        RecFormat.s16 => c.RecFormat.REC_FORMAT_S16,
+        RecFormat.s24 => c.RecFormat.REC_FORMAT_S24,
+        RecFormat.s32 => c.RecFormat.REC_FORMAT_S32,
+        RecFormat.f32 => c.RecFormat.REC_FORMAT_F32,
+      };
 }

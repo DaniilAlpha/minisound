@@ -2,8 +2,8 @@
 #define MINISOUND_H
 
 #include "engine.h"
+#include "recorder/rec.h"
 #include "recorder/recorder.h"
-#include "recorder/recording.h"
 #include "sound.h"
 #include "sound_data/encoded_sound_data.h"
 #include "sound_data/noise_sound_data.h"

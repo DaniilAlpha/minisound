@@ -8,6 +8,9 @@ abstract interface class PlatformSound {
 
   bool get isPlaying;
 
+  double get pitch;
+  set pitch(double value);
+
   void unload();
 
   void play();
@@ -17,7 +20,9 @@ abstract interface class PlatformSound {
 
 abstract interface class PlatformEncodedSound extends PlatformSound {
   double get duration;
-  double get position;
+
+  double get cursor;
+  set cursor(double value);
 
   PlatformSoundLooping get looping;
   set looping(PlatformSoundLooping value);

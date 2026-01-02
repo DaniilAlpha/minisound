@@ -1,4 +1,4 @@
-MAKEFLAGS += --always-make -j2
+MAKEFLAGS += --always-make -j4
 SHELL := /bin/bash # set the shell explicitly for UNIX-like systems
 
 ### cmake settings ###
@@ -8,7 +8,6 @@ export CMAKE_LOG_LEVEL ?= NOTICE
 
 
 ### dirs ###
-
 PROJ_PI_DIR = ./minisound_platform_interface/ 
 
 PROJ_FFI_DIR = ./minisound_ffi/ 
@@ -17,6 +16,7 @@ PROJ_FFI_NATIVE_TEST_SRC_DIR = ./minisound_ffi/test_native/
 PROJ_FFI_NATIVE_TEST_BUILD_DIR = ./minisound_ffi/test_native/build/
 
 PROJ_WEB_DIR = ./minisound_web/ 
+PROJ_WEB_SRC_DIR = $(PROJ_FFI_SRC_DIR)
 PROJ_WEB_LIB_BUILD_DIR = ./minisound_web/lib/build/
 
 PROJ_MAIN_DIR = ./minisound/ 
@@ -90,7 +90,7 @@ endif
 
 proj-web-lib-build:
 	@\
-	emcmake cmake -B $(PROJ_WEB_LIB_BUILD_DIR)/cmake_stuff/ -S $(SRC_DIR) -DCMAKE_BUILD_TYPE=Debug &&\
+	emcmake cmake -B $(PROJ_WEB_LIB_BUILD_DIR)/cmake_stuff/ -S $(PROJ_WEB_SRC_DIR) -DCMAKE_BUILD_TYPE=Debug &&\
 	cmake --build $(PROJ_WEB_LIB_BUILD_DIR)/cmake_stuff/
 
 proj-web-lib-clean:

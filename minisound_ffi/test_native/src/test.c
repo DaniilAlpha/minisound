@@ -316,7 +316,7 @@ FILE *files[3] = {0};
     }                                                                          \
     static void seek_data_rec##I_(                                             \
         Rec *const self,                                                       \
-        ssize_t const off,                                                     \
+        long const off,                                                        \
         int const origin                                                       \
     ) {                                                                        \
         FILE *const file = files[I_];                                          \
@@ -353,7 +353,7 @@ MiunteResult test_recording_wav() {
     MIUNTE_EXPECT(recorder, "recorder should be allocated properly");
 
     MIUNTE_EXPECT(
-        recorder_init(recorder) == Ok,
+        recorder_init(recorder, 33) == Ok,
         "recorder initialization should not fail"
     );
     MIUNTE_EXPECT(
@@ -390,17 +390,17 @@ MiunteResult test_recording_wav() {
     sleep(5000);
 
     for (size_t i = 0; i < lenof(files); i++)
-        recorder_pause_recording(recorder, recs[i]);
+        recorder_pause_rec(recorder, recs[i]);
 
     sleep(1000);
 
     for (size_t i = 0; i < lenof(files); i++)
-        recorder_resume_recording(recorder, recs[i]);
+        recorder_resume_rec(recorder, recs[i]);
 
     sleep(4000);
 
     for (size_t i = 0; i < lenof(files); i++) {
-        recorder_stop_recording(recorder, recs[i]);
+        recorder_stop_rec(recorder, recs[i]);
         rec_uninit(recs[i]), free(recs[i]);
     }
 

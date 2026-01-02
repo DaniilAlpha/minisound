@@ -19,7 +19,7 @@ abstract class MinisoundPlatform extends PlatformInterface {
   }
 
   PlatformEngine Function() get createEngine;
-  PlatformRecorder Function() get createRecorder;
+  PlatformRecorder Function(int maxRecCount) get createRecorder;
 }
 
 base class MinisoundPlatformException implements Exception {

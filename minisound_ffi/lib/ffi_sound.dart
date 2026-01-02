@@ -17,6 +17,15 @@ sealed class FfiSound implements PlatformSound {
   @override
   bool get isPlaying => _binds.sound_get_is_playing(_self);
 
+  late var _pitch = _binds.sound_get_pitch(_self);
+  @override
+  double get pitch => _pitch;
+  @override
+  set pitch(double value) {
+    _binds.sound_set_pitch(_self, value);
+    _pitch = value;
+  }
+
   @override
   void unload() {
     _binds.sound_unload(_self);
@@ -46,8 +55,11 @@ final class FfiEncodedSound extends FfiSound implements PlatformEncodedSound {
 
   @override
   late final duration = _binds.sound_get_duration(_self);
+
   @override
-  double get position => _binds.sound_get_position(_self);
+  double get cursor => _binds.sound_get_cursor(_self);
+  @override
+  set cursor(double value) => _binds.sound_set_cursor(_self, value);
 
   var _looping = (false, 0);
   @override

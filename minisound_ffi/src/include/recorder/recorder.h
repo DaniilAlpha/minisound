@@ -11,8 +11,11 @@
 typedef struct Recorder Recorder;
 
 EXPORT Recorder *recorder_alloc(size_t const max_rec_count);
-EXPORT Result recorder_init(Recorder *const self);
+EXPORT Result recorder_init(Recorder *const self, uint32_t const period_ms);
 EXPORT void recorder_uninit(Recorder *const self);
+
+EXPORT bool
+recorder_get_is_recording(Recorder const *const self, Rec const *const rec);
 
 EXPORT Result recorder_start(Recorder *const self);
 
@@ -29,10 +32,8 @@ EXPORT Result recorder_record(
 
     Rec **const out
 );
-EXPORT Result
-recorder_pause_recording(Recorder *const self, Rec const *const rec);
-EXPORT Result recorder_resume_recording(Recorder *const self, Rec *const rec);
-EXPORT Result
-recorder_stop_recording(Recorder *const self, Rec const *const rec);
+EXPORT Result recorder_pause_rec(Recorder *const self, Rec const *const rec);
+EXPORT Result recorder_resume_rec(Recorder *const self, Rec *const rec);
+EXPORT Result recorder_stop_rec(Recorder *const self, Rec *const rec);
 
 #endif
