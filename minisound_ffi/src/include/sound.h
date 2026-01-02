@@ -29,8 +29,10 @@ EXPORT float sound_get_volume(Sound const *const self);
 EXPORT void sound_set_volume(Sound *const self, float const value);
 
 EXPORT float sound_get_duration(Sound const *const self);
-EXPORT float sound_get_position(Sound const *const self);
 EXPORT bool sound_get_is_playing(Sound const *const self);
+
+EXPORT float sound_get_cursor(Sound const *const self);
+EXPORT void sound_set_cursor(Sound *const self, float const value);
 
 EXPORT EncodedSoundData *sound_get_encoded_data(Sound const *const self);
 EXPORT WaveformSoundData *sound_get_waveform_data(Sound const *const self);

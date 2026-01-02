@@ -31,14 +31,19 @@ static ma_data_source *waveform_sound_data_get_ds(
 WaveformSoundData *waveform_sound_data_alloc(void) {
     return malloc0(sizeof(WaveformSoundData));
 }
-Result waveform_sound_data_init(WaveformSoundData *const self) {
+Result waveform_sound_data_init(
+    WaveformSoundData *const self,
+    int const format,
+    uint32_t const channels,
+    uint32_t const sample_rate
+) {
     ma_result r;
 
     ma_waveform_config const config = ma_waveform_config_init(
         // TODO? maybe needs not to be hardcoded here
-        ma_format_f32,
-        1,
-        48000,
+        format,
+        channels,
+        sample_rate,
         ma_waveform_type_sine,
         DEFAULT_AMPLITUDE,
         0.0

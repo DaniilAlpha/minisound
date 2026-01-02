@@ -14,7 +14,13 @@ typedef enum NoiseType {
 } NoiseType;
 
 NoiseSoundData *noise_sound_data_alloc(void);
-Result noise_sound_data_init(NoiseSoundData *const self, NoiseType const type);
+Result noise_sound_data_init(
+    NoiseSoundData *const self,
+    NoiseType const type,
+
+    int const format,
+    uint32_t const channels
+);
 void noise_sound_data_uninit(NoiseSoundData *const self);
 
 SoundData noise_sound_data_ww_sound_data(NoiseSoundData *const self);

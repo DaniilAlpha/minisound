@@ -29,12 +29,18 @@ static ma_data_source *noise_sound_data_get_ds(NoiseSoundData *const self) {
 NoiseSoundData *noise_sound_data_alloc(void) {
     return malloc0(sizeof(NoiseSoundData));
 }
-Result noise_sound_data_init(NoiseSoundData *const self, NoiseType const type) {
+Result noise_sound_data_init(
+    NoiseSoundData *const self,
+    NoiseType const type,
+
+    int const format,
+    uint32_t const channels
+) {
     ma_result r;
 
     ma_noise_config const config = ma_noise_config_init(
-        ma_format_f32,
-        2,
+        format,
+        channels,
         (ma_noise_type)type,
         1999999999,
         DEFAULT_AMPLITUDE

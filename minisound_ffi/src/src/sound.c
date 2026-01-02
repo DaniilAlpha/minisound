@@ -131,19 +131,22 @@ float sound_get_duration(Sound const *const self) {
     ma_sound_get_length_in_seconds(&self->sound, &length_in_seconds);
     return length_in_seconds;
 }
+bool sound_get_is_playing(Sound const *const self) {
+    if (self->state == SOUND_STATE_UNINITIALIZED) return false;
 
-float sound_get_position(Sound const *const self) {
+    return self->state == SOUND_STATE_PLAYING;
+}
+
+float sound_get_cursor(Sound const *const self) {
     if (self->state == SOUND_STATE_UNINITIALIZED) return 0.0;
 
     float pos_in_seconds;
     ma_sound_get_cursor_in_seconds(&self->sound, &pos_in_seconds);
     return pos_in_seconds;
 }
-
-bool sound_get_is_playing(Sound const *const self) {
-    if (self->state == SOUND_STATE_UNINITIALIZED) return false;
-
-    return self->state == SOUND_STATE_PLAYING;
+void sound_set_cursor(Sound *const self, float const value) {
+    if (self->state == SOUND_STATE_UNINITIALIZED) return;
+    ma_sound_seek_to_second(&self->sound, value);
 }
 
 EncodedSoundData *sound_get_encoded_data(Sound const *const self) {

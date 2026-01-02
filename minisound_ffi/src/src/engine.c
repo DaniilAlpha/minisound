@@ -102,7 +102,15 @@ Result engine_generate_waveform(Engine *const self, Sound *const sound) {
     WaveformSoundData *const waveform = waveform_sound_data_alloc();
     if (waveform == NULL) return OutOfMemErr;
 
-    UNROLL_CLEANUP(waveform_sound_data_init(waveform), { free(waveform); });
+    UNROLL_CLEANUP(
+        waveform_sound_data_init(
+            waveform,
+            self->engine.pDevice->playback.format,
+            self->engine.pDevice->playback.channels,
+            self->engine.pDevice->playback.internalSampleRate
+        ),
+        { free(waveform); }
+    );
 
     UNROLL_CLEANUP(
         sound_init(
@@ -125,7 +133,15 @@ Result engine_generate_noise(
     NoiseSoundData *const noise = noise_sound_data_alloc();
     if (noise == NULL) return OutOfMemErr;
 
-    UNROLL_CLEANUP(noise_sound_data_init(noise, type), { free(noise); });
+    UNROLL_CLEANUP(
+        noise_sound_data_init(
+            noise,
+            type,
+            self->engine.pDevice->playback.format,
+            self->engine.pDevice->playback.channels
+        ),
+        { free(noise); }
+    );
     UNROLL_CLEANUP(
         sound_init(sound, noise_sound_data_ww_sound_data(noise), &self->engine),
         { noise_sound_data_uninit(noise), free(noise); }

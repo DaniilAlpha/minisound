@@ -14,7 +14,12 @@ typedef enum WaveformType {
 } WaveformType;
 
 WaveformSoundData *waveform_sound_data_alloc(void);
-Result waveform_sound_data_init(WaveformSoundData *const self);
+Result waveform_sound_data_init(
+    WaveformSoundData *const self,
+    int const format,
+    uint32_t const channels,
+    uint32_t const sample_rate
+);
 void waveform_sound_data_uninit(WaveformSoundData *const self);
 
 EXPORT WaveformType waveform_sound_data_get_type(WaveformSoundData *const self);
