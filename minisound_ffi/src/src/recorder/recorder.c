@@ -12,6 +12,8 @@
 #define MILO_LVL RECORDER_MILO_LVL
 #include "../../external/milo/milo.h"
 
+#define RECORDING_BUF_COUNT (3)
+
 /*************
  ** private **
  *************/
@@ -35,7 +37,7 @@ static void on_data(
     ma_device *const device,
     void *const _,
     void const *const data,
-    uint32_t const data_len_pcm
+    uint32_t const data_len_frames
 ) {
     (void)_;
 
@@ -43,7 +45,7 @@ static void on_data(
 
     for (Rec **rec_ptr = self->recs; rec_ptr < self->recs + self->recs_len;
          rec_ptr++)
-        if (*rec_ptr) rec_write_raw(*rec_ptr, data, data_len_pcm);
+        if (*rec_ptr) rec_write_raw(*rec_ptr, data, data_len_frames);
 }
 
 /************
@@ -63,8 +65,12 @@ Result recorder_init(Recorder *const self) {
 
     ma_device_config device_config =
         ma_device_config_init(ma_device_type_capture);
+    device_config.capture.format = ma_format_s16;
+    device_config.capture.channels = 2;
+    device_config.sampleRate = 44100;
     device_config.dataCallback = on_data;
     device_config.pUserData = self;
+
     if ((r = ma_device_init(NULL, &device_config, &self->device)) != MA_SUCCESS)
         return error("minisudio device initialization error (code: %i)!", r),
                UnknownErr;
@@ -79,11 +85,11 @@ Result recorder_init(Recorder *const self) {
 void recorder_uninit(Recorder *const self) {
     if (self->state == RECORDER_STATE_UNINITIALIZED) return;
 
-    ma_device_uninit(&self->device);
-
     for (Rec **rec_ptr = self->recs; rec_ptr < self->recs + self->recs_len;
          rec_ptr++)
-        *rec_ptr = NULL;
+        if (*rec_ptr) rec_end(*rec_ptr), *rec_ptr = NULL;
+
+    ma_device_uninit(&self->device);
 
     self->state = RECORDER_STATE_UNINITIALIZED;
 }
@@ -109,10 +115,11 @@ Result recorder_record(
     uint32_t const channel_count,
     uint32_t const sample_rate,
 
+    size_t const data_availability_threshold_ms,
     RecOnDataFn *const on_data_available,
-    size_t const data_availability_threshold,
+    RecSeekDataFn *const seek_data,
 
-    Rec const **const out
+    Rec **const out
 ) {
     if (self->state == RECORDER_STATE_UNINITIALIZED ||
         self->state == RECORDER_STATE_INITIALIZED)
@@ -130,6 +137,20 @@ Result recorder_record(
     Rec *const rec = rec_alloc();
     if (!rec) return OutOfMemErr;
 
+    size_t const buf_size_ms = self->device.capture.internalPeriodSizeInFrames *
+                               1000 / self->device.capture.internalSampleRate;
+    size_t const data_availability_threshold_bufs =
+        data_availability_threshold_ms < buf_size_ms
+            ? 1
+            : data_availability_threshold_ms / buf_size_ms;
+
+    size_t const data_availability_threshold_frames =
+        self->device.capture.internalPeriodSizeInFrames *
+        data_availability_threshold_bufs;
+    trace(
+        "determined recording threshold = %zu frames",
+        data_availability_threshold_frames
+    );
     UNROLL_CLEANUP(
         rec_init(
             rec,
@@ -137,8 +158,11 @@ Result recorder_record(
             format,
             channel_count,
             sample_rate,
+
+            data_availability_threshold_frames * RECORDING_BUF_COUNT,
+            data_availability_threshold_frames,
             on_data_available,
-            data_availability_threshold
+            seek_data
         ),
         { free(rec); }
     );
@@ -154,7 +178,7 @@ Result recorder_stop_recording(Recorder *const self, Rec const *const rec) {
     for (Rec **rec_ptr = self->recs; rec_ptr < self->recs + self->recs_len;
          rec_ptr++)
         if (*rec_ptr == rec) {
-            *rec_ptr = NULL;
+            rec_end(*rec_ptr), *rec_ptr = NULL;
             break;
         }
 

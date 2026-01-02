@@ -5,6 +5,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <sys/types.h>
+
 #include "../../external/result/result.h"
 #include "../export.h"
 
@@ -22,6 +24,8 @@ typedef enum RecFormat {
 } RecFormat;
 typedef struct Rec Rec;
 typedef void RecOnDataFn(Rec *const self);
+typedef void
+RecSeekDataFn(Rec *const self, ssize_t const off, int const origin);
 
 Rec *rec_alloc(void);
 Result rec_init(
@@ -31,8 +35,10 @@ Result rec_init(
     uint32_t const channel_count,
     uint32_t const sample_rate,
 
+    size_t const buf_size_frames,
+    size_t const data_availability_threshold_frames,
     RecOnDataFn *const on_data_available,
-    uint32_t const data_availability_threshold_ms
+    RecSeekDataFn *const seek_data
 );
 void rec_uninit(Rec *const self);
 
@@ -46,5 +52,6 @@ EXPORT Result rec_read(
     uint8_t const **const out_data,
     size_t *const out_data_size
 );
+void rec_end(Rec *const self);
 
 #endif

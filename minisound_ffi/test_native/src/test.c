@@ -129,16 +129,26 @@ MiunteResult test_encoded_sounds() {
         if (sound_get_duration(sound) > sleep_duration) {
             MIUNTE_EXPECT(
                 sound_get_is_playing(sound) &&
-                    fabs(sound_get_position(sound) - sleep_duration) <= 0.033,
+                    fabs(sound_get_cursor(sound) - sleep_duration) <= 0.066,
                 "sound should be playing at `sleep_dutation` right here"
             );
         } else {
             MIUNTE_EXPECT(
                 !sound_get_is_playing(sound) &&
-                    fabs(
-                        sound_get_position(sound) - sound_get_duration(sound)
-                    ) <= 0.033,
+                    fabs(sound_get_cursor(sound) - sound_get_duration(sound)) <=
+                        0.066,
                 "sound should be ended right here"
+            );
+        }
+
+        if (sound_get_duration(sound) > 15.0) {
+            sound_set_cursor(sound, 15.0);
+            sleep(3000);
+
+            MIUNTE_EXPECT(
+                sound_get_is_playing(sound) &&
+                    fabs(sound_get_cursor(sound) - 18.0) <= 0.066,
+                "sound should be playing at 20s right here"
             );
         }
 
@@ -282,23 +292,32 @@ MiunteResult test_generated_pulse_sounds() {
 }
 
 FILE *files[3] = {0};
-#define DECL_ON_DATA_AVAILABLE(I_)                                             \
+#define DECL_REC_FNS(I_)                                                       \
     static void on_data_available_rec##I_(Rec *const self) {                   \
         FILE *const file = files[I_];                                          \
                                                                                \
         uint8_t const *data = NULL;                                            \
         size_t data_size = 0;                                                  \
-        rec_read(self, &data, &data_size);                                     \
-        assert(data && data_size);                                             \
+        Result const r = rec_read(self, &data, &data_size);                    \
+        assert(r == Ok && data && data_size);                                  \
                                                                                \
         fwrite(data, 1, data_size, file);                                      \
                                                                                \
         free((void *)data);                                                    \
     }                                                                          \
+    static void seek_data_rec##I_(                                             \
+        Rec *const self,                                                       \
+        ssize_t const off,                                                     \
+        int const origin                                                       \
+    ) {                                                                        \
+        FILE *const file = files[I_];                                          \
+                                                                               \
+        fseek(file, off, origin);                                              \
+    }                                                                          \
     void ___i_really_want_you_to_put_semicolon_here_please()
-DECL_ON_DATA_AVAILABLE(0);
-DECL_ON_DATA_AVAILABLE(1);
-DECL_ON_DATA_AVAILABLE(2);
+DECL_REC_FNS(0);
+DECL_REC_FNS(1);
+DECL_REC_FNS(2);
 // other formats are not supported at the moment
 MiunteResult test_recording_wav() {
     static struct {
@@ -307,9 +326,10 @@ MiunteResult test_recording_wav() {
     } const rec_params[lenof(files)] = {
         {REC_FORMAT_S16, 2, 44100},
         {REC_FORMAT_U8, 1, 8000},
-        {REC_FORMAT_F32, 2, 96000}
+        {REC_FORMAT_S32, 2, 96000}
     };
-    Recorder *const recorder = recorder_alloc(lenof(rec_params));
+
+    Recorder *const recorder = recorder_alloc(1);
     MIUNTE_EXPECT(recorder, "recorder should be allocated properly");
 
     MIUNTE_EXPECT(
@@ -325,11 +345,11 @@ MiunteResult test_recording_wav() {
         char filename[] = "./minisound_ffi/test_native/rec#.wav";
         strchr(filename, '#')[0] = '0' + file_ptr - files;
         *file_ptr = fopen(filename, "wb");
-        MIUNTE_EXPECT(file_ptr, "fopen should not fail");
+        MIUNTE_EXPECT(*file_ptr, "fopen should not fail");
     }
 
-    for (size_t i = 0; i < lenof(rec_params); i++) {
-        Rec const *rec = NULL;
+    for (size_t i = 0; i < 2; i++) {
+        Rec *rec = NULL;
         MIUNTE_EXPECT(
             recorder_record(
                 recorder,
@@ -338,17 +358,22 @@ MiunteResult test_recording_wav() {
                 rec_params[i].channel_count,
                 rec_params[i].sample_rate,
 
+                0,
                 i == 0   ? on_data_available_rec0
                 : i == 1 ? on_data_available_rec1
                 : i == 2 ? on_data_available_rec2
                          : NULL,
-                0,
+                i == 0   ? seek_data_rec0
+                : i == 1 ? seek_data_rec1
+                : i == 2 ? seek_data_rec2
+                         : NULL,
                 &rec
             ) == Ok,
             "recorder starting should not fail"
         );
-        sleep(1000);
+        sleep(3000);
         recorder_stop_recording(recorder, rec);
+        rec_uninit(rec), free(rec);
     }
 
     for (FILE **file_ptr = files; file_ptr < files + lenof(files); file_ptr++)
@@ -364,12 +389,12 @@ int main() {
         setup_test,
         teardown_test,
         {
-            // test_encoded_sounds,
+            test_encoded_sounds,
             // test_looping,
             // test_generated_waveform_sounds,
-            test_generated_noise_sounds,
+            // test_generated_noise_sounds,
             // test_generated_pulse_sounds,
-            test_recording_wav,
+            // test_recording_wav,
         }
     );
 

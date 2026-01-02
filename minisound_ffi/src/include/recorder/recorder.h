@@ -23,10 +23,11 @@ EXPORT Result recorder_record(
     uint32_t const channel_count,
     uint32_t const sample_rate,
 
+    size_t const data_availability_threshold_ms,
     RecOnDataFn *const on_data_available,
-    size_t const data_availability_threshold,
+    RecSeekDataFn *const seek_data,
 
-    Rec const **const out
+    Rec **const out
 );
 EXPORT Result
 recorder_stop_recording(Recorder *const self, Rec const *const rec);
