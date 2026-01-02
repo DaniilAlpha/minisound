@@ -1,84 +1,30 @@
 {
-    "init": {
-        "cmds": [
-            "export CMAKE_EXPORT_COMPILE_COMMANDS=1",
-            "export CMAKE_LOG_LEVEL=NOTICE"
-        ]
-    },
     "tasks": {
         "get": {
             "icon": "󰇚",
             "desc": "get flutter packages",
-            "cmd": [
-                "cd ./minisound_platform_interface/ && flutter pub get && flutter pub upgrade && cd ../",
-                "cd ./minisound_ffi/ && flutter pub get && flutter pub upgrade && cd ../",
-                "cd ./minisound_web/ && flutter pub get && flutter pub upgrade && cd ../",
-                "cd ./minisound/ && flutter pub get && flutter pub upgrade && cd ../",
-                "cd ./minisound/example/ && flutter pub get && flutter pub upgrade"
-            ],
+            "cmd": "make projs-get",
             "noninteractive": true
         },
         "clean": {
             "icon": "󰃢",
-            "cmd": [
-                "cd ./minisound_platform_interface/ && flutter clean && cd ../",
-                "cd ./minisound_ffi/ && flutter clean && cd ../",
-                "cd ./minisound_web/ && flutter clean && cd ../",
-                "cd ./minisound/ && flutter clean && cd ../",
-                "cd ./minisound/example/ && flutter clean"
-            ],
+            "cmd": "make projs-clean",
             "noninteractive": true
         },
-        "run": {
-            "icon": "󰐊",
-            "cmd": [
-                "cd ./minisound/example/",
-                "flutter run"
-            ]
-        },
-        "test": {
-            "icon": "󰙨",
-            "cmd": [
-                "make clean_native_test",
-                "export CMAKE_EXPORT_COMPILE_COMMANDS=1 CMAKE_BUILD_TYPE=Debug; make build_native_test",
-                "echo; ./minisound_ffi/test_native/build/minisound_test"
-            ]
-        },
-        "test w/ gdb": {
-            "icon": "󰙨",
-            "cmd": [
-                "make clean_native_test",
-                "export CMAKE_EXPORT_COMPILE_COMMANDS=1 CMAKE_BUILD_TYPE=Debug; make build_native_test",
-                "echo; gdb ./minisound_ffi/test_native/build/minisound_test"
-            ]
-        },
-        "ffigen": {
-            "desc": "generate dart ffi bindings",
-            "cmd": [
-                "cd ./minisound_ffi/",
-                "dart run ffigen"
-            ]
-        },
+        "run": { "icon": "󰐊", "cmd": "make proj-main-example-run" },
+        "run web": { "icon": "󰐊", "cmd": "make proj-main-example-run-web" },
+        "run wasm": { "icon": "󰐊", "cmd": "make proj-main-example-run-wasm" },
+
+        "ffigen": { "desc": "generate dart ffi bindings", "cmd": "make proj-ffi-gen-bindings" },
+        "native test": { "icon": "󰙨", "cmd": "make proj-ffi-native-test-run" },
+        "native test w/ gdb": { "icon": "󰙨", "cmd": "RUNNER=gdb make proj-ffi-native-test-run" },
+
         "rebuild web lib": {
             "desc": "build ffi lib to web via emscripten",
             "cmd": [
-                "make clean_web_lib",
+                "make proj-web-lib-clean && make proj-web-lib-build",
                 "export EMSDK_QUIET=1; . ~/emsdk/emsdk_env.sh",
                 "make build_web_lib"
-            ]
-        },
-        "run web": {
-            "icon": "󰐊",
-            "cmd": [
-                "cd ./minisound/example/",
-                "flutter run -d chrome --web-browser-flag '--enable-features=SharedArrayBuffer'"
-            ]
-        },
-        "run wasm": {
-            "icon": "󰐊",
-            "cmd": [
-                "cd ./minisound/example/",
-                "flutter run -d chrome --wasm --web-browser-flag '--enable-features=SharedArrayBuffer'"
             ]
         }
     }

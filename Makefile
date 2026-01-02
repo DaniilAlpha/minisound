@@ -1,65 +1,118 @@
-# Set the shell explicitly for UNIX-like systems
-SHELL := /bin/bash
+MAKEFLAGS += --always-make -j2
+SHELL := /bin/bash # set the shell explicitly for UNIX-like systems
+
+### cmake settings ###
+
+export CMAKE_EXPORT_COMPILE_COMMANDS ?= 1
+export CMAKE_LOG_LEVEL ?= NOTICE
 
 
-SRC_DIR := ./minisound_ffi/src/
+### dirs ###
 
-WEB_BUILD_DIR := ./minisound_web/lib/build/
+PROJ_PI_DIR = ./minisound_platform_interface/ 
 
-NATIVE_TEST_SRC_DIR := ./minisound_ffi/test_native/
-NATIVE_TEST_BUILD_DIR := ./minisound_ffi/test_native/build/
+PROJ_FFI_DIR = ./minisound_ffi/ 
+PROJ_FFI_SRC_DIR = ./minisound_ffi/src/
+PROJ_FFI_NATIVE_TEST_SRC_DIR = ./minisound_ffi/test_native/
+PROJ_FFI_NATIVE_TEST_BUILD_DIR = ./minisound_ffi/test_native/build/
 
+PROJ_WEB_DIR = ./minisound_web/ 
+PROJ_WEB_LIB_BUILD_DIR = ./minisound_web/lib/build/
 
-help:
-	@ echo "No target selected. Available targets:"
-	@ echo "  help: Shows this help message."
-	@ echo "  pubspec_local: Switches pubspecs for local dev."
-	@ echo "  pubspec_release: Switches pubspecs for release."
-	@ echo "  build_web_lib: Builds the ffi lib to web via emscripten."
-	@ echo "  clean_web_lib: Cleans the web lib." 
-	@ echo "  build_native_test: Build automatic tests for the native platform."
-	@ echo "  clean_native_test: Cleans automatic tests." 
+PROJ_MAIN_DIR = ./minisound/ 
+PROJ_MAIN_EXAMPLE_DIR = ./minisound/example/
 
 
-_check_if_version_set:
-ifndef VER
-	$(error Variable `VER` is not set)
-endif
+### tasks ###
 
-pubspec_local: _check_if_version_set
-	@ echo "Switching our pubspecs : dev $(VER)..."
-	@ python update_pubspecs.py $(VER)
+all: proj-main-example-run
 
-pubspec_release: _check_if_version_set
-	@ echo "Switching our pubspecs : release $(VER)..."
-	@ python update_pubspecs.py $(VER) --release
+# flutter
+
+projs-get: --proj-pi-get --proj-ffi-get --proj-web-get --proj-main-get --proj-main-example-get
+--proj-pi-get:
+	@ cd $(PROJ_PI_DIR) && flutter pub get && flutter pub upgrade
+--proj-ffi-get:
+	@ cd $(PROJ_FFI_DIR) && flutter pub get && flutter pub upgrade
+--proj-web-get:
+	@ cd $(PROJ_WEB_DIR) && flutter pub get && flutter pub upgrade
+--proj-main-get:
+	@ cd $(PROJ_MAIN_DIR) && flutter pub get && flutter pub upgrade
+--proj-main-example-get:
+	@ cd $(PROJ_MAIN_EXAMPLE_DIR) && flutter pub get && flutter pub upgrade
+
+projs-clean: --proj-pi-clean --proj-ffi-clean --proj-web-clean --proj-main-clean --proj-main-example-clean
+--proj-pi-clean:
+	@ cd $(PROJ_PI_DIR) && flutter clean
+--proj-ffi-clean:
+	@ cd $(PROJ_FFI_DIR) && flutter clean
+--proj-web-clean:
+	@ cd $(PROJ_WEB_DIR) && flutter clean
+--proj-main-clean:
+	@ cd $(PROJ_MAIN_DIR) && flutter clean
+--proj-main-example-clean:
+	@ cd $(PROJ_MAIN_EXAMPLE_DIR) && flutter clean
+
+proj-ffi-gen-bindings:
+	@ cd $(PROJ_FFI_DIR) && dart run ffigen 
+
+proj-main-example-run:
+	@ cd $(PROJ_MAIN_EXAMPLE_DIR) && flutter run 
+proj-main-example-run-web:
+	@ cd $(PROJ_MAIN_EXAMPLE_DIR) && flutter run -d chrome --web-browser-flag '--enable-features=SharedArrayBuffer'
+proj-main-example-run-wasm:
+	@ cd $(PROJ_MAIN_EXAMPLE_DIR) && flutter run -d chrome --wasm --web-browser-flag '--enable-features=SharedArrayBuffer'
 
 
-_init_submodules:
-	git submodule update --init --recursive
+# native test
 
-build_web_lib: _init_submodules
-	@ echo "Building ffi lib to web via emscripten..."
-	@ emcmake cmake -S $(SRC_DIR) -B $(WEB_BUILD_DIR)/cmake_stuff/ --log-level=$(CMAKE_LOG_LEVEL) && cmake --build $(WEB_BUILD_DIR)/cmake_stuff/
+proj-ffi-native-test-run: proj-ffi-native-test-build
+	@ $(RUNNER) $(PROJ_FFI_NATIVE_TEST_BUILD_DIR)/minisound_test # to allow the same command with the GDB
 
-clean_web_lib:
-	@ echo "Cleaning web lib..."
+proj-ffi-native-test-build:
+	@\
+	cmake -B $(PROJ_FFI_NATIVE_TEST_BUILD_DIR)/lib/ -S $(PROJ_FFI_SRC_DIR) -DCMAKE_BUILD_TYPE=Debug &&\
+	cmake --build $(PROJ_FFI_NATIVE_TEST_BUILD_DIR)/lib/
+	@\
+	cmake -B $(PROJ_FFI_NATIVE_TEST_BUILD_DIR) -S $(PROJ_FFI_NATIVE_TEST_SRC_DIR) -DCMAKE_BUILD_TYPE=Debug &&\
+	cmake --build $(PROJ_FFI_NATIVE_TEST_BUILD_DIR)
+
+proj-ffi-native-test-clean:
+ifdef PROJ_FFI_NATIVE_TEST_BUILD_DIR
 ifeq ($(OS),Windows_NT)
-	@ del /S $(WEB_BUILD_DIR)/*
+	@ rd /s /q $(PROJ_FFI_NATIVE_TEST_BUILD_DIR)/*
 else
-	@ rm -rf $(WEB_BUILD_DIR)/*
+	@ rm -r -f $(PROJ_FFI_NATIVE_TEST_BUILD_DIR)/*
+endif
 endif
 
+# web lib
 
-build_native_test:
-	@ echo "Building automatic tests for the native platform..."
-	@ cmake -B $(NATIVE_TEST_BUILD_DIR)/lib/ -S $(SRC_DIR) --log-level=$(CMAKE_LOG_LEVEL); cmake --build $(NATIVE_TEST_BUILD_DIR)/lib/
-	@ cmake -B $(NATIVE_TEST_BUILD_DIR) -S $(NATIVE_TEST_SRC_DIR) --log-level=$(CMAKE_LOG_LEVEL); cmake --build $(NATIVE_TEST_BUILD_DIR)
+proj-web-lib-build:
+	@\
+	emcmake cmake -B $(PROJ_WEB_LIB_BUILD_DIR)/cmake_stuff/ -S $(SRC_DIR) -DCMAKE_BUILD_TYPE=Debug &&\
+	cmake --build $(PROJ_WEB_LIB_BUILD_DIR)/cmake_stuff/
 
-clean_native_test:
-	@ echo "Cleaning automatic tests..."
+proj-web-lib-clean:
+ifdef PROJ_WEB_LIB_BUILD_DIR
 ifeq ($(OS),Windows_NT)
-	@ del /S $(NATIVE_TEST_BUILD_DIR)/*
+	@ rd /s /q $(PROJ_WEB_LIB_BUILD_DIR)/*
 else
-	@ rm -rf $(NATIVE_TEST_BUILD_DIR)/*
+	@ rm -r -f $(PROJ_WEB_LIB_BUILD_DIR)/*
 endif
+endif
+
+# pubspec 
+
+# _check_if_version_set:
+# ifndef VER
+# 	$(error Variable `VER` is not set)
+# endif
+
+# pubspec_local: _check_if_version_set
+# 	@ echo "Switching our pubspecs : dev $(VER)..."
+# 	@ python update_pubspecs.py $(VER)
+
+# pubspec_release: _check_if_version_set
+# 	@ echo "Switching our pubspecs : release $(VER)..."
+# 	@ python update_pubspecs.py $(VER) --release
