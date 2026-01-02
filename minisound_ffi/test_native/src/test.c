@@ -141,6 +141,15 @@ MiunteResult test_encoded_sounds() {
             );
         }
 
+        if (i == 3) {
+            sound_set_pitch(sound, 1.5);
+            sound_stop(sound), sound_play(sound);
+
+            sleep(1000 * sleep_duration);
+
+            sound_stop(sound);
+        }
+
         if (sound_get_duration(sound) > 15.0) {
             sound_set_cursor(sound, 15.0);
             sleep(3000);
@@ -393,7 +402,7 @@ int main() {
         setup_test,
         teardown_test,
         {
-            // test_encoded_sounds,
+            test_encoded_sounds,
             // test_looping,
             // test_generated_waveform_sounds,
             // test_generated_noise_sounds,
