@@ -130,10 +130,10 @@ endif()
 
 add_subdirectory(external/miniaudio/)
 
-if(NOT EMSCRIPTEN)
-    target_compile_options(miniaudio PUBLIC -fPIC)
-else()
+if(EMSCRIPTEN)
     target_compile_options(miniaudio PRIVATE -sWASM_WORKERS=1 -Wno-c23-extensions -Wno-unknown-warning-option)
+elseif(NOT MSVC)
+    target_compile_options(miniaudio PUBLIC -fPIC)
 endif()
 
 if(EMSCRIPTEN)
