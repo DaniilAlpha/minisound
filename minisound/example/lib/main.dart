@@ -39,8 +39,8 @@ class _ExamplePageState extends State<ExamplePage> {
     const space = SizedBox.square(dimension: 20);
     return Scaffold(
       appBar: AppBar(title: const Text("Minisound Example")),
-      body: Center(
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: Center(
           child: FutureBuilder(
             future: initFuture,
             builder: (_, snapshot) => switch (snapshot) {

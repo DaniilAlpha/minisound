@@ -58,8 +58,13 @@ class FfiRecorder implements PlatformRecorder {
       channelCount,
       sampleRate,
       dataAvailabilityThresholdMs,
-      Pointer.fromFunction(_onDataFn),
-      Pointer.fromFunction(_seekDataFn),
+      NativeCallable<Void Function(Pointer<c.Rec> rec)>.listener(
+        (Pointer<c.Rec> rec) => onDataFn(FfiRec._(rec).read()),
+      ).nativeFunction,
+      NativeCallable<
+          Void Function(Pointer<c.Rec> rec, Long offset, Int origin)>.listener(
+        (Pointer<c.Rec> rec, int off, int origin) => seekDataFn(off, origin),
+      ).nativeFunction,
       outRec,
     );
     final rec = outRec.value;
@@ -108,13 +113,6 @@ class FfiRecorder implements PlatformRecorder {
         "Failed to stop the recording (code: $r).",
       );
     }
-  }
-
-  static void _onDataFn(Pointer<c.Rec> rec) {
-    // (Pointer<c.Rec> rec) => onDataFn(FfiRec._(rec).read()),
-  }
-  static void _seekDataFn(Pointer<c.Rec> rec, int off, int origin) {
-    // (Pointer<c.Rec> rec, int off, int origin) => seekDataFn(off, origin),
   }
 }
 

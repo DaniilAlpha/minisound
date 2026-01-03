@@ -25,28 +25,34 @@ abstract class Rec {
 }
 
 final class FileRec extends Rec {
-  FileRec._(File file, super.recorder)
-      : file = file.openSync(),
-        super._();
+  FileRec._(this.file, super.recorder) : super._() {
+    file.createSync();
+    _wfile = file.openSync(mode: FileMode.writeOnly);
+  }
 
-  final RandomAccessFile file;
+  final File file;
+  late final RandomAccessFile _wfile;
 
   @override
   void stop() {
     super.stop();
-    file.closeSync();
+
+    _wfile.writeFromSync([1, 2, 3, 4, 5, 65]);
+    _wfile.closeSync();
   }
 
   @override
-  void _onData(Uint8List data) => file.writeFromSync(data);
+  void _onData(Uint8List data) {
+    _wfile.writeFromSync(data);
+  }
 
   @override
   void _seekData(int offset, int origin) {
-    file.setPositionSync(switch (origin) {
+    _wfile.setPositionSync(switch (origin) {
       0 => offset,
-      1 => file.positionSync() + offset,
-      2 => file.lengthSync() - offset,
-      _ => file.positionSync(),
+      1 => _wfile.positionSync() + offset,
+      2 => _wfile.lengthSync() - offset,
+      _ => _wfile.positionSync(),
     });
   }
 }
