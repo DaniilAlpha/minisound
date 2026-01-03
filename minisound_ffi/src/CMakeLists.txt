@@ -56,7 +56,8 @@ if(NOT MSVC)
     #           -Wno-strict-prototypes -Wno-comma)
     # endif()
 else()
-    target_compile_options(${MAIN_LIB} PRIVATE /W4)
+    target_compile_options(${MAIN_LIB} PRIVATE
+        /W3 /wd5287)
 endif()
 
 if(EMSCRIPTEN)
