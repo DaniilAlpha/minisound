@@ -57,7 +57,7 @@ if(NOT MSVC)
     # endif()
 else()
     target_compile_options(${MAIN_LIB} PRIVATE
-        /W3 /wd5287)
+        /W2 /wd5287 /wd4098)
 endif()
 
 if(EMSCRIPTEN)

@@ -48,4 +48,4 @@ jobs:
         working-directory: minisound/example/
         run: |
           flutter doctor -v
-          flutter build windows --debug
+          flutter build windows 
