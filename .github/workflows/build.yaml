@@ -12,9 +12,9 @@ jobs:
       matrix:
         os: 
           - ubuntu-latest
-          # - windows-latest
+          - windows-latest
           # - macos-latest
-    runs-on: ${{matrix.os}}
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Clone the repo
@@ -27,7 +27,8 @@ jobs:
         with:
           cmakeVersion: "^3.11.0"
 
-      - name: Set up Flutter dependencies
+      - name: Set up Linux Flutter dependencies
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         run: sudo apt-get update -y && sudo apt-get install -y clang libgtk-3-dev
 
       - name: Set up Flutter
