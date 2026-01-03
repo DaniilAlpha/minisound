@@ -9,6 +9,7 @@ import "package:minisound_platform_interface/minisound_platform_interface.dart";
 part "ffi_engine.dart";
 part "ffi_sound.dart";
 part "ffi_recorder.dart";
+part "ffi_rec.dart";
 
 // dynamic lib
 

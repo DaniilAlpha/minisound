@@ -1,4 +1,6 @@
 import "dart:async";
+import "dart:io";
+import "dart:math" as math;
 import "dart:typed_data";
 
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
@@ -7,71 +9,113 @@ export "package:minisound_platform_interface/minisound_platform_interface.dart"
     show
         MinisoundPlatformException,
         MinisoundPlatformOutOfMemoryException,
-        RecordingFormat;
+        RecEncoding,
+        RecFormat;
+
+part "rec.dart";
 
 /// Controls audio recoding.
 ///
 /// Should be initialized before doing anything.
 final class Recorder {
-  Recorder() {
+  /// Creates the recorder.
+  ///
+  /// Creating multiple recorders working simulteniously is not recommended. Use multiple `Rec`s of a single recorder instead.
+  ///
+  /// `maxRecCount` - max simulteniously working recordings count. Affects performance of all core recorder operations in a linear way. Usually recording same data to multiple destinations is pointless, so this is pretty low by default.
+  Recorder([int maxRecCount = 8]) : _recorder = PlatformRecorder(maxRecCount) {
     _finalizer.attach(this, _recorder);
   }
 
   static final _finalizer =
       Finalizer<PlatformRecorder>((recorder) => recorder.dispose());
-  static final _recordingsFinalizer =
-      Finalizer<PlatformRecording>((recording) => recording.dispose());
+  static final _recsFinalizer = Finalizer<PlatformRec>((rec) => rec.dispose());
 
-  final _recorder = PlatformRecorder();
-
-  bool get isRecording => _recorder.isRecording;
+  final PlatformRecorder _recorder;
 
   /// Initializes the recorder.
-  Future<void> init() => _recorder.init();
+  ///
+  /// `periodMs` - affects sounds latency (lower period means lower latency but possibble crackles). Clamped between `0` and `1000` (1s). Probably has no effect on the web.
+  Future<void> init([int periodMs = 32]) =>
+      _recorder.init(periodMs.clamp(0, 1000));
 
   /// Starts the recorder.
+  Future<void> start() async => _recorder.start();
+
+  /// Creates a file and starts recording into it.
   ///
-  /// Recording is saved into RAM. Parameters directly influence the amount of memory that the
-  /// recording will take. This'll be fine for under an hour for sure, but if you are recording
-  /// very large sounds, it is recommended to process (save, send, etc.) recording by splitting it
-  /// into multiple smaller ones. Delay for restarting is generally unnoticeable, especially for
-  /// shorter recordings.
+  /// Parameters directly influence the resulting file size.
   ///
-  /// `channelCount` must be in range 1..254 inclusive.
-  /// `sampleRate` must be in range 1000..384000 inclusive.
-  ///
-  /// And here is the formula for calculating occupied memory size in case you really need:
-  /// `s = l * f * n * s0`,
-  ///   where `l` - length in seconds, `f` - sample rate, `n` - channel count, `s0` - format size (`1` for `u8`, `2` for `s16`, `3` for `s24`, `4` for `s32` and `f32`).
-  Future<void> start({
-    RecordingFormat format = RecordingFormat.s16,
+  /// `encoding` - currently only WAV is supported, so there's no need in this parameter.
+  /// `format` - the amount of different amplitude levels of the data. S16 is a standard value.
+  /// `channelCount` - must be in range `1..254` inclusive. Using `1` (in case mono audio is ok) will reduce data size in half.
+  /// `sampleRate` - controls sound frequencies that can be properly captured in a recording. Must be in range `1000..384000` inclusive. `44100` is a standard value.
+  /// `dataAvailabilityThresholdMs` - the period before new data is written to a file. Clamped between the recorder period and `1000`.
+  FileRec recordFile(
+    String filePath, {
+    RecEncoding encoding = RecEncoding.wav,
+    RecFormat format = RecFormat.s16,
     int channelCount = 2,
     int sampleRate = 44100,
-  }) async {
+    int dataAvailabilityThresholdMs = 0,
+  }) =>
+      _record(
+        (recorder) => FileRec._(File(filePath), recorder),
+        encoding: encoding,
+        format: format,
+        channelCount: channelCount,
+        sampleRate: sampleRate,
+        dataAvailabilityThresholdMs: dataAvailabilityThresholdMs,
+      );
+
+  /// Starts recording into in-RAM buffer. After the recording is stopped, it can be directly fed into `Engine::loadSound`.
+  ///
+  /// Parameters directly influence the resulting buffer size.
+  ///
+  /// `encoding` - currently only WAV is supported, so there's no need in this parameter.
+  /// `format` - the amount of different amplitude levels of the data. S16 is a standard value.
+  /// `channelCount` - must be in range `1..254` inclusive. Using `1` (in case mono audio is ok) will reduce data size in half.
+  /// `sampleRate` - controls sound frequencies that can be properly captured in a recording. Must be in range `1000..384000` inclusive. `44100` is a standard value.
+  /// `dataAvailabilityThresholdMs` - the period before new data is written to a file. Clamped between the recorder period and `1000`.
+  RamRec recordRam({
+    RecEncoding encoding = RecEncoding.wav,
+    RecFormat format = RecFormat.s16,
+    int channelCount = 2,
+    int sampleRate = 44100,
+    int dataAvailabilityThresholdMs = 0,
+  }) =>
+      _record(
+        RamRec._,
+        encoding: encoding,
+        format: format,
+        channelCount: channelCount,
+        sampleRate: sampleRate,
+        dataAvailabilityThresholdMs: dataAvailabilityThresholdMs,
+      );
+
+  T _record<T extends Rec>(
+    T Function(Recorder recorder) createRec, {
+    RecEncoding encoding = RecEncoding.wav,
+    RecFormat format = RecFormat.s16,
+    int channelCount = 2,
+    int sampleRate = 44100,
+    int dataAvailabilityThresholdMs = 0,
+  }) {
     assert(1 <= channelCount && channelCount <= 254);
     assert(1000 <= sampleRate && sampleRate <= 384000);
 
-    _recorder.start(
-      sampleRate: sampleRate,
-      channelCount: channelCount,
+    final rec = createRec(this);
+    final platformRec = _recorder.record(
+      encoding: encoding,
       format: format,
+      channelCount: channelCount,
+      sampleRate: sampleRate,
+      dataAvailabilityThresholdMs: dataAvailabilityThresholdMs.clamp(0, 1000),
+      onDataFn: rec._onData,
+      seekDataFn: rec._seekData,
     );
+    rec._rec = platformRec;
+    _recsFinalizer.attach(rec, platformRec);
+    return rec;
   }
-
-  /// Stops the recorder and returns what have been recorded.
-  Future<Recording> stop() async {
-    final platformRecording = _recorder.stop();
-    final recording = Recording._(platformRecording);
-    _recordingsFinalizer.attach(recording, platformRecording);
-    return recording;
-  }
-}
-
-final class Recording {
-  Recording._(PlatformRecording recording) : _recording = recording;
-
-  final PlatformRecording _recording;
-
-  /// Recorded data in the WAV format. Can be directly fed into the `loadSound` engine function.
-  Uint8List get data => _recording.buffer;
 }

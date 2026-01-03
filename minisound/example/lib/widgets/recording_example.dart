@@ -15,28 +15,36 @@ class RecordingExample extends StatefulWidget {
 class _RecordingExampleState extends State<RecordingExample> {
   final sounds = <(DateTime, LoadedSound)>[];
 
+  final activeRecordings = <RamRec>[];
+
   @override
   Widget build(BuildContext context) {
     const space = SizedBox.square(dimension: 20);
     return Column(children: [
       Text("Recording", style: Theme.of(context).textTheme.headlineMedium),
-      !widget.recorder.isRecording
-          ? ElevatedButton(
-              onPressed: () =>
-                  widget.recorder.start().then((_) => setState(() {})),
-              child: const Text("START RECORDING"),
-            )
-          : ElevatedButton(
-              child: const Text("STOP RECORDING"),
-              onPressed: () async {
-                final recording = await widget.recorder.stop();
-                sounds.add((
-                  DateTime.now(),
-                  await widget.engine.loadSound(recording.data)
-                ));
-                setState(() {});
-              },
-            ),
+      IconButton.filledTonal(
+        icon: const Icon(Icons.mic),
+        onPressed: () async {
+          await widget.recorder.start();
+
+          activeRecordings.add(widget.recorder.recordRam());
+          setState(() {});
+        },
+      ),
+      ElevatedButton(
+        child: const Text("STOP RECORDING"),
+        onPressed: () async {
+          if (activeRecordings.isEmpty) return;
+
+          final rec = activeRecordings.removeLast();
+          rec.stop();
+
+          sounds.add(
+            (DateTime.now(), await widget.engine.loadSound(rec.data!)),
+          );
+          setState(() {});
+        },
+      ),
       Column(
           children: sounds.reversed
               .map((t) => OverflowBar(

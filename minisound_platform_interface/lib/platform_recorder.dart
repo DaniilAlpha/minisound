@@ -27,8 +27,8 @@ abstract interface class PlatformRecorder {
     required int channelCount,
     required int sampleRate,
     required int dataAvailabilityThresholdMs,
-    void Function() onDataAvailableFn,
-    void Function() seekDataFn,
+    required void Function(Uint8List data) onDataFn,
+    required void Function(int off, int origin) seekDataFn,
   });
   void pauseRec(PlatformRec rec);
   void resumeRec(PlatformRec rec);

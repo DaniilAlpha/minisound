@@ -2,7 +2,6 @@ import "dart:io";
 import "dart:math";
 import "dart:typed_data";
 
-import "package:flutter/foundation.dart";
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
 
 export "package:minisound_platform_interface/minisound_platform_interface.dart"
@@ -32,24 +31,18 @@ final class Engine {
 
   /// Initializes the engine.
   ///
-  /// `periodMs` - affects sounds latency (lower period means lower latency but possibble crackles). Must be greater than zero. Probably has no effect on the web.
-  Future<void> init([int periodMs = kIsWeb ? 30 : 10]) async {
-    assert(periodMs > 0);
-    await _engine.init(periodMs);
-  }
+  /// `periodMs` - affects sounds latency (lower period means lower latency but possibble crackles). Clamped between `0` and `1000` (1s). Probably has no effect on the web.
+  Future<void> init([int periodMs = 16]) =>
+      _engine.init(periodMs.clamp(0, 1000));
 
   /// Starts the engine.
   Future<void> start() async => _engine.start();
 
   /// Copies `data` to the internal memory location and creates a `LoadedSound` from it.
-  Future<LoadedSound> loadSound(
-    TypedData audioData, {
-    @Deprecated("Should be used only in case something is not working.")
-    bool doAddToFinalizer = true,
-  }) async {
+  Future<LoadedSound> loadSound(TypedData audioData) async {
     final platformSound = await _engine.loadSound(audioData);
     final sound = LoadedSound._(platformSound);
-    if (doAddToFinalizer) _soundsFinalizer.attach(sound, platformSound);
+    _soundsFinalizer.attach(sound, platformSound);
     return sound;
   }
 
@@ -58,45 +51,30 @@ final class Engine {
       loadSound(await File(filePath).readAsBytes());
 
   /// Generates a waveform sound with provided `type` and `freq`.
-  WaveformSound genWaveform(
-    WaveformType type, {
-    double freq = 440.0,
-    @Deprecated(
-        "Should be used only in special cases (see the migration guide in README).")
-    bool doAddToFinalizer = true,
-  }) {
+  WaveformSound genWaveform(WaveformType type, {double freq = 440.0}) {
     final platformSound = _engine.generateWaveform();
     final sound = WaveformSound._(platformSound);
-    if (doAddToFinalizer) _soundsFinalizer.attach(sound, platformSound);
+    _soundsFinalizer.attach(sound, platformSound);
     return sound
       ..type = type
       ..freq = freq;
   }
 
   /// Generates a noise with the provided `type`.
-  NoiseSound genNoise(
-    NoiseType type, {
-    @Deprecated(
-        "Should be used only in special cases (see the migration guide in README).")
-    bool doAddToFinalizer = true,
-  }) {
+  NoiseSound genNoise(NoiseType type) {
     final platformSound = _engine.generateNoise(type);
     final sound = NoiseSound._(platformSound);
-    if (doAddToFinalizer) _soundsFinalizer.attach(sound, platformSound);
+    _soundsFinalizer.attach(sound, platformSound);
     return sound;
   }
 
   /// Generates a pulsewave sound with provided `freq` and `dutyCycle`.
-  PulseSound genPulse({
-    double freq = 440.0,
-    double dutyCycle = 0.5,
-    @Deprecated(
-        "Should be used only in special cases (see the migration guide in README).")
-    bool doAddToFinalizer = true,
-  }) {
+  @Deprecated(
+      "This is a part of a non-consistent API, so probably will be removed in the future. Use `generateWaveform` with `WaveformType.square` instead. In case you are really relying on the variable duty cycle, create a GitHub issue explaining your usecase and I will bring this capability into regular waveforms.")
+  PulseSound genPulse({double freq = 440.0, double dutyCycle = 0.5}) {
     final platformSound = _engine.generatePulse();
     final sound = PulseSound._(platformSound);
-    if (doAddToFinalizer) _soundsFinalizer.attach(sound, platformSound);
+    _soundsFinalizer.attach(sound, platformSound);
     return sound
       ..freq = freq
       ..dutyCycle = dutyCycle;

@@ -1,4 +1,4 @@
-MAKEFLAGS += --always-make -j4
+MAKEFLAGS += --always-make 
 SHELL := /bin/bash # set the shell explicitly for UNIX-like systems
 
 ### cmake settings ###

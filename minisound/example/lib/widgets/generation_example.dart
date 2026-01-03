@@ -1,7 +1,9 @@
 import "dart:math";
 
+import "package:example/widgets/sound_widget.dart";
 import "package:flutter/material.dart";
 import "package:minisound/engine.dart";
+import "package:minisound/engine_flutter.dart";
 
 enum GeneratorType { wave, noise, pulse }
 
@@ -24,14 +26,11 @@ class _GenerationExampleState extends State<GenerationExample> {
   GeneratedSound? sound;
 
   @override
-  Widget build(BuildContext context) {
-    final headline = Theme.of(context).textTheme.headlineMedium;
-    return Column(children: [
-      Row(mainAxisSize: MainAxisSize.min, children: [
-        Text("Generation: ", style: headline),
+  Widget build(BuildContext context) => Column(children: [
+        Text("Generation", style: Theme.of(context).textTheme.headlineMedium),
         DropdownButton(
-          style: headline,
           items: GeneratorType.values
+              .where((e) => e != GeneratorType.pulse)
               .map((t) => DropdownMenuItem(value: t, child: Text(t.name)))
               .toList(),
           value: generatorType,
@@ -42,121 +41,129 @@ class _GenerationExampleState extends State<GenerationExample> {
             sound = null;
           }),
         ),
-      ]),
-      switch (generatorType) {
-        GeneratorType.wave => Column(children: [
-            Row(mainAxisSize: MainAxisSize.min, children: [
-              const Text("Waveform Type: "),
-              DropdownButton(
-                value: waveformType,
-                items: WaveformType.values
-                    .map((t) => DropdownMenuItem(value: t, child: Text(t.name)))
-                    .toList(),
-                onChanged: (value) => setState(() {
-                  value!;
+        Card(
+          margin: EdgeInsets.all(8),
+          child: Padding(
+            padding: EdgeInsets.all(8),
+            child: Column(children: [
+              switch (generatorType) {
+                GeneratorType.wave => Column(children: [
+                    Row(mainAxisSize: MainAxisSize.min, children: [
+                      const Text("Waveform Type: "),
+                      DropdownButton(
+                        value: waveformType,
+                        items: WaveformType.values
+                            .map((t) =>
+                                DropdownMenuItem(value: t, child: Text(t.name)))
+                            .toList(),
+                        onChanged: (value) => setState(() {
+                          value!;
 
-                  waveformType = value;
-                  (sound as WaveformSound?)?.type = value;
-                }),
-              ),
-            ]),
-            Row(mainAxisSize: MainAxisSize.min, children: [
-              const Text("Frequency\n(changes immediately): "),
-              SizedBox(
-                width: 200,
-                child: Slider(
-                  value: freq,
-                  min: 4,
-                  max: 14,
-                  divisions: (14 - 4) * 12,
-                  label: pow(2, freq).toStringAsFixed(2),
-                  onChanged: (value) => setState(() {
-                    freq = value;
-                    (sound as WaveformSound?)?.freq = pow(2, value).toDouble();
-                  }),
+                          waveformType = value;
+                          (sound as WaveformSound?)?.type = value;
+                        }),
+                      ),
+                    ]),
+                    Row(mainAxisSize: MainAxisSize.min, children: [
+                      const Text("Frequency: "),
+                      SizedBox(
+                        width: 200,
+                        child: Slider(
+                          value: freq,
+                          min: 4,
+                          max: 14,
+                          divisions: (14 - 4) * 12,
+                          label: pow(2, freq).toStringAsFixed(2),
+                          onChanged: (value) => setState(() {
+                            freq = value;
+                            (sound as WaveformSound?)?.freq =
+                                pow(2, value).toDouble();
+                          }),
+                        ),
+                      ),
+                    ]),
+                  ]),
+                GeneratorType.noise => Column(children: [
+                    Row(mainAxisSize: MainAxisSize.min, children: [
+                      const Text("Noise Type: \n(changes after regen) "),
+                      DropdownButton(
+                        value: noiseType,
+                        items: NoiseType.values
+                            .map((t) =>
+                                DropdownMenuItem(value: t, child: Text(t.name)))
+                            .toList(),
+                        onChanged: (value) => setState(() {
+                          noiseType = value!;
+                        }),
+                      ),
+                    ]),
+                  ]),
+                GeneratorType.pulse => Column(children: [
+                    Row(mainAxisSize: MainAxisSize.min, children: [
+                      const Text("Frequency: "),
+                      SizedBox(
+                        width: 200,
+                        child: Slider(
+                          value: freq,
+                          min: 4,
+                          max: 14,
+                          divisions: (14 - 4) * 12,
+                          label: pow(2, freq).toStringAsFixed(2),
+                          onChanged: (value) => setState(() {
+                            freq = value;
+                            (sound as PulseSound?)?.freq =
+                                pow(2, value).toDouble();
+                          }),
+                        ),
+                      ),
+                    ]),
+                    Row(mainAxisSize: MainAxisSize.min, children: [
+                      const Text("Duty Cycle: "),
+                      SizedBox(
+                        width: 200,
+                        child: Slider(
+                          min: 0,
+                          max: 1,
+                          value: dutyCycle,
+                          divisions: 100,
+                          label: dutyCycle.toStringAsFixed(2),
+                          onChanged: (value) => setState(() {
+                            dutyCycle = value;
+                            (sound as PulseSound?)?.dutyCycle =
+                                value.clamp(0.01, 0.99);
+                          }),
+                        ),
+                      ),
+                    ]),
+                  ]),
+              },
+              SizedBox.square(dimension: 16),
+              OverflowBar(children: [
+                IconButton.filledTonal(
+                  icon: const Icon(Icons.play_arrow),
+                  onPressed: () async {
+                    await widget.engine.start();
+
+                    sound?.stop();
+                    sound = switch (generatorType) {
+                      GeneratorType.wave => widget.engine.genWaveform(
+                          waveformType,
+                          freq: pow(2, freq).toDouble(),
+                        ),
+                      GeneratorType.noise => widget.engine.genNoise(noiseType),
+                      GeneratorType.pulse => null,
+                    }
+                      ?..volume = 0.3;
+                    sound?.play();
+                  },
                 ),
-              ),
-            ]),
-          ]),
-        GeneratorType.noise => Column(children: [
-            Row(mainAxisSize: MainAxisSize.min, children: [
-              const Text("Noise Type\n(changes after regen): "),
-              DropdownButton(
-                value: noiseType,
-                items: NoiseType.values
-                    .map((t) => DropdownMenuItem(value: t, child: Text(t.name)))
-                    .toList(),
-                onChanged: (value) => setState(() {
-                  noiseType = value!;
-                }),
-              ),
-            ]),
-          ]),
-        GeneratorType.pulse => Column(children: [
-            Row(mainAxisSize: MainAxisSize.min, children: [
-              const Text("Frequency\n(changes immediately): "),
-              SizedBox(
-                width: 200,
-                child: Slider(
-                  value: freq,
-                  min: 4,
-                  max: 14,
-                  divisions: (14 - 4) * 12,
-                  label: pow(2, freq).toStringAsFixed(2),
-                  onChanged: (value) => setState(() {
-                    freq = value;
-                    (sound as PulseSound?)?.freq = pow(2, value).toDouble();
-                  }),
+                IconButton.filledTonal(
+                  icon: const Icon(Icons.stop),
+                  onPressed: () => sound?.stop(),
                 ),
-              ),
+              ]),
             ]),
-            Row(mainAxisSize: MainAxisSize.min, children: [
-              const Text("Duty Cycle\n(changes immediately): "),
-              SizedBox(
-                width: 200,
-                child: Slider(
-                  min: 0,
-                  max: 1,
-                  value: dutyCycle,
-                  divisions: 100,
-                  label: dutyCycle.toStringAsFixed(2),
-                  onChanged: (value) => setState(() {
-                    dutyCycle = value;
-                    (sound as PulseSound?)?.dutyCycle = value.clamp(0.01, 0.99);
-                  }),
-                ),
-              ),
-            ]),
-          ]),
-      },
-      OverflowBar(children: [
-        ElevatedButton(
-          child: const Text("PLAY"),
-          onPressed: () {
-            sound?.stop();
-            sound = switch (generatorType) {
-              GeneratorType.wave => widget.engine.genWaveform(
-                  waveformType,
-                  freq: pow(2, freq).toDouble(),
-                ),
-              GeneratorType.noise => widget.engine.genNoise(noiseType),
-              GeneratorType.pulse => widget.engine.genPulse(
-                  dutyCycle: dutyCycle,
-                  freq: pow(2, freq).toDouble(),
-                ),
-            }
-              ..volume = 0.3;
-            widget.engine.start().then((_) => sound!.play());
-          },
+          ),
         ),
-        ElevatedButton(
-          child: const Text("STOP"),
-          onPressed: () {
-            sound?.stop();
-            sound = null;
-          },
-        ),
-      ]),
-    ]);
-  }
+      ]);
 }

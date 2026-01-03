@@ -26,6 +26,7 @@ dependencies:
     path: ../minisound_ffi
   minisound_web:
     path: ../minisound_web
+  collection: ^1.19.1
 
 dev_dependencies:
   flutter_lints: ^6.0.0

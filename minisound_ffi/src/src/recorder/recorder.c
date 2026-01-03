@@ -202,6 +202,8 @@ Result recorder_resume_rec(Recorder *const self, Rec *const rec) {
         self->state == RECORDER_STATE_INITIALIZED)
         return StateErr;
 
+    if (recorder_get_is_recording(self, rec)) return Ok;
+
     Rec **avail_rec_ptr = NULL;
     for (Rec **rec_ptr = self->recs; rec_ptr < self->recs + self->recs_len;
          rec_ptr++)

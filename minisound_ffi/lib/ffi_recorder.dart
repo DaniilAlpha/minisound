@@ -1,32 +1,5 @@
 part of "minisound_ffi.dart";
 
-class FfiRec implements PlatformRec {
-  FfiRec._(Pointer<c.Rec> self) : _self = self;
-
-  final Pointer<c.Rec> _self;
-
-  @override
-  Uint8List read() {
-    final outData = malloc.allocate<Pointer<Uint8>>(sizeOf<Pointer<Uint8>>()),
-        outDataSize = malloc.allocate<Size>(sizeOf<Size>());
-    if (outData == nullptr) throw MinisoundPlatformOutOfMemoryException();
-    _binds.rec_read(_self, outData, outDataSize);
-    final data = outData.value, dataSize = outDataSize.value;
-    malloc.free(outData);
-    malloc.free(outDataSize);
-
-    final readData = data.asTypedList(dataSize);
-    malloc.free(data);
-    return readData;
-  }
-
-  @override
-  void dispose() {
-    _binds.rec_uninit(_self);
-    malloc.free(_self);
-  }
-}
-
 class FfiRecorder implements PlatformRecorder {
   FfiRecorder._(int maxRecCount) : _self = _binds.recorder_alloc(maxRecCount) {
     if (_self == nullptr) throw MinisoundPlatformOutOfMemoryException();
@@ -73,8 +46,8 @@ class FfiRecorder implements PlatformRecorder {
     required int channelCount,
     required int sampleRate,
     required int dataAvailabilityThresholdMs,
-    void Function() onDataAvailableFn,
-    void Function() seekDataFn,
+    required void Function(Uint8List data) onDataFn,
+    required void Function(int offset, int origin) seekDataFn,
   }) {
     final outRec = malloc.allocate<Pointer<c.Rec>>(sizeOf<Pointer<c.Rec>>());
     if (outRec == nullptr) throw MinisoundPlatformOutOfMemoryException();
@@ -85,8 +58,8 @@ class FfiRecorder implements PlatformRecorder {
       channelCount,
       sampleRate,
       dataAvailabilityThresholdMs,
-      onDataAvailableFn,
-      seekDataFn,
+      Pointer.fromFunction(_onDataFn),
+      Pointer.fromFunction(_seekDataFn),
       outRec,
     );
     final rec = outRec.value;
@@ -135,6 +108,13 @@ class FfiRecorder implements PlatformRecorder {
         "Failed to stop the recording (code: $r).",
       );
     }
+  }
+
+  static void _onDataFn(Pointer<c.Rec> rec) {
+    // (Pointer<c.Rec> rec) => onDataFn(FfiRec._(rec).read()),
+  }
+  static void _seekDataFn(Pointer<c.Rec> rec, int off, int origin) {
+    // (Pointer<c.Rec> rec, int off, int origin) => seekDataFn(off, origin),
   }
 }
 

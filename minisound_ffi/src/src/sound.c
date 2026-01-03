@@ -1,5 +1,6 @@
 #include "../include/sound.h"
 
+#include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -139,9 +140,10 @@ bool sound_get_is_playing(Sound const *const self) {
 float sound_get_cursor(Sound const *const self) {
     if (self->state == SOUND_STATE_UNINITIALIZED) return 0.0;
 
-    float pos_in_seconds;
+    float pos_in_seconds, length_in_seconds;
     ma_sound_get_cursor_in_seconds(&self->sound, &pos_in_seconds);
-    return pos_in_seconds;
+    ma_sound_get_length_in_seconds(&self->sound, &length_in_seconds);
+    return fminf(pos_in_seconds, length_in_seconds);
 }
 void sound_set_cursor(Sound *const self, float const value) {
     if (self->state == SOUND_STATE_UNINITIALIZED) return;

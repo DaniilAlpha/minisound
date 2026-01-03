@@ -11,10 +11,14 @@ abstract class Sound {
 
   bool get isPlaying => _sound.isPlaying;
 
+  /// A `double` greater than `0`. Changes both the pitch and the speed. Changing only one requires complex audio proccessing algorithms.
+  double get pitch => _sound.pitch;
+  set pitch(double value) => _sound.pitch = value < 0 ? 0 : value;
+
   /// Starts the sound. Continues if was paused.
   void resume() => _sound.play();
 
-  /// Stop the sound, but keep it's position.
+  /// Stops the sound, but keeps it's position.
   ///
   /// If sound is looped, when played again will wait `loopDelay` and play. If you do not want this, use `stop()`.
   void pause() => _sound.pause();
@@ -23,14 +27,10 @@ abstract class Sound {
   void stop() => _sound.stop();
 
   /// Starts the sound. Played from the beginning if was paused.
-  @nonVirtual
   void play() {
     stop();
     resume();
   }
-
-  @Deprecated("Only use if loading sound WITHOUT auto management.")
-  void unload() => _sound.unload();
 }
 
 /// A sound loaded from some kind of source.
@@ -42,9 +42,12 @@ class LoadedSound extends Sound {
 
   Duration get duration =>
       Duration(milliseconds: (_sound.duration * 1000).toInt());
-  Duration get position =>
+
+  Duration get cursor =>
       // TODO? maybe increase resolution?
-      Duration(milliseconds: (_sound.position * 1000).toInt());
+      Duration(milliseconds: (_sound.cursor * 1000).toInt());
+  set cursor(Duration value) =>
+      _sound.cursor = max(0.0, value.inMilliseconds / 1000);
 
   /// Whether the playbal should be started again automatically after `loopDelay`ms when the sound is ended.
   bool get isLooped => _sound.looping.$1;
