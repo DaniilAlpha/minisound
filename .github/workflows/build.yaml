@@ -47,4 +47,4 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' }}
         working-directory: minisound/example/
         run: |
-          flutter build windows --verbose
+          flutter build windows --debug --verbose
