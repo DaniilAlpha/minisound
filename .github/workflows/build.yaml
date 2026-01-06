@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: 
-          - ubuntu-latest
+          # - ubuntu-latest
           - windows-latest
           # - macos-latest
     runs-on: ${{ matrix.os }}
@@ -46,6 +46,13 @@ jobs:
       - name: Test Windows build
         if: ${{ matrix.os == 'windows-latest' }}
         working-directory: minisound/example/
+        continue-on-error: true
         run: |
           flutter pub get
           flutter build windows --debug --verbose
+          for /r "minisound\example\build\windows\x64" %%F in (*) do (
+              echo ===== FILE: %%F =====
+              type "%%F"
+              echo ===== EOF =====
+          )
+

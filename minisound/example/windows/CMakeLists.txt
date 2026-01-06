@@ -63,11 +63,6 @@ include(flutter/generated_plugins.cmake)
 # run in place. This is done instead of making a separate bundle (as on Linux)
 # so that building and running from within Visual Studio will work.
 set(BUILD_BUNDLE_DIR "$<TARGET_FILE_DIR:${BINARY_NAME}>")
-add_custom_target(
-  echo_target
-  COMMAND ${CMAKE_COMMAND} -E echo "HERE IT IS\n\n\n$<TARGET_FILE:${BINARY_NAME}>"
-)
-add_dependencies(${BINARY_NAME} echo_target)
 # Make the "install" step default, as it's required to run.
 set(CMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD 1)
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
