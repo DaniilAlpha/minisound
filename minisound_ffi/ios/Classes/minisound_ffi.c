@@ -1,7 +1,6 @@
 // Relative import to be able to reuse the C sources.
 // See the comment in ../minisound_ffi.podspec for more information.
 
-#include "../../src/external/miniaudio/miniaudio.c"
 #include "../../src/src/engine.c"
 #include "../../src/src/milo.c"
 #include "../../src/src/recorder/recorder.c"
