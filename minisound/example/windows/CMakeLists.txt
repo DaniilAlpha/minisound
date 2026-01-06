@@ -66,7 +66,6 @@ set(BUILD_BUNDLE_DIR "$<TARGET_FILE_DIR:${BINARY_NAME}>")
 add_custom_target(
   echo_target
   COMMAND ${CMAKE_COMMAND} -E echo "HERE IT IS\n\n\n$<TARGET_FILE:${BINARY_NAME}>"
-  VERBATIM
 )
 add_dependencies(${BINARY_NAME} echo_target)
 # Make the "install" step default, as it's required to run.
