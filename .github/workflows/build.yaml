@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         os: 
           - ubuntu-latest
@@ -47,7 +48,7 @@ jobs:
           flutter doctor -v
           flutter build linux --debug
 
-          flutter run 
+          flutter run -d linux
 
           cd build\linux\x64
           tree
