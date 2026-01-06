@@ -48,10 +48,10 @@ jobs:
           flutter doctor -v
           flutter build linux --debug
 
-          flutter run -d linux
+          tree build\linux\x64
 
-          cd build\linux\x64
-          tree
+          flutter run -d linux --verbose
+
 
       - name: Test Windows build
         if: matrix.os == 'windows-latest'
@@ -63,6 +63,8 @@ jobs:
           cd build\windows\x64
           tree /F
 
+          flutter run -d windows --verbose
+
       - name: Test MacOS build
         if: matrix.os == 'macos-latest'
         working-directory: minisound/example/
@@ -70,5 +72,4 @@ jobs:
           flutter doctor -v
           flutter build macos --debug
 
-          cd build\macos\x64
-          tree
+          tree build\macos\x64
