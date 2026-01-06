@@ -20,7 +20,7 @@ jobs:
       - name: Clone the repo
         uses: actions/checkout@v6
         with:
-          submodules: true
+          submodules: recursive
 
       - name: Set up CMake
         uses: lukka/get-cmake@latest
