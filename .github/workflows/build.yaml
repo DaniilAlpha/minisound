@@ -28,7 +28,7 @@ jobs:
           cmakeVersion: "^3.11.0"
 
       - name: Set up Linux Flutter dependencies 
-        uses: awalsh128/cache-apt-pkgs-action@1
+        uses: awalsh128/cache-apt-pkgs-action@latest
         if: matrix.os == 'ubuntu-latest'
         with:
           packages: clang libgtk-3-dev
