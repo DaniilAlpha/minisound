@@ -65,7 +65,7 @@ include(flutter/generated_plugins.cmake)
 set(BUILD_BUNDLE_DIR "$<TARGET_FILE_DIR:${BINARY_NAME}>")
 add_custom_target(
   GenexDemo
-  COMMAND ${CMAKE_COMMAND} -E echo "$<TARGET_FILE:${BINARY_NAME}>"
+  COMMAND ${CMAKE_COMMAND} -E echo "HERE IT IS\n\n\n$<TARGET_FILE:${BINARY_NAME}>"
   VERBATIM
 )
 # Make the "install" step default, as it's required to run.
