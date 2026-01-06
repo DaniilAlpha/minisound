@@ -50,16 +50,16 @@ jobs:
         run: |
           flutter pub get
           flutter build windows --debug --verbose
-          Get-ChildItem -Path "build\windows\x64" -File -Recurse | ForEach-Object {
-              Write-Host "===== FILE: $($_.FullName) ====="
-              $bytes = [System.IO.File]::ReadAllBytes($_.FullName)
-              if ($bytes.Length -gt 32768) {
-                  $text = [System.Text.Encoding]::UTF8.GetString($bytes, 0, 32768)
-                  Write-Host $text
-                  Write-Host "[truncated from $($bytes.Length) bytes...]"
-              } else {
-                  Get-Content $_.FullName -Raw
-              }
-              Write-Host "===== EOF =====\n\n"
-          }
+          # Get-ChildItem -Path "build\windows\x64" -File -Recurse | ForEach-Object {
+          #     Write-Host "===== FILE: $($_.FullName) ====="
+          #     $bytes = [System.IO.File]::ReadAllBytes($_.FullName)
+          #     if ($bytes.Length -gt 32768) {
+          #         $text = [System.Text.Encoding]::UTF8.GetString($bytes, 0, 32768)
+          #         Write-Host $text
+          #         Write-Host "[truncated from $($bytes.Length) bytes...]"
+          #     } else {
+          #         Get-Content $_.FullName -Raw
+          #     }
+          #     Write-Host "===== EOF =====\n\n"
+          # }
 
