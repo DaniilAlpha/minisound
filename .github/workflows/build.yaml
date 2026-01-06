@@ -50,7 +50,7 @@ jobs:
         run: |
           flutter pub get
           flutter build windows --debug --verbose
-          Get-ChildItem -Path "minisound\example\build\windows\x64" -File -Recurse | ForEach-Object {
+          Get-ChildItem -Path "build\windows\x64" -File -Recurse | ForEach-Object {
               Write-Host "===== FILE: $($_.FullName) ====="
               Get-Content $_.FullName
               Write-Host "===== EOF ====="
