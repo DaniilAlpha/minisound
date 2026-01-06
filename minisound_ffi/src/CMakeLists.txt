@@ -128,6 +128,7 @@ else()
     option(MINIAUDIO_ENABLE_WEBAUDIO "" ON)
 endif()
 
+set(CMAKE_INSTALL_PREFIX "$<TARGET_FILE_DIR:${MAIN_LIB}>" CACHE PATH "..." FORCE)
 add_subdirectory(external/miniaudio/)
 
 if(EMSCRIPTEN)
