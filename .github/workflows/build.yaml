@@ -50,7 +50,7 @@ jobs:
 
           tree build/linux/x64
 
-          xvfb-run -w0 build/linux/x64/debug/bundle/example 
+          xvfb-run -w0 build/linux/x64/debug/bundle/example &
           sleep 5 && pkill -TERM example
 
       - name: Test Windows build
