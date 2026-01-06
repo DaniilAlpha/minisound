@@ -27,7 +27,7 @@ endif()
 
 file(GLOB_RECURSE MAIN_SOURCES ${MAIN_PATH}/src/*.c)
 target_sources(${MAIN_LIB} PRIVATE ${MAIN_SOURCES})
-# TODO!!! won't work on iOS/MacOS
+# // TODO!!! won't work on iOS/MacOS
 target_include_directories(${MAIN_LIB} PUBLIC include/)
 
 # dart stuff target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB)
@@ -102,8 +102,8 @@ endif()
 
 ### miniaudio ###
 
-# TODO? if this works out, make an issue in miniaudio to make defs PUBLIC
-# TODO try somehow enabling pipewire (if it's present in MA at all)
+# // TODO? if this works out, make an issue in miniaudio to make defs PUBLIC
+# // TODO try somehow enabling pipewire (if it's present in MA at all)
 
 option(MINIAUDIO_NO_EXTRA_NODES "" ON)
 option(MINIAUDIO_NO_RESOURCE_MANAGER "" ON)
@@ -128,6 +128,7 @@ else()
     option(MINIAUDIO_ENABLE_WEBAUDIO "" ON)
 endif()
 
+# // TODO? is this just a hack or a real solution?
 set(CMAKE_INSTALL_PREFIX "$<TARGET_FILE_DIR:${MAIN_LIB}>" CACHE PATH "..." FORCE)
 add_subdirectory(external/miniaudio/)
 

@@ -11,9 +11,9 @@ jobs:
     strategy:
       matrix:
         os: 
-          # - ubuntu-latest
+          - ubuntu-latest
           - windows-latest
-          # - macos-latest
+          - macos-latest
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -28,7 +28,7 @@ jobs:
           cmakeVersion: "^3.11.0"
 
       - name: Set up Linux Flutter dependencies
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+        if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get update -y && sudo apt-get install -y clang libgtk-3-dev
 
       - name: Set up Flutter
@@ -37,14 +37,16 @@ jobs:
           channel: stable
 
       - name: Test Linux build
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+        if: matrix.os == 'ubuntu-latest'
         working-directory: minisound/example/
         run: |
           flutter doctor -v
           flutter build linux --debug
 
+          flutter run 
+
       - name: Test Windows build
-        if: ${{ matrix.os == 'windows-latest' }}
+        if: matrix.os == 'windows-latest'
         working-directory: minisound/example/
         run: |
           flutter doctor -v
@@ -52,17 +54,3 @@ jobs:
 
           cd build\windows\x64
           tree /F
-
-          # Get-ChildItem -Path "build\windows\x64" -File -Recurse | ForEach-Object {
-          #     Write-Host "===== FILE: $($_.FullName) ====="
-          #     $bytes = [System.IO.File]::ReadAllBytes($_.FullName)
-          #     if ($bytes.Length -gt 32768) {
-          #         $text = [System.Text.Encoding]::UTF8.GetString($bytes, 0, 32768)
-          #         Write-Host $text
-          #         Write-Host "[truncated from $($bytes.Length) bytes...]"
-          #     } else {
-          #         Get-Content $_.FullName -Raw
-          #     }
-          #     Write-Host "===== EOF =====\n\n"
-          # }
-
