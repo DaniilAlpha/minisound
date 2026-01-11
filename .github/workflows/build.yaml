@@ -76,4 +76,5 @@ jobs:
           set +e
           flutter build macos --debug
 
-          tree build/macos/x64
+          cd build/macos/
+          find 
