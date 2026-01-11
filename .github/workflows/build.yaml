@@ -77,6 +77,14 @@ jobs:
           build/macos/Build/Products/Debug/example.app/Contents/MacOS/example &
           sleep 10 && kill -TERM $!
 
+      - name: Test iOS build
+        if: matrix.os == 'macos-latest'
+        working-directory: minisound/example/
+        run: |
+          flutter build ios --debug
+
+          find build/ios/Build/ -print
+
       - name: Get Flutter info
         if: failure()
         run: flutter doctor -v
