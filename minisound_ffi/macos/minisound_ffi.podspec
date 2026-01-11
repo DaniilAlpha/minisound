@@ -26,7 +26,7 @@ A new Flutter FFI plugin project.
     s.dependency 'FlutterMacOS'
 
     cmake_build_type = 'Release'
-    cmake_build_type = 'Debug', :configurations => ['Debug']
+    # cmake_build_type = 'Debug', :configurations => ['Debug']
     s.prepare_command = <<-CMD
         echo Building minisound_ffi via CMake...
         cmake -B ./build/ -S ../src/ -DCMAKE_BUILD_TYPE=#{cmake_build_type}
