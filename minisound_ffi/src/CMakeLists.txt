@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11)
-if (APPLE)
+if (IOS)
     set(LANGS OBJC)
 else()
     set(LANGS C)
