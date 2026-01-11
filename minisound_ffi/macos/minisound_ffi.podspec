@@ -32,7 +32,7 @@ A new Flutter FFI plugin project.
     }
     s.prepare_command = <<-CMD
         echo Building minisound_ffi via CMake...
-        cmake -B ./build/ -S ../src/ -DCMAKE_BUILD_TYPE=#{CMAKE_BUILD_TYPE}
+        cmake -B ./build/ -S ../src/ -DCMAKE_BUILD_TYPE=#{s.pod_target_xcconfig.CMAKE_BUILD_TYPE}
         cmake --build ./build/ 
     CMD
     s.vendored_libraries = 'build/libminisound_ffi.dylib'
