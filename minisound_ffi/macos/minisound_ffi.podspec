@@ -22,7 +22,6 @@ A new Flutter FFI plugin project.
     # paths, so Classes contains a forwarder C file that relatively imports
     # `../src/*` so that the C sources can be shared among all target platforms.
     s.source           = { :path => '.' }
-    s.source_files     = 'Classes/**/*'
     s.dependency 'FlutterMacOS'
 
     cmake_build_type = 'Release'
@@ -33,8 +32,8 @@ A new Flutter FFI plugin project.
         :output_files => ['build/libminisound_ffi.dylib'],
         :script => <<-SCRIPT
             echo Building minisound_ffi via CMake...
-            cmake -B ./build/ -S ../src/ -DCMAKE_BUILD_TYPE=#{cmake_build_type}
-            cmake --build ./build/ 
+            cmake -B ${PODS_BUILD_DIR}/ -S ${PODS_TARGET_SRCROOT}/../src/ -DCMAKE_BUILD_TYPE=#{cmake_build_type} -DCMAKE_OSX_ARCHITECTURES="${ARCHS}"
+            cmake --build ${PODS_BUILD_DIR}/
         SCRIPT
     }
     s.vendored_libraries = 'build/libminisound_ffi.dylib'
