@@ -77,5 +77,5 @@ jobs:
 
           find build/macos/Build/ -print
 
-          build/macos/Build/Products/Debug/example.app &
-          sleep 10 && kill -TERM $!
+          build/macos/Build/Products/Debug/example.app/Contents/MacOS/example &
+          sleep 5 && kill -TERM $!
