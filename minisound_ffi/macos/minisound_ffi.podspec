@@ -37,5 +37,5 @@ A new Flutter FFI plugin project.
         SCRIPT
     }
     s.vendored_libraries = '${PODS_BUILD_DIR}/libminisound_ffi.dylib'
-    s.xcconfig = { 'OTHER_LDFLAGS' => '-force_load "${PODS_ROOT}/../packages/minisound_ffi/macos/build/libminisound_ffi.dylib"' }
+    s.xcconfig = { 'OTHER_LDFLAGS' => '-force_load "${PODS_BUILD_DIR}/libminisound_ffi.dylib"' }
 end
