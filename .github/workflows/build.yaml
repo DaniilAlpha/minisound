@@ -65,9 +65,9 @@ jobs:
           tree /F
           cd -
 
-          $EXAMPLE_PID = Start-Process -FilePath build\windows\x64\runner\Debug\example.exe -PassThru
+          $PROC = Start-Process -FilePath build\windows\x64\runner\Debug\example.exe -PassThru
           Start-Sleep -Seconds 5
-          Stop-Process -Id $EXAMPLE_PID
+          $PROC.CloseMainWindow()
 
       - name: Test MacOS build
         if: matrix.os == 'macos-latest'
