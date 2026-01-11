@@ -77,4 +77,4 @@ jobs:
           flutter build macos --debug
 
           cd build/macos/
-          find 
+          find . -print
