@@ -133,7 +133,7 @@ endif()
 #     message(WARNING "INSTALLATION PATH CHANGED")
 #     set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "..." FORCE)
 # endif()
-add_subdirectory(external/miniaudio/)
+add_subdirectory(external/miniaudio/ EXCLUDE_FROM_ALL)
 
 if(EMSCRIPTEN)
     target_compile_options(miniaudio PRIVATE -sWASM_WORKERS=1 -Wno-c23-extensions -Wno-unknown-warning-option)
