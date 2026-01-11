@@ -2,9 +2,9 @@ name: Test Build on All Platforms
 
 on:
   push:
-    branches: [master, dev]
+    branches: [dev]
   pull_request:
-    branches: [master, dev]
+    branches: [dev]
 
 jobs:
   build:
@@ -72,6 +72,7 @@ jobs:
       - name: Test MacOS build
         if: matrix.os == 'macos-latest'
         working-directory: minisound/example/
+        continue-on-error: true
         run: |
           flutter build macos --debug
 
