@@ -66,6 +66,14 @@ jobs:
           Start-Sleep -Seconds 10
           $PROC.CloseMainWindow()
 
+      - name: Test iOS build
+        if: matrix.os == 'macos-latest'
+        working-directory: minisound/example/
+        run: |
+          flutter build ios --debug --no-codesign
+
+          find build/ios/Build/ -print
+
       - name: Test MacOS build
         if: matrix.os == 'macos-latest'
         working-directory: minisound/example/
@@ -77,13 +85,6 @@ jobs:
           build/macos/Build/Products/Debug/example.app/Contents/MacOS/example &
           sleep 10 && kill -TERM $!
 
-      - name: Test iOS build
-        if: matrix.os == 'macos-latest'
-        working-directory: minisound/example/
-        run: |
-          flutter build ios --debug --no-codesign
-
-          find build/ios/Build/ -print
 
       - name: Get Flutter info
         if: failure()
