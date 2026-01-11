@@ -1,5 +1,3 @@
-system("mkdir -d build && touch build/libminisound_ffi.dylib")
-
 #
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
 # Run `pod lib lint minisound_ffi.podspec` to validate before publishing.
@@ -29,11 +27,16 @@ A new Flutter FFI plugin project.
 
     cmake_build_type = 'Release'
     # cmake_build_type = 'Debug', :configurations => ['Debug']
-    s.prepare_command = <<-CMD
-        echo Building minisound_ffi via CMake...
-        cmake -B ./build/ -S ../src/ -DCMAKE_BUILD_TYPE=#{cmake_build_type}
-        cmake --build ./build/ 
-    CMD
+    s.script_phase = {
+        :name => 'CMake Build',
+        :execution_position => :before_compile,
+        :output_files => 'build/libminisound_ffi.dylib',
+        :script => <<-SCRIPT
+            echo Building minisound_ffi via CMake...
+            cmake -B ./build/ -S ../src/ -DCMAKE_BUILD_TYPE=#{cmake_build_type}
+            cmake --build ./build/ 
+        SCRIPT
+    }
     s.vendored_libraries = 'build/libminisound_ffi.dylib'
     s.xcconfig = { 'OTHER_LDFLAGS' => '-force_load "${PODS_ROOT}/../packages/minisound_ffi/macos/build/libminisound_ffi.dylib"' }
 end
