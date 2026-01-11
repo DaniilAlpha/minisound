@@ -1,3 +1,5 @@
+system("mkdir -d build && touch build/libminisound_ffi.dylib")
+
 #
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
 # Run `pod lib lint minisound_ffi.podspec` to validate before publishing.
