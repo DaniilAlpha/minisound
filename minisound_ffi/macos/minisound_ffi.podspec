@@ -13,7 +13,8 @@ A new Flutter FFI plugin project.
     s.license     = { :file => '../LICENSE' }
     s.author      = { 'Your Company' => 'email@example.com' }
 
-    s.platform                = { :osx => '10.11', :ios => '11.0' }
+    s.osx.deployment_target   = '10.11'
+    s.ios.deployment_target   = '11.0'
     s.osx.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
     s.ios.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
     s.swift_version           = '5.0'
