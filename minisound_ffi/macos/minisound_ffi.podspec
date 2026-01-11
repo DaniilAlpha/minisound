@@ -30,7 +30,7 @@ A new Flutter FFI plugin project.
     s.script_phase = {
         :name => 'CMake Build',
         :execution_position => :before_compile,
-        :output_files => 'build/libminisound_ffi.dylib',
+        :output_files => ['build/libminisound_ffi.dylib'],
         :script => <<-SCRIPT
             echo Building minisound_ffi via CMake...
             cmake -B ./build/ -S ../src/ -DCMAKE_BUILD_TYPE=#{cmake_build_type}
