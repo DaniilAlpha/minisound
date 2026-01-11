@@ -14,6 +14,7 @@ A new Flutter FFI plugin project.
     s.author           = { 'Your Company' => 'email@example.com' }
 
     s.platform = :osx, '10.11'
+    s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
     s.swift_version = '5.0'
 
     # This will ensure the source files in Classes/ are included in the native
@@ -24,15 +25,11 @@ A new Flutter FFI plugin project.
     s.source_files     = 'Classes/**/*'
     s.dependency 'FlutterMacOS'
 
-    s.pod_target_xcconfig = { 
-        'CMAKE_BUILD_TYPE' => 'Release',
-        'CMAKE_BUILD_TYPE_Debug' => 'Debug',
-
-        'DEFINES_MODULE' => 'YES' # was here before, don't remove
-    }
+    cmake_build_type = 'Release'
+    cmake_build_type = 'Debug', :configurations => ['Debug']
     s.prepare_command = <<-CMD
         echo Building minisound_ffi via CMake...
-        cmake -B ./build/ -S ../src/ -DCMAKE_BUILD_TYPE=#{s.pod_target_xcconfig.CMAKE_BUILD_TYPE}
+        cmake -B ./build/ -S ../src/ -DCMAKE_BUILD_TYPE=#{cmake_build_type}
         cmake --build ./build/ 
     CMD
     s.vendored_libraries = 'build/libminisound_ffi.dylib'
