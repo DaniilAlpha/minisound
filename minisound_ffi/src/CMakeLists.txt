@@ -102,9 +102,9 @@ endif()
 
 ### miniaudio ###
 
-# // TODO? if this works out, make an issue in miniaudio to make defs PUBLIC
 # // TODO try somehow enabling pipewire (if it's present in MA at all)
 
+# // TODO? if this works out, make an issue in miniaudio to make defs PUBLIC
 option(MINIAUDIO_NO_EXTRA_NODES "" ON)
 option(MINIAUDIO_NO_RESOURCE_MANAGER "" ON)
 option(MINIAUDIO_ENABLE_ONLY_SPECIFIC_BACKENDS "" ON)
@@ -125,13 +125,14 @@ if (NOT EMSCRIPTEN)
     # apple
     option(MINIAUDIO_ENABLE_COREAUDIO "" ON)
 else()
+    # web
     option(MINIAUDIO_ENABLE_WEBAUDIO "" ON)
 endif()
 
-if(CMAKE_INSTALL_PREFIX MATCHES "\\$<TARGET_FILE_DIR")
-    message(WARNING "INSTALLATION PATH CHANGED")
-    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "..." FORCE)
-endif()
+# if(CMAKE_INSTALL_PREFIX MATCHES "\\$<TARGET_FILE_DIR")
+#     message(WARNING "INSTALLATION PATH CHANGED")
+#     set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "..." FORCE)
+# endif()
 add_subdirectory(external/miniaudio/)
 
 if(EMSCRIPTEN)
