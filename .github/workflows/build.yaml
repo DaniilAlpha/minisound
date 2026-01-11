@@ -41,9 +41,6 @@ jobs:
           cache-sdk: true
           cache: true
 
-      - name: Get Flutter info
-        run: flutter doctor -v
-
       - name: Test Linux build
         if: matrix.os == 'ubuntu-latest'
         working-directory: minisound/example/
@@ -53,7 +50,7 @@ jobs:
           tree build/linux/x64
 
           xvfb-run -w0 build/linux/x64/debug/bundle/example &
-          sleep 5 && kill -TERM $!
+          sleep 10 && kill -TERM $!
 
       - name: Test Windows build
         if: matrix.os == 'windows-latest'
@@ -66,7 +63,7 @@ jobs:
           cd -
 
           $PROC = Start-Process -FilePath build\windows\x64\runner\Debug\example.exe -PassThru
-          Start-Sleep -Seconds 5
+          Start-Sleep -Seconds 10
           $PROC.CloseMainWindow()
 
       - name: Test MacOS build
@@ -78,4 +75,8 @@ jobs:
           find build/macos/Build/ -print
 
           build/macos/Build/Products/Debug/example.app/Contents/MacOS/example &
-          sleep 5 && kill -TERM $!
+          sleep 10 && kill -TERM $!
+
+      - name: Get Flutter info
+        if: failure()
+        run: flutter doctor -v
