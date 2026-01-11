@@ -25,9 +25,10 @@ A new Flutter FFI plugin project.
     s.dependency 'FlutterMacOS'
 
     s.pod_target_xcconfig = { 
+        'CMAKE_BUILD_TYPE' => 'Release',
+        'CMAKE_BUILD_TYPE[config=Debug]' => 'Debug',
+
         'DEFINES_MODULE' => 'YES' # was here before, don't remove
-        'CMAKE_BUILD_TYPE' => 'Release'
-        'CMAKE_BUILD_TYPE[config=Debug]' => 'Debug'
     }
     s.prepare_command = <<-CMD
         echo Building minisound_ffi via CMake...
@@ -35,5 +36,5 @@ A new Flutter FFI plugin project.
         cmake --build ./build/ 
     CMD
     s.vendored_libraries = 'build/libminisound_ffi.dylib'
-    s.xcconfig = { 'OTHER_LDFLAGS' => '-force_load "${PODS_ROOT}/../packages/minisound_ffi/macos/build/libminisound_ffi.dylib'}
+    s.xcconfig = { 'OTHER_LDFLAGS' => '-force_load "${PODS_ROOT}/../packages/minisound_ffi/macos/build/libminisound_ffi.dylib' }
 end
