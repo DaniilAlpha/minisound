@@ -128,8 +128,10 @@ else()
     option(MINIAUDIO_ENABLE_WEBAUDIO "" ON)
 endif()
 
-# // TODO? is this just a hack or a real solution?
-# set(CMAKE_INSTALL_PREFIX "$<TARGET_FILE_DIR:${MAIN_LIB}>" CACHE PATH "..." FORCE)
+if(CMAKE_INSTALL_PREFIX MATCHES "\\$<TARGET_FILE_DIR")
+    message(WARNING "INSTALLATION PATH CHANGED")
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "..." FORCE)
+endif()
 add_subdirectory(external/miniaudio/)
 
 if(EMSCRIPTEN)
