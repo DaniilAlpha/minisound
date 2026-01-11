@@ -89,15 +89,16 @@ endif()
 if(EMSCRIPTEN)
     set_target_properties(${MAIN_LIB} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${WEB_OUT_DIR})
+elseif(APPLE)
+    set_target_properties(${MAIN_LIB} PROPERTIES
+        PUBLIC_HEADER include/minisound.h
+        OUTPUT_NAME ${MAIN_LIB}
+        MACOSX_RPATH TRUE
+        INSTALL_PATH "@loader_path/../Frameworks")
 else()
     set_target_properties(${MAIN_LIB} PROPERTIES
         PUBLIC_HEADER include/minisound.h
         OUTPUT_NAME ${MAIN_LIB})
-    if(APPLE)
-        set_target_properties(${MAIN_LIB} PROPERTIES
-            MACOSX_RPATH TRUE
-            INSTALL_PATH "@loader_path/../Frameworks")
-    endif()
 endif()
 
 
