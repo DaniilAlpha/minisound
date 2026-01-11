@@ -32,7 +32,7 @@ jobs:
         uses: awalsh128/cache-apt-pkgs-action@latest
         if: matrix.os == 'ubuntu-latest'
         with:
-          packages: clang libgtk-3-dev xvfb
+          packages: clang libgtk-3-dev xvfb pulseaudio
 
       - name: Set up Flutter
         uses: flutter-actions/setup-flutter@v4 
@@ -53,7 +53,7 @@ jobs:
           tree build/linux/x64
 
           xvfb-run -w0 build/linux/x64/debug/bundle/example &
-          sleep 5 && pkill -TERM example
+          sleep 5 && kill -TERM $!
 
       - name: Test Windows build
         if: matrix.os == 'windows-latest'
@@ -73,8 +73,9 @@ jobs:
         if: matrix.os == 'macos-latest'
         working-directory: minisound/example/
         run: |
-          set +e
           flutter build macos --debug
 
-          cd build/macos/
-          find . -print
+          find build/macos/Build/ -print
+
+          build/macos/Build/Products/Debug/example.app &
+          sleep 5 && kill -TERM $!
