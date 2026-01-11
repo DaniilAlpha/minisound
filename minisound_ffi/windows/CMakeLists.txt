@@ -20,5 +20,12 @@ set(minisound_ffi_bundled_libraries
   # This can be changed to accommodate different builds.
   $<TARGET_FILE:minisound_ffi>
   $<TARGET_FILE:miniaudio>
+  $<TARGET_FILE:miniaudio_libvorbis>
+  $<TARGET_FILE:miniaudio_libopus>
+  $<TARGET_FILE:miniaudio_channel_combiner_node>
+  $<TARGET_FILE:miniaudio_channel_separator_node>
+  $<TARGET_FILE:miniaudio_ltrim_node>
+  $<TARGET_FILE:miniaudio_reverb_node>
+  $<TARGET_FILE:miniaudio_vocoder_node>
   PARENT_SCOPE
 )
