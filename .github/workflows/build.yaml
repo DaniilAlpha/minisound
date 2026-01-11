@@ -72,8 +72,8 @@ jobs:
       - name: Test MacOS build
         if: matrix.os == 'macos-latest'
         working-directory: minisound/example/
-        continue-on-error: true
         run: |
+          set +e
           flutter build macos --debug
 
           tree build/macos/x64
