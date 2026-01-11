@@ -12,17 +12,17 @@ endif()
 
 ### library ###
 
-if(NOT EMSCRIPTEN)
-    set(MAIN_LIB minisound_ffi)
-else()
+if(EMSCRIPTEN)
     set(MAIN_LIB minisound_web)
     set(MAIN_JS minisound_web_js)
+else()
+    set(MAIN_LIB minisound_ffi)
 endif()
 
-if(NOT EMSCRIPTEN)
-    add_library(${MAIN_LIB} SHARED)
-else()
+if(EMSCRIPTEN)
     add_executable(${MAIN_LIB})
+else()
+    add_library(${MAIN_LIB} SHARED)
 endif()
 
 file(GLOB_RECURSE MAIN_SOURCES ${MAIN_PATH}/src/*.c)
@@ -48,16 +48,16 @@ target_compile_definitions(${MAIN_LIB} PRIVATE
     >)
 
 # warnings
-if(NOT MSVC)
+if(MSVC)
+    target_compile_options(${MAIN_LIB} PRIVATE
+        /W2 /wd5287 /wd4098)
+else()
     target_compile_options(${MAIN_LIB} PRIVATE
         -W -Wall -Wextra -Wformat -Wno-unused-function)
     # if(APPLE)
     #     target_compile_options(${MAIN_LIB} PUBLIC
     #           -Wno-strict-prototypes -Wno-comma)
     # endif()
-else()
-    target_compile_options(${MAIN_LIB} PRIVATE
-        /W2 /wd5287 /wd4098)
 endif()
 
 if(EMSCRIPTEN)
@@ -71,8 +71,7 @@ if(EMSCRIPTEN)
         -sNO_DEFAULT_TO_CXX -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB
         -sWASM_WORKERS=1 -sAUDIO_WORKLET=1
         -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072
-        -sSTACK_OVERFLOW_CHECK=1
-    ) ]]
+        -sSTACK_OVERFLOW_CHECK=1) ]]
 
     target_compile_options(${MAIN_LIB} PUBLIC
         -Og -g3 -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
@@ -84,19 +83,21 @@ if(EMSCRIPTEN)
         -sNO_DEFAULT_TO_CXX -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB
         -sWASM_WORKERS=1 -sAUDIO_WORKLET=1
         -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072
-        -sSTACK_OVERFLOW_CHECK=1 -sSAFE_HEAP
-    )
+        -sSTACK_OVERFLOW_CHECK=1 -sSAFE_HEAP)
 endif()
 
-if(NOT EMSCRIPTEN)
+if(EMSCRIPTEN)
     set_target_properties(${MAIN_LIB} PROPERTIES
-        PUBLIC_HEADER include/minisound.h
-        OUTPUT_NAME ${MAIN_LIB}
-    )
+        RUNTIME_OUTPUT_DIRECTORY ${WEB_OUT_DIR})
 else()
     set_target_properties(${MAIN_LIB} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${WEB_OUT_DIR}
-    )
+        PUBLIC_HEADER include/minisound.h
+        OUTPUT_NAME ${MAIN_LIB})
+    if(APPLE)
+        set_target_properties(${MAIN_LIB} PROPERTIES
+            MACOSX_RPATH TRUE
+            INSTALL_PATH "@loader_path/../Frameworks")
+    endif()
 endif()
 
 
@@ -108,7 +109,10 @@ endif()
 option(MINIAUDIO_NO_EXTRA_NODES "" ON)
 option(MINIAUDIO_NO_RESOURCE_MANAGER "" ON)
 option(MINIAUDIO_ENABLE_ONLY_SPECIFIC_BACKENDS "" ON)
-if (NOT EMSCRIPTEN)
+if (EMSCRIPTEN)
+    # web
+    option(MINIAUDIO_ENABLE_WEBAUDIO "" ON)
+else()
     if(NOT (WIN32 OR LINUX OR ANDROID OR APPLE))
         message(ERROR
             "Sound won't work, as no backend for your platform was enabled!")
@@ -124,16 +128,14 @@ if (NOT EMSCRIPTEN)
     option(MINIAUDIO_ENABLE_OPENSL "" ON)
     # apple
     option(MINIAUDIO_ENABLE_COREAUDIO "" ON)
-else()
-    # web
-    option(MINIAUDIO_ENABLE_WEBAUDIO "" ON)
 endif()
 
 add_subdirectory(external/miniaudio/ EXCLUDE_FROM_ALL)
 
 if(EMSCRIPTEN)
     target_compile_options(miniaudio PRIVATE -sWASM_WORKERS=1 -Wno-c23-extensions -Wno-unknown-warning-option)
-elseif(NOT MSVC)
+elseif(MSVC)
+else()
     target_compile_options(miniaudio PUBLIC -fPIC)
 endif()
 
