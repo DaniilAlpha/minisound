@@ -26,7 +26,7 @@ A new Flutter FFI plugin project.
 
     s.pod_target_xcconfig = { 
         'CMAKE_BUILD_TYPE' => 'Release',
-        'CMAKE_BUILD_TYPE[config=Debug]' => 'Debug',
+        'CMAKE_BUILD_TYPE_Debug' => 'Debug',
 
         'DEFINES_MODULE' => 'YES' # was here before, don't remove
     }
