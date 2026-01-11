@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.11)
-project(minisound_ffi VERSION 1.0.0 LANGUAGES C)
+if (APPLE)
+    set(LANGS C OBJC)
+else()
+    set(LANGS C)
+endif()
+project(minisound_ffi VERSION 1.0.0 LANGUAGES ${LANGS})
 
 
 ### paths ###
