@@ -41,11 +41,13 @@ jobs:
           cache-sdk: true
           cache: true
 
+      - name: Get Flutter info
+        run: flutter doctor -v
+
       - name: Test Linux build
         if: matrix.os == 'ubuntu-latest'
         working-directory: minisound/example/
         run: |
-          flutter doctor -v
           flutter build linux --debug
 
           tree build/linux/x64
@@ -57,19 +59,19 @@ jobs:
         if: matrix.os == 'windows-latest'
         working-directory: minisound/example/
         run: |
-          flutter doctor -v
           flutter build windows --debug
 
           cd build\windows\x64
           tree /F
 
-          flutter run -d windows --verbose
+          $PID = Start-Process -FilePath build/windows/x64/debug/bundle/example -PassThru
+          Start-Sleep -Seconds 5
+          Stop-Process -Id $PID
 
       - name: Test MacOS build
         if: matrix.os == 'macos-latest'
         working-directory: minisound/example/
         run: |
-          flutter doctor -v
           flutter build macos --debug
 
           tree build/macos/x64
