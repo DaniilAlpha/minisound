@@ -32,7 +32,7 @@ A new Flutter FFI plugin project.
     s.ios.pod_target_xcconfig = { 
         'DEFINES_MODULE' => 'YES',
         'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
-        'CMAKE_BUILD_TYPE' => 'Release'
+        'CMAKE_BUILD_TYPE' => 'Release',
         'CMAKE_SYSTEM_NAME' => 'iOS'
     }
     s.script_phase = {
