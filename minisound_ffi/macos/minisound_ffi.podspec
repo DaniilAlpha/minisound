@@ -15,8 +15,6 @@ A new Flutter FFI plugin project.
 
     s.osx.deployment_target   = '10.11'
     s.ios.deployment_target   = '13.0'
-    s.osx.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
-    s.ios.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
     s.swift_version           = '5.0'
 
     # This will ensure the source files in Classes/ are included in the native
@@ -27,15 +25,25 @@ A new Flutter FFI plugin project.
     s.osx.dependency 'FlutterMacOS'
     s.ios.dependency 'Flutter'
 
-    cmake_build_type = 'Release'
-    # cmake_build_type = 'Debug', :configurations => ['Debug']
+    s.osx.pod_target_xcconfig = { 
+        'DEFINES_MODULE' => 'YES',
+        'CMAKE_BUILD_TYPE' => 'Release'
+    }
+    s.ios.pod_target_xcconfig = { 
+        'DEFINES_MODULE' => 'YES',
+        'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
+        'CMAKE_BUILD_TYPE' => 'Release'
+        'CMAKE_SYSTEM_NAME' => 'iOS'
+    }
     s.script_phase = {
         :name => 'CMake Build',
         :execution_position => :before_compile,
         :output_files => ['${PODS_BUILD_DIR}/libminisound_ffi.dylib'],
         :script => <<-SCRIPT
-            echo Building minisound_ffi via CMake...
-            cmake -B ${PODS_BUILD_DIR} -S ${PODS_TARGET_SRCROOT}/../src/ -DCMAKE_BUILD_TYPE=#{cmake_build_type} -DCMAKE_OSX_ARCHITECTURES="${ARCHS}"
+            cmake -B ${PODS_BUILD_DIR} -S ${PODS_TARGET_SRCROOT}/../src/ \
+                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}                   \
+                -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}                 \
+                -DCMAKE_OSX_ARCHITECTURES="${ARCHS}"
             cmake --build ${PODS_BUILD_DIR}
         SCRIPT
     }
