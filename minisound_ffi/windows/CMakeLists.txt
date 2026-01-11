@@ -19,5 +19,6 @@ set(minisound_ffi_bundled_libraries
   # Defined in ../src/CMakeLists.txt.
   # This can be changed to accommodate different builds.
   $<TARGET_FILE:minisound_ffi>
+  $<TARGET_FILE:miniaudio>
   PARENT_SCOPE
 )
