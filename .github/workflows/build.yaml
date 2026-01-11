@@ -63,8 +63,9 @@ jobs:
 
           cd build\windows\x64
           tree /F
+          cd -
 
-          $PID = Start-Process -FilePath build/windows/x64/debug/bundle/example -PassThru
+          $PID = Start-Process -FilePath build\windows\x64\runner\Debug\example.exe -PassThru
           Start-Sleep -Seconds 5
           Stop-Process -Id $PID
 

@@ -129,10 +129,6 @@ else()
     option(MINIAUDIO_ENABLE_WEBAUDIO "" ON)
 endif()
 
-# if(CMAKE_INSTALL_PREFIX MATCHES "\\$<TARGET_FILE_DIR")
-#     message(WARNING "INSTALLATION PATH CHANGED")
-#     set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "..." FORCE)
-# endif()
 add_subdirectory(external/miniaudio/ EXCLUDE_FROM_ALL)
 
 if(EMSCRIPTEN)
