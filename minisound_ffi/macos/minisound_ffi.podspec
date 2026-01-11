@@ -29,13 +29,13 @@ A new Flutter FFI plugin project.
     s.script_phase = {
         :name => 'CMake Build',
         :execution_position => :before_compile,
-        :output_files => ['build/libminisound_ffi.dylib'],
+        :output_files => ['${PODS_BUILD_DIR}/libminisound_ffi.dylib'],
         :script => <<-SCRIPT
             echo Building minisound_ffi via CMake...
-            cmake -B ${PODS_BUILD_DIR}/ -S ${PODS_TARGET_SRCROOT}/../src/ -DCMAKE_BUILD_TYPE=#{cmake_build_type} -DCMAKE_OSX_ARCHITECTURES="${ARCHS}"
-            cmake --build ${PODS_BUILD_DIR}/
+            cmake -B ${PODS_BUILD_DIR} -S ${PODS_TARGET_SRCROOT}/../src/ -DCMAKE_BUILD_TYPE=#{cmake_build_type} -DCMAKE_OSX_ARCHITECTURES="${ARCHS}"
+            cmake --build ${PODS_BUILD_DIR}
         SCRIPT
     }
-    s.vendored_libraries = 'build/libminisound_ffi.dylib'
+    s.vendored_libraries = '${PODS_BUILD_DIR}/libminisound_ffi.dylib'
     s.xcconfig = { 'OTHER_LDFLAGS' => '-force_load "${PODS_ROOT}/../packages/minisound_ffi/macos/build/libminisound_ffi.dylib"' }
 end
