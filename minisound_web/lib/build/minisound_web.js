@@ -206,7 +206,7 @@ var wasmModule;
 var ABORT = false;
 
 // set by exit() and abort().  Passed to 'onExit' handler.
-// NOTE: This is also used as the process return code code in shell environments
+// NOTE: This is also used as the process return code in shell environments
 // but only when noExitRuntime is false.
 var EXITSTATUS;
 
@@ -329,7 +329,7 @@ if (ENVIRONMENT_IS_NODE && (ENVIRONMENT_IS_WASM_WORKER)) {
 var wwParams;
 
 /**
- * Called once the intiial message has been recieved from the creating thread.
+ * Called once the initial message has been received from the creating thread.
  * The `props` object is property bag sent via postMessage to create the worker.
  *
  * This function is called both in normal wasm workers and in audio worklets.
@@ -342,7 +342,7 @@ var wwParams;
   run();
   // Drop now unneeded references to from the Module object in this Worker,
   // these are not needed anymore.
-  props.wasm = props.memMemory = 0;
+  props.wasm = props.wasmMemory = 0;
 }
 
 if (ENVIRONMENT_IS_WASM_WORKER && !ENVIRONMENT_IS_AUDIO_WORKLET) {
@@ -409,7 +409,7 @@ if (ENVIRONMENT_IS_AUDIO_WORKLET) {
         // Prepare the output views; see createOutputViews(). The 'STACK_ALIGN'
         // deduction stops the STACK_OVERFLOW_CHECK failing (since the stack will
         // be full if we allocate all the available space) leaving room for a
-        // single AudioSampleFrame as a minumum. There's an arbitrary maximum of
+        // single AudioSampleFrame as a minimum. There's an arbitrary maximum of
         // 64 frames, for the case where a multi-MB stack is passed.
         this.outputViews = new Array(Math.min(((wwParams.stackSize - 16) / this.bytesPerChannel) | 0, /*sensible limit*/ 64));
         this.createOutputViews();
@@ -735,7 +735,7 @@ function getBinarySync(file) {
   if (readBinary) {
     return readBinary(file);
   }
-  // Throwing a plain string here, even though it not normally adviables since
+  // Throwing a plain string here, even though it not normally advisable since
   // this gets turning into an `abort` in instantiateArrayBuffer.
   throw "both async and sync fetching of the wasm failed";
 }
@@ -829,7 +829,7 @@ async function createWasm() {
     });
   }
   if ((ENVIRONMENT_IS_WASM_WORKER)) {
-    // Instantiate from the module that was recieved via postMessage from
+    // Instantiate from the module that was received via postMessage from
     // the main thread. We can just use sync instantiation in the worker.
     var instance = new WebAssembly.Instance(wasmModule, getWasmImports());
     return receiveInstance(instance, wasmModule);
@@ -1711,7 +1711,7 @@ var Asyncify = {
           // `Asyncify.handleSleepReturnValue`.
           // `Asyncify.handleSleepReturnValue` contains the return
           // value of the last C function to have executed
-          // `Asyncify.handleSleep()`, where as `asyncWasmReturnValue`
+          // `Asyncify.handleSleep()`, whereas `asyncWasmReturnValue`
           // contains the return value of the exported WASM function
           // that may have called C functions that
           // call `Asyncify.handleSleep()`.
@@ -1941,7 +1941,7 @@ Module["ccall"] = ccall;
 // End JS library exports
 // end include: postlibrary.js
 var ASM_CONSTS = {
-  47928: ($0, $1, $2, $3, $4) => {
+  48216: ($0, $1, $2, $3, $4) => {
     if (typeof window === "undefined" || (window.AudioContext || window.webkitAudioContext) === undefined) {
       return 0;
     }
@@ -2013,7 +2013,7 @@ var ASM_CONSTS = {
     window.miniaudio.referenceCount += 1;
     return 1;
   },
-  50122: () => {
+  50410: () => {
     if (typeof (window.miniaudio) !== "undefined") {
       miniaudio.unlock_event_types.map(function(event_type) {
         document.removeEventListener(event_type, miniaudio.unlock, true);
@@ -2024,7 +2024,7 @@ var ASM_CONSTS = {
       }
     }
   },
-  50412: () => {
+  50700: () => {
     try {
       var temp = new (window.AudioContext || window.webkitAudioContext);
       var sampleRate = temp.sampleRate;
@@ -2034,13 +2034,13 @@ var ASM_CONSTS = {
       return 0;
     }
   },
-  50583: () => (navigator.mediaDevices !== undefined && navigator.mediaDevices.getUserMedia !== undefined),
-  50687: ($0, $1) => window.miniaudio.track_device({
+  50871: () => (navigator.mediaDevices !== undefined && navigator.mediaDevices.getUserMedia !== undefined),
+  50975: ($0, $1) => window.miniaudio.track_device({
     webaudio: emscriptenGetAudioObject($0),
     state: 1,
     pDevice: $1
   }),
-  50796: ($0, $1) => {
+  51084: ($0, $1) => {
     var getUserMediaResult = 0;
     var audioWorklet = emscriptenGetAudioObject($0);
     var audioContext = emscriptenGetAudioObject($1);
@@ -2058,14 +2058,14 @@ var ASM_CONSTS = {
     });
     return getUserMediaResult;
   },
-  51358: ($0, $1) => {
+  51646: ($0, $1) => {
     var audioWorklet = emscriptenGetAudioObject($0);
     var audioContext = emscriptenGetAudioObject($1);
     audioWorklet.connect(audioContext.destination);
     return 0;
   },
-  51518: $0 => emscriptenGetAudioObject($0).sampleRate,
-  51570: $0 => {
+  51806: $0 => emscriptenGetAudioObject($0).sampleRate,
+  51858: $0 => {
     var device = window.miniaudio.get_device_by_index($0);
     if (device.streamNode !== undefined) {
       device.streamNode.disconnect();
@@ -2073,15 +2073,15 @@ var ASM_CONSTS = {
     }
     device.pDevice = undefined;
   },
-  51761: $0 => {
+  52049: $0 => {
     window.miniaudio.untrack_device_by_index($0);
   },
-  51811: $0 => {
+  52099: $0 => {
     var device = window.miniaudio.get_device_by_index($0);
     device.webaudio.resume();
     device.state = window.miniaudio.device_status.started;
   },
-  51951: $0 => {
+  52239: $0 => {
     var device = window.miniaudio.get_device_by_index($0);
     device.webaudio.suspend();
     device.state = window.miniaudio.device_status.stopped;

@@ -78,4 +78,4 @@ jobs:
           find build/macos/Build/ -print
 
           build/macos/Build/Products/Debug/example.app &
-          sleep 5 && kill -TERM $!
+          sleep 10 && kill -TERM $!

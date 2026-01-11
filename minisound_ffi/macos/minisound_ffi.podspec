@@ -13,11 +13,10 @@ A new Flutter FFI plugin project.
     s.license     = { :file => '../LICENSE' }
     s.author      = { 'Your Company' => 'email@example.com' }
 
-    s.platform            = :osx, '10.11'
-    # s.platform            = :ios, '11.0'
+    s.platform                = { :osx => '10.11', :ios => '11.0' }
     s.osx.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
     s.ios.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
-    s.swift_version       = '5.0'
+    s.swift_version           = '5.0'
 
     # This will ensure the source files in Classes/ are included in the native
     # builds of apps using this FFI plugin. Podspec does not support relative
