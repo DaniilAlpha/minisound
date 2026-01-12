@@ -98,8 +98,10 @@ elseif(APPLE)
     set_target_properties(${MAIN_LIB} PROPERTIES
         PUBLIC_HEADER include/minisound.h
         OUTPUT_NAME ${MAIN_LIB}
+        FRAMEWORK TRUE
         MACOSX_RPATH TRUE
-        INSTALL_PATH "@loader_path/../Frameworks")
+        MACOSX_FRAMEWORK_IDENTIFIER "com.daniilalpha.${MAIN_LIB}"
+        #[[ INSTALL_PATH "@loader_path/../Frameworks" ]])
 else()
     set_target_properties(${MAIN_LIB} PROPERTIES
         PUBLIC_HEADER include/minisound.h
