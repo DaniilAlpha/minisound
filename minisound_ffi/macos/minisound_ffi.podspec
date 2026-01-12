@@ -13,25 +13,15 @@ A new Flutter FFI plugin project.
     s.license     = { :file => '../LICENSE' }
     s.author      = { 'Your Company' => 'email@example.com' }
 
-    s.osx.deployment_target   = '10.11'
-    s.ios.deployment_target   = '12.0'
+    s.platform = :osx, '10.11'
 
-    # This will ensure the source files in Classes/ are included in the native
-    # builds of apps using this FFI plugin. Podspec does not support relative
-    # paths, so Classes contains a forwarder C file that relatively imports `../src/*` so that the C sources can be shared among all target platforms.
-    s.source          = { :path => '.' }
-    s.osx.dependency 'FlutterMacOS'
-    s.ios.dependency 'Flutter'
+    s.source     = { :path => '.' }
+    s.dependency 'FlutterMacOS'
 
     s.vendored_frameworks = '${PODS_BUILD_DIR}/libminisound_ffi.framework'
-    s.osx.pod_target_xcconfig = { 
+    s.pod_target_xcconfig = { 
         'DEFINES_MODULE' => 'YES',
         'CMAKE_BUILD_TYPE' => 'Release'
-    }
-    s.ios.pod_target_xcconfig = { 
-        'DEFINES_MODULE' => 'YES',
-        'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
-        'CMAKE_BUILD_TYPE' => 'Release',
     }
     s.script_phase = {
         :name => 'CMake Build',
@@ -40,24 +30,14 @@ A new Flutter FFI plugin project.
         :script => <<-SCRIPT
             set -e
 
-            echo === Building `minisound_ffi` via CMake ===
-            echo - Platform: ${PLATFORM_NAME}
+            echo === Building `minisound_ffi` for macOS via CMake ===
             echo - Archs: $(echo ${ARCHS} | tr ' ' ';') 
             echo - SDK Root: ${SDKROOT}
 
             cd ${PODS_BUILD_DIR} 
-            if [ ${PLATFORM_NAME} = "macosx" ]; then
-                cmake ${PODS_TARGET_SRCROOT}/../src/                        \
-                    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}                  \
-                    -DCMAKE_OSX_ARCHITECTURES=$(echo ${ARCHS} | tr ' ' ';')
-            else
-                cmake ${PODS_TARGET_SRCROOT}/../src/                        \
-                    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}                  \
-                    -DCMAKE_OSX_ARCHITECTURES=$(echo ${ARCHS} | tr ' ' ';') \
-                    -DCMAKE_OSX_SYSROOT=${SDKROOT}                          \
-                    -DCMAKE_SYSTEM_NAME=iOS                                 \
-                    -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0
-            fi
+            cmake ${PODS_TARGET_SRCROOT}/../src/                        \
+                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}                  \
+                -DCMAKE_OSX_ARCHITECTURES=$(echo ${ARCHS} | tr ' ' ';')
             cmake --build .
         SCRIPT
     }
