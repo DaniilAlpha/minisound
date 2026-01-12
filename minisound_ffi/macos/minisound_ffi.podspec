@@ -18,8 +18,7 @@ A new Flutter FFI plugin project.
 
     # This will ensure the source files in Classes/ are included in the native
     # builds of apps using this FFI plugin. Podspec does not support relative
-    # paths, so Classes contains a forwarder C file that relatively imports
-    # `../src/*` so that the C sources can be shared among all target platforms.
+    # paths, so Classes contains a forwarder C file that relatively imports `../src/*` so that the C sources can be shared among all target platforms.
     s.source          = { :path => '.' }
     s.osx.dependency 'FlutterMacOS'
     s.ios.dependency 'Flutter'
@@ -44,6 +43,7 @@ A new Flutter FFI plugin project.
             echo === Building `minisound_ffi` via CMake ===
             echo - Platform: ${PLATFORM_NAME}
             echo - Archs: ${ARCHS}
+            echo - SDK Root: ${SDKROOT}
 
             cd ${PODS_BUILD_DIR} 
             if [ ${PLATFORM_NAME} = "macosx" ]; then
