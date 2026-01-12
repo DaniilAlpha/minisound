@@ -47,15 +47,15 @@ A new Flutter FFI plugin project.
 
             cd ${PODS_BUILD_DIR} 
             if [ ${PLATFORM_NAME} = "macosx" ]; then
-                cmake ${PODS_TARGET_SRCROOT}/../src/        \
-                    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}  \
-                    -DCMAKE_OSX_ARCHITECTURES=$CMAKE_ARCHS
+                cmake ${PODS_TARGET_SRCROOT}/../src/                        \
+                    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}                  \
+                    -DCMAKE_OSX_ARCHITECTURES=$(echo ${ARCHS} | tr ' ' ';')
             else
-                cmake ${PODS_TARGET_SRCROOT}/../src/        \
-                    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}  \
-                    -DCMAKE_OSX_ARCHITECTURES=$CMAKE_ARCHS      \
-                    -DCMAKE_OSX_SYSROOT=${SDKROOT}          \
-                    -DCMAKE_SYSTEM_NAME=iOS                 \
+                cmake ${PODS_TARGET_SRCROOT}/../src/                        \
+                    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}                  \
+                    -DCMAKE_OSX_ARCHITECTURES=$(echo ${ARCHS} | tr ' ' ';') \
+                    -DCMAKE_OSX_SYSROOT=${SDKROOT}                          \
+                    -DCMAKE_SYSTEM_NAME=iOS                                 \
                     -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0
             fi
             cmake --build .
