@@ -4,6 +4,7 @@ if (IOS)
 else()
     set(LANGS C)
 endif()
+message(WARNING "===== USED LANGUAGES: ${LANGS} =====")
 project(minisound_ffi VERSION 1.0.0 LANGUAGES ${LANGS})
 
 
