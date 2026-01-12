@@ -40,11 +40,9 @@ A new Flutter FFI plugin project.
         :script => <<-SCRIPT
             set -e
 
-            CMAKE_ARCHS=$(echo ${ARCHS} | tr ' ' ';')
-
             echo === Building `minisound_ffi` via CMake ===
             echo - Platform: ${PLATFORM_NAME}
-            echo - Archs: $(echo ${ARCHS} | tr ' ' ';') | ${CMAKE_ARCHS}
+            echo - Archs: $(echo ${ARCHS} | tr ' ' ';') 
             echo - SDK Root: ${SDKROOT}
 
             cd ${PODS_BUILD_DIR} 
