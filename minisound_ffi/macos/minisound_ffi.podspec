@@ -44,7 +44,7 @@ A new Flutter FFI plugin project.
 
             echo === Building `minisound_ffi` via CMake ===
             echo - Platform: ${PLATFORM_NAME}
-            echo - Archs: $CMAKE_ARCHS
+            echo - Archs: $(${ARCHS} | tr ' ' ';')
             echo - SDK Root: ${SDKROOT}
 
             cd ${PODS_BUILD_DIR} 
