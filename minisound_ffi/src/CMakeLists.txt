@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.18)
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
     set(LANGS OBJC)
 else()
@@ -32,6 +32,8 @@ endif()
 
 file(GLOB_RECURSE MAIN_SOURCES ${MAIN_PATH}/src/*.c)
 target_sources(${MAIN_LIB} PRIVATE ${MAIN_SOURCES})
+set_source_files_properties(${MAIN_SOURCES} PROPERTIES LANGUAGE OBJC)
+
 # // TODO!!! won't work on iOS/MacOS
 target_include_directories(${MAIN_LIB} PUBLIC include/)
 
