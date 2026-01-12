@@ -1,8 +1,8 @@
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
     set(IOS TRUE)
 endif()
-
 cmake_minimum_required(VERSION 3.18)
+
 if(IOS)
     set(LANG OBJC)
 else()

@@ -157,7 +157,7 @@ MiunteResult test_encoded_sounds() {
             MIUNTE_EXPECT(
                 sound_get_is_playing(sound) &&
                     fabs(sound_get_cursor(sound) - 18.0) <= 0.066,
-                "sound should be playing at 20s right here"
+                "sound should be playing at 18s right here"
             );
         }
 
