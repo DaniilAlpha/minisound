@@ -68,9 +68,10 @@ jobs:
 
       - name: Test iOS build
         if: matrix.os == 'macos-latest'
-        continue-on-error: true
         working-directory: minisound/example/
         run: |
+          set +e 
+
           flutter build ios --debug --simulator --no-codesign --verbose
 
           # find build/ios/Build/ -print
