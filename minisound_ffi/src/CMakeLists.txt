@@ -4,7 +4,7 @@ if (IOS)
 else()
     set(LANGS C)
 endif()
-message(WARNING "===== USED LANGUAGES: ${LANGS} (${CMAKE_SYSTEM_NAME}) =====")
+message(WARNING "===== USED LANGUAGES: ${LANGS} (${CMAKE_SYSTEM_NAME}, Apple:${APPLE} iOS:${IOS}) =====")
 project(minisound_ffi VERSION 1.0.0 LANGUAGES ${LANGS})
 
 
