@@ -71,7 +71,7 @@ jobs:
         working-directory: minisound/example/
         run: |
           set +e
-          flutter build ios --debug --simulator --no-codesign --verbose
+          flutter build ios --debug --simulator --no-codesign 
 
           find build/ios/Build/ -print
 
