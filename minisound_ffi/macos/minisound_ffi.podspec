@@ -42,8 +42,8 @@ A new Flutter FFI plugin project.
             set -e
 
             echo === Building `minisound_ffi` via CMake ===
-            echo - Platform: \'${PLATFORM_NAME}\'
-            echo - Archs: \'${ARCHS}\'
+            echo - Platform: ${PLATFORM_NAME}
+            echo - Archs: ${ARCHS}
 
             cd ${PODS_BUILD_DIR} 
             if [ ${PLATFORM_NAME} = "macosx" ]; then
