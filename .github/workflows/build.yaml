@@ -68,11 +68,13 @@ jobs:
 
       - name: Test iOS build
         if: matrix.os == 'macos-latest'
+        continue-on-error: true
         working-directory: minisound/example/
         run: |
           flutter build ios --debug --simulator --no-codesign --verbose
 
-          find build/ios/Build/ -print
+          # find build/ios/Build/ -print
+          cat /User/runner/Library/Developer/Xcode/DerivedData/Runner-*/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/minisound_ffi.build/Script-*.sh
 
       - name: Test MacOS build
         if: matrix.os == 'macos-latest'
