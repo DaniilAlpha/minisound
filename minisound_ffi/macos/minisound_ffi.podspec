@@ -40,7 +40,7 @@ A new Flutter FFI plugin project.
         :script => <<-SCRIPT
             set -e
 
-            ARCHS=$(${ARCHS} | tr ' ' ';')
+            CMAKE_ARCHS=$(${ARCHS} | tr ' ' ';')
 
             echo === Building `minisound_ffi` via CMake ===
             echo - Platform: ${PLATFORM_NAME}
@@ -51,11 +51,11 @@ A new Flutter FFI plugin project.
             if [ ${PLATFORM_NAME} = "macosx" ]; then
                 cmake ${PODS_TARGET_SRCROOT}/../src/        \
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}  \
-                    -DCMAKE_OSX_ARCHITECTURES=${ARCHS}
+                    -DCMAKE_OSX_ARCHITECTURES=${CMAKE_ARCHS}
             else
                 cmake ${PODS_TARGET_SRCROOT}/../src/        \
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}  \
-                    -DCMAKE_OSX_ARCHITECTURES=${ARCHS}      \
+                    -DCMAKE_OSX_ARCHITECTURES=${CMAKE_ARCHS}      \
                     -DCMAKE_OSX_SYSROOT=${SDKROOT}          \
                     -DCMAKE_SYSTEM_NAME=iOS                 \
                     -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0
