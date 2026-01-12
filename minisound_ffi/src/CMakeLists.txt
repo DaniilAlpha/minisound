@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 3.14)
-if (CMAKE_SYSTEM_NAME STREQUAL "iOS")
+if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
     set(LANGS OBJC)
 else()
     set(LANGS C)
 endif()
-message(WARNING "===== USED LANGUAGES: ${LANGS} (${CMAKE_SYSTEM_NAME}, Apple:${APPLE} iOS:${IOS}) =====")
 project(minisound_ffi VERSION 1.0.0 LANGUAGES ${LANGS})
 
 
