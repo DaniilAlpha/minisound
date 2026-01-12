@@ -26,7 +26,7 @@ jobs:
       - name: Set up CMake
         uses: lukka/get-cmake@latest
         with:
-          cmakeVersion: "^3.11.0"
+          cmakeVersion: "^3.31.0"
 
       - name: Set up Linux dependencies 
         uses: awalsh128/cache-apt-pkgs-action@latest
