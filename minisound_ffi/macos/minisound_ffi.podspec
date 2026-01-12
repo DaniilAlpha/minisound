@@ -40,7 +40,7 @@ A new Flutter FFI plugin project.
         :script => <<-SCRIPT
             set -e
 
-            ARCHS = $(${ARCHS} | tr ' ' ';')
+            ARCHS=$(${ARCHS} | tr ' ' ';')
 
             echo === Building `minisound_ffi` via CMake ===
             echo - Platform: ${PLATFORM_NAME}
