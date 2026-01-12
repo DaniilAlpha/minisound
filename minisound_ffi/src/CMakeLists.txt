@@ -1,10 +1,14 @@
-cmake_minimum_required(VERSION 3.18)
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
-    set(LANGS OBJC)
-else()
-    set(LANGS C)
+    set(IOS TRUE)
 endif()
-project(minisound_ffi VERSION 1.0.0 LANGUAGES ${LANGS})
+
+cmake_minimum_required(VERSION 3.18)
+if(IOS)
+    set(LANG OBJC)
+else()
+    set(LANG C)
+endif()
+project(minisound_ffi VERSION 1.0.0 LANGUAGES ${LANG})
 
 
 ### paths ###
@@ -32,7 +36,7 @@ endif()
 
 file(GLOB_RECURSE MAIN_SOURCES ${MAIN_PATH}/src/*.c)
 target_sources(${MAIN_LIB} PRIVATE ${MAIN_SOURCES})
-set_source_files_properties(${MAIN_SOURCES} PROPERTIES LANGUAGE OBJC)
+set_source_files_properties(${MAIN_SOURCES} PROPERTIES LANGUAGE ${LANG})
 
 # // TODO!!! won't work on iOS/MacOS
 target_include_directories(${MAIN_LIB} PUBLIC include/)
