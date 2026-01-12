@@ -45,5 +45,5 @@ A new Flutter FFI plugin project.
             cmake --build .
         SCRIPT
     }
-    s.xcconfig = { 'OTHER_LDFLAGS' => '$(inherited) -framework libminisound_ffi' }
+    # s.xcconfig = { 'OTHER_LDFLAGS' => '$(inherited) -framework libminisound_ffi' }
 end
