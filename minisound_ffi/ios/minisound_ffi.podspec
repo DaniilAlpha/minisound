@@ -31,7 +31,7 @@ A new Flutter FFI plugin project.
         :script => <<-SCRIPT
             set -e
 
-            echo === Building `minisound_ffi` for iOS via CMake ===
+            echo === Building minisound_ffi for iOS via CMake ===
             echo - Archs: $(echo ${ARCHS} | tr ' ' ';') 
             echo - SDK Root: ${SDKROOT}
 
