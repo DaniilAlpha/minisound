@@ -17,6 +17,7 @@ A new Flutter FFI plugin project.
 
     s.source     = { :path => '.' }
     s.dependency 'Flutter'
+    s.framework = 'AVFoundation'
 
     s.vendored_frameworks = '${PODS_BUILD_DIR}/libminisound_ffi.framework'
     s.pod_target_xcconfig = { 
