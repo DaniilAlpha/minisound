@@ -24,7 +24,7 @@ struct EncodedSoundData {
     SilenceDataSource loop_delay_ds;
 };
 
-static ma_data_source *encoded_sound_data_get_ds(EncodedSoundData *const self) {
+static void *encoded_sound_data_get_ds(EncodedSoundData *const self) {
     return &self->decoder;
 }
 

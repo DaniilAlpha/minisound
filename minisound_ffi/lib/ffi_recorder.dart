@@ -40,43 +40,52 @@ class FfiRecorder implements PlatformRecorder {
   }
 
   @override
-  FfiRec record({
-    required RecEncoding encoding,
-    required RecFormat format,
+  Future<FfiRec> saveRec({
+    required AudioEncoding encoding,
+    required SampleFormat sampleFormat,
     required int channelCount,
     required int sampleRate,
-    required int dataAvailabilityThresholdMs,
-    required void Function(Uint8List data) onDataFn,
-    required void Function(int offset, int origin) seekDataFn,
-  }) {
-    final outRec = malloc.allocate<Pointer<c.Rec>>(sizeOf<Pointer<c.Rec>>());
-    if (outRec == nullptr) throw MinisoundPlatformOutOfMemoryException();
-    final r = _binds.recorder_record(
+  }) async {
+    final rec = _binds.rec_alloc();
+    if (rec == nullptr) throw MinisoundPlatformOutOfMemoryException();
+
+    final dataPtr = malloc.allocate<Pointer<Uint8>>(sizeOf<Pointer<Uint8>>());
+    if (dataPtr == nullptr) {
+      malloc.free(rec);
+      throw MinisoundPlatformOutOfMemoryException();
+    }
+    final dataSizePtr = malloc.allocate<Size>(sizeOf<Size>());
+    if (dataSizePtr == nullptr) {
+      malloc.free(dataPtr);
+      malloc.free(rec);
+      throw MinisoundPlatformOutOfMemoryException();
+    }
+
+    final r = _binds.recorder_save_rec(
       _self,
+      rec,
       encoding.toC(),
-      format.toC(),
+      sampleFormat.toC(),
       channelCount,
       sampleRate,
-      dataAvailabilityThresholdMs,
-      NativeCallable<Void Function(Pointer<c.Rec> rec)>.listener(
-        (Pointer<c.Rec> rec) => onDataFn(FfiRec._(rec).read()),
-      ).nativeFunction,
-      NativeCallable<
-          Void Function(Pointer<c.Rec> rec, Long offset, Int origin)>.listener(
-        (Pointer<c.Rec> rec, int off, int origin) => seekDataFn(off, origin),
-      ).nativeFunction,
-      outRec,
-    );
-    final rec = outRec.value;
-    malloc.free(outRec);
+      dataPtr,
+      dataSizePtr,
 
+      // NativeCallable<Void Function(Size, Pointer<Uint8>, Size)>.listener(
+      //   (int pos, Pointer<Uint8> data, int dataSize) {
+      //     onDataFn(pos, data.asTypedList(dataSize));
+      //     malloc.free(data);
+      //   },
+      // ).nativeFunction,
+    );
     if (r != c.Result.Ok) {
+      malloc.free(rec);
       throw MinisoundPlatformException(
-        "Failed to recor (code: $r).",
+        "Failed to save a recording (code: $r).",
       );
     }
 
-    return FfiRec._(rec);
+    return FfiRec._(rec, dataPtr, dataSizePtr);
   }
 
   @override
@@ -102,33 +111,4 @@ class FfiRecorder implements PlatformRecorder {
       );
     }
   }
-
-  @override
-  void stopRec(PlatformRec rec) {
-    rec as FfiRec;
-
-    final r = _binds.recorder_stop_rec(_self, rec._self);
-    if (r != c.Result.Ok) {
-      throw MinisoundPlatformException(
-        "Failed to stop the recording (code: $r).",
-      );
-    }
-  }
-}
-
-extension on RecEncoding {
-  c.RecEncoding toC() => switch (this) {
-        // RecEncoding.raw => c.RecEncoding.REC_ENCODING_RAW,
-        RecEncoding.wav => c.RecEncoding.REC_ENCODING_WAV,
-      };
-}
-
-extension on RecFormat {
-  c.RecFormat toC() => switch (this) {
-        RecFormat.u8 => c.RecFormat.REC_FORMAT_U8,
-        RecFormat.s16 => c.RecFormat.REC_FORMAT_S16,
-        RecFormat.s24 => c.RecFormat.REC_FORMAT_S24,
-        RecFormat.s32 => c.RecFormat.REC_FORMAT_S32,
-        RecFormat.f32 => c.RecFormat.REC_FORMAT_F32,
-      };
 }

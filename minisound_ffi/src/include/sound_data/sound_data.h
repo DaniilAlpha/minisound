@@ -26,10 +26,10 @@ static inline SoundDataType sound_data_get_type(SoundData const *const self) {
 }
 
 /// Assuming returning `ma_ds` (without exposing to public api).
-static inline void *sound_data_get_ds(SoundData *const self) {
+static inline void *sound_data_get_ds(SoundData const *const self) {
     return WRAPPER_CALL(get_ds, self);
 }
-static inline void sound_data_uninit(SoundData *const self) {
+static inline void sound_data_uninit(SoundData const *const self) {
     return WRAPPER_CALL(uninit, self);
 }
 

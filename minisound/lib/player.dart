@@ -6,9 +6,11 @@ import "package:minisound_platform_interface/minisound_platform_interface.dart";
 
 export "package:minisound_platform_interface/minisound_platform_interface.dart"
     show
+        AudioEncoding,
         MinisoundPlatformException,
         MinisoundPlatformOutOfMemoryException,
         NoiseType,
+        SampleFormat,
         WaveformType;
 
 part "sound.dart";
@@ -17,8 +19,8 @@ part "sound.dart";
 ///
 /// Should be initialized before doing anything.
 /// Should be started to hear any sound.
-final class Engine {
-  Engine() {
+final class Player {
+  Player() {
     _finalizer.attach(this, _engine);
   }
 

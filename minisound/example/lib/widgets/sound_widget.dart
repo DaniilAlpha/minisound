@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:minisound/engine_flutter.dart';
+import 'package:minisound/player_flutter.dart';
 
 class SoundWidget extends StatefulWidget {
-  const SoundWidget({required this.engine, required this.sound, super.key});
+  const SoundWidget({required this.player, required this.sound, super.key});
 
-  final Engine engine;
+  final Player player;
   final Sound sound;
 
   @override
@@ -93,7 +93,7 @@ class _SoundWidgetState extends State<SoundWidget> {
             IconButton.filledTonal(
               icon: const Icon(Icons.restart_alt),
               onPressed: () async {
-                await widget.engine.start();
+                await widget.player.start();
 
                 sound.play();
                 _startUpdateTimer();
@@ -109,7 +109,7 @@ class _SoundWidgetState extends State<SoundWidget> {
             IconButton.filledTonal(
               icon: const Icon(Icons.play_arrow),
               onPressed: () async {
-                await widget.engine.start();
+                await widget.player.start();
 
                 sound.resume();
                 _startUpdateTimer();

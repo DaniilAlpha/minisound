@@ -5,7 +5,7 @@ import "package:example/widgets/playback_example.dart";
 import "package:example/widgets/recording_example.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
-import "package:minisound/engine.dart";
+import "package:minisound/player.dart";
 import "package:minisound/recorder.dart";
 import "package:permission_handler/permission_handler.dart";
 
@@ -26,10 +26,10 @@ class ExamplePage extends StatefulWidget {
 }
 
 class _ExamplePageState extends State<ExamplePage> {
-  final engine = Engine();
+  final player = Player();
   final recorder = Recorder();
 
-  late final initFuture = engine.init().then((_) {
+  late final initFuture = player.init().then((_) {
     if (kIsWeb || !Platform.isLinux) return Permission.microphone.request();
     return Future.value();
   }).then((_) => recorder.init());
@@ -49,11 +49,11 @@ class _ExamplePageState extends State<ExamplePage> {
                 hasError: false
               ) =>
                 Column(children: [
-                  PlaybackExample(engine),
+                  PlaybackExample(player),
                   space,
-                  GenerationExample(engine),
+                  GenerationExample(player),
                   space,
-                  RecordingExample(recorder, engine: engine),
+                  RecordingExample(recorder, player: player),
                 ]),
               AsyncSnapshot(connectionState: ConnectionState.waiting) =>
                 const Center(child: CircularProgressIndicator()),

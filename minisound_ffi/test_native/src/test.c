@@ -300,56 +300,18 @@ MiunteResult test_generated_pulse_sounds() {
     MIUNTE_PASS();
 }
 
-FILE *files[3] = {0};
-#define DECL_REC_FNS(I_)                                                       \
-    static void on_data_available_rec##I_(Rec *const self) {                   \
-        FILE *const file = files[I_];                                          \
-                                                                               \
-        uint8_t const *data = NULL;                                            \
-        size_t data_size = 0;                                                  \
-        Result const r = rec_read(self, &data, &data_size);                    \
-        assert(r == Ok && data && data_size);                                  \
-                                                                               \
-        fwrite(data, 1, data_size, file);                                      \
-                                                                               \
-        free((void *)data);                                                    \
-    }                                                                          \
-    static void seek_data_rec##I_(                                             \
-        Rec *const self,                                                       \
-        long const off,                                                        \
-        int const origin                                                       \
-    ) {                                                                        \
-        FILE *const file = files[I_];                                          \
-                                                                               \
-        fseek(file, off, origin);                                              \
-    }                                                                          \
-    void ___i_really_want_you_to_put_semicolon_here_please()
-DECL_REC_FNS(0);
-DECL_REC_FNS(1);
-DECL_REC_FNS(2);
-// other formats are not supported at the moment
-MiunteResult test_recording_wav() {
+MiunteResult test_encoded_recs() {
     static struct {
-        RecFormat format;
+        AudioEncoding encoding;
+        SampleFormat sample_format;
         uint32_t channel_count, sample_rate;
-    } const rec_params[lenof(files)] = {
-        {REC_FORMAT_S16, 2, 44100},
-        {REC_FORMAT_U8, 1, 8000},
-        {REC_FORMAT_F32, 2, 96000}
-    };
-    static typeof(&on_data_available_rec0)
-        on_data_available_recs[lenof(files)] = {
-            on_data_available_rec0,
-            on_data_available_rec1,
-            on_data_available_rec2,
-        };
-    static typeof(&seek_data_rec0) seek_data_recs[lenof(files)] = {
-        seek_data_rec0,
-        seek_data_rec1,
-        seek_data_rec2,
+    } const rec_params[] = {
+        {AUDIO_ENCODING_WAV, SAMPLE_FORMAT_S16, 2, 44100},
+        {AUDIO_ENCODING_MP3, SAMPLE_FORMAT_U8, 1, 8000},
+        {AUDIO_ENCODING_FLAC, SAMPLE_FORMAT_F32, 2, 96000}
     };
 
-    Recorder *const recorder = recorder_alloc(lenof(files));
+    Recorder *const recorder = recorder_alloc(lenof(rec_params) * 3);
     MIUNTE_EXPECT(recorder, "recorder should be allocated properly");
 
     MIUNTE_EXPECT(
@@ -361,51 +323,56 @@ MiunteResult test_recording_wav() {
         "recorder starting should not fail"
     );
 
-    for (FILE **file_ptr = files; file_ptr < files + lenof(files); file_ptr++) {
-        char filename[] = "./minisound_ffi/test_native/rec#.wav";
-        strchr(filename, '#')[0] = '0' + file_ptr - files;
-        *file_ptr = fopen(filename, "wb");
-        MIUNTE_EXPECT(*file_ptr, "fopen should not fail");
-    }
-
-    Rec *recs[lenof(files)] = {0};
-    for (size_t i = 0; i < lenof(files); i++) {
+    struct {
+        Rec *rec;
+        uint8_t *data;
+        size_t data_size;
+    } recs[lenof(rec_params)] = {0};
+    for (size_t i = 0; i < lenof(recs); i++) {
+        recs[i].rec = rec_alloc();
         MIUNTE_EXPECT(
-            recorder_record(
+            recorder_save_rec(
                 recorder,
-                REC_ENCODING_WAV,
-                rec_params[i].format,
+                recs[i].rec,
+                AUDIO_ENCODING_WAV,
+                rec_params[i].sample_format,
                 rec_params[i].channel_count,
                 rec_params[i].sample_rate,
 
-                0,
-                on_data_available_recs[i],
-                seek_data_recs[i],
-                &recs[i]
+                &recs[i].data,
+                &recs[i].data_size
             ) == Ok,
             "recorder starting should not fail"
         );
     }
-
-    sleep(5000);
-
-    for (size_t i = 0; i < lenof(files); i++)
-        recorder_pause_rec(recorder, recs[i]);
-
+    sleep(2000);
+    for (size_t i = 0; i < lenof(recs); i++)
+        recorder_pause_rec(recorder, recs[i].rec);
     sleep(1000);
+    for (size_t i = 0; i < lenof(recs); i++)
+        recorder_resume_rec(recorder, recs[i].rec);
+    sleep(2000);
+    for (size_t i = 0; i < lenof(recs); i++) {
+        rec_uninit(recs[i].rec), free(recs[i].rec);
 
-    for (size_t i = 0; i < lenof(files); i++)
-        recorder_resume_rec(recorder, recs[i]);
+        char filename[] = "./minisound_ffi/test_native/rec#.EXTENSION";
+        strchr(filename, '#')[0] = '0' + i;
+        char const *ext = NULL;
+        switch (rec_params[i].encoding) {
+        case AUDIO_ENCODING_RAW: assert(false);
+        case AUDIO_ENCODING_WAV: ext = "wav"; break;
+        case AUDIO_ENCODING_MP3: ext = "mp3"; break;
+        case AUDIO_ENCODING_FLAC: ext = "flac"; break;
+        }
+        strcpy(strchr(filename, 'E'), ext);
 
-    sleep(4000);
+        FILE *const file = fopen(filename, "wb");
+        MIUNTE_EXPECT(file, "file opening/creation should not fail");
+        fwrite(recs[i].data, 1, recs[i].data_size, file);
+        fclose(file);
 
-    for (size_t i = 0; i < lenof(files); i++) {
-        recorder_stop_rec(recorder, recs[i]);
-        rec_uninit(recs[i]), free(recs[i]);
+        free(recs[i].data);
     }
-
-    for (FILE **file_ptr = files; file_ptr < files + lenof(files); file_ptr++)
-        fclose(*file_ptr);
 
     recorder_uninit(recorder), free(recorder);
 
@@ -422,7 +389,7 @@ int main() {
             test_generated_waveform_sounds,
             test_generated_noise_sounds,
             test_generated_pulse_sounds,
-            test_recording_wav,
+            test_encoded_recs,
         }
     );
 

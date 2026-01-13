@@ -1,11 +1,12 @@
+import "package:example/widgets/sound_widget.dart";
 import "package:flutter/material.dart";
-import "package:minisound/engine.dart";
+import "package:minisound/player.dart";
 import "package:minisound/recorder.dart";
 
 class RecordingExample extends StatefulWidget {
-  const RecordingExample(this.recorder, {required this.engine, super.key});
+  const RecordingExample(this.recorder, {required this.player, super.key});
 
-  final Engine engine;
+  final Player player;
   final Recorder recorder;
 
   @override
@@ -15,57 +16,79 @@ class RecordingExample extends StatefulWidget {
 class _RecordingExampleState extends State<RecordingExample> {
   final sounds = <(DateTime, LoadedSound)>[];
 
-  final activeRecordings = <RamRec>[];
+  final recQueue = <BufRec>[];
+
+  var sampleFormat = SampleFormat.s16;
 
   @override
-  Widget build(BuildContext context) {
-    const space = SizedBox.square(dimension: 20);
-    return Column(children: [
-      Text("Recording", style: Theme.of(context).textTheme.headlineMedium),
-      IconButton.filledTonal(
-        icon: const Icon(Icons.mic),
-        onPressed: () async {
-          await widget.recorder.start();
+  Widget build(BuildContext context) => Column(children: [
+        Text("Recording", style: Theme.of(context).textTheme.headlineMedium),
+        Card(
+          margin: EdgeInsets.all(8),
+          child: Padding(
+            padding: EdgeInsets.all(8),
+            child: Column(children: [
+              Row(mainAxisSize: MainAxisSize.min, children: [
+                const Text("Sample Format: "),
+                DropdownButton(
+                  value: sampleFormat,
+                  items: SampleFormat.values
+                      .map((t) =>
+                          DropdownMenuItem(value: t, child: Text(t.name)))
+                      .toList(),
+                  onChanged: (value) => setState(() {
+                    value!;
 
-          activeRecordings.add(widget.recorder.recordRam());
-          setState(() {});
-        },
-      ),
-      ElevatedButton(
-        child: const Text("STOP RECORDING"),
-        onPressed: () async {
-          if (activeRecordings.isEmpty) return;
+                    sampleFormat = value;
+                  }),
+                ),
+              ]),
+              OverflowBar(children: [
+                IconButton.filledTonal(
+                  icon: const Icon(Icons.mic),
+                  onPressed: () async {
+                    await widget.recorder.start();
 
-          final rec = activeRecordings.removeLast();
-          rec.stop();
+                    recQueue.add(await widget.recorder.saveRecBuf(
+                      sampleFormat: sampleFormat,
+                    ));
+                    setState(() {});
+                  },
+                ),
+                IconButton.filledTonal(
+                  icon: const Icon(Icons.stop),
+                  onPressed: () async {
+                    if (recQueue.isEmpty) return;
 
-          sounds.add(
-            (DateTime.now(), await widget.engine.loadSound(rec.data!)),
-          );
-          setState(() {});
-        },
-      ),
-      Column(
-          children: sounds.reversed
-              .map((t) => OverflowBar(
-                      overflowAlignment: OverflowBarAlignment.center,
-                      children: [
-                        Text(t.$1.toString()),
-                        space,
-                        Text("${t.$2.duration}s"),
-                        space,
-                        ElevatedButton(
-                          child: const Text("PLAY"),
-                          onPressed: () =>
-                              widget.engine.start().then((_) => t.$2.play()),
-                        ),
-                        ElevatedButton(
-                          child: const Text("STOP"),
-                          onPressed: () =>
-                              widget.engine.start().then((_) => t.$2.stop()),
-                        ),
-                      ]))
-              .toList()),
-    ]);
-  }
+                    final rec = recQueue.removeAt(0);
+
+                    sounds.add(
+                      (
+                        DateTime.now(),
+                        await widget.player.loadSound(await rec.end())
+                      ),
+                    );
+                    setState(() {});
+                  },
+                ),
+              ]),
+              const SizedBox.square(dimension: 10),
+              Text("Currently Recording: ${recQueue.length}"),
+            ]),
+          ),
+        ),
+        Column(
+            children: sounds.reversed
+                .map((t) => Row(mainAxisSize: MainAxisSize.min, children: [
+                      Text(t.$1
+                          .toString()
+                          .substring(0, 19)
+                          .replaceFirst(" ", "\n")),
+                      SoundWidget(
+                        player: widget.player,
+                        sound: t.$2,
+                      ),
+                    ]))
+                .toList()),
+      ]);
 }

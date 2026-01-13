@@ -54,16 +54,12 @@ Result sound_init(
 
     ma_result r;
 
-    self->sound_data = sound_data;
-    self->engine = engine;
-
     ma_sound_notifications notifications = ma_sound_notifications_init();
     notifications.onAtEnd = on_sound_ended;
     notifications.pUserData = self;
-
     if ((r = ma_sound_init_from_data_source(
-             self->engine,
-             sound_data_get_ds(&self->sound_data),
+             engine,
+             sound_data_get_ds(&sound_data),
              MA_SOUND_FLAG_NO_SPATIALIZATION,
              NULL,
              &notifications,
@@ -71,8 +67,10 @@ Result sound_init(
          )) != MA_SUCCESS)
         return error("miniaudio sound initialization error (code: %i)!", r),
                UnknownErr;
-
     // ma_sound_set_end_callback(&self->sound, on_sound_ended, self);
+
+    self->sound_data = sound_data;
+    self->engine = engine;
 
     self->state = SOUND_STATE_STOPPED;
     return info("sound initialized."), Ok;
@@ -82,8 +80,7 @@ void sound_unload(Sound *const self) {
 
     ma_sound_uninit(&self->sound);
 
-    sound_data_uninit(&self->sound_data);
-    free(self->sound_data._self);
+    sound_data_uninit(&self->sound_data), free(self->sound_data._self);
 
     self->state = SOUND_STATE_UNINITIALIZED;
 }

@@ -119,7 +119,8 @@ endif()
 
 # // TODO try somehow enabling pipewire (if it's present in MA at all)
 
-# // TODO? if this works out, make an issue in miniaudio to make defs PUBLIC
+# // TODO? maybe make an issue in miniaudio to make defs PUBLIC
+option(MINIAUDIO_USE_STDINT "" ON)
 option(MINIAUDIO_NO_EXTRA_NODES "" ON)
 option(MINIAUDIO_NO_RESOURCE_MANAGER "" ON)
 option(MINIAUDIO_ENABLE_ONLY_SPECIFIC_BACKENDS "" ON)

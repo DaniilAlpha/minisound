@@ -1,4 +1,4 @@
-part of "engine.dart";
+part of "player.dart";
 
 abstract class Sound {
   Sound();
@@ -59,6 +59,7 @@ class LoadedSound extends Sound {
       _sound.looping = (_sound.looping.$1, max(0, val.inMilliseconds));
 }
 
+/// A sound generated with some kind of pre-defined wave shape.
 abstract class GeneratedSound extends Sound {}
 
 class WaveformSound extends GeneratedSound {
@@ -84,6 +85,7 @@ class NoiseSound extends GeneratedSound {
   NoiseType get type => _sound.type;
 }
 
+/// A sound generated with some kind of pre-defined wave shape, with a duty cycle.
 class PulseSound extends GeneratedSound {
   PulseSound._(PlatformPulseSound sound) : _sound = sound;
 

@@ -1,17 +1,15 @@
 import "dart:async";
 import "dart:io";
-import "dart:isolate";
-import "dart:math" as math;
 import "dart:typed_data";
 
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
 
 export "package:minisound_platform_interface/minisound_platform_interface.dart"
     show
+        AudioEncoding,
         MinisoundPlatformException,
         MinisoundPlatformOutOfMemoryException,
-        RecEncoding,
-        RecFormat;
+        SampleFormat;
 
 part "rec.dart";
 
@@ -48,25 +46,22 @@ final class Recorder {
   /// Parameters directly influence the resulting file size.
   ///
   /// `encoding` - currently only WAV is supported, so there's no need in this parameter.
-  /// `format` - the amount of different amplitude levels of the data. S16 is a standard value.
+  /// `sampleFormat` - the amount of different amplitude levels of the data. S16 is a standard value.
   /// `channelCount` - must be in range `1..254` inclusive. Using `1` (in case mono audio is ok) will reduce data size in half.
   /// `sampleRate` - controls sound frequencies that can be properly captured in a recording. Must be in range `1000..384000` inclusive. `44100` is a standard value.
-  /// `dataAvailabilityThresholdMs` - the period before new data is written to a file. Clamped between the recorder period and `1000`.
-  FileRec recordFile(
+  Future<FileRec> saveRecFile(
     String filePath, {
-    RecEncoding encoding = RecEncoding.wav,
-    RecFormat format = RecFormat.s16,
+    AudioEncoding encoding = AudioEncoding.wav,
+    SampleFormat sampleFormat = SampleFormat.s16,
     int channelCount = 2,
     int sampleRate = 44100,
-    int dataAvailabilityThresholdMs = 0,
   }) =>
-      _record(
+      _saveRec(
         (recorder) => FileRec._(File(filePath), recorder),
         encoding: encoding,
-        format: format,
+        sampleFormat: sampleFormat,
         channelCount: channelCount,
         sampleRate: sampleRate,
-        dataAvailabilityThresholdMs: dataAvailabilityThresholdMs,
       );
 
   /// Starts recording into in-RAM buffer. After the recording is stopped, it can be directly fed into `Engine::loadSound`.
@@ -74,46 +69,39 @@ final class Recorder {
   /// Parameters directly influence the resulting buffer size.
   ///
   /// `encoding` - currently only WAV is supported, so there's no need in this parameter.
-  /// `format` - the amount of different amplitude levels of the data. S16 is a standard value.
+  /// `sampleFormat` - the amount of different amplitude levels of the data. S16 is a standard value.
   /// `channelCount` - must be in range `1..254` inclusive. Using `1` (in case mono audio is ok) will reduce data size in half.
   /// `sampleRate` - controls sound frequencies that can be properly captured in a recording. Must be in range `1000..384000` inclusive. `44100` is a standard value.
-  /// `dataAvailabilityThresholdMs` - the period before new data is written to a file. Clamped between the recorder period and `1000`.
-  RamRec recordRam({
-    RecEncoding encoding = RecEncoding.wav,
-    RecFormat format = RecFormat.s16,
+  Future<BufRec> saveRecBuf({
+    AudioEncoding encoding = AudioEncoding.wav,
+    SampleFormat sampleFormat = SampleFormat.s16,
     int channelCount = 2,
     int sampleRate = 44100,
-    int dataAvailabilityThresholdMs = 0,
   }) =>
-      _record(
-        RamRec._,
+      _saveRec(
+        BufRec._,
         encoding: encoding,
-        format: format,
+        sampleFormat: sampleFormat,
         channelCount: channelCount,
         sampleRate: sampleRate,
-        dataAvailabilityThresholdMs: dataAvailabilityThresholdMs,
       );
 
-  T _record<T extends Rec>(
+  Future<T> _saveRec<T extends Rec>(
     T Function(Recorder recorder) createRec, {
-    RecEncoding encoding = RecEncoding.wav,
-    RecFormat format = RecFormat.s16,
-    int channelCount = 2,
-    int sampleRate = 44100,
-    int dataAvailabilityThresholdMs = 0,
-  }) {
+    required AudioEncoding encoding,
+    required SampleFormat sampleFormat,
+    required int channelCount,
+    required int sampleRate,
+  }) async {
     assert(1 <= channelCount && channelCount <= 254);
     assert(1000 <= sampleRate && sampleRate <= 384000);
 
     final rec = createRec(this);
-    final platformRec = _recorder.record(
+    final platformRec = await _recorder.saveRec(
       encoding: encoding,
-      format: format,
+      sampleFormat: sampleFormat,
       channelCount: channelCount,
       sampleRate: sampleRate,
-      dataAvailabilityThresholdMs: dataAvailabilityThresholdMs.clamp(0, 1000),
-      onDataFn: rec._onData,
-      seekDataFn: rec._seekData,
     );
     rec._rec = platformRec;
     _recsFinalizer.attach(rec, platformRec);

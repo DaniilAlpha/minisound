@@ -10,7 +10,6 @@
 #include "sound_data/waveform_sound_data.h"
 
 typedef struct Sound Sound;
-
 typedef struct ma_engine ma_engine;
 
 EXPORT Sound *sound_alloc(void);

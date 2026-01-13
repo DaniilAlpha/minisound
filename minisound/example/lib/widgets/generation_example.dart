@@ -1,16 +1,14 @@
 import "dart:math";
 
-import "package:example/widgets/sound_widget.dart";
 import "package:flutter/material.dart";
-import "package:minisound/engine.dart";
-import "package:minisound/engine_flutter.dart";
+import "package:minisound/player_flutter.dart";
 
 enum GeneratorType { wave, noise, pulse }
 
 class GenerationExample extends StatefulWidget {
-  const GenerationExample(this.engine, {super.key});
+  const GenerationExample(this.player, {super.key});
 
-  final Engine engine;
+  final Player player;
 
   @override
   State<GenerationExample> createState() => _GenerationExampleState();
@@ -142,15 +140,15 @@ class _GenerationExampleState extends State<GenerationExample> {
                 IconButton.filledTonal(
                   icon: const Icon(Icons.play_arrow),
                   onPressed: () async {
-                    await widget.engine.start();
+                    await widget.player.start();
 
                     sound?.stop();
                     sound = switch (generatorType) {
-                      GeneratorType.wave => widget.engine.genWaveform(
+                      GeneratorType.wave => widget.player.genWaveform(
                           waveformType,
                           freq: pow(2, freq).toDouble(),
                         ),
-                      GeneratorType.noise => widget.engine.genNoise(noiseType),
+                      GeneratorType.noise => widget.player.genNoise(noiseType),
                       GeneratorType.pulse => null,
                     }
                       ?..volume = 0.3;

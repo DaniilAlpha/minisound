@@ -10,6 +10,7 @@ part "ffi_engine.dart";
 part "ffi_sound.dart";
 part "ffi_recorder.dart";
 part "ffi_rec.dart";
+part "ffi_audio_common.dart";
 
 // dynamic lib
 

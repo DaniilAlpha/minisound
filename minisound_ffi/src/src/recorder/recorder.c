@@ -8,11 +8,10 @@
 
 #include "../../include/recorder/rec.h"
 #include "conviniences.h"
+#include "recorder/rec_sink/encoded_rec_sink.h"
 
 #define MILO_LVL RECORDER_MILO_LVL
 #include "../../external/milo/milo.h"
-
-#define RECORDING_BUF_COUNT (3)
 
 /*************
  ** private **
@@ -33,7 +32,7 @@ struct Recorder {
     Rec *recs[];
 };
 
-static void on_data(
+static void device_on_data(
     ma_device *const device,
     void *const _,
     void const *const data,
@@ -44,8 +43,12 @@ static void on_data(
     Recorder *const self = device->pUserData;
 
     for (Rec **rec_ptr = self->recs; rec_ptr < self->recs + self->recs_len;
-         rec_ptr++)
-        if (*rec_ptr) rec_write_raw(*rec_ptr, data, data_len_frames);
+         rec_ptr++) {
+        if (!*rec_ptr) continue;
+
+        if (rec_write_raw(*rec_ptr, data, data_len_frames) == StateErr)
+            *rec_ptr = NULL;
+    }
 }
 
 /************
@@ -66,7 +69,7 @@ Result recorder_init(Recorder *const self, uint32_t const period_ms) {
     ma_device_config device_config =
         ma_device_config_init(ma_device_type_capture);
     device_config.periodSizeInMilliseconds = period_ms;
-    device_config.dataCallback = on_data;
+    device_config.dataCallback = device_on_data;
     device_config.pUserData = self;
 
     if ((r = ma_device_init(NULL, &device_config, &self->device)) != MA_SUCCESS)
@@ -118,22 +121,18 @@ Result recorder_start(Recorder *const self) {
     return info("recorder started."), Ok;
 }
 
-Result recorder_record(
+Result recorder_save_rec(
     Recorder *const self,
-    RecEncoding const encoding,
-    RecFormat const format,
+    Rec *const rec,
+    AudioEncoding const encoding,
+    SampleFormat const sample_format,
     uint32_t const channel_count,
     uint32_t const sample_rate,
 
-    size_t const data_availability_threshold_ms,
-    RecOnDataFn *const on_data_available,
-    RecSeekDataFn *const seek_data,
-
-    Rec **const out
+    uint8_t **const data_ptr,
+    size_t *const data_size_ptr
 ) {
-    if (self->state == RECORDER_STATE_UNINITIALIZED ||
-        self->state == RECORDER_STATE_INITIALIZED)
-        return StateErr;
+    if (self->state == RECORDER_STATE_UNINITIALIZED) return StateErr;
 
     Rec **avail_rec_ptr = NULL;
     for (Rec **rec_ptr = self->recs; rec_ptr < self->recs + self->recs_len;
@@ -144,58 +143,34 @@ Result recorder_record(
         }
     if (!avail_rec_ptr) return RangeErr;
 
-    Rec *const rec = rec_alloc();
-    if (!rec) return OutOfMemErr;
+    EncodedRecSink *const encoded = encoded_rec_sink_alloc();
+    if (!encoded) return OutOfMemErr;
 
-    size_t const buf_size_ms = self->device.capture.internalPeriodSizeInFrames *
-                               1000 / self->device.sampleRate;
-    size_t const data_availability_threshold_bufs =
-        data_availability_threshold_ms < buf_size_ms
-            ? 1
-            : data_availability_threshold_ms / buf_size_ms;
+    UNROLL_CLEANUP(
+        encoded_rec_sink_init(
+            encoded,
+            encoding,
+            sample_format,
+            channel_count,
+            sample_rate,
 
-    size_t const data_availability_threshold_frames =
-        self->device.capture.internalPeriodSizeInFrames *
-        data_availability_threshold_bufs;
-    trace(
-        "determined recording threshold = %zu frames",
-        data_availability_threshold_frames
+            data_ptr,
+            data_size_ptr
+        ),
+        { free(encoded); }
     );
     UNROLL_CLEANUP(
         rec_init(
             rec,
-            encoding,
-            format,
-            channel_count,
-            sample_rate,
-            self->device.capture.format,
-            self->device.capture.channels,
-            self->device.sampleRate,
+            encoded_rec_sink_ww_rec_sink(encoded),
+            &self->device
 
-            data_availability_threshold_frames * RECORDING_BUF_COUNT,
-            data_availability_threshold_frames,
-            on_data_available,
-            seek_data
         ),
-        { free(rec); }
+        { encoded_rec_sink_uninit(encoded), free(rec); }
     );
 
     *avail_rec_ptr = rec;
-    return info("recorder recording."), *out = rec, Ok;
-}
-Result recorder_pause_rec(Recorder *const self, Rec const *const rec) {
-    if (self->state == RECORDER_STATE_UNINITIALIZED ||
-        self->state == RECORDER_STATE_INITIALIZED)
-        return StateErr;
-
-    for (Rec **rec_ptr = self->recs; rec_ptr < self->recs + self->recs_len;
-         rec_ptr++)
-        if (*rec_ptr == rec) {
-            *rec_ptr = NULL;
-            break;
-        }
-
-    return info("recording paused."), Ok;
+    return info("recorder recording."), Ok;
 }
 Result recorder_resume_rec(Recorder *const self, Rec *const rec) {
     if (self->state == RECORDER_STATE_UNINITIALIZED ||
@@ -216,7 +191,7 @@ Result recorder_resume_rec(Recorder *const self, Rec *const rec) {
     *avail_rec_ptr = rec;
     return info("recording resumed."), Ok;
 }
-Result recorder_stop_rec(Recorder *const self, Rec *const rec) {
+Result recorder_pause_rec(Recorder *const self, Rec const *const rec) {
     if (self->state == RECORDER_STATE_UNINITIALIZED ||
         self->state == RECORDER_STATE_INITIALIZED)
         return StateErr;
@@ -228,7 +203,5 @@ Result recorder_stop_rec(Recorder *const self, Rec *const rec) {
             break;
         }
 
-    rec_end(rec);
-
-    return info("recording stopped."), Ok;
+    return info("recording paused."), Ok;
 }

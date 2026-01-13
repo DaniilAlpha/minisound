@@ -1,13 +1,11 @@
 part of "minisound_platform_interface.dart";
 
-enum RecEncoding { /*raw,*/ wav }
-
-enum RecFormat { u8, s16, s24, s32, f32 }
-
 abstract interface class PlatformRec {
-  void dispose();
+  Uint8List get data;
 
-  Uint8List read();
+  void end();
+
+  void dispose();
 }
 
 abstract interface class PlatformRecorder {
@@ -21,16 +19,12 @@ abstract interface class PlatformRecorder {
 
   void start();
 
-  PlatformRec record({
-    required RecEncoding encoding,
-    required RecFormat format,
+  Future<PlatformRec> saveRec({
+    required AudioEncoding encoding,
+    required SampleFormat sampleFormat,
     required int channelCount,
     required int sampleRate,
-    required int dataAvailabilityThresholdMs,
-    required void Function(Uint8List data) onDataFn,
-    required void Function(int off, int origin) seekDataFn,
   });
-  void pauseRec(PlatformRec rec);
   void resumeRec(PlatformRec rec);
-  void stopRec(PlatformRec rec);
+  void pauseRec(PlatformRec rec);
 }

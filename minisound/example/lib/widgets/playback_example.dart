@@ -2,12 +2,12 @@ import "dart:async";
 
 import "package:example/widgets/sound_widget.dart";
 import "package:flutter/material.dart";
-import "package:minisound/engine_flutter.dart";
+import "package:minisound/player_flutter.dart";
 
 class PlaybackExample extends StatefulWidget {
-  const PlaybackExample(this.engine, {super.key});
+  const PlaybackExample(this.player, {super.key});
 
-  final Engine engine;
+  final Player player;
 
   @override
   State<PlaybackExample> createState() => _PlaybackExampleState();
@@ -32,7 +32,7 @@ class _PlaybackExampleState extends State<PlaybackExample> {
     () async {
       final newSounds = <String, LoadedSound>{};
       await Future.wait(soundNames.map((soundName) async {
-        newSounds[soundName] = await widget.engine.loadSoundAsset(soundName);
+        newSounds[soundName] = await widget.player.loadSoundAsset(soundName);
       }));
 
       setState(() {
@@ -56,7 +56,7 @@ class _PlaybackExampleState extends State<PlaybackExample> {
           }),
         ),
         if (sounds[currentSoundName] case final Sound currentSound) ...[
-          SoundWidget(engine: widget.engine, sound: currentSound),
+          SoundWidget(player: widget.player, sound: currentSound),
           ElevatedButton(
             child: const Text("REMOVE"),
             onPressed: () => setState(() {

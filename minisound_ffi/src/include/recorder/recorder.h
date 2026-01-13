@@ -7,8 +7,11 @@
 #include "../../external/result/result.h"
 #include "../export.h"
 #include "./rec.h"
+#include "audio_common.h"
 
 typedef struct Recorder Recorder;
+typedef void
+RecorderOnDataFn(size_t const pos, uint8_t *const data, size_t const data_size);
 
 EXPORT Recorder *recorder_alloc(size_t const max_rec_count);
 EXPORT Result recorder_init(Recorder *const self, uint32_t const period_ms);
@@ -19,21 +22,18 @@ recorder_get_is_recording(Recorder const *const self, Rec const *const rec);
 
 EXPORT Result recorder_start(Recorder *const self);
 
-EXPORT Result recorder_record(
+EXPORT Result recorder_save_rec(
     Recorder *const self,
-    RecEncoding const encoding,
-    RecFormat const format,
+    Rec *const rec,
+    AudioEncoding const encoding,
+    SampleFormat const sample_format,
     uint32_t const channel_count,
     uint32_t const sample_rate,
 
-    size_t const data_availability_threshold_ms,
-    RecOnDataFn *const on_data_available,
-    RecSeekDataFn *const seek_data,
-
-    Rec **const out
+    uint8_t **const data_ptr,
+    size_t *const data_size_ptr
 );
-EXPORT Result recorder_pause_rec(Recorder *const self, Rec const *const rec);
 EXPORT Result recorder_resume_rec(Recorder *const self, Rec *const rec);
-EXPORT Result recorder_stop_rec(Recorder *const self, Rec *const rec);
+EXPORT Result recorder_pause_rec(Recorder *const self, Rec const *const rec);
 
 #endif
