@@ -23,7 +23,7 @@ abstract class Rec<T> {
   Future<T> end();
 
   Future<void> _end() async {
-    _rec.end();
+    await _rec.end();
 
     // meant for waiting until audio thread finishes its job, not sure if really needed
     await Future.delayed(const Duration(milliseconds: 50));
