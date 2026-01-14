@@ -54,20 +54,20 @@ Result sound_init(
 
     ma_result r;
 
-    ma_sound_notifications notifications = ma_sound_notifications_init();
-    notifications.onAtEnd = on_sound_ended;
-    notifications.pUserData = self;
+    // ma_sound_notifications notifications = ma_sound_notifications_init();
+    // notifications.onAtEnd = on_sound_ended;
+    // notifications.pUserData = self;
     if ((r = ma_sound_init_from_data_source(
              engine,
              sound_data_get_ds(&sound_data),
              MA_SOUND_FLAG_NO_SPATIALIZATION,
              NULL,
-             &notifications,
+             // &notifications,
              &self->sound
          )) != MA_SUCCESS)
         return error("miniaudio sound initialization error (code: %i)!", r),
                UnknownErr;
-    // ma_sound_set_end_callback(&self->sound, on_sound_ended, self);
+    ma_sound_set_end_callback(&self->sound, on_sound_ended, self);
 
     self->sound_data = sound_data;
     self->engine = engine;

@@ -38,7 +38,8 @@ file(GLOB_RECURSE MAIN_SOURCES ${MAIN_PATH}/src/*.c)
 target_sources(${MAIN_LIB} PRIVATE ${MAIN_SOURCES})
 set_source_files_properties(${MAIN_SOURCES} PROPERTIES LANGUAGE ${LANG})
 
-target_include_directories(${MAIN_LIB} PUBLIC include/ external/result/ external/woodi/ external/milo/)
+target_include_directories(${MAIN_LIB} PUBLIC
+    include/ external/result/ external/woodi/ external/milo/)
 
 # dart stuff
 target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB)
@@ -70,14 +71,13 @@ else()
 endif()
 
 if(EMSCRIPTEN)
-
     target_compile_options(${MAIN_LIB} PUBLIC
     $<$<CONFIG:Debug>:
         -Og -g3
     > $<$<CONFIG:Release>:
         -O3 -flto
     >
-    -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
+    -fno-rtti -fno-exceptions -sWASM_WORKERS)
     target_link_options(${MAIN_LIB} PUBLIC
     $<$<CONFIG:Debug>:
         -Og -g3 -gsource-map
@@ -87,10 +87,9 @@ if(EMSCRIPTEN)
     >
     -fno-rtti -fno-exceptions
     -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall
-    -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb
+    -sALLOW_MEMORY_GROWTH=1 -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb
     -sNO_DEFAULT_TO_CXX -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB
-    -sWASM_WORKERS=1 -sAUDIO_WORKLET=1
-    -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072
+    -sWASM_WORKERS -sAUDIO_WORKLET -sASYNCIFY -sASYNCIFY_STACK_SIZE=131072
     -sSTACK_OVERFLOW_CHECK=1)
 endif()
 
@@ -144,14 +143,11 @@ endif()
 add_subdirectory(external/miniaudio/ EXCLUDE_FROM_ALL)
 
 if(EMSCRIPTEN)
-    target_compile_options(miniaudio PRIVATE -sWASM_WORKERS=1 -Wno-c23-extensions -Wno-unknown-warning-option)
+    target_compile_options(miniaudio PRIVATE -sWASM_WORKERS -Wno-c23-extensions -Wno-unknown-warning-option)
+    target_compile_definitions(miniaudio PUBLIC MA_ENABLE_AUDIO_WORKLETS)
 elseif(MSVC)
 else()
     target_compile_options(miniaudio PUBLIC -fPIC)
-endif()
-
-if(EMSCRIPTEN)
-    target_compile_definitions(miniaudio PUBLIC MA_ENABLE_AUDIO_WORKLETS)
 endif()
 
 target_link_libraries(${MAIN_LIB} miniaudio)

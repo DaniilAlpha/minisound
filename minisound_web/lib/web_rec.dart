@@ -22,5 +22,5 @@ class WebRec implements PlatformRec {
   }
 
   @override
-  void end() => _binds.rec_end(_self);
+  Future<void> end() => _binds.rec_end(_self);
 }

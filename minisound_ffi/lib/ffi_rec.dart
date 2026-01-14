@@ -22,5 +22,5 @@ class FfiRec implements PlatformRec {
   }
 
   @override
-  void end() => _binds.rec_end(_self);
+  Future<void> end() async => _binds.rec_end(_self);
 }

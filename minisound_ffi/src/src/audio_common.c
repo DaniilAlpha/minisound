@@ -8,8 +8,8 @@
 
 // clang-format off
 
-static_assert(sizeof(size_t) == 4, "The dart-wasm bindings assume the size of `size_t` to be 4.");
-static_assert(sizeof(void *) == 4, "The dart-wasm bindings assume the size of `void *` to be 4.");
+static_assert(sizeof(size_t) == sizeof(uint32_t), "The dart-wasm bindings assume the `size_t` is 32-bit.");
+static_assert(sizeof(void *) == sizeof(uint32_t), "The dart-wasm bindings assume the `void *` is 32-bit.");
 
 // clang-format on
 

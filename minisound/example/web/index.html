@@ -47,7 +47,9 @@
             {{flutter_build_config}}
 
             // load minisound
-            await _minisound.loader.load();
+            await _minisound.loader.load({
+                useDebugBuild: _flutter.buildConfig.builds[0].compileTarget == "dartdevc"
+            });
 
             // Download main.dart.js
             _flutter.loader.load({

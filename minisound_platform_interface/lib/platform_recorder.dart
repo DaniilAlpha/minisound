@@ -3,7 +3,7 @@ part of "minisound_platform_interface.dart";
 abstract interface class PlatformRec {
   Uint8List get data;
 
-  void end();
+  Future<void> end();
 
   void dispose();
 }

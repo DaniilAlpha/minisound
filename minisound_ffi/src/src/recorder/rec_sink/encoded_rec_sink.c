@@ -68,10 +68,15 @@ static ma_result encoder_on_seek(
 ) {
     EncodedRecSink *const self = encoder->pUserData;
 
+    // switch (origin) {
+    // case MA_SEEK_CUR: self->pos += off; break;
+    // case MA_SEEK_SET: self->pos = off; break;
+    // case MA_SEEK_END: self->pos = *self->data_size_ptr - off; break;
+    // }
     switch (origin) {
-    case MA_SEEK_CUR: self->pos += off; break;
-    case MA_SEEK_SET: self->pos = off; break;
-    case MA_SEEK_END: self->pos = *self->data_size_ptr - off; break;
+    case ma_seek_origin_current: self->pos += off; break;
+    case ma_seek_origin_start: self->pos = off; break;
+    case ma_seek_origin_end: self->pos = *self->data_size_ptr - off; break;
     }
 
     return MA_SUCCESS;

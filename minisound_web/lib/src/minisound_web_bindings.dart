@@ -169,6 +169,7 @@ void sound_unload(ffi.Pointer<Sound> self) => _sound_unload(self.addr);
 
 Result sound_play(ffi.Pointer<Sound> self) =>
     Result.fromValue(_sound_play(self.addr));
+
 void sound_pause(ffi.Pointer<Sound> self) => _sound_pause(self.addr);
 void sound_stop(ffi.Pointer<Sound> self) => _sound_stop(self.addr);
 

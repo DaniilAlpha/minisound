@@ -1,13 +1,15 @@
 part of "wasm.dart";
 
-final class Pointer<T> extends Primitive {
+const nullptr = Pointer(0);
+
+final class Pointer<T> extends Uint32 {
   const Pointer(this.addr);
 
   final int addr;
 
-  Pointer<R> cast<R>() => Pointer<R>(addr);
+  Pointer<R> cast<R>() => Pointer(addr);
 
-  Pointer<T> operator +(int offset) => Pointer<T>(addr + offset);
+  Pointer<T> operator +(int offset) => Pointer(addr + offset);
 
   @override
   bool operator ==(Object other) =>
@@ -15,45 +17,25 @@ final class Pointer<T> extends Primitive {
       ((other.runtimeType == Pointer<T>) ||
           (other.runtimeType == Pointer<dynamic>)) &&
       other.addr == addr;
-
   @override
   int get hashCode => Object.hash(addr, T);
-}
 
-extension PointerValue<T extends Primitive> on Pointer<T> {
-  // TODO!!!!!!!!! incomplete
-  T get value => heap.getU8(addr);
-}
-
-// extension PointerFloatLists on Pointer<Float> {
-//   Float32List asTypedList(int length) =>
-//       heap._heapF32.sublist(addr ~/ 4, addr ~/ 4 + length);
-//
-//   void copy(Float32List data) => heap.copyFloat32List(addr, data);
-// }
-//
-// extension PointerInt32Lists on Pointer<Int32> {
-//   Int32List asTypedList(int length) =>
-//       heap._heapI32.sublist(addr ~/ 4, addr ~/ 4 + length);
-//
-//   void copy(Int32List data) => heap.copyInt32List(addr, data);
-// }
-//
-// extension PointerInt16Lists on Pointer<Int16> {
-//   Int16List asTypedList(int length) =>
-//       heap._heapI16.sublist(addr ~/ 2, addr ~/ 2 + length);
-//
-//   void copy(Int16List data) => heap.copyInt16List(addr, data);
-// }
-
-extension PointerUint8AsTypedList on Pointer<Uint8> {
-  Uint8List asTypedList(int length) =>
-      heap._heapU8.sublist(addr, addr + length);
-}
-
-extension PointerCopy on Pointer {
   void copy(TypedData data) =>
       heap.copyUint8List(addr, data.buffer.asUint8List());
 }
 
-const nullptr = Pointer(0);
+extension PointerUint8AsTypedList on Pointer<Uint8> {
+  Uint8List asTypedList(int length) => heap._u8s.sublist(addr, addr + length);
+}
+
+extension Uint8PointerValue on Pointer<Uint8> {
+  int get value => heap.u8(addr);
+}
+
+extension Uint32PointerValue on Pointer<Uint32> {
+  int get value => heap.u32(addr);
+}
+
+extension PointerPointerValue<T> on Pointer<Pointer<T>> {
+  Pointer<T> get value => Pointer(heap.u32(addr));
+}

@@ -1417,6 +1417,14 @@ var _emscripten_resize_heap = requestedSize => {
   return false;
 };
 
+/** @param {number=} timeout */ var safeSetTimeout = (func, timeout) => setTimeout(() => {
+  callUserCallback(func);
+}, timeout);
+
+var _emscripten_sleep = ms => Asyncify.handleSleep(wakeUp => safeSetTimeout(wakeUp, ms));
+
+_emscripten_sleep.isAsync = true;
+
 var _wasmWorkersID = 1;
 
 var _emAudioDispatchProcessorCallback = e => {
@@ -1933,7 +1941,7 @@ Module["ccall"] = ccall;
 // End JS library exports
 // end include: postlibrary.js
 var ASM_CONSTS = {
-  47304: ($0, $1, $2, $3, $4) => {
+  46248: ($0, $1, $2, $3, $4) => {
     if (typeof window === "undefined" || (window.AudioContext || window.webkitAudioContext) === undefined) {
       return 0;
     }
@@ -1945,9 +1953,9 @@ var ASM_CONSTS = {
       window.miniaudio.device_type.playback = $0;
       window.miniaudio.device_type.capture = $1;
       window.miniaudio.device_type.duplex = $2;
-      window.miniaudio.device_status = {};
-      window.miniaudio.device_status.stopped = $3;
-      window.miniaudio.device_status.started = $4;
+      window.miniaudio.device_state = {};
+      window.miniaudio.device_state.stopped = $3;
+      window.miniaudio.device_state.started = $4;
       let miniaudio = window.miniaudio;
       miniaudio.devices = [];
       miniaudio.track_device = function(device) {
@@ -1986,9 +1994,9 @@ var ASM_CONSTS = {
       miniaudio.unlock = function() {
         for (var i = 0; i < miniaudio.devices.length; ++i) {
           var device = miniaudio.devices[i];
-          if (device != null && device.webaudio != null && device.state === miniaudio.device_status.started) {
+          if (device != null && device.webaudio != null && device.state === miniaudio.device_state.started) {
             device.webaudio.resume().then(() => {
-              _ma_device_post_notification_unlocked_emscripten(device.pDevice);
+              _ma_device__on_notification_unlocked(device.pDevice);
             }, error => {
               console.error("Failed to resume audiocontext", error);
             });
@@ -2005,10 +2013,10 @@ var ASM_CONSTS = {
     window.miniaudio.referenceCount += 1;
     return 1;
   },
-  49498: () => {
+  48426: () => {
     if (typeof (window.miniaudio) !== "undefined") {
-      window.miniaudio.unlock_event_types.map(function(event_type) {
-        document.removeEventListener(event_type, window.miniaudio.unlock, true);
+      miniaudio.unlock_event_types.map(function(event_type) {
+        document.removeEventListener(event_type, miniaudio.unlock, true);
       });
       window.miniaudio.referenceCount -= 1;
       if (window.miniaudio.referenceCount === 0) {
@@ -2016,7 +2024,8 @@ var ASM_CONSTS = {
       }
     }
   },
-  49802: () => {
+  48716: () => (navigator.mediaDevices !== undefined && navigator.mediaDevices.getUserMedia !== undefined),
+  48820: () => {
     try {
       var temp = new (window.AudioContext || window.webkitAudioContext);
       var sampleRate = temp.sampleRate;
@@ -2026,14 +2035,12 @@ var ASM_CONSTS = {
       return 0;
     }
   },
-  49973: () => (navigator.mediaDevices !== undefined && navigator.mediaDevices.getUserMedia !== undefined),
-  50077: $0 => emscriptenGetAudioObject($0).sampleRate,
-  50129: ($0, $1) => window.miniaudio.track_device({
+  48991: ($0, $1) => window.miniaudio.track_device({
     webaudio: emscriptenGetAudioObject($0),
     state: 1,
     pDevice: $1
   }),
-  50238: ($0, $1) => {
+  49100: ($0, $1) => {
     var getUserMediaResult = 0;
     var audioWorklet = emscriptenGetAudioObject($0);
     var audioContext = emscriptenGetAudioObject($1);
@@ -2051,13 +2058,14 @@ var ASM_CONSTS = {
     });
     return getUserMediaResult;
   },
-  50800: ($0, $1) => {
+  49662: ($0, $1) => {
     var audioWorklet = emscriptenGetAudioObject($0);
     var audioContext = emscriptenGetAudioObject($1);
     audioWorklet.connect(audioContext.destination);
     return 0;
   },
-  50960: $0 => {
+  49822: $0 => emscriptenGetAudioObject($0).sampleRate,
+  49874: $0 => {
     var device = window.miniaudio.get_device_by_index($0);
     if (device.streamNode !== undefined) {
       device.streamNode.disconnect();
@@ -2065,23 +2073,23 @@ var ASM_CONSTS = {
     }
     device.pDevice = undefined;
   },
-  51151: $0 => {
+  50065: $0 => {
     window.miniaudio.untrack_device_by_index($0);
   },
-  51201: $0 => {
+  50115: $0 => {
     var device = window.miniaudio.get_device_by_index($0);
     device.webaudio.resume();
-    device.state = window.miniaudio.device_status.started;
+    device.state = window.miniaudio.device_state.started;
   },
-  51341: $0 => {
+  50254: $0 => {
     var device = window.miniaudio.get_device_by_index($0);
     device.webaudio.suspend();
-    device.state = window.miniaudio.device_status.stopped;
+    device.state = window.miniaudio.device_state.stopped;
   }
 };
 
 // Imports from the Wasm binary.
-var _engine_alloc, _engine_init, _engine_uninit, _engine_start, _engine_load_sound, _free, _engine_generate_waveform, _engine_generate_noise, _engine_generate_pulse, _rec_alloc, _rec_uninit, _rec_end, _malloc, _recorder_alloc, _recorder_init, _recorder_uninit, _recorder_get_is_recording, _recorder_start, _recorder_save_rec, _recorder_resume_rec, _recorder_pause_rec, _sound_alloc, _sound_unload, _sound_play, _sound_pause, _sound_stop, _sound_get_volume, _sound_set_volume, _sound_get_duration, _sound_get_is_playing, _sound_get_cursor, _sound_set_cursor, _sound_get_pitch, _sound_set_pitch, _sound_get_encoded_data, _sound_get_waveform_data, _sound_get_noise_data, _sound_get_pulse_data, _encoded_sound_data_get_is_looped, _encoded_sound_data_set_looped, _pulse_sound_data_get_freq, _pulse_sound_data_set_freq, _pulse_sound_data_get_duty_cycle, _pulse_sound_data_set_duty_cycle, _waveform_sound_data_get_type, _waveform_sound_data_set_type, _waveform_sound_data_get_freq, _waveform_sound_data_set_freq, _ma_device_post_notification_unlocked_emscripten, _ma_malloc_emscripten, _ma_free_emscripten, _ma_device_process_pcm_frames_capture__webaudio, _ma_device_process_pcm_frames_playback__webaudio, _emscripten_stack_get_end, _emscripten_stack_get_base, _sbrk, _emscripten_get_sbrk_ptr, _emscripten_stack_init, _emscripten_stack_get_free, __emscripten_stack_restore, __emscripten_stack_alloc, _emscripten_stack_get_current, __emscripten_wasm_worker_initialize, dynCall_iiiii, dynCall_iiji, dynCall_ii, dynCall_vi, dynCall_viiii, dynCall_vii, dynCall_iiiji, dynCall_iij, dynCall_iiiiiii, dynCall_iii, dynCall_iiii, dynCall_viii, dynCall_iiiiiiii, dynCall_iiiiii, dynCall_iiiiiiiii, dynCall_jii, dynCall_viiiii, dynCall_jiji, dynCall_iidiiii, _asyncify_start_unwind, _asyncify_stop_unwind, _asyncify_start_rewind, _asyncify_stop_rewind, __indirect_function_table, wasmTable;
+var _engine_alloc, _engine_init, _engine_uninit, _engine_start, _engine_load_sound, _free, _engine_generate_waveform, _engine_generate_noise, _engine_generate_pulse, _rec_alloc, _rec_uninit, _rec_end, _malloc, _recorder_alloc, _recorder_init, _recorder_uninit, _recorder_get_is_recording, _recorder_start, _recorder_save_rec, _recorder_resume_rec, _recorder_pause_rec, _sound_alloc, _sound_unload, _sound_play, _sound_pause, _sound_stop, _sound_get_volume, _sound_set_volume, _sound_get_duration, _sound_get_is_playing, _sound_get_cursor, _sound_set_cursor, _sound_get_pitch, _sound_set_pitch, _sound_get_encoded_data, _sound_get_waveform_data, _sound_get_noise_data, _sound_get_pulse_data, _encoded_sound_data_get_is_looped, _encoded_sound_data_set_looped, _pulse_sound_data_get_freq, _pulse_sound_data_set_freq, _pulse_sound_data_get_duty_cycle, _pulse_sound_data_set_duty_cycle, _waveform_sound_data_get_type, _waveform_sound_data_set_type, _waveform_sound_data_get_freq, _waveform_sound_data_set_freq, _ma_device__on_notification_unlocked, _ma_malloc_emscripten, _ma_free_emscripten, _ma_device_process_pcm_frames_capture__webaudio, _ma_device_process_pcm_frames_playback__webaudio, _emscripten_stack_get_end, _emscripten_stack_get_base, _sbrk, _emscripten_get_sbrk_ptr, _emscripten_stack_init, _emscripten_stack_get_free, __emscripten_stack_restore, __emscripten_stack_alloc, _emscripten_stack_get_current, __emscripten_wasm_worker_initialize, dynCall_iiiii, dynCall_iiji, dynCall_ii, dynCall_vi, dynCall_viiii, dynCall_vii, dynCall_iiiji, dynCall_iij, dynCall_iiiiiii, dynCall_iii, dynCall_iiii, dynCall_viii, dynCall_iiiiiiii, dynCall_jii, dynCall_iiiiiiiii, dynCall_iiiiii, dynCall_viiiii, dynCall_jiji, dynCall_iidiiii, _asyncify_start_unwind, _asyncify_stop_unwind, _asyncify_start_rewind, _asyncify_stop_rewind, __indirect_function_table, wasmTable;
 
 function assignWasmExports(wasmExports) {
   _engine_alloc = Module["_engine_alloc"] = wasmExports["engine_alloc"];
@@ -2132,7 +2140,7 @@ function assignWasmExports(wasmExports) {
   _waveform_sound_data_set_type = Module["_waveform_sound_data_set_type"] = wasmExports["waveform_sound_data_set_type"];
   _waveform_sound_data_get_freq = Module["_waveform_sound_data_get_freq"] = wasmExports["waveform_sound_data_get_freq"];
   _waveform_sound_data_set_freq = Module["_waveform_sound_data_set_freq"] = wasmExports["waveform_sound_data_set_freq"];
-  _ma_device_post_notification_unlocked_emscripten = Module["_ma_device_post_notification_unlocked_emscripten"] = wasmExports["ma_device_post_notification_unlocked_emscripten"];
+  _ma_device__on_notification_unlocked = Module["_ma_device__on_notification_unlocked"] = wasmExports["ma_device__on_notification_unlocked"];
   _ma_malloc_emscripten = Module["_ma_malloc_emscripten"] = wasmExports["ma_malloc_emscripten"];
   _ma_free_emscripten = Module["_ma_free_emscripten"] = wasmExports["ma_free_emscripten"];
   _ma_device_process_pcm_frames_capture__webaudio = Module["_ma_device_process_pcm_frames_capture__webaudio"] = wasmExports["ma_device_process_pcm_frames_capture__webaudio"];
@@ -2160,9 +2168,9 @@ function assignWasmExports(wasmExports) {
   dynCall_iiii = dynCalls["iiii"] = wasmExports["dynCall_iiii"];
   dynCall_viii = dynCalls["viii"] = wasmExports["dynCall_viii"];
   dynCall_iiiiiiii = dynCalls["iiiiiiii"] = wasmExports["dynCall_iiiiiiii"];
-  dynCall_iiiiii = dynCalls["iiiiii"] = wasmExports["dynCall_iiiiii"];
-  dynCall_iiiiiiiii = dynCalls["iiiiiiiii"] = wasmExports["dynCall_iiiiiiiii"];
   dynCall_jii = dynCalls["jii"] = wasmExports["dynCall_jii"];
+  dynCall_iiiiiiiii = dynCalls["iiiiiiiii"] = wasmExports["dynCall_iiiiiiiii"];
+  dynCall_iiiiii = dynCalls["iiiiii"] = wasmExports["dynCall_iiiiii"];
   dynCall_viiiii = dynCalls["viiiii"] = wasmExports["dynCall_viiiii"];
   dynCall_jiji = dynCalls["jiji"] = wasmExports["dynCall_jiji"];
   dynCall_iidiiii = dynCalls["iidiiii"] = wasmExports["dynCall_iidiiii"];
@@ -2191,6 +2199,7 @@ function assignWasmImports() {
     /** @export */ emscripten_destroy_web_audio_node: _emscripten_destroy_web_audio_node,
     /** @export */ emscripten_get_now: _emscripten_get_now,
     /** @export */ emscripten_resize_heap: _emscripten_resize_heap,
+    /** @export */ emscripten_sleep: _emscripten_sleep,
     /** @export */ emscripten_start_wasm_audio_worklet_thread_async: _emscripten_start_wasm_audio_worklet_thread_async,
     /** @export */ fd_close: _fd_close,
     /** @export */ fd_read: _fd_read,
