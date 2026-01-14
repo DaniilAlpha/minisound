@@ -1,4 +1,3 @@
-publish_to: none
 name: minisound_platform_interface
 description: A common platform interface for the Minisound package.
 version: 3.0.0

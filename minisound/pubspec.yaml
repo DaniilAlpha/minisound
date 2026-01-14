@@ -1,4 +1,3 @@
-publish_to: none
 name: minisound
 description: A high-level real-time audio playback library based on Miniaudio.
 version: 3.0.0
@@ -20,12 +19,9 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
-  minisound_platform_interface:
-    path: ../minisound_platform_interface
-  minisound_ffi:
-    path: ../minisound_ffi
-  minisound_web:
-    path: ../minisound_web
+  minisound_platform_interface: ^3.0.0
+  minisound_ffi: ^3.0.0
+  minisound_web: ^3.0.0
   collection: ^1.19.1
 
 dev_dependencies:
