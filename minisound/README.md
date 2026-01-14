@@ -1,6 +1,6 @@
 # minisound
 
-A high-level real-time audio playback library based on [miniaudio](https://miniaud.io). The library offers basic functionality for realtime audio applications and quite low latency. Supports MP3, WAV and FLAC formats.
+A high-level real-time audio playback, generation and recording library based on [miniaudio](https://miniaud.io). The library offers basic functionality for realtime audio applications and quite low latency. Supports MP3, WAV and FLAC formats.
 
 
 ## Platform support
@@ -8,10 +8,10 @@ A high-level real-time audio playback library based on [miniaudio](https://minia
 |Platform |Tested     |Supposed to work|Unsupported|
 |-------- |-----------|----------------|-----------|
 |Android  |SDK 31, 19 |Any*            |None*      |
-|Windows  |11,        |Any*            |None*      |
-|GNU/Linux|Fedora 42, Mint 22|Any*     |None*      |
-|iOS      |None       |Unknown         |Unknown    |
-|macOS    |None       |Unknown         |Unknown    |
+|Windows  |11         |Any*            |None*      |
+|GNU/Linux|Arch Linux |Any*            |None*      |
+|iOS      |Latest (Simulator)|Any*     |None*      |
+|macOS    |Latest     |Any*            |None*      |
 |Web      |Chrome(ium) 93+, Firefox 79+, Safari 16+|Browsers with an `AudioWorklet` support|Browsers without an `AudioWorklet` support|
 |Wasm     |Chrome(ium) 137+ |Any*      |None*      |
 
@@ -32,7 +32,7 @@ Apart from setting the permission in the Android manifest (which is done by `min
 
 ### Web / Wasm
 
-While the main script is quite large, there are a loader script provided. Include it in the `web/index.html` file like this
+While the main script is quite large, there is a loader script provided. Include it in the `web/index.html` file like this
 
 ```html
   <script src="assets/packages/minisound_web/src/build/release/minisound_web.loader.js"></script>
@@ -67,7 +67,7 @@ window.addEventListener('load', async function (ev) {
   );
 ```
 
-`Minisound` uses `SharedArrayBuffer` feature, so you should [enable cross-origin isolation on your site](https://web.dev/cross-origin-isolation-guide/).
+`Minisound` depends on the `SharedArrayBuffer` feature, so you should [enable cross-origin isolation on your site](https://web.dev/cross-origin-isolation-guide/).
 
 
 ## Usage
