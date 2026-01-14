@@ -1,7 +1,6 @@
 #ifndef SOUND_H
 #define SOUND_H
 
-#include "../external/result/result.h"
 #include "export.h"
 #include "sound_data/encoded_sound_data.h"
 #include "sound_data/noise_sound_data.h"

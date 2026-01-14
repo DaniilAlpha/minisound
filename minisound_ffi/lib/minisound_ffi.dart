@@ -3,7 +3,7 @@ import "dart:io";
 import "dart:typed_data";
 
 import "package:ffi/ffi.dart";
-import "package:minisound_ffi/minisound_ffi_bindings.dart" as c;
+import "package:minisound_ffi/src/minisound_ffi_bindings.dart" as c;
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
 
 part "ffi_engine.dart";

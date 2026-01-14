@@ -1,4 +1,4 @@
-#include "../../include/sound_data/pulse_sound_data.h"
+#include "sound_data/pulse_sound_data.h"
 
 #include <stdlib.h>
 
@@ -7,7 +7,7 @@
 #include "conviniences.h"
 
 #define MILO_LVL SOUND_MILO_LVL
-#include "../../external/milo/milo.h"
+#include <milo.h>
 
 #define DEFAULT_AMPLITUDE (0.5)
 

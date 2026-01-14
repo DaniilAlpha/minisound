@@ -35,7 +35,7 @@ Apart from setting the permission in the Android manifest (which is done by `min
 While the main script is quite large, there are a loader script provided. Include it in the `web/index.html` file like this
 
 ```html
-  <script src="assets/packages/minisound_web/build/minisound_web.loader.js"></script>
+  <script src="assets/packages/minisound_web/src/build/release/minisound_web.loader.js"></script>
 ```
 
 > It is highly recommended NOT to make the script `defer`, as loading may not work properly. Also, it is very small (only 18 lines).

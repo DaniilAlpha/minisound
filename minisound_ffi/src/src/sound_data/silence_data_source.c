@@ -1,8 +1,6 @@
-#include "../../include/sound_data/silence_data_source.h"
+#include "sound_data/silence_data_source.h"
 
 #include <string.h>
-
-#include "../../external/result/result.h"
 
 /*************
  ** private **

@@ -1,4 +1,4 @@
-#include "../../../include/recorder/rec_sink/encoded_rec_sink.h"
+#include "recorder/rec_sink/encoded_rec_sink.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -8,7 +8,7 @@
 #include "conviniences.h"
 
 #define MILO_LVL RECORDER_MILO_LVL
-#include "../../../external/milo/milo.h"
+#include <milo.h>
 
 #define ENCODED_REC_SINK_MIN_CAP (1024)
 

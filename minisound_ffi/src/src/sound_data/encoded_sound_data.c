@@ -1,12 +1,12 @@
-#include "../../include/sound_data/encoded_sound_data.h"
+#include "sound_data/encoded_sound_data.h"
 
 #include <stdlib.h>
 
-#include "../../include/sound_data/silence_data_source.h"
 #include "conviniences.h"
+#include "sound_data/silence_data_source.h"
 
 #define MILO_LVL SOUND_MILO_LVL
-#include "../../external/milo/milo.h"
+#include <milo.h>
 
 /*************
  ** private **

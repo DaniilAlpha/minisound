@@ -6,8 +6,8 @@ class Heap {
   const Heap();
 
   Uint8List get _heapU8 => _GROWABLE_HEAP_U8().toDart;
-  // Int16List get _heapI16 => _GROWABLE_HEAP_I16();
-  // Int32List get _heapI32 => _GROWABLE_HEAP_I32();
+  Uint16List get _heapU16 => _GROWABLE_HEAP_U16().toDart;
+  Uint32List get _heapU32 => _GROWABLE_HEAP_U32().toDart;
   // Float32List get _heapF32 => _GROWABLE_HEAP_F32();
 
   // void copyFloat32List(int addr, Float32List data) =>
@@ -17,6 +17,10 @@ class Heap {
   // void copyInt16List(int addr, Int16List data) =>
   //     _heapI16.setAll(addr ~/ 2, data);
   void copyUint8List(int addr, Uint8List data) => _heapU8.setAll(addr, data);
+
+  int getU8(int addr) => _heapU8[addr];
+  int getU16(int addr) => _heapU16[addr];
+  int getU32(int addr) => _heapU32[addr];
 }
 
 const heap = Heap();
@@ -24,10 +28,10 @@ const heap = Heap();
 // js interop
 @JS("GROWABLE_HEAP_U8")
 external JSUint8Array _GROWABLE_HEAP_U8();
-// @JS("GROWABLE_HEAP_I16")
-// external JSUint16Array _GROWABLE_HEAP_I16();
-// @JS("GROWABLE_HEAP_I32")
-// external JSInt32Array _GROWABLE_HEAP_I32();
+@JS("GROWABLE_HEAP_U16")
+external JSUint16Array _GROWABLE_HEAP_U16();
+@JS("GROWABLE_HEAP_U32")
+external JSUint32Array _GROWABLE_HEAP_U32();
 //
 // @JS("GROWABLE_HEAP_F32")
 // external JSFloat32Array _GROWABLE_HEAP_F32();

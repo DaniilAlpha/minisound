@@ -1,13 +1,9 @@
 part of "wasm.dart";
 
-class Pointer<T> {
+final class Pointer<T> extends Primitive {
   const Pointer(this.addr);
 
   final int addr;
-
-  // int get value => heap[addr];
-  //
-  // set value(int value) => heap[addr] = value;
 
   Pointer<R> cast<R>() => Pointer<R>(addr);
 
@@ -22,6 +18,11 @@ class Pointer<T> {
 
   @override
   int get hashCode => Object.hash(addr, T);
+}
+
+extension PointerValue<T extends Primitive> on Pointer<T> {
+  // TODO!!!!!!!!! incomplete
+  T get value => heap.getU8(addr);
 }
 
 // extension PointerFloatLists on Pointer<Float> {

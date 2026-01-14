@@ -1,4 +1,4 @@
-#include "../../include/sound_data/waveform_sound_data.h"
+#include "sound_data/waveform_sound_data.h"
 
 #include <assert.h>
 #include <miniaudio.h>
@@ -6,7 +6,7 @@
 #include "conviniences.h"
 
 #define MILO_LVL SOUND_MILO_LVL
-#include "../../external/milo/milo.h"
+#include <milo.h>
 
 #define DEFAULT_AMPLITUDE (0.5)
 

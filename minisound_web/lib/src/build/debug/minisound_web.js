@@ -1417,14 +1417,6 @@ var _emscripten_resize_heap = requestedSize => {
   return false;
 };
 
-/** @param {number=} timeout */ var safeSetTimeout = (func, timeout) => setTimeout(() => {
-  callUserCallback(func);
-}, timeout);
-
-var _emscripten_sleep = ms => Asyncify.handleSleep(wakeUp => safeSetTimeout(wakeUp, ms));
-
-_emscripten_sleep.isAsync = true;
-
 var _wasmWorkersID = 1;
 
 var _emAudioDispatchProcessorCallback = e => {
@@ -1941,7 +1933,7 @@ Module["ccall"] = ccall;
 // End JS library exports
 // end include: postlibrary.js
 var ASM_CONSTS = {
-  48216: ($0, $1, $2, $3, $4) => {
+  47304: ($0, $1, $2, $3, $4) => {
     if (typeof window === "undefined" || (window.AudioContext || window.webkitAudioContext) === undefined) {
       return 0;
     }
@@ -2013,10 +2005,10 @@ var ASM_CONSTS = {
     window.miniaudio.referenceCount += 1;
     return 1;
   },
-  50410: () => {
+  49498: () => {
     if (typeof (window.miniaudio) !== "undefined") {
-      miniaudio.unlock_event_types.map(function(event_type) {
-        document.removeEventListener(event_type, miniaudio.unlock, true);
+      window.miniaudio.unlock_event_types.map(function(event_type) {
+        document.removeEventListener(event_type, window.miniaudio.unlock, true);
       });
       window.miniaudio.referenceCount -= 1;
       if (window.miniaudio.referenceCount === 0) {
@@ -2024,7 +2016,7 @@ var ASM_CONSTS = {
       }
     }
   },
-  50700: () => {
+  49802: () => {
     try {
       var temp = new (window.AudioContext || window.webkitAudioContext);
       var sampleRate = temp.sampleRate;
@@ -2034,13 +2026,14 @@ var ASM_CONSTS = {
       return 0;
     }
   },
-  50871: () => (navigator.mediaDevices !== undefined && navigator.mediaDevices.getUserMedia !== undefined),
-  50975: ($0, $1) => window.miniaudio.track_device({
+  49973: () => (navigator.mediaDevices !== undefined && navigator.mediaDevices.getUserMedia !== undefined),
+  50077: $0 => emscriptenGetAudioObject($0).sampleRate,
+  50129: ($0, $1) => window.miniaudio.track_device({
     webaudio: emscriptenGetAudioObject($0),
     state: 1,
     pDevice: $1
   }),
-  51084: ($0, $1) => {
+  50238: ($0, $1) => {
     var getUserMediaResult = 0;
     var audioWorklet = emscriptenGetAudioObject($0);
     var audioContext = emscriptenGetAudioObject($1);
@@ -2058,14 +2051,13 @@ var ASM_CONSTS = {
     });
     return getUserMediaResult;
   },
-  51646: ($0, $1) => {
+  50800: ($0, $1) => {
     var audioWorklet = emscriptenGetAudioObject($0);
     var audioContext = emscriptenGetAudioObject($1);
     audioWorklet.connect(audioContext.destination);
     return 0;
   },
-  51806: $0 => emscriptenGetAudioObject($0).sampleRate,
-  51858: $0 => {
+  50960: $0 => {
     var device = window.miniaudio.get_device_by_index($0);
     if (device.streamNode !== undefined) {
       device.streamNode.disconnect();
@@ -2073,15 +2065,15 @@ var ASM_CONSTS = {
     }
     device.pDevice = undefined;
   },
-  52049: $0 => {
+  51151: $0 => {
     window.miniaudio.untrack_device_by_index($0);
   },
-  52099: $0 => {
+  51201: $0 => {
     var device = window.miniaudio.get_device_by_index($0);
     device.webaudio.resume();
     device.state = window.miniaudio.device_status.started;
   },
-  52239: $0 => {
+  51341: $0 => {
     var device = window.miniaudio.get_device_by_index($0);
     device.webaudio.suspend();
     device.state = window.miniaudio.device_status.stopped;
@@ -2089,7 +2081,7 @@ var ASM_CONSTS = {
 };
 
 // Imports from the Wasm binary.
-var _engine_alloc, _engine_init, _engine_uninit, _engine_start, _engine_load_sound, _free, _engine_generate_waveform, _engine_generate_noise, _engine_generate_pulse, _rec_init, _malloc, _rec_read, _recorder_alloc, _recorder_init, _recorder_uninit, _recorder_get_is_recording, _recorder_start, _recorder_record, _recorder_pause_rec, _recorder_resume_rec, _recorder_stop_rec, _sound_alloc, _sound_unload, _sound_play, _sound_pause, _sound_stop, _sound_get_volume, _sound_set_volume, _sound_get_duration, _sound_get_is_playing, _sound_get_cursor, _sound_set_cursor, _sound_get_pitch, _sound_set_pitch, _sound_get_encoded_data, _sound_get_waveform_data, _sound_get_noise_data, _sound_get_pulse_data, _encoded_sound_data_get_is_looped, _encoded_sound_data_set_looped, _pulse_sound_data_get_freq, _pulse_sound_data_set_freq, _pulse_sound_data_get_duty_cycle, _pulse_sound_data_set_duty_cycle, _waveform_sound_data_get_type, _waveform_sound_data_set_type, _waveform_sound_data_get_freq, _waveform_sound_data_set_freq, _ma_device_post_notification_unlocked_emscripten, _ma_malloc_emscripten, _ma_free_emscripten, _ma_device_process_pcm_frames_capture__webaudio, _ma_device_process_pcm_frames_playback__webaudio, _emscripten_stack_get_end, _emscripten_stack_get_base, _sbrk, _emscripten_get_sbrk_ptr, _emscripten_stack_init, _emscripten_stack_get_free, __emscripten_stack_restore, __emscripten_stack_alloc, _emscripten_stack_get_current, __emscripten_wasm_worker_initialize, dynCall_iiiii, dynCall_iiji, dynCall_viiii, dynCall_vii, dynCall_ii, dynCall_vi, dynCall_iiiji, dynCall_iij, dynCall_iiiiiii, dynCall_iii, dynCall_iiii, dynCall_viii, dynCall_iiiiiiii, dynCall_iiiiii, dynCall_iiiiiiiii, dynCall_jii, dynCall_viiiii, dynCall_jiji, dynCall_iidiiii, _asyncify_start_unwind, _asyncify_stop_unwind, _asyncify_start_rewind, _asyncify_stop_rewind, __indirect_function_table, wasmTable;
+var _engine_alloc, _engine_init, _engine_uninit, _engine_start, _engine_load_sound, _free, _engine_generate_waveform, _engine_generate_noise, _engine_generate_pulse, _rec_alloc, _rec_uninit, _rec_end, _malloc, _recorder_alloc, _recorder_init, _recorder_uninit, _recorder_get_is_recording, _recorder_start, _recorder_save_rec, _recorder_resume_rec, _recorder_pause_rec, _sound_alloc, _sound_unload, _sound_play, _sound_pause, _sound_stop, _sound_get_volume, _sound_set_volume, _sound_get_duration, _sound_get_is_playing, _sound_get_cursor, _sound_set_cursor, _sound_get_pitch, _sound_set_pitch, _sound_get_encoded_data, _sound_get_waveform_data, _sound_get_noise_data, _sound_get_pulse_data, _encoded_sound_data_get_is_looped, _encoded_sound_data_set_looped, _pulse_sound_data_get_freq, _pulse_sound_data_set_freq, _pulse_sound_data_get_duty_cycle, _pulse_sound_data_set_duty_cycle, _waveform_sound_data_get_type, _waveform_sound_data_set_type, _waveform_sound_data_get_freq, _waveform_sound_data_set_freq, _ma_device_post_notification_unlocked_emscripten, _ma_malloc_emscripten, _ma_free_emscripten, _ma_device_process_pcm_frames_capture__webaudio, _ma_device_process_pcm_frames_playback__webaudio, _emscripten_stack_get_end, _emscripten_stack_get_base, _sbrk, _emscripten_get_sbrk_ptr, _emscripten_stack_init, _emscripten_stack_get_free, __emscripten_stack_restore, __emscripten_stack_alloc, _emscripten_stack_get_current, __emscripten_wasm_worker_initialize, dynCall_iiiii, dynCall_iiji, dynCall_ii, dynCall_vi, dynCall_viiii, dynCall_vii, dynCall_iiiji, dynCall_iij, dynCall_iiiiiii, dynCall_iii, dynCall_iiii, dynCall_viii, dynCall_iiiiiiii, dynCall_iiiiii, dynCall_iiiiiiiii, dynCall_jii, dynCall_viiiii, dynCall_jiji, dynCall_iidiiii, _asyncify_start_unwind, _asyncify_stop_unwind, _asyncify_start_rewind, _asyncify_stop_rewind, __indirect_function_table, wasmTable;
 
 function assignWasmExports(wasmExports) {
   _engine_alloc = Module["_engine_alloc"] = wasmExports["engine_alloc"];
@@ -2101,18 +2093,18 @@ function assignWasmExports(wasmExports) {
   _engine_generate_waveform = Module["_engine_generate_waveform"] = wasmExports["engine_generate_waveform"];
   _engine_generate_noise = Module["_engine_generate_noise"] = wasmExports["engine_generate_noise"];
   _engine_generate_pulse = Module["_engine_generate_pulse"] = wasmExports["engine_generate_pulse"];
-  _rec_init = Module["_rec_init"] = wasmExports["rec_init"];
+  _rec_alloc = Module["_rec_alloc"] = wasmExports["rec_alloc"];
+  _rec_uninit = Module["_rec_uninit"] = wasmExports["rec_uninit"];
+  _rec_end = Module["_rec_end"] = wasmExports["rec_end"];
   _malloc = Module["_malloc"] = wasmExports["malloc"];
-  _rec_read = Module["_rec_read"] = wasmExports["rec_read"];
   _recorder_alloc = Module["_recorder_alloc"] = wasmExports["recorder_alloc"];
   _recorder_init = Module["_recorder_init"] = wasmExports["recorder_init"];
   _recorder_uninit = Module["_recorder_uninit"] = wasmExports["recorder_uninit"];
   _recorder_get_is_recording = Module["_recorder_get_is_recording"] = wasmExports["recorder_get_is_recording"];
   _recorder_start = Module["_recorder_start"] = wasmExports["recorder_start"];
-  _recorder_record = Module["_recorder_record"] = wasmExports["recorder_record"];
-  _recorder_pause_rec = Module["_recorder_pause_rec"] = wasmExports["recorder_pause_rec"];
+  _recorder_save_rec = Module["_recorder_save_rec"] = wasmExports["recorder_save_rec"];
   _recorder_resume_rec = Module["_recorder_resume_rec"] = wasmExports["recorder_resume_rec"];
-  _recorder_stop_rec = Module["_recorder_stop_rec"] = wasmExports["recorder_stop_rec"];
+  _recorder_pause_rec = Module["_recorder_pause_rec"] = wasmExports["recorder_pause_rec"];
   _sound_alloc = Module["_sound_alloc"] = wasmExports["sound_alloc"];
   _sound_unload = Module["_sound_unload"] = wasmExports["sound_unload"];
   _sound_play = Module["_sound_play"] = wasmExports["sound_play"];
@@ -2157,10 +2149,10 @@ function assignWasmExports(wasmExports) {
   __emscripten_wasm_worker_initialize = wasmExports["_emscripten_wasm_worker_initialize"];
   dynCall_iiiii = dynCalls["iiiii"] = wasmExports["dynCall_iiiii"];
   dynCall_iiji = dynCalls["iiji"] = wasmExports["dynCall_iiji"];
-  dynCall_viiii = dynCalls["viiii"] = wasmExports["dynCall_viiii"];
-  dynCall_vii = dynCalls["vii"] = wasmExports["dynCall_vii"];
   dynCall_ii = dynCalls["ii"] = wasmExports["dynCall_ii"];
   dynCall_vi = dynCalls["vi"] = wasmExports["dynCall_vi"];
+  dynCall_viiii = dynCalls["viiii"] = wasmExports["dynCall_viiii"];
+  dynCall_vii = dynCalls["vii"] = wasmExports["dynCall_vii"];
   dynCall_iiiji = dynCalls["iiiji"] = wasmExports["dynCall_iiiji"];
   dynCall_iij = dynCalls["iij"] = wasmExports["dynCall_iij"];
   dynCall_iiiiiii = dynCalls["iiiiiii"] = wasmExports["dynCall_iiiiiii"];
@@ -2199,7 +2191,6 @@ function assignWasmImports() {
     /** @export */ emscripten_destroy_web_audio_node: _emscripten_destroy_web_audio_node,
     /** @export */ emscripten_get_now: _emscripten_get_now,
     /** @export */ emscripten_resize_heap: _emscripten_resize_heap,
-    /** @export */ emscripten_sleep: _emscripten_sleep,
     /** @export */ emscripten_start_wasm_audio_worklet_thread_async: _emscripten_start_wasm_audio_worklet_thread_async,
     /** @export */ fd_close: _fd_close,
     /** @export */ fd_read: _fd_read,

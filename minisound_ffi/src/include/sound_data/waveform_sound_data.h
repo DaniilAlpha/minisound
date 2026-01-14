@@ -1,8 +1,9 @@
 #ifndef WAVEFORM_SOUND_DATA_H
 #define WAVEFORM_SOUND_DATA_H
 
-#include "../../external/result/result.h"
-#include "../../include/export.h"
+#include <result.h>
+
+#include "export.h"
 #include "sound_data.h"
 
 typedef struct WaveformSoundData WaveformSoundData;

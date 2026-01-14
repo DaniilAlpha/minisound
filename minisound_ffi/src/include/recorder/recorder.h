@@ -4,10 +4,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "../../external/result/result.h"
-#include "../export.h"
-#include "./rec.h"
+#include <result.h>
+
 #include "audio_common.h"
+#include "export.h"
+#include "rec.h"
 
 typedef struct Recorder Recorder;
 typedef void

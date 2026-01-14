@@ -1,7 +1,19 @@
-#include "../include/audio_common.h"
+#include "audio_common.h"
 
 #include <assert.h>
 #include <miniaudio.h>
+
+#if __EMSCRIPTEN__
+#  include <assert.h>
+
+// clang-format off
+
+static_assert(sizeof(size_t) == 4, "The dart-wasm bindings assume the size of `size_t` to be 4.");
+static_assert(sizeof(void *) == 4, "The dart-wasm bindings assume the size of `void *` to be 4.");
+
+// clang-format on
+
+#endif
 
 // clang-format off
 

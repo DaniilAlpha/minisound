@@ -17,7 +17,7 @@ PROJ_FFI_NATIVE_TEST_BUILD_DIR = ./minisound_ffi/test_native/build/
 
 PROJ_WEB_DIR = ./minisound_web/ 
 PROJ_WEB_SRC_DIR = $(PROJ_FFI_SRC_DIR)
-PROJ_WEB_LIB_BUILD_DIR = ./minisound_web/lib/build/
+PROJ_WEB_LIB_BUILD_DIR = ./minisound_web/lib/src/build/
 
 PROJ_MAIN_DIR = ./minisound/ 
 PROJ_MAIN_EXAMPLE_DIR = ./minisound/example/
@@ -88,10 +88,14 @@ endif
 
 # web lib
 
-proj-web-lib-build:
+proj-web-lib-build-debug:
 	@\
-	emcmake cmake -B $(PROJ_WEB_LIB_BUILD_DIR)/cmake_stuff/ -S $(PROJ_WEB_SRC_DIR) -DCMAKE_BUILD_TYPE=Debug &&\
-	cmake --build $(PROJ_WEB_LIB_BUILD_DIR)/cmake_stuff/
+	emcmake cmake -B $(PROJ_WEB_LIB_BUILD_DIR)/debug/cmake_stuff/ -S $(PROJ_WEB_SRC_DIR) -DCMAKE_BUILD_TYPE=Debug &&\
+	cmake --build $(PROJ_WEB_LIB_BUILD_DIR)/debug/cmake_stuff/
+proj-web-lib-build-release:
+	@\
+	emcmake cmake -B $(PROJ_WEB_LIB_BUILD_DIR)/release/cmake_stuff/ -S $(PROJ_WEB_SRC_DIR) -DCMAKE_BUILD_TYPE=Release &&\
+	cmake --build $(PROJ_WEB_LIB_BUILD_DIR)/release/cmake_stuff/
 
 proj-web-lib-clean:
 ifdef PROJ_WEB_LIB_BUILD_DIR

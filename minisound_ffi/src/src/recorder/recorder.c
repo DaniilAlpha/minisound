@@ -1,4 +1,4 @@
-#include "../../include/recorder/recorder.h"
+#include "recorder/recorder.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -6,12 +6,12 @@
 #include <assert.h>
 #include <miniaudio.h>
 
-#include "../../include/recorder/rec.h"
 #include "conviniences.h"
+#include "recorder/rec.h"
 #include "recorder/rec_sink/encoded_rec_sink.h"
 
 #define MILO_LVL RECORDER_MILO_LVL
-#include "../../external/milo/milo.h"
+#include <milo.h>
 
 /*************
  ** private **

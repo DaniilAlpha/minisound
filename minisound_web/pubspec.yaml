@@ -28,9 +28,11 @@ flutter:
         fileName: minisound_web.dart
 
   assets:
-    - packages/minisound_web/build/minisound_web.loader.js
-    - packages/minisound_web/build/minisound_web.wasm
-    # - packages/minisound_web/build/minisound_web.wasm.map
-    - packages/minisound_web/build/minisound_web.js
-    # - packages/minisound_web/build/minisound_web.aw.js
-    # - packages/minisound_web/build/minisound_web.ww.js
+    - packages/minisound_web/src/build/release/minisound_web.loader.js
+    - packages/minisound_web/src/build/release/minisound_web.js
+    - packages/minisound_web/src/build/release/minisound_web.wasm
+
+    - packages/minisound_web/src/build/debug/minisound_web.loader.js
+    - packages/minisound_web/src/build/debug/minisound_web.js
+    - packages/minisound_web/src/build/debug/minisound_web.wasm
+    - packages/minisound_web/src/build/debug/minisound_web.wasm.map

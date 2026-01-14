@@ -38,12 +38,10 @@ file(GLOB_RECURSE MAIN_SOURCES ${MAIN_PATH}/src/*.c)
 target_sources(${MAIN_LIB} PRIVATE ${MAIN_SOURCES})
 set_source_files_properties(${MAIN_SOURCES} PROPERTIES LANGUAGE ${LANG})
 
-# // TODO!!! won't work on iOS/MacOS
-target_include_directories(${MAIN_LIB} PUBLIC include/)
+target_include_directories(${MAIN_LIB} PUBLIC include/ external/result/ external/woodi/ external/milo/)
 
-# dart stuff target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB)
-
-
+# dart stuff
+target_compile_definitions(${MAIN_LIB} PRIVATE DART_SHARED_LIB)
 # logging
 target_compile_definitions(${MAIN_LIB} PRIVATE
     $<$<CONFIG:Debug>:
@@ -72,29 +70,28 @@ else()
 endif()
 
 if(EMSCRIPTEN)
-    #[[ target_compile_options(${MAIN_LIB} PUBLIC
-        -O3 -flto -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
-    target_link_options(${MAIN_LIB} PUBLIC
-        -O3
-        -flto -fno-rtti -fno-exceptions
-        -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall
-        -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb
-        -sNO_DEFAULT_TO_CXX -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB
-        -sWASM_WORKERS=1 -sAUDIO_WORKLET=1
-        -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072
-        -sSTACK_OVERFLOW_CHECK=1) ]]
 
     target_compile_options(${MAIN_LIB} PUBLIC
-        -Og -g3 -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
+    $<$<CONFIG:Debug>:
+        -Og -g3
+    > $<$<CONFIG:Release>:
+        -O3 -flto
+    >
+    -fno-rtti -fno-exceptions -sWASM_WORKERS=1)
     target_link_options(${MAIN_LIB} PUBLIC
+    $<$<CONFIG:Debug>:
         -Og -g3 -gsource-map
-        -fno-rtti -fno-exceptions
-        -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall
-        -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb
-        -sNO_DEFAULT_TO_CXX -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB
-        -sWASM_WORKERS=1 -sAUDIO_WORKLET=1
-        -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072
-        -sSTACK_OVERFLOW_CHECK=1 -sSAFE_HEAP)
+        -sSAFE_HEAP
+    > $<$<CONFIG:Release>:
+        -O3 -fltp
+    >
+    -fno-rtti -fno-exceptions
+    -sEXPORTED_FUNCTIONS=_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall
+    -sALLOW_MEMORY_GROWTH -sSTACK_SIZE=1mb -sMAXIMUM_MEMORY=1gb
+    -sNO_DEFAULT_TO_CXX -sNO_FILESYSTEM -sNO_FETCH_SUPPORT_INDEXEDDB
+    -sWASM_WORKERS=1 -sAUDIO_WORKLET=1
+    -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=131072
+    -sSTACK_OVERFLOW_CHECK=1)
 endif()
 
 if(EMSCRIPTEN)
@@ -106,8 +103,7 @@ elseif(APPLE)
         OUTPUT_NAME ${MAIN_LIB}
         FRAMEWORK TRUE
         MACOSX_RPATH TRUE
-        MACOSX_FRAMEWORK_IDENTIFIER "com.daniilalpha.${MAIN_LIB}"
-        #[[ INSTALL_PATH "@loader_path/../Frameworks" ]])
+        MACOSX_FRAMEWORK_IDENTIFIER "com.daniilalpha.${MAIN_LIB}")
 else()
     set_target_properties(${MAIN_LIB} PROPERTIES
         PUBLIC_HEADER include/minisound.h
@@ -116,8 +112,6 @@ endif()
 
 
 ### miniaudio ###
-
-# // TODO try somehow enabling pipewire (if it's present in MA at all)
 
 # // TODO? maybe make an issue in miniaudio to make defs PUBLIC
 option(MINIAUDIO_USE_STDINT "" ON)
@@ -134,6 +128,8 @@ else()
     endif()
 
     # linux
+    option(MINIAUDIO_ENABLE_PIPEWIRE "" ON)
+    # // TODO when pipewire backend will be mature enough to use, get rid of this
     option(MINIAUDIO_ENABLE_PULSEAUDIO "" ON)
     option(MINIAUDIO_ENABLE_ALSA "" ON)
     # windows

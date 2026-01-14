@@ -1,4 +1,4 @@
-#include "../include/sound.h"
+#include "sound.h"
 
 #include <math.h>
 #include <stdbool.h>
@@ -9,7 +9,7 @@
 #include "conviniences.h"
 
 #define MILO_LVL SOUND_MILO_LVL
-#include "../external/milo/milo.h"
+#include <milo.h>
 
 /*************
  ** private **

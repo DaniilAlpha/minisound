@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "../../../external/woodi/woodi.h"
+#include <woodi.h>
 
 typedef enum RecSinkType {
     REC_SINK_TYPE_ENCODED,

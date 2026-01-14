@@ -1,16 +1,16 @@
-#include "../include/engine.h"
+#include "engine.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
 
 #include <miniaudio.h>
 
-#include "../include/sound_data/encoded_sound_data.h"
-#include "../include/sound_data/pulse_sound_data.h"
 #include "conviniences.h"
+#include "sound_data/encoded_sound_data.h"
+#include "sound_data/pulse_sound_data.h"
 
 #define MILO_LVL ENGINE_MILO_LVL
-#include "../external/milo/milo.h"
+#include <milo.h>
 
 /*************
  ** private **

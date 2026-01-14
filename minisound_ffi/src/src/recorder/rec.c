@@ -1,4 +1,4 @@
-#include "../../include/recorder/rec.h"
+#include "recorder/rec.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -10,7 +10,7 @@
 #include "conviniences.h"
 
 #define MILO_LVL RECORDER_MILO_LVL
-#include "../../external/milo/milo.h"
+#include <milo.h>
 
 #define RECORDING_RB_ITER_LIMIT (16)
 

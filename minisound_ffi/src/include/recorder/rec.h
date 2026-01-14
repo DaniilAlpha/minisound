@@ -5,17 +5,16 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <sys/types.h>
+#include <result.h>
 
-#include "../../external/result/result.h"
-#include "../export.h"
+#include "export.h"
 #include "rec_sink/rec_sink.h"
 
 typedef struct Rec Rec;
 typedef struct ma_device ma_device;
 
 EXPORT Rec *rec_alloc(void);
-EXPORT Result
+Result
 rec_init(Rec *const self, RecSink const rec_sink, ma_device *const device);
 EXPORT void rec_uninit(Rec *const self);
 

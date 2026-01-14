@@ -3,7 +3,8 @@
 
 #include <stdint.h>
 
-#include "../external/result/result.h"
+#include <result.h>
+
 #include "export.h"
 #include "sound.h"
 

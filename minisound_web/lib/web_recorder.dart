@@ -1,73 +1,107 @@
 part of "minisound_web.dart";
 
-class WebRecording implements PlatformRecording {
-  WebRecording._(c.Recording self) : _self = self;
-
-  final c.Recording _self;
-
-  @override
-  Uint8List get buffer => _self.buf.asTypedList(_self.size);
-
-  @override
-  void dispose() => malloc.free(_self.buf);
-}
-
 class WebRecorder implements PlatformRecorder {
-  WebRecorder._(Pointer<c.Recorder> self) : _self = self;
+  WebRecorder._(int maxRecCount) : _self = _binds.recorder_alloc(maxRecCount) {
+    if (_self == nullptr) throw MinisoundPlatformOutOfMemoryException();
+  }
 
   final Pointer<c.Recorder> _self;
 
   @override
-  bool get isRecording => c.recorder_get_is_recording(_self);
-
-  @override
-  Future<void> init({
-    required RecorderFormat format,
-    required int channelCount,
-    required int sampleRate,
-  }) async {
-    final r =
-        await c.recorder_init(_self, format.toC(), channelCount, sampleRate);
+  Future<void> init(int periodMs) async {
+    final r = await _binds.recorder_init(_self, periodMs);
     if (r != c.Result.Ok) {
       throw MinisoundPlatformException(
-          "Failed to initialize recorder (code: $r).");
+          "Failed to init the recorder (code: $r).");
     }
   }
 
   @override
   void dispose() {
-    c.recorder_uninit(_self);
+    _binds.recorder_uninit(_self);
     malloc.free(_self);
   }
 
   @override
   void start() {
-    final r = c.recorder_start(
-      _self,
-      c.RecordingEncoding.RECORDING_ENCODING_WAV,
-    );
+    final r = _binds.recorder_start(_self);
     if (r != c.Result.Ok) {
       throw MinisoundPlatformException(
-          "Failed to start the recorder (code: $r).");
+        "Failed to start the recorder (code: $r).",
+      );
     }
   }
 
   @override
-  WebRecording stop() {
-    if (!c.recorder_get_is_recording(_self)) {
-      throw MinisoundPlatformException("Recording has no data.");
-    }
-    final recording = c.recorder_stop(_self);
-    return WebRecording._(recording);
-  }
-}
+  bool isRecording(PlatformRec rec) {
+    rec as WebRec;
 
-extension on RecorderFormat {
-  int toC() => switch (this) {
-        RecorderFormat.u8 => c.RecorderFormat.RECORDER_FORMAT_U8,
-        RecorderFormat.s16 => c.RecorderFormat.RECORDER_FORMAT_S16,
-        RecorderFormat.s24 => c.RecorderFormat.RECORDER_FORMAT_S24,
-        RecorderFormat.s32 => c.RecorderFormat.RECORDER_FORMAT_S32,
-        RecorderFormat.f32 => c.RecorderFormat.RECORDER_FORMAT_F32,
-      };
+    return _binds.recorder_get_is_recording(_self, rec._self);
+  }
+
+  @override
+  Future<WebRec> saveRec({
+    required AudioEncoding encoding,
+    required SampleFormat sampleFormat,
+    required int channelCount,
+    required int sampleRate,
+  }) async {
+    final rec = _binds.rec_alloc();
+    if (rec == nullptr) throw MinisoundPlatformOutOfMemoryException();
+
+    final dataPtr = malloc.allocate<Pointer<Uint8>>(sizeOf<Pointer<Uint8>>());
+    if (dataPtr == nullptr) {
+      malloc.free(rec);
+      throw MinisoundPlatformOutOfMemoryException();
+    }
+    final dataSizePtr = malloc.allocate<Size>(sizeOf<Size>());
+    if (dataSizePtr == nullptr) {
+      malloc.free(dataPtr);
+      malloc.free(rec);
+      throw MinisoundPlatformOutOfMemoryException();
+    }
+
+    final r = _binds.recorder_save_rec(
+      _self,
+      rec,
+      encoding.toC(),
+      sampleFormat.toC(),
+      channelCount,
+      sampleRate,
+      dataPtr,
+      dataSizePtr,
+    );
+    if (r != c.Result.Ok) {
+      malloc.free(rec);
+      throw MinisoundPlatformException(
+        "Failed to save a recording (code: $r).",
+      );
+    }
+
+    return WebRec._(rec, dataPtr, dataSizePtr);
+  }
+
+  @override
+  void pauseRec(PlatformRec rec) {
+    rec as WebRec;
+
+    final r = _binds.recorder_pause_rec(_self, rec._self);
+    if (r != c.Result.Ok) {
+      throw MinisoundPlatformException(
+        "Failed to pause the recording (code: $r).",
+      );
+    }
+  }
+
+  @override
+  void resumeRec(PlatformRec rec) {
+    rec as WebRec;
+
+    final r = _binds.recorder_resume_rec(_self, rec._self);
+    if (r != c.Result.Ok) {
+      throw MinisoundPlatformException(
+        "Failed to resume the recording (code: $r).",
+      );
+    }
+  }
 }

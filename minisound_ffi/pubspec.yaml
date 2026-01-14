@@ -24,7 +24,7 @@ dev_dependencies:
 ffigen:
   name: MinisoundFfiBindings
   description: "Bindings for minisound.h"
-  output: lib/minisound_ffi_bindings.dart
+  output: lib/src/minisound_ffi_bindings.dart
   headers:
     entry-points:
       - "src/include/minisound.h"
@@ -45,6 +45,8 @@ ffigen:
   compiler-opts:
     - -I/usr/lib/clang/21/include/
     - -I./src/include/
+    - -I./src/external/result/
+    - -I./src/external/woodi/
     - -std=c11
   silence-enum-warning: true
 

@@ -77,8 +77,7 @@ MiunteResult setup_test() {
 }
 
 MiunteResult teardown_test() {
-    engine_uninit(engine);
-    free(engine), engine = NULL;
+    engine_uninit(engine), free(engine), engine = NULL;
 
     MIUNTE_PASS();
 }
