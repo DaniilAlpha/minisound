@@ -1,16 +1,27 @@
 # minisound
 
-A high-level real-time audio playback, generation and recording library based on [miniaudio](https://miniaud.io).
+A high-level real-time audio library for playback, generation and recording, focusing on ease of use and performance. Suitable for realtime audio applications and games, where low latency is essential. Based on [miniaudio](https://miniaud.io).
 
-## Feature highlight
+## Features
 
 - Aim to support all platforms Dart itself works on, including the web and wasm.
-- Configurable low latency, suitable for real-time audio applications.
+
+- Configurable low latency, perfect for realtime audio applications.
+
 - Full support (playing and recording) of WAV, MP3 and FLAC formats.
-- Uniform object oriented API for the player/generator and recorder.
+
+- Leverages native audio APIs under the hood.
+
+- Uniform object oriented APIs for audio playback, generation and recording, focusing on ease of use.
+
+- Annotated public API and comprehensive examples.
+
 - Automatic resource management (uses Dart's `Finalizer`s internally), so you don't need to `dispose()` anything.
+
 - Advanced looping controls, with an ability to set a precise delay.
+
 - Configurable recording parameters like sample format, channel count and sample rate.
+
 - An ability to record multiple recordings at once, including in different formats/encodings.
 
 
@@ -18,7 +29,7 @@ A high-level real-time audio playback, generation and recording library based on
 
 |Platform |Tested                      |Supported* (best efforts)|
 |---------|----------------------------|-------------------------|
-|Android  |SDK 31, 19                  |Any                      |
+|Android  |SDK 31                      |Any                      |
 |Windows  |Latest (GH Action)          |Any                      |
 |GNU/Linux|Latest Arch Linux           |Any                      |
 |iOS      |Latest Simulator (GH Action)|Any                      |
@@ -36,19 +47,17 @@ There was some pretty major API changes in the 3.0.0, see [migration guide](#mig
 
 ## Getting started 
 
-### Android
-
-Apart from setting permissions in the Android manifest (which is done by `minisound`), you also have to request permission from the user at runtime. This can be done easily using the [`permission_handler` package](https://pub.dev/packages/permission_handler) (you can look at the [example app](/minisound/example/lib/main.dart) to see some code).
+For some platforms, you have to request permission from the user at runtime. This can be done easily using the [`permission_handler` package](https://pub.dev/packages/permission_handler) (you can look at the [example app](/minisound/example/lib/main.dart) to see some code).
 
 
 ### GNU/Linux
 
-The library works best with the PulseAudio (expects package to be installed), but can also work through ALSA to broaden the support.
+The library works best with the PulseAudio, but can also work through ALSA to broaden the support. Development libraries should be installed accordingly.
 
 
 ### macOS and iOS 
 
-Testing for this platforms is a bit problematic, so this can be considered experimental yet. Feel free to report any issues to the GitHub repo.
+Testing for this platforms is a bit problematic, so this should be considered experimental. Feel free to report any issues to the GitHub repo.
 
 
 ### Web and Wasm
@@ -103,6 +112,7 @@ flutter run -d chrome --web-browser-flag '--enable-features=SharedArrayBuffer'
 
 To use this plugin, add `minisound` as a [dependency in your pubspec.yaml file](https://flutter.dev/platform-plugins/).
 
+Apart from this simple examples you may want to look at the [example app](/minisound/example/lib/main.dart).
 
 ### Playback
 
@@ -174,7 +184,6 @@ void main() async {
 }
 ```
 
-
 ### Generation 
 
 ```dart
@@ -203,7 +212,6 @@ void main() async {
   // player and sounds will be automatically disposed on GC run
 }
 ```
-
 
 ### Recording
 
@@ -245,53 +253,25 @@ void main() async {
 
 - The `Engine` class was renamed into `Player`. File names changed to `player.dart` and `player_flutter.dart` as well.
 
-- `doAddToFinalizer` params in loading and generation methods got removed completely.
+- Replace `sound.playLooped(loopDelay: loopDelay)` with `sound.isLooped = true` and `sound.loopDelay = loopDelay`. Fields can now be set independently.
 
-- `genPulse` is deprecated, as it made the API inconsistent and is not very useful either. Some time in the future i might add `dutyCycle` to `WaveformSound`s and remove pulsewave completely.
+- Manual sound management got completely removed.
+
+- Method `engine.genPulse` is deprecated, as it made the API inconsistent and is not very useful either. Some time in the future i might add `dutyCycle` to `WaveformSound`s and remove pulsewaves completely.
 
 
-### 1.6.X -> 2.0.0
+## Developing and contributing
 
-- Recording and generation APIs got heavily changed. See [usage](#usage) for new usage.
-
-- Sound autounloading logic got changed, now they depend on the sound object itself, rather than the engine.
-```dart
-  // remove
-  // sound.unload();
+To run the project locally, you'll need to clone the repo. It defaults to the latest dev version, where all the development work should be done.
+```bash
+git clone https://github.com/DaniilAlpha/minisound.git --recurse-submodules
 ```
-As a result, when `Sound` objects get garbage collected (which may be immediately after or not at the moment they go out of scope), they stop and unload. If you want to prevent this, you are probably doing something wrong, as this means you are creating an indefenetely played sound with no way to access it. Though this behaviour can still be disabled via the `doAddToFinalizer` parameter to sound loading and generation methods of the `Engine` class. However, it disables any finalization, so you'll need to manage `Sound`s completely yourself. If you believe your usecase is valid, create a github issue and provide the code. Maybe it will change my mind.
 
+You can use `make` to run some common commands sets:
 
-<!-- ## Building the project -->
-
-<!-- A Makefile is provided with recipes to build the project and ease development. Type `make help` to see a list of available commands. -->
-
-<!-- To manually build the project, follow these steps: -->
-
-<!-- 1. Initialize the submodules: -->
-
-<!--     ```bash -->
-<!--     git submodule update --init --recursive -->
-<!--     ``` -->
-
-<!-- 2. Run the following commands to build the project using emcmake: -->
-
-<!--     ```bash -->
-<!--     emcmake cmake -S ./minisound_ffi/src/ -B ./minisound_web/lib/build/cmake_stuff  -->
-<!--     cmake --build ./minisound_web/lib/build/cmake_stuff  -->
-<!--     ``` -->
-
-<!--     If you encounter issues or want to start fresh, clean the `build` folder and rerun the cmake commands: -->
-
-<!--     ```bash -->
-<!--     rm -rf * -->
-<!--     emcmake cmake -S ./minisound_ffi/src/ -B ./minisound_web/lib/build/cmake_stuff  -->
-<!--     cmake --build ./minisound_web/lib/build/cmake_stuff  -->
-<!--     ``` -->
-
-<!-- 4. For the development work, it's useful to run `ffigen` from the `minisound_ffi` directory: -->
-
-<!--     ```bash -->
-<!--     cd ./minisound_ffi/ -->
-<!--     dart run ffigen -->
-<!--     ``` -->
+- `projs-get` - get dependencies for all the packages
+- `projs-clean` - clean all the packages
+- `proj-main-example-run` - run the example app 
+- `proj-ffi-gen-bindings` - generate Dart FFI bindings
+- `proj-ffi-native-test-run` - semi-automatic test to test the underlying C library (not guaranteed to work with compilers other than GCC)
+- `proj-web-lib-build-debug` and `proj-web-lib-build-release` - build debug and release versions respectfully of the web library 
