@@ -247,7 +247,7 @@ void main() async {
 
 ## Migration guide
 
-### 2.X.X -> 3.0.0
+### 2.x.x ➔ 3.0.0
 
 - Recording API got heavily changed. See the [usage](#usage) for new usage.
 
