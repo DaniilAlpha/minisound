@@ -1227,6 +1227,7 @@ enum AudioEncoding {
 }
 
 enum SampleFormat {
+  SAMPLE_FORMAT_UNDEFINED(0),
   SAMPLE_FORMAT_U8(1),
   SAMPLE_FORMAT_S16(2),
   SAMPLE_FORMAT_S24(3),
@@ -1237,6 +1238,7 @@ enum SampleFormat {
   const SampleFormat(this.value);
 
   static SampleFormat fromValue(int value) => switch (value) {
+        0 => SAMPLE_FORMAT_UNDEFINED,
         1 => SAMPLE_FORMAT_U8,
         2 => SAMPLE_FORMAT_S16,
         3 => SAMPLE_FORMAT_S24,

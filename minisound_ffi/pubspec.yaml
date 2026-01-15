@@ -2,7 +2,7 @@ publish_to: none
 name: minisound_ffi
 description: FFI implementation of the Minisound package.
 version: 3.0.0
-repository: https://github.com/DaniilAlpha/minisound/tree/master/minisound_ffi
+repository: https://github.com/DaniilAlpha/minisound/tree/release/minisound_ffi
 
 #####
 

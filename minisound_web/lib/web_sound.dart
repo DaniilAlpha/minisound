@@ -47,11 +47,16 @@ sealed class WebSound implements PlatformSound {
 }
 
 final class WebEncodedSound extends WebSound implements PlatformEncodedSound {
-  WebEncodedSound._(super.self, {required Pointer data}) : _data = data;
-
-  late final _soundData = _binds.sound_get_encoded_data(_self);
+  WebEncodedSound._(super.self, {required Pointer data})
+      : _data = data,
+        _soundData = _binds.sound_get_encoded_data(self) {
+    if (_soundData == nullptr) {
+      throw MinisoundPlatformException("Failed to get the sound data.");
+    }
+  }
 
   final Pointer _data;
+  final Pointer<c.EncodedSoundData> _soundData;
 
   @override
   late final duration = _binds.sound_get_duration(_self);
@@ -78,12 +83,16 @@ final class WebEncodedSound extends WebSound implements PlatformEncodedSound {
 }
 
 final class WebWaveformSound extends WebSound implements PlatformWaveformSound {
-  WebWaveformSound._(super.self);
+  WebWaveformSound._(super.self)
+      : _waveform = _binds.sound_get_waveform_data(self) {
+    if (_waveform == nullptr) {
+      throw MinisoundPlatformException("Failed to get the sound data.");
+    }
+  }
 
-  late final _waveform = _binds.sound_get_waveform_data(_self);
+  final Pointer<c.WaveformSoundData> _waveform;
 
-  late WaveformType _type =
-      _binds.waveform_sound_data_get_type(_waveform).toDart();
+  late var _type = _binds.waveform_sound_data_get_type(_waveform).toDart();
   @override
   WaveformType get type => _type;
   @override
@@ -92,7 +101,7 @@ final class WebWaveformSound extends WebSound implements PlatformWaveformSound {
     _type = value;
   }
 
-  late double _freq = _binds.waveform_sound_data_get_freq(_waveform);
+  late var _freq = _binds.waveform_sound_data_get_freq(_waveform);
   @override
   double get freq => _freq;
   @override

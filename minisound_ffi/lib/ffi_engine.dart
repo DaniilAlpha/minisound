@@ -26,8 +26,7 @@ final class FfiEngine implements PlatformEngine {
     final r = _binds.engine_start(_self);
     if (r != c.Result.Ok) {
       throw MinisoundPlatformException(
-        "Failed to start the engine (code: $r).",
-      );
+          "Failed to start the engine (code: $r).");
     }
   }
 

@@ -24,6 +24,7 @@ static_assert((int)AUDIO_ENCODING_FLAC == (int)ma_encoding_format_flac, "`AUDIO_
 static_assert((int)AUDIO_ENCODING_MP3 == (int)ma_encoding_format_mp3, "`AUDIO_ENCODING_MP3` should match `ma_encoding_format_mp3`.");
 
 // this ensures safe casting between `SampleFormat` and `ma_format`
+static_assert((int)SAMPLE_FORMAT_UNDEFINED == (int)ma_format_unknown, "`SAMPLE_FORMAT_UNDEFINED` should match `ma_format_unknown`.");
 static_assert((int)SAMPLE_FORMAT_U8 == (int)ma_format_u8, "`SAMPLE_FORMAT_U8` should match `ma_format_u8`.");
 static_assert((int)SAMPLE_FORMAT_S16 == (int)ma_format_s16, "`SAMPLE_FORMAT_S16` should match `ma_format_s16`.");
 static_assert((int)SAMPLE_FORMAT_S24 == (int)ma_format_s24, "`SAMPLE_FORMAT_S24` should match `ma_format_s24`.");

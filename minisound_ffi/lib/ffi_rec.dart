@@ -12,15 +12,31 @@ class FfiRec implements PlatformRec {
   final Pointer<Pointer<Uint8>> _dataPtr;
   final Pointer<Size> _dataSizePtr;
 
-  @override
-  Uint8List get data => _dataPtr.value.asTypedList(_dataSizePtr.value);
+  Uint8List? data;
 
   @override
   void dispose() {
+    malloc.free(_dataPtr);
+    malloc.free(_dataSizePtr);
+
     _binds.rec_uninit(_self);
     malloc.free(_self);
   }
 
   @override
-  Future<void> end() async => _binds.rec_end(_self);
+  Future<Uint8List> end() async {
+    if (data != null) return data!;
+
+    final r = _binds.rec_end(_self);
+    if (r != c.Result.Ok) {
+      malloc.free(_dataPtr.value);
+      throw MinisoundPlatformException("Failed to and a recording (code: $r).");
+    }
+
+    data = Uint8List.fromList(_dataPtr.value.asTypedList(_dataSizePtr.value));
+    malloc.free(_dataPtr.value);
+    _dataPtr.value = nullptr;
+
+    return data!;
+  }
 }

@@ -68,6 +68,7 @@ enum AudioEncoding {
 }
 
 enum SampleFormat {
+  SAMPLE_FORMAT_UNDEFINED(0),
   SAMPLE_FORMAT_U8(1),
   SAMPLE_FORMAT_S16(2),
   SAMPLE_FORMAT_S24(3),

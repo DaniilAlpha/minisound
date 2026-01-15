@@ -22,12 +22,7 @@ abstract class Rec<T> {
   /// Stops recording and ends it. Cannot be resumed after this call.
   Future<T> end();
 
-  Future<void> _end() async {
-    await _rec.end();
-
-    // meant for waiting until audio thread finishes its job, not sure if really needed
-    await Future.delayed(const Duration(milliseconds: 50));
-  }
+  Future<Uint8List> _end() => _rec.end();
 }
 
 /// A recording that provides its buffer after it's ended.
@@ -35,10 +30,7 @@ final class BufRec extends Rec<Uint8List> {
   BufRec._(super.recorder) : super._();
 
   @override
-  Future<Uint8List> end() async {
-    await super._end();
-    return _rec.data;
-  }
+  Future<Uint8List> end() => super._end();
 }
 
 /// A recording that is written into a file immediately when ended.
@@ -50,9 +42,6 @@ final class FileRec extends Rec<File> {
   final File _file;
 
   @override
-  Future<File> end() async {
-    await super._end();
-    await (_file..createSync()).writeAsBytes(_rec.data, flush: true);
-    return _file;
-  }
+  Future<File> end() async =>
+      (_file..createSync()).writeAsBytes(await super._end(), flush: true);
 }

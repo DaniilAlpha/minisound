@@ -150,9 +150,10 @@ Result recorder_save_rec(
         encoded_rec_sink_init(
             encoded,
             encoding,
-            sample_format,
-            channel_count,
-            sample_rate,
+            sample_format ? sample_format
+                          : (SampleFormat)self->device.capture.format,
+            channel_count ? channel_count : self->device.capture.channels,
+            sample_rate ? sample_rate : self->device.sampleRate,
 
             data_ptr,
             data_size_ptr

@@ -30,12 +30,15 @@ extension PointerUint8AsTypedList on Pointer<Uint8> {
 
 extension Uint8PointerValue on Pointer<Uint8> {
   int get value => heap.u8(addr);
+  set value(int value) => heap.setu8(addr, value);
 }
 
 extension Uint32PointerValue on Pointer<Uint32> {
   int get value => heap.u32(addr);
+  set value(int value) => heap.setu32(addr, value);
 }
 
 extension PointerPointerValue<T> on Pointer<Pointer<T>> {
   Pointer<T> get value => Pointer(heap.u32(addr));
+  set value(Pointer<T> value) => heap.setu32(addr, value.addr);
 }
