@@ -49,7 +49,7 @@ class LoadedSound extends Sound {
   set cursor(Duration value) =>
       _sound.cursor = max(0.0, value.inMilliseconds / 1000);
 
-  /// Whether the playbal should be started again automatically after `loopDelay`ms when the sound is ended.
+  /// Whether the playback should be started again automatically `loopDelay` ms after sound is ended.
   bool get isLooped => _sound.looping.$1;
   set isLooped(bool val) => _sound.looping = (val, _sound.looping.$2);
 

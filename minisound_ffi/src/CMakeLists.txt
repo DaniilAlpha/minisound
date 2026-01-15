@@ -161,7 +161,7 @@ if(EMSCRIPTEN)
     set(JS_OUTPUTS)
     foreach(JS_FILE ${JS_SOURCES})
         get_filename_component(JS_FILENAME ${JS_FILE} NAME)
-        set(JS_OUTPUT ${WEB_OUT_DIR}/${JS_FILENAME})
+        set(JS_OUTPUT ${WEB_OUT_DIR}/../${JS_FILENAME})
         list(APPEND JS_OUTPUTS ${JS_OUTPUT})
         add_custom_command(
             OUTPUT ${JS_OUTPUT}

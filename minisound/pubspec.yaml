@@ -5,6 +5,7 @@ repository: https://github.com/DaniilAlpha/minisound/tree/master/minisound
 topics:
   - audio
   - player
+  - recorder
   - sound
   - music
 
@@ -44,3 +45,4 @@ flutter:
         default_package: minisound_ffi
       web:
         default_package: minisound_web
+
