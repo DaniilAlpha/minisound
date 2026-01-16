@@ -1,16 +1,17 @@
-# name: Publish to pub.dev
+name: Publish to pub.dev
 
-# on:
-#   push:
-#     tags:
-#       - 'v[0-9]+.[0-9]+.[0-9]+*'
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
 
-# jobs:
-#   publish:
-#     permissions:
-#       id-token: write
-#     runs-on: ubuntu-latest
-#     steps:
+jobs:
+  publish:
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo Ignoring this job.
 #       - name: Clone the repo
 #         uses: actions/checkout@v6
 #         with:
