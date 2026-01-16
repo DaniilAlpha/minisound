@@ -20,10 +20,9 @@ jobs:
         uses: dart-lang/setup-dart@v1 
 
       - name: Analyze the package
-        working-directory: minisound/
         run: |
           dart pub global activate pana
-          pana minisound --exit-code-threshold 0
+          pana --exit-code-threshold 0 minisound
 
       # // TODO!!! do something to publish all the packages
 
