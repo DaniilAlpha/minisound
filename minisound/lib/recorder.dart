@@ -1,7 +1,7 @@
 import "dart:async";
 import "dart:typed_data";
 
-import "package:minisound/src/dummy_file.dart" if (dart.library.io) "dart:io";
+import "package:minisound/src/dummy_io.dart" if (dart.library.io) "dart:io";
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
 
 export "package:minisound_platform_interface/minisound_platform_interface.dart"
