@@ -1,33 +1,33 @@
-name: Publish to pub.dev
+# name: Publish to pub.dev
 
-on:
-  push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+*'
+# on:
+#   push:
+#     tags:
+#       - 'v[0-9]+.[0-9]+.[0-9]+*'
 
-jobs:
-  publish:
-    permissions:
-      id-token: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clone the repo
-        uses: actions/checkout@v6
-        with:
-          submodules: recursive
+# jobs:
+#   publish:
+#     permissions:
+#       id-token: write
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Clone the repo
+#         uses: actions/checkout@v6
+#         with:
+#           submodules: recursive
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          cache: true
+#       - name: Set up Flutter
+#         uses: subosito/flutter-action@v2
+#         with:
+#           channel: stable
+#           cache: true
 
-      - name: Analyze the package
-        run: |
-          dart pub global activate pana
-          pana --exit-code-threshold 0 minisound
+#       - name: Analyze the package
+#         run: |
+#           dart pub global activate pana
+#           pana --exit-code-threshold 0 minisound
 
-      # // TODO!!! do something to publish all the packages
+#       # // TODO!!! do something to publish all the packages
 
-      # - name: Publish
-      #   run: dart pub publish --force
+#       # - name: Publish
+#       #   run: dart pub publish --force
