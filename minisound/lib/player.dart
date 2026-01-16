@@ -1,10 +1,9 @@
 import "dart:math";
 import "dart:typed_data";
 
+import "package:minisound/src/dummy_io.dart" if (dart.library.io) "dart:io";
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
 
-export "package:minisound/src/dummy.dart"
-    if (dart.library.io) "package:minisound/src/player_io.dart";
 export "package:minisound_platform_interface/minisound_platform_interface.dart"
     show
         AudioEncoding,
@@ -48,6 +47,10 @@ final class Player {
     _soundsFinalizer.attach(sound, platformSound);
     return sound;
   }
+
+  /// Loads a file and creates a `LoadedSound` from it.
+  Future<LoadedSound> loadSoundFile(String filePath) async =>
+      loadSound(await File(filePath).readAsBytes());
 
   /// Generates a waveform sound with provided `type` and `freq`.
   WaveformSound genWaveform(WaveformType type, {double freq = 440.0}) {
