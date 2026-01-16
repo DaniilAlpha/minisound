@@ -112,7 +112,7 @@ flutter run -d chrome --web-browser-flag '--enable-features=SharedArrayBuffer'
 
 To use this plugin, add `minisound` as a [dependency in your pubspec.yaml file](https://flutter.dev/platform-plugins/).
 
-Apart from this simple examples you may want to look at the [example app](/minisound/example/lib/main.dart).
+Apart from these simple examples you may want to look at the [example app](/minisound/example/lib/main.dart).
 
 ### Playback
 
