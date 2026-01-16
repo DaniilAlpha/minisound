@@ -3,8 +3,8 @@ import "dart:typed_data";
 
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
 
-export "package:minisound/src/player_io.dart"
-    if (dart.library.io) "package:minisound/src/dummy.dart";
+export "package:minisound/src/dummy.dart"
+    if (dart.library.io) "package:minisound/src/player_io.dart";
 export "package:minisound_platform_interface/minisound_platform_interface.dart"
     show
         AudioEncoding,

@@ -20,20 +20,9 @@ jobs:
         uses: dart-lang/setup-dart@v1 
 
       - name: Analyze the package
-        uses: axel-op/dart-package-analyzer@v3
-        with:
-          relativePath: minisound/
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Check scores
-        env:
-          SCORE: ${{ steps.analysis.outputs.total }}
-          SCORE_MAX: ${{ steps.analysis.outputs.total_max }}
         run: |
-          if [ $SCORE -lt $SCORE_MAX ]; then
-            echo Score too low ($SCORE/$SCORE_MAX)!
-            exit 1
-          fi
+          dart pub global activate pana
+          pana minisound --exit-code-threshold 0
 
       # // TODO!!! do something to publish all the packages
 
