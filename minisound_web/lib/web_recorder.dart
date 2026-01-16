@@ -27,8 +27,7 @@ class WebRecorder implements PlatformRecorder {
     final r = _binds.recorder_start(_self);
     if (r != c.Result.Ok) {
       throw MinisoundPlatformException(
-        "Failed to start the recorder (code: $r).",
-      );
+          "Failed to start the recorder (code: $r).");
     }
   }
 
@@ -42,9 +41,9 @@ class WebRecorder implements PlatformRecorder {
   @override
   Future<WebRec> saveRec({
     required AudioEncoding encoding,
-    required SampleFormat sampleFormat,
-    required int channelCount,
-    required int sampleRate,
+    required SampleFormat? sampleFormat,
+    required int? channelCount,
+    required int? sampleRate,
   }) async {
     final rec = _binds.rec_alloc();
     if (rec == nullptr) throw MinisoundPlatformOutOfMemoryException();
@@ -65,17 +64,25 @@ class WebRecorder implements PlatformRecorder {
       _self,
       rec,
       encoding.toC(),
-      sampleFormat.toC(),
-      channelCount,
-      sampleRate,
+      sampleFormat?.toC() ?? c.SampleFormat.SAMPLE_FORMAT_UNDEFINED,
+      channelCount ?? 0,
+      sampleRate ?? 0,
       dataPtr,
       dataSizePtr,
+
+      // NativeCallable<Void Function(Size, Pointer<Uint8>, Size)>.listener(
+      //   (int pos, Pointer<Uint8> data, int dataSize) {
+      //     onDataFn(pos, data.asTypedList(dataSize));
+      //     malloc.free(data);
+      //   },
+      // ).nativeFunction,
     );
     if (r != c.Result.Ok) {
+      malloc.free(dataSizePtr);
+      malloc.free(dataPtr);
       malloc.free(rec);
       throw MinisoundPlatformException(
-        "Failed to save a recording (code: $r).",
-      );
+          "Failed to save a recording (code: $r).");
     }
 
     return WebRec._(rec, dataPtr, dataSizePtr);
@@ -88,8 +95,7 @@ class WebRecorder implements PlatformRecorder {
     final r = _binds.recorder_pause_rec(_self, rec._self);
     if (r != c.Result.Ok) {
       throw MinisoundPlatformException(
-        "Failed to pause the recording (code: $r).",
-      );
+          "Failed to pause the recording (code: $r).");
     }
   }
 
@@ -100,8 +106,7 @@ class WebRecorder implements PlatformRecorder {
     final r = _binds.recorder_resume_rec(_self, rec._self);
     if (r != c.Result.Ok) {
       throw MinisoundPlatformException(
-        "Failed to resume the recording (code: $r).",
-      );
+          "Failed to resume the recording (code: $r).");
     }
   }
 }

@@ -1,7 +1,7 @@
 import "dart:async";
-import "dart:io";
-import "dart:typed_data";
+import "dart:io" if (dart.library.io) "package:minisound/src/dummy_file.dart";
 
+import "package:flutter/foundation.dart";
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
 
 export "package:minisound_platform_interface/minisound_platform_interface.dart"
@@ -34,49 +34,51 @@ final class Recorder {
 
   /// Initializes the recorder.
   ///
-  /// `periodMs` - affects sounds latency (lower period means lower latency but possibble crackles). Clamped between `0` and `1000` (1s). Probably has no effect on the web.
-  Future<void> init([int periodMs = 32]) =>
-      _recorder.init(periodMs.clamp(0, 1000));
+  /// `periodMs` - affects sounds latency (lower period means lower latency but possibble crackles). Clamped between `1` and `1000` (1s). Probably has no effect on the web.
+  Future<void> init([int periodMs = 64]) =>
+      _recorder.init(periodMs.clamp(1, 1000));
 
   /// Starts the recorder.
   Future<void> start() async => _recorder.start();
 
   /// Creates a file and starts recording into it.
   ///
-  /// Parameters directly influence the resulting file size.
+  /// Parameters directly influence the resulting file size. If any are absent, they take values from the device, which is a bit faster.
   ///
   /// `encoding` - currently only WAV is supported, so there's no need in this parameter.
-  /// `sampleFormat` - the amount of different amplitude levels of the data. S16 is a standard value.
-  /// `channelCount` - must be in range `1..254` inclusive. Using `1` (in case mono audio is ok) will reduce data size in half.
-  /// `sampleRate` - controls sound frequencies that can be properly captured in a recording. Must be in range `1000..384000` inclusive. `44100` is a standard value.
+  /// `sampleFormat` - the amount of different amplitude levels of the data.
+  /// `channelCount` - must be in range `1..254` inclusive.
+  /// `sampleRate` - controls sound frequencies that can be properly captured in a recording. Must be in range `1000..384000` inclusive.
   Future<FileRec> saveRecFile(
     String filePath, {
     AudioEncoding encoding = AudioEncoding.wav,
-    SampleFormat sampleFormat = SampleFormat.s16,
-    int channelCount = 2,
-    int sampleRate = 44100,
+    SampleFormat? sampleFormat,
+    int? channelCount,
+    int? sampleRate,
   }) =>
-      _saveRec(
-        (recorder) => FileRec._(File(filePath), recorder),
-        encoding: encoding,
-        sampleFormat: sampleFormat,
-        channelCount: channelCount,
-        sampleRate: sampleRate,
-      );
+      kIsWeb
+          ? throw UnimplementedError()
+          : _saveRec(
+              (recorder) => FileRec._(File(filePath), recorder),
+              encoding: encoding,
+              sampleFormat: sampleFormat,
+              channelCount: channelCount,
+              sampleRate: sampleRate,
+            );
 
   /// Starts recording into in-RAM buffer. After the recording is stopped, it can be directly fed into `Engine::loadSound`.
   ///
-  /// Parameters directly influence the resulting buffer size.
+  /// Parameters directly influence the resulting buffer size. If any are absent, they take values from the device, which is a bit faster.
   ///
   /// `encoding` - currently only WAV is supported, so there's no need in this parameter.
-  /// `sampleFormat` - the amount of different amplitude levels of the data. S16 is a standard value.
-  /// `channelCount` - must be in range `1..254` inclusive. Using `1` (in case mono audio is ok) will reduce data size in half.
-  /// `sampleRate` - controls sound frequencies that can be properly captured in a recording. Must be in range `1000..384000` inclusive. `44100` is a standard value.
+  /// `sampleFormat` - the amount of different amplitude levels of the data.
+  /// `channelCount` - must be in range `1..254` inclusive.
+  /// `sampleRate` - controls sound frequencies that can be properly captured in a recording. Must be in range `1000..384000` inclusive.
   Future<BufRec> saveRecBuf({
     AudioEncoding encoding = AudioEncoding.wav,
-    SampleFormat sampleFormat = SampleFormat.s16,
-    int channelCount = 2,
-    int sampleRate = 44100,
+    SampleFormat? sampleFormat,
+    int? channelCount,
+    int? sampleRate,
   }) =>
       _saveRec(
         BufRec._,
@@ -89,12 +91,12 @@ final class Recorder {
   Future<T> _saveRec<T extends Rec>(
     T Function(Recorder recorder) createRec, {
     required AudioEncoding encoding,
-    required SampleFormat sampleFormat,
-    required int channelCount,
-    required int sampleRate,
+    required SampleFormat? sampleFormat,
+    required int? channelCount,
+    required int? sampleRate,
   }) async {
-    assert(1 <= channelCount && channelCount <= 254);
-    assert(1000 <= sampleRate && sampleRate <= 384000);
+    if (channelCount != null) assert(1 <= channelCount && channelCount <= 254);
+    if (sampleRate != null) assert(1000 <= sampleRate && sampleRate <= 384000);
 
     final rec = createRec(this);
     final platformRec = await _recorder.saveRec(

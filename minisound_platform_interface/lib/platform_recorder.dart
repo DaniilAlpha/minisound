@@ -1,9 +1,7 @@
 part of "minisound_platform_interface.dart";
 
 abstract interface class PlatformRec {
-  Uint8List get data;
-
-  Future<void> end();
+  Future<Uint8List> end();
 
   void dispose();
 }
@@ -21,9 +19,9 @@ abstract interface class PlatformRecorder {
 
   Future<PlatformRec> saveRec({
     required AudioEncoding encoding,
-    required SampleFormat sampleFormat,
-    required int channelCount,
-    required int sampleRate,
+    required SampleFormat? sampleFormat,
+    required int? channelCount,
+    required int? sampleRate,
   });
   void resumeRec(PlatformRec rec);
   void pauseRec(PlatformRec rec);

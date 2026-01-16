@@ -34,9 +34,9 @@ final class Player {
 
   /// Initializes the engine.
   ///
-  /// `periodMs` - affects sounds latency (lower period means lower latency but possibble crackles). Clamped between `0` and `1000` (1s). Probably has no effect on the web.
-  Future<void> init([int periodMs = 16]) =>
-      _engine.init(periodMs.clamp(0, 1000));
+  /// `periodMs` - affects sounds latency (lower period means lower latency but possibble crackles). Clamped between `1` and `1000` (1s). Probably has no effect on the web.
+  Future<void> init([int periodMs = 32]) =>
+      _engine.init(periodMs.clamp(1, 1000));
 
   /// Starts the engine.
   Future<void> start() async => _engine.start();

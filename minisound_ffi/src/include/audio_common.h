@@ -8,6 +8,7 @@ typedef enum AudioEncoding {
     AUDIO_ENCODING_MP3,
 } AudioEncoding;
 typedef enum SampleFormat {
+    SAMPLE_FORMAT_UNDEFINED = 0,
     SAMPLE_FORMAT_U8 = 1,
     SAMPLE_FORMAT_S16,
     SAMPLE_FORMAT_S24,

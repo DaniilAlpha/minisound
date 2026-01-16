@@ -1941,7 +1941,7 @@ Module["ccall"] = ccall;
 // End JS library exports
 // end include: postlibrary.js
 var ASM_CONSTS = {
-  45176: ($0, $1, $2, $3, $4) => {
+  45592: ($0, $1, $2, $3, $4) => {
     if (typeof window === "undefined" || (window.AudioContext || window.webkitAudioContext) === undefined) {
       return 0;
     }
@@ -2013,7 +2013,7 @@ var ASM_CONSTS = {
     window.miniaudio.referenceCount += 1;
     return 1;
   },
-  47354: () => {
+  47770: () => {
     if (typeof (window.miniaudio) !== "undefined") {
       miniaudio.unlock_event_types.map(function(event_type) {
         document.removeEventListener(event_type, miniaudio.unlock, true);
@@ -2024,8 +2024,8 @@ var ASM_CONSTS = {
       }
     }
   },
-  47644: () => (navigator.mediaDevices !== undefined && navigator.mediaDevices.getUserMedia !== undefined),
-  47748: () => {
+  48060: () => (navigator.mediaDevices !== undefined && navigator.mediaDevices.getUserMedia !== undefined),
+  48164: () => {
     try {
       var temp = new (window.AudioContext || window.webkitAudioContext);
       var sampleRate = temp.sampleRate;
@@ -2035,12 +2035,12 @@ var ASM_CONSTS = {
       return 0;
     }
   },
-  47919: ($0, $1) => window.miniaudio.track_device({
+  48335: ($0, $1) => window.miniaudio.track_device({
     webaudio: emscriptenGetAudioObject($0),
     state: 1,
     pDevice: $1
   }),
-  48028: ($0, $1) => {
+  48444: ($0, $1) => {
     var getUserMediaResult = 0;
     var audioWorklet = emscriptenGetAudioObject($0);
     var audioContext = emscriptenGetAudioObject($1);
@@ -2058,14 +2058,14 @@ var ASM_CONSTS = {
     });
     return getUserMediaResult;
   },
-  48590: ($0, $1) => {
+  49006: ($0, $1) => {
     var audioWorklet = emscriptenGetAudioObject($0);
     var audioContext = emscriptenGetAudioObject($1);
     audioWorklet.connect(audioContext.destination);
     return 0;
   },
-  48750: $0 => emscriptenGetAudioObject($0).sampleRate,
-  48802: $0 => {
+  49166: $0 => emscriptenGetAudioObject($0).sampleRate,
+  49218: $0 => {
     var device = window.miniaudio.get_device_by_index($0);
     if (device.streamNode !== undefined) {
       device.streamNode.disconnect();
@@ -2073,15 +2073,15 @@ var ASM_CONSTS = {
     }
     device.pDevice = undefined;
   },
-  48993: $0 => {
+  49409: $0 => {
     window.miniaudio.untrack_device_by_index($0);
   },
-  49043: $0 => {
+  49459: $0 => {
     var device = window.miniaudio.get_device_by_index($0);
     device.webaudio.resume();
     device.state = window.miniaudio.device_state.started;
   },
-  49182: $0 => {
+  49598: $0 => {
     var device = window.miniaudio.get_device_by_index($0);
     device.webaudio.suspend();
     device.state = window.miniaudio.device_state.stopped;
