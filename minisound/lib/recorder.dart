@@ -1,7 +1,7 @@
 import "dart:async";
-import "dart:io" if (dart.library.io) "package:minisound/src/dummy_file.dart";
+import "dart:typed_data";
 
-import "package:flutter/foundation.dart";
+import "package:minisound/src/dummy_file.dart" if (dart.library.io) "dart:io";
 import "package:minisound_platform_interface/minisound_platform_interface.dart";
 
 export "package:minisound_platform_interface/minisound_platform_interface.dart"
@@ -56,15 +56,13 @@ final class Recorder {
     int? channelCount,
     int? sampleRate,
   }) =>
-      kIsWeb
-          ? throw UnimplementedError()
-          : _saveRec(
-              (recorder) => FileRec._(File(filePath), recorder),
-              encoding: encoding,
-              sampleFormat: sampleFormat,
-              channelCount: channelCount,
-              sampleRate: sampleRate,
-            );
+      _saveRec(
+        (recorder) => FileRec._(File(filePath), recorder),
+        encoding: encoding,
+        sampleFormat: sampleFormat,
+        channelCount: channelCount,
+        sampleRate: sampleRate,
+      );
 
   /// Starts recording into in-RAM buffer. After the recording is stopped, it can be directly fed into `Engine::loadSound`.
   ///
