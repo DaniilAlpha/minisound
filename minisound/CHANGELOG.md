@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.0.1
+
+- Fix `useDebugBuild` being mandatory in the web loader script.
+- Update docs to mention web setup changes.
+
 ## 3.0.0
 
 - Integrates GitHub actions to have at least some level of macOS/iOS testing. Fixes macOS/iOS build.
