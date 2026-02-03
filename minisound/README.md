@@ -249,6 +249,8 @@ void main() async {
 
 ### 2.x.x ➔ 3.0.0
 
+- **[web]** Minisound loader script changed its location and got updated a bit. You'll need to redo steps from the [web and wasm](#web-and-wasm) section.
+
 - Recording API got heavily changed. See the [usage](#usage) for new usage.
 
 - The `Engine` class was renamed into `Player`. File names changed to `player.dart` and `player_flutter.dart` as well.

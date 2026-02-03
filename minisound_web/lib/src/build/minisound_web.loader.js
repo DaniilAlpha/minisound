@@ -1,7 +1,7 @@
 if (!_minisound) var _minisound = {};
 if (!_minisound.loader) _minisound.loader = {};
 
-_minisound.loader.load = function ({ useDebugBuild }) { 
+_minisound.loader.load = function({ useDebugBuild } = { useDebugBuild: false }) {
     return new Promise((resolve, reject) => {
         const minisound_web_js = document.createElement("script");
         minisound_web_js.src = `assets/packages/minisound_web/src/build/${useDebugBuild ? "debug" : "release"}/minisound_web.js`;
