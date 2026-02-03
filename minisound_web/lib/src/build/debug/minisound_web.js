@@ -39,7 +39,7 @@ var ENVIRONMENT_IS_NODE = globalThis.process?.versions?.node && globalThis.proce
 var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIRONMENT_IS_WORKER && !ENVIRONMENT_IS_AUDIO_WORKLET;
 
 if (ENVIRONMENT_IS_NODE) {
-  var worker_threads = require("worker_threads");
+  var worker_threads = require("node:worker_threads");
   global.Worker = worker_threads.Worker;
   ENVIRONMENT_IS_WORKER = !worker_threads.isMainThread;
   ENVIRONMENT_IS_WASM_WORKER = ENVIRONMENT_IS_WORKER && worker_threads["workerData"] == "em-ww";
@@ -82,7 +82,7 @@ var readAsync, readBinary;
 if (ENVIRONMENT_IS_NODE) {
   // These modules will usually be used on Node.js. Load them eagerly to avoid
   // the complexity of lazy-loading.
-  var fs = require("fs");
+  var fs = require("node:fs");
   scriptDirectory = __dirname + "/";
   // include: node_shell_read.js
   readBinary = filename => {
@@ -172,7 +172,7 @@ var defaultPrint = console.log.bind(console);
 var defaultPrintErr = console.error.bind(console);
 
 if (ENVIRONMENT_IS_NODE) {
-  var utils = require("util");
+  var utils = require("node:util");
   var stringify = a => typeof a == "object" ? utils.inspect(a) : a;
   defaultPrint = (...args) => fs.writeSync(1, args.map(stringify).join(" ") + "\n");
   defaultPrintErr = (...args) => fs.writeSync(2, args.map(stringify).join(" ") + "\n");
@@ -300,14 +300,17 @@ function growMemViews() {
 
 if (ENVIRONMENT_IS_NODE && (ENVIRONMENT_IS_WASM_WORKER)) {
   // Create as web-worker-like an environment as we can.
+  globalThis.self = globalThis;
   var parentPort = worker_threads["parentPort"];
-  parentPort.on("message", msg => global.onmessage?.({
-    data: msg
-  }));
-  Object.assign(globalThis, {
-    self: global,
-    postMessage: msg => parentPort["postMessage"](msg)
-  });
+  // Deno and Bun already have `postMessage` defined on the global scope and
+  // deliver messages to `globalThis.onmessage`, so we must not duplicate that
+  // behavior here if `postMessage` is already present.
+  if (!globalThis.postMessage) {
+    parentPort.on("message", msg => globalThis.onmessage?.({
+      data: msg
+    }));
+    globalThis.postMessage = msg => parentPort["postMessage"](msg);
+  }
   // Node.js Workers do not pass postMessage()s and uncaught exception events to the parent
   // thread necessarily in the same order where they were generated in sequential program order.
   // See https://github.com/nodejs/node/issues/59617
@@ -905,10 +908,11 @@ var callUserCallback = func => {
     return;
   }
   try {
-    func();
-    maybeExit();
+    return func();
   } catch (e) {
     handleException(e);
+  } finally {
+    maybeExit();
   }
 };
 
@@ -1010,9 +1014,9 @@ var dynCall = (sig, ptr, args = [], promising = false) => {
 };
 
 /**
-     * @param {number} ptr
-     * @param {string} type
-     */ function getValue(ptr, type = "i8") {
+   * @param {number} ptr
+   * @param {string} type
+   */ function getValue(ptr, type = "i8") {
   if (type.endsWith("*")) type = "*";
   switch (type) {
    case "i1":
@@ -1053,10 +1057,10 @@ var ptrToString = ptr => {
 };
 
 /**
-     * @param {number} ptr
-     * @param {number} value
-     * @param {string} type
-     */ function setValue(ptr, value, type = "i8") {
+   * @param {number} ptr
+   * @param {number} value
+   * @param {string} type
+   */ function setValue(ptr, value, type = "i8") {
   if (type.endsWith("*")) type = "*";
   switch (type) {
    case "i1":
@@ -1116,15 +1120,15 @@ var findStringEnd = (heapOrArray, idx, maxBytesToRead, ignoreNul) => {
 };
 
 /**
-     * Given a pointer 'idx' to a null-terminated UTF8-encoded string in the given
-     * array that contains uint8 values, returns a copy of that string as a
-     * Javascript String object.
-     * heapOrArray is either a regular array, or a JavaScript typed array view.
-     * @param {number=} idx
-     * @param {number=} maxBytesToRead
-     * @param {boolean=} ignoreNul - If true, the function will not stop on a NUL character.
-     * @return {string}
-     */ var UTF8ArrayToString = (heapOrArray, idx = 0, maxBytesToRead, ignoreNul) => {
+   * Given a pointer 'idx' to a null-terminated UTF8-encoded string in the given
+   * array that contains uint8 values, returns a copy of that string as a
+   * Javascript String object.
+   * heapOrArray is either a regular array, or a JavaScript typed array view.
+   * @param {number=} idx
+   * @param {number=} maxBytesToRead
+   * @param {boolean=} ignoreNul - If true, the function will not stop on a NUL character.
+   * @return {string}
+   */ var UTF8ArrayToString = (heapOrArray, idx = 0, maxBytesToRead, ignoreNul) => {
   var endPtr = findStringEnd(heapOrArray, idx, maxBytesToRead, ignoreNul);
   // When using conditional TextDecoder, skip it for short strings as the overhead of the native call is not worth it.
   if (endPtr - idx > 16 && heapOrArray.buffer && UTF8Decoder) {
@@ -1163,18 +1167,18 @@ var findStringEnd = (heapOrArray, idx, maxBytesToRead, ignoreNul) => {
 };
 
 /**
-     * Given a pointer 'ptr' to a null-terminated UTF8-encoded string in the
-     * emscripten HEAP, returns a copy of that string as a Javascript String object.
-     *
-     * @param {number} ptr
-     * @param {number=} maxBytesToRead - An optional length that specifies the
-     *   maximum number of bytes to read. You can omit this parameter to scan the
-     *   string until the first 0 byte. If maxBytesToRead is passed, and the string
-     *   at [ptr, ptr+maxBytesToReadr[ contains a null byte in the middle, then the
-     *   string will cut short at that byte index.
-     * @param {boolean=} ignoreNul - If true, the function will not stop on a NUL character.
-     * @return {string}
-     */ var UTF8ToString = (ptr, maxBytesToRead, ignoreNul) => ptr ? UTF8ArrayToString((growMemViews(), 
+   * Given a pointer 'ptr' to a null-terminated UTF8-encoded string in the
+   * emscripten HEAP, returns a copy of that string as a Javascript String object.
+   *
+   * @param {number} ptr
+   * @param {number=} maxBytesToRead - An optional length that specifies the
+   *   maximum number of bytes to read. You can omit this parameter to scan the
+   *   string until the first 0 byte. If maxBytesToRead is passed, and the string
+   *   at [ptr, ptr+maxBytesToReadr[ contains a null byte in the middle, then the
+   *   string will cut short at that byte index.
+   * @param {boolean=} ignoreNul - If true, the function will not stop on a NUL character.
+   * @return {string}
+   */ var UTF8ToString = (ptr, maxBytesToRead, ignoreNul) => ptr ? UTF8ArrayToString((growMemViews(), 
 HEAPU8), ptr, maxBytesToRead, ignoreNul) : "";
 
 var ___assert_fail = (condition, filename, line, func) => abort(`Assertion failed: ${UTF8ToString(condition)}, at: ` + [ filename ? UTF8ToString(filename) : "unknown filename", line, func ? UTF8ToString(func) : "unknown function" ]);
@@ -1417,11 +1421,10 @@ var _emscripten_resize_heap = requestedSize => {
   return false;
 };
 
-/** @param {number=} timeout */ var safeSetTimeout = (func, timeout) => setTimeout(() => {
-  callUserCallback(func);
-}, timeout);
-
-var _emscripten_sleep = ms => Asyncify.handleSleep(wakeUp => safeSetTimeout(wakeUp, ms));
+var _emscripten_sleep = function(ms) {
+  let innerFunc = () => new Promise(resolve => setTimeout(resolve, ms));
+  return Asyncify.handleAsync(innerFunc);
+};
 
 _emscripten_sleep.isAsync = true;
 
@@ -1670,7 +1673,7 @@ var Asyncify = {
     var func = Asyncify.funcWrappers.get(original);
     // Once we have rewound and the stack we no longer need to artificially
     // keep the runtime alive.
-    return func();
+    return callUserCallback(func);
   },
   handleSleep(startAsync) {
     if (ABORT) return;
@@ -1753,9 +1756,9 @@ var Asyncify = {
     }
     return Asyncify.handleSleepReturnValue;
   },
-  handleAsync: startAsync => Asyncify.handleSleep(wakeUp => {
+  handleAsync: startAsync => Asyncify.handleSleep(async wakeUp => {
     // TODO: add error handling as a second param when handleSleep implements it.
-    startAsync().then(wakeUp);
+    wakeUp(await startAsync());
   })
 };
 
@@ -1843,11 +1846,11 @@ var stringToUTF8OnStack = str => {
 };
 
 /**
-     * @param {string|null=} returnType
-     * @param {Array=} argTypes
-     * @param {Array=} args
-     * @param {Object=} opts
-     */ var ccall = (ident, returnType, argTypes, args, opts) => {
+   * @param {string|null=} returnType
+   * @param {Array=} argTypes
+   * @param {Array=} args
+   * @param {Object=} opts
+   */ var ccall = (ident, returnType, argTypes, args, opts) => {
   // For fast lookup of conversion functions
   var toC = {
     "string": str => {
