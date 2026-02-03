@@ -1,6 +1,6 @@
 name: minisound
 description: A high-level real-time audio library for playback, generation and recording, focusing on ease of use and performance. Based on miniaudio.
-version: 3.0.0
+version: 3.0.1
 repository: https://github.com/DaniilAlpha/minisound/tree/release/minisound
 topics:
   - audio
